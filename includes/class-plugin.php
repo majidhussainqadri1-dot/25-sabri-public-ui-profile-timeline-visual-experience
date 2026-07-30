@@ -63,8 +63,9 @@ final class Plugin
 
         $native = new Native_Integration();
         $dependencies = new Dependency_Manager($native);
-        $registry = new Timeline_Registry();
-        (new System_Check($dependencies, $registry))->register();
+        $timeline_registry = new Timeline_Registry();
+        $section_registry = new Section_Registry();
+        (new System_Check($dependencies, $timeline_registry, $section_registry))->register();
 
         if (Safe_Mode::is_active()) {
             Safe_Mode::end();
@@ -97,24 +98,18 @@ final class Plugin
         $visibility = new Visibility_Policy($native);
         $profiles = new Profile_Repository($visibility, $native);
 
-        /**
-         * Native owners may register richer providers first. Any future File 21
-         * provider must retain the canonical `file-21` ID and therefore takes
-         * precedence over File 25's compatibility adapter.
-         *
-         * @param Timeline_Registry $registry
-         */
+        /** Native owners may register accepted timeline providers first. */
         try {
-            do_action('sabri_public_experience/register_timeline_providers', $registry);
+            do_action('sabri_public_experience/register_timeline_providers', $timeline_registry);
         } catch (\Throwable $exception) {
             do_action('sabri_public_experience/provider_registration_error', $exception);
         }
 
-        if ($registry->get('file-21') === null && $native->home_news_available()) {
+        if ($timeline_registry->get('file-21') === null && $native->home_news_available()) {
             try {
                 $file_21 = new File_21_Provider();
                 if ($file_21->is_available()) {
-                    $registry->register($file_21);
+                    $timeline_registry->register($file_21);
                 }
             } catch (\Throwable $exception) {
                 do_action('sabri_public_experience/provider_registration_error', $exception);
@@ -123,23 +118,32 @@ final class Plugin
 
         // Never bypass an active but incompatible File 21 installation with a
         // raw WordPress query. The fallback is allowed only while File 21 is absent.
-        if ($registry->get('file-21') === null && ! $native->home_news_available()) {
+        if ($timeline_registry->get('file-21') === null && ! $native->home_news_available()) {
             try {
-                $registry->register(new WordPress_Posts_Provider());
+                $timeline_registry->register(new WordPress_Posts_Provider());
             } catch (\Throwable $exception) {
                 do_action('sabri_public_experience/provider_registration_error', $exception);
             }
         }
 
-        $timeline = new Timeline_Service($registry);
-        $renderer = new Profile_Renderer($router, $profiles, $timeline);
+        // Optional profile sections are registered by their native owners. The
+        // registry accepts read projections only and cannot take native ownership.
+        try {
+            do_action('sabri_public_experience/register_section_providers', $section_registry);
+        } catch (\Throwable $exception) {
+            do_action('sabri_public_experience/section_provider_registration_error', $exception);
+        }
+
+        $timeline = new Timeline_Service($timeline_registry);
+        $sections = new Section_Service($section_registry);
+        $renderer = new Profile_Renderer($router, $profiles, $timeline, $sections);
 
         $router->register();
         (new Shell_Integration($router, $profiles, $native))->register();
         $renderer->register();
         (new Rest_Controller($profiles, $timeline))->register();
 
-        do_action('sabri_public_experience/booted', $this, $registry);
+        do_action('sabri_public_experience/booted', $this, $timeline_registry, $section_registry);
         Safe_Mode::end();
     }
 }
