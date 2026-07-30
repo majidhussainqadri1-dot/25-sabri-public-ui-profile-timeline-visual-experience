@@ -81,6 +81,9 @@ final class Profile_Repository
             ? $this->native->profile_value($user_id, 'city', (string) ($clinic['city'] ?? ''))
             : '';
         $contacts = $this->public_contacts($user_id, $clinic, $founder);
+        $available_sections = $this->available_sections($profile_class, $bio, $contacts, $clinic);
+        $all_labels = $this->section_labels($profile_class);
+        $section_labels = array_intersect_key($all_labels, array_flip($available_sections));
 
         $profile = [
             'slug' => sanitize_title((string) $user->user_nicename),
@@ -101,14 +104,15 @@ final class Profile_Repository
             'city' => $city,
             'contacts' => $contacts,
             'canonical_url' => $this->canonical_url($user),
-            'available_sections' => $this->available_sections($profile_class, $bio, $contacts, $clinic),
+            'available_sections' => $available_sections,
+            'section_labels' => $section_labels,
         ];
 
         /** @var array<string,mixed> $filtered */
         $filtered = (array) apply_filters('sabri_public_experience/public_profile_data', $profile, $user);
 
         // Presentation filters may change presentational text or media, but the
-        // authoritative class, badge, contacts, slug, and routing cannot be widened.
+        // authoritative class, badge, contacts, slug, sections, and routing cannot be widened.
         $profile['display_name'] = $this->plain_text((string) ($filtered['display_name'] ?? $profile['display_name']), 190);
         $profile['headline'] = $this->plain_text((string) ($filtered['headline'] ?? $profile['headline']), 300);
         $profile['bio'] = $this->safe_html((string) ($filtered['bio'] ?? $profile['bio']), 12000);
@@ -138,7 +142,7 @@ final class Profile_Repository
     /** @return array<string,string> */
     public function section_labels(string $profile_class): array
     {
-        $all = match ($profile_class) {
+        return match ($profile_class) {
             'founder' => [
                 'overview' => __('Overview', 'sabri-public-experience'),
                 'timeline' => __('Timeline', 'sabri-public-experience'),
@@ -163,8 +167,6 @@ final class Profile_Repository
                 'about' => __('About', 'sabri-public-experience'),
             ],
         };
-
-        return $all;
     }
 
     private function role_label(string $profile_class): string
@@ -274,8 +276,10 @@ final class Profile_Repository
 
     private function safe_html(string $value, int $limit): string
     {
-        $value = wp_kses_post($value);
+        // Bound input before sanitizing so truncation cannot leave an approved tag
+        // half-open in the returned profile fragment.
+        $value = function_exists('mb_substr') ? mb_substr($value, 0, $limit) : substr($value, 0, $limit);
 
-        return function_exists('mb_substr') ? mb_substr($value, 0, $limit) : substr($value, 0, $limit);
+        return wp_kses_post($value);
     }
 }
