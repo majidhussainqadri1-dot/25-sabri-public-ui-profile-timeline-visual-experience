@@ -54,7 +54,7 @@ final class Section_Service
             'items' => [],
             'provider_error_count' => 0,
             'truncated' => false,
-            'is_provider_section' => in_array($section, Section_Registry::approved_sections(), true),
+            'is_provider_section' => Section_Registry::section_is_approved($section),
         ];
         if ($user_id <= 0 || ! $empty['is_provider_section']) {
             return $empty;
@@ -83,7 +83,7 @@ final class Section_Service
                 ]);
             } catch (\Throwable $exception) {
                 $errors++;
-                do_action('sabri_public_experience/section_provider_error', $exception, $section);
+                self::emit_error($exception, $section);
                 continue;
             }
 
@@ -134,13 +134,16 @@ final class Section_Service
     {
         try {
             $maturity = self::key($provider->get_maturity_level());
-            if ($maturity === 'disabled' || $provider->owns_native_content()) {
+            if (! Section_Registry::maturity_is_approved($maturity) || $maturity === 'disabled') {
+                return false;
+            }
+            if ($provider->owns_native_content()) {
                 return false;
             }
 
             return $provider->is_available() && $provider->supports_profile($profile);
         } catch (\Throwable $exception) {
-            do_action('sabri_public_experience/section_provider_error', $exception, self::key($provider->get_section()));
+            self::emit_error($exception, self::key($provider->get_section()));
             return false;
         }
     }
@@ -158,6 +161,13 @@ final class Section_Service
         $date = self::text($candidate['published_at'] ?? '', 80);
 
         return hash('sha256', strtolower($url) . '|' . $type . '|' . $title . '|' . $date);
+    }
+
+    private static function emit_error(\Throwable $exception, string $section): void
+    {
+        if (function_exists('do_action')) {
+            do_action('sabri_public_experience/section_provider_error', $exception, self::key($section));
+        }
     }
 
     private static function label(string $section): string
