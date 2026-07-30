@@ -43,8 +43,6 @@ final class Profile_Renderer
             return;
         }
 
-        // Profile visibility and contacts may change at any moment. Until File 24
-        // provides an audited cache-partition contract, HTML remains no-store.
         if (! defined('DONOTCACHEPAGE')) {
             define('DONOTCACHEPAGE', true);
         }
@@ -73,17 +71,18 @@ final class Profile_Renderer
             ? $requested_section
             : 'overview';
         $canonical = $this->profiles->canonical_url($user, $canonical_section);
+        $requested_slug = sanitize_title((string) ($context['slug'] ?? ''));
+        $canonical_slug = sanitize_title((string) $user->user_nicename);
 
         if (
             ($requested_type === 'member' && in_array($canonical_type, ['founder', 'doctor'], true))
             || ($requested_type === 'doctor' && $canonical_type !== 'doctor')
+            || ($requested_type !== 'founder' && $requested_slug !== $canonical_slug)
         ) {
             wp_safe_redirect($canonical, 301);
             exit;
         }
 
-        // A syntactically valid but unavailable section must not become a dead,
-        // indexable tab or an empty duplicate of Overview.
         if (! in_array($requested_section, $available_sections, true)) {
             $this->set_not_found();
             return;
@@ -192,22 +191,26 @@ final class Profile_Renderer
             echo '<meta property="og:image" content="' . esc_url((string) $profile['avatar_url']) . '">' . "\n";
         }
 
-        $person = [
-            '@type' => 'Person',
+        $profile_class = sanitize_key((string) ($profile['class'] ?? 'member'));
+        $entity_type = in_array($profile_class, ['pharmacy', 'institution', 'publisher'], true)
+            ? 'Organization'
+            : 'Person';
+        $entity = [
+            '@type' => $entity_type,
             'name' => (string) ($profile['display_name'] ?? ''),
         ];
         if ($description !== '') {
-            $person['description'] = $description;
+            $entity['description'] = $description;
         }
         if (! empty($profile['avatar_url'])) {
-            $person['image'] = (string) $profile['avatar_url'];
+            $entity['image'] = (string) $profile['avatar_url'];
         }
 
         $schema = [
             '@context' => 'https://schema.org',
             '@type' => 'ProfilePage',
             'url' => (string) ($profile['canonical_url'] ?? ''),
-            'mainEntity' => $person,
+            'mainEntity' => $entity,
         ];
         echo '<script type="application/ld+json">'
             . wp_json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT)
