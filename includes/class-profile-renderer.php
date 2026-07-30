@@ -15,7 +15,8 @@ final class Profile_Renderer
     public function __construct(
         private Profile_Router $router,
         private Profile_Repository $profiles,
-        private Timeline_Service $timeline
+        private Timeline_Service $timeline,
+        private Section_Service $sections
     ) {
     }
 
@@ -56,16 +57,20 @@ final class Profile_Renderer
             return;
         }
 
-        $requested_type = $context['type'];
-        $canonical_type = (string) $profile['class'];
+        $provider_labels = $this->sections->available_for_profile((int) $user->ID, $profile);
         $available_sections = array_values(array_filter(
             (array) ($profile['available_sections'] ?? ['overview']),
             'is_string'
         ));
+        $available_sections = array_values(array_unique(array_merge($available_sections, array_keys($provider_labels))));
         if (! in_array('overview', $available_sections, true)) {
             array_unshift($available_sections, 'overview');
         }
+        $profile['available_sections'] = $available_sections;
+        $profile['section_labels'] = array_merge((array) ($profile['section_labels'] ?? []), $provider_labels);
 
+        $requested_type = $context['type'];
+        $canonical_type = (string) $profile['class'];
         $requested_section = sanitize_key((string) $context['section']) ?: 'overview';
         $canonical_section = in_array($requested_section, $available_sections, true)
             ? $requested_section
@@ -119,10 +124,23 @@ final class Profile_Renderer
             ]);
         }
 
+        $provider_section = [
+            'section' => '',
+            'label' => '',
+            'items' => [],
+            'provider_error_count' => 0,
+            'truncated' => false,
+            'is_provider_section' => false,
+        ];
+        if (isset($provider_labels[$requested_section])) {
+            $provider_section = $this->sections->get_section((int) $user->ID, $profile, $requested_section);
+        }
+
         $GLOBALS['sabri_public_experience_profile_user'] = $user;
         $GLOBALS['sabri_public_experience_profile'] = $profile;
         $GLOBALS['sabri_public_experience_context'] = $context;
         $GLOBALS['sabri_public_experience_timeline'] = $timeline;
+        $GLOBALS['sabri_public_experience_provider_section'] = $provider_section;
     }
 
     /** @param array<string,string> $parts @return array<string,string> */
