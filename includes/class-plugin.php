@@ -116,6 +116,7 @@ final class Plugin
         $renderer = new Profile_Renderer($router, $profiles, $timeline);
 
         $router->register();
+        (new Shell_Integration($router, $profiles, $native))->register();
         $renderer->register();
         (new Assets($router))->register();
         (new Rest_Controller($profiles, $timeline))->register();
