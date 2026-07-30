@@ -48,11 +48,19 @@ final class System_Check
     public function design_system_test(): array
     {
         $contract = Design_System::contract();
+        $cards = (array) ($contract['content_cards'] ?? []);
+        $components = (array) ($contract['components'] ?? []);
         $stylesheet = SABRI_PUBLIC_EXPERIENCE_DIR . 'assets/css/design-system.css';
         $valid = ($contract['file'] ?? null) === 25
             && ($contract['contract_version'] ?? '') === Design_System::CONTRACT_VERSION
             && ($contract['visual_system_owner'] ?? '') === 'file-25'
             && ($contract['global_shell_owner'] ?? '') === 'file-20'
+            && ($components['contract_version'] ?? '') === Components::CONTRACT_VERSION
+            && ($cards['contract_version'] ?? '') === Content_Cards::CONTRACT_VERSION
+            && ($cards['owns_native_data'] ?? true) === false
+            && is_callable('sabri_visual_experience_contract')
+            && is_callable('sabri_visual_experience_render_state')
+            && is_callable('sabri_visual_experience_render_card')
             && is_readable($stylesheet);
 
         if (! $valid) {
@@ -60,7 +68,7 @@ final class System_Check
                 'design_system',
                 __('The File 25 global design-system contract is incomplete', 'sabri-public-experience'),
                 'critical',
-                __('The canonical contract or local design-system stylesheet is missing or inconsistent.', 'sabri-public-experience')
+                __('The canonical contract, reusable renderer API, ownership boundary, or local stylesheet is missing or inconsistent.', 'sabri-public-experience')
             );
         }
 
@@ -68,7 +76,7 @@ final class System_Check
             'design_system',
             __('The File 25 global design-system contract is available', 'sabri-public-experience'),
             'good',
-            __('File 25 owns the visual system while File 20 remains the sole application-shell owner. Visual staging acceptance is still required.', 'sabri-public-experience')
+            __('File 25 owns the visual system and reusable cards while File 20 remains the sole application-shell owner. Visual staging acceptance is still required.', 'sabri-public-experience')
         );
     }
 
