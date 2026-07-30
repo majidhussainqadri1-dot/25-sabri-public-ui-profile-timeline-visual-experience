@@ -1,27 +1,30 @@
 === Sabri Unified Global Visual Experience and Design System ===
 Contributors: majidhussainqadri1-dot
-Tags: design-system, profiles, timeline, accessibility, responsive, public-ui, content-cards
+Tags: design-system, profiles, timeline, accessibility, responsive, public-ui, content-cards, profile-sections
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 0.5.0
+Stable tag: 0.6.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-File 25 global public design system, reusable components, public profiles, federated timelines, responsive refinement, and accessibility for the Sabri Social Homeopathy Platform.
+File 25 global public design system, reusable components, public profiles, federated timelines, optional profile sections, responsive refinement, and accessibility for the Sabri Social Homeopathy Platform.
 
 == Description ==
 
 This is the same existing File 25, canonically named “Sabri Unified Global Visual Experience and Design System,” with the subtitle “Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency.” No duplicate File 26 is created for this scope.
 
-The reviewed 0.5.0 source foundation includes:
+The reviewed 0.6.0 source foundation includes:
 
 * global semantic visual tokens that inherit File 20 without duplicating its application shell;
 * contrast-safe light, dark, system, and shell-degraded visual derivatives;
 * reusable containers, layouts, cards, buttons, badges, notices, form controls, tables, skeletons, and visual states;
+* escaped public state, notice, and content-card rendering helpers;
 * presentation-only cards for article, post, news, video, reel, book, PDF, Doctor, clinic, event, and Marketplace visual variants;
 * exact same-origin URL enforcement against protocol-relative, external, downgrade, credential-bearing, malformed, port-mismatched, and backslash destinations;
-* public card and state renderers with strict display allow lists and no native data ownership;
+* a bounded optional profile-section provider contract for Knowledge, Media, Reviews, Research, and Marketplace;
+* content-backed tab visibility so optional sections remain hidden until an accepted native provider returns approved public cards;
+* provider ID/version/section/maturity validation, runtime revalidation, native-ownership denial, exception isolation, deduplication, and bounded results;
 * nested non-destructive Safe Mode and truthful Site Health diagnostics;
 * canonical Founder, verified-Doctor, and permitted-Member profile routes;
 * File 00-authoritative public profile and contact projection;
@@ -33,9 +36,9 @@ The reviewed 0.5.0 source foundation includes:
 * File 20 shell integration without creating a second header, navigation, sidebar, drawer, or bottom navigation;
 * structured Founder and verified-Doctor profiles using privacy-safe public allow lists;
 * visible focus, RTL/LTR logical properties, reduced motion, forced colors, print handling, local/system fonts, and responsive components;
-* PHP 8.0/8.3 timeline, profile, File 21, design-system, URL-security, content-card, Safe Mode, package, and JavaScript CI.
+* PHP 8.0/8.3 timeline, profile, File 21, design-system, URL-security, content-card, optional-section, Safe Mode, package, and JavaScript CI.
 
-This release is not production-complete. Exact multi-plugin staging, File 24 runtime integration, native-module adoption, optional providers, visual-regression evidence, migration, rollback, real-user testing, performance, packaging, and deployment remain pending.
+This release is not production-complete. Exact multi-plugin staging, File 24 runtime integration, native Knowledge/Media/Reviews/Research/Marketplace adapters, visual-regression evidence, migration, rollback, real-user testing, performance, packaging, and deployment remain pending.
 
 == Installation ==
 
@@ -46,6 +49,14 @@ This release is not production-complete. Exact multi-plugin staging, File 24 run
 5. Review Site Health; source contracts and reusable components are not production-acceptance evidence.
 
 == Changelog ==
+
+= 0.6.0 =
+* Added a bounded read-only optional profile-section provider contract and registry.
+* Added content-backed Knowledge, Media, Reviews, Research, and Marketplace profile tabs.
+* Added strict provider ID, version, section, maturity, ownership, item-limit, deduplication, and exception-isolation rules.
+* Added a canonical optional-section template and Site Health diagnostics.
+* Completed the reusable component class map and added `sabri_visual_experience_render_notice()`.
+* Added PHP 8.0/8.3 optional-section provider tests and package rules.
 
 = 0.5.0 =
 * Added exact same-origin URL security for reusable visual actions and cards.
