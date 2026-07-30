@@ -19,11 +19,18 @@ final class Safe_Mode
     private const OPTION = 'sabri_public_experience_safe_mode';
     private const INCIDENT_OPTION = 'sabri_public_experience_safe_mode_incident';
 
+    private static bool $registered = false;
+    private static bool $shutdown_registered = false;
     private static bool $boundary_active = false;
     private static string $boundary = '';
 
     public static function register(): void
     {
+        if (self::$registered) {
+            return;
+        }
+        self::$registered = true;
+
         add_action('admin_notices', [self::class, 'notice']);
         add_action('network_admin_notices', [self::class, 'notice']);
         add_action('admin_post_spux_enable_safe_mode', [self::class, 'handle_enable']);
@@ -32,6 +39,10 @@ final class Safe_Mode
 
     public static function register_shutdown_guard(): void
     {
+        if (self::$shutdown_registered) {
+            return;
+        }
+        self::$shutdown_registered = true;
         register_shutdown_function([self::class, 'shutdown']);
     }
 
