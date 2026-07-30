@@ -60,9 +60,9 @@ final class Normalized_Timeline_Item implements JsonSerializable
             throw new InvalidArgumentException('Only public items may enter the public timeline projection.');
         }
 
-        $canonical_url = (string) $data['canonical_url'];
+        $canonical_url = trim((string) $data['canonical_url']);
         $scheme = strtolower((string) parse_url($canonical_url, PHP_URL_SCHEME));
-        if (filter_var($canonical_url, FILTER_VALIDATE_URL) === false || ! in_array($scheme, ['http', 'https'], true)) {
+        if (strlen($canonical_url) > 2048 || filter_var($canonical_url, FILTER_VALIDATE_URL) === false || ! in_array($scheme, ['http', 'https'], true)) {
             throw new InvalidArgumentException('Timeline canonical URL must be an HTTP or HTTPS URL.');
         }
 
@@ -81,9 +81,9 @@ final class Normalized_Timeline_Item implements JsonSerializable
 
         $this->data = [
             'provider_id'        => $provider_id,
-            'provider_version'   => trim((string) $data['provider_version']),
+            'provider_version'   => $this->limit(trim((string) $data['provider_version']), 64),
             'native_object_type' => $object_type,
-            'native_object_id'   => (string) $data['native_object_id'],
+            'native_object_id'   => $this->limit(trim((string) $data['native_object_id']), 191),
             'author_id'          => (int) $data['author_id'],
             'public_profile_id'  => (int) $data['public_profile_id'],
             'title'              => $this->limit(trim(strip_tags((string) $data['title'])), 300),
@@ -94,9 +94,9 @@ final class Normalized_Timeline_Item implements JsonSerializable
             'visibility_state'   => 'public',
             'native_status'      => $this->clean_key((string) $data['native_status']),
             'content_type'       => $content_type,
-            'topic'              => trim(strip_tags((string) ($data['topic'] ?? ''))),
-            'language'           => trim((string) ($data['language'] ?? 'en-US')),
-            'thumbnail_reference'=> $data['thumbnail_reference'] ?? null,
+            'topic'              => $this->limit(trim(strip_tags((string) ($data['topic'] ?? ''))), 300),
+            'language'           => $this->limit(trim((string) ($data['language'] ?? 'en-US')), 35),
+            'thumbnail_reference'=> $this->scalar_reference($data['thumbnail_reference'] ?? null),
             'media_type'         => $this->clean_key((string) ($data['media_type'] ?? 'none')),
             'verification_state' => $this->clean_key((string) ($data['verification_state'] ?? 'unverified')),
             'review_state'       => $this->clean_key((string) ($data['review_state'] ?? 'published')),
