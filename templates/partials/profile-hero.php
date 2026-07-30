@@ -1,11 +1,12 @@
 <?php
 /** @var array<string,mixed> $profile */
-$cover_style = ! empty($profile['cover_url'])
-    ? ' style="background-image:url(' . esc_url((string) $profile['cover_url']) . ')"'
-    : '';
 ?>
 <header class="spux-hero">
-    <div class="spux-hero__cover"<?php echo $cover_style; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>></div>
+    <div class="spux-hero__cover" aria-hidden="true">
+        <?php if (! empty($profile['cover_url'])) : ?>
+            <img src="<?php echo esc_url((string) $profile['cover_url']); ?>" alt="" width="1600" height="480" fetchpriority="high">
+        <?php endif; ?>
+    </div>
     <div class="spux-hero__body">
         <img class="spux-avatar" src="<?php echo esc_url((string) $profile['avatar_url']); ?>" alt="<?php echo esc_attr(sprintf(__('%s profile photograph', 'sabri-public-experience'), (string) $profile['display_name'])); ?>" width="160" height="160">
         <div class="spux-identity">
