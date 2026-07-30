@@ -43,9 +43,14 @@
 .spux-hero__cover {
     background: #fff3e8;
     background: linear-gradient(135deg, color-mix(in srgb, var(--spux-primary) 28%, white), var(--spux-surface));
-    background-position: center;
-    background-size: cover;
     block-size: clamp(9rem, 25vw, 18rem);
+    overflow: hidden;
+}
+
+.spux-hero__cover img {
+    block-size: 100%;
+    inline-size: 100%;
+    object-fit: cover;
 }
 
 .spux-hero__body {
