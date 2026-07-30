@@ -25,6 +25,12 @@ final class Timeline_Registry
         if (isset($this->providers[$id])) {
             throw new InvalidArgumentException(sprintf('Timeline provider already registered: %s', $id));
         }
+        $maturity = $provider->get_maturity_level();
+        $allowed = ['detected', 'read-only', 'staging-accepted', 'production-accepted', 'degraded', 'disabled'];
+        if (! in_array($maturity, $allowed, true)) {
+            throw new InvalidArgumentException(sprintf('Invalid timeline provider maturity: %s', $maturity));
+        }
+
         $this->providers[$id] = $provider;
     }
 
