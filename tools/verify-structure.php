@@ -14,6 +14,8 @@ $required = [
     'includes/class-components.php',
     'includes/class-content-cards.php',
     'includes/class-design-system.php',
+    'includes/class-section-registry.php',
+    'includes/class-section-service.php',
     'includes/class-native-integration.php',
     'includes/class-visibility-policy.php',
     'includes/class-profile-data.php',
@@ -24,10 +26,12 @@ $required = [
     'includes/class-timeline-registry.php',
     'includes/class-timeline-service.php',
     'includes/contracts/interface-timeline-provider.php',
+    'includes/contracts/interface-profile-section-provider.php',
     'includes/providers/class-file-21-provider.php',
     'templates/public-profile.php',
     'templates/partials/profile-hero.php',
     'templates/partials/timeline.php',
+    'templates/partials/provider-section.php',
     'templates/partials/founder-overview.php',
     'templates/partials/doctor-overview.php',
     'templates/partials/books-research.php',
@@ -41,6 +45,7 @@ $required = [
     'tests/file21-provider.php',
     'tests/design-system.php',
     'tests/content-cards.php',
+    'tests/section-providers.php',
     'tests/safe-mode.php',
     'SECURITY.md',
     'PRIVACY.md',
@@ -49,6 +54,8 @@ $required = [
     'docs/DECISION-LOG.md',
     'docs/DESIGN-SYSTEM-CONTRACT.md',
     'docs/CONTENT-CARD-CONTRACT.md',
+    'docs/OPTIONAL-PROFILE-SECTIONS-CONTRACT.md',
+    'docs/FOURTH-REVIEW-AND-CORRECTION-2026-07-31.md',
     'docs/THIRD-REVIEW-AND-CORRECTION-2026-07-30.md',
     'docs/SECOND-REVIEW-AND-CORRECTION-2026-07-30.md',
     'docs/REVIEW-AND-CORRECTION-2026-07-30.md',
@@ -136,6 +143,9 @@ foreach ([
     'class-components.php',
     'class-content-cards.php',
     'class-design-system.php',
+    'interface-profile-section-provider.php',
+    'class-section-registry.php',
+    'class-section-service.php',
     'class-profile-data.php',
     'class-shell-integration.php',
     'class-file-21-provider.php',
@@ -147,6 +157,7 @@ foreach ([
 foreach ([
     'sabri_visual_experience_contract',
     'sabri_visual_experience_render_state',
+    'sabri_visual_experience_render_notice',
     'sabri_visual_experience_render_card',
 ] as $function) {
     if (! str_contains($main, $function)) {
@@ -155,7 +166,16 @@ foreach ([
 }
 
 $plugin = file_get_contents($root . '/includes/class-plugin.php') ?: '';
-foreach (['home_news_available', 'new Shell_Integration', 'new File_21_Provider', 'new Design_System', 'new Assets'] as $marker) {
+foreach ([
+    'home_news_available',
+    'new Shell_Integration',
+    'new File_21_Provider',
+    'new Design_System',
+    'new Assets',
+    'new Section_Registry',
+    'new Section_Service',
+    'register_section_providers',
+] as $marker) {
     if (! str_contains($plugin, $marker)) {
         $errors[] = 'Plugin bootstrap boundary missing: ' . $marker;
     }
@@ -170,7 +190,14 @@ if (! str_contains($shell, '$base[\'owns_global_shell\'] = false')) {
 }
 
 $design_system = file_get_contents($root . '/includes/class-design-system.php') ?: '';
-foreach (['reusable-content-cards', 'Content_Cards::contract', 'creates_file_26', 'shell_is_available'] as $marker) {
+foreach ([
+    'reusable-content-cards',
+    'optional-profile-sections',
+    'Content_Cards::contract',
+    'Section_Registry::approved_sections',
+    'creates_file_26',
+    'shell_is_available',
+] as $marker) {
     if (! str_contains($design_system, $marker)) {
         $errors[] = 'Design-system contract marker missing: ' . $marker;
     }
@@ -191,6 +218,23 @@ foreach (['owns_native_data', 'same_site_destinations', 'Public_URL::sanitize_sa
 }
 if (preg_match('/update_|insert_|delete_|wp_insert_post|wp_update_post|wp_delete_post/i', $content_cards)) {
     $errors[] = 'Content-card renderer must remain presentation-only.';
+}
+
+$section_registry = file_get_contents($root . '/includes/class-section-registry.php') ?: '';
+foreach (['MAX_PROVIDERS', 'maturity_is_approved', 'section_is_approved', 'owns_native_content'] as $marker) {
+    if (! str_contains($section_registry, $marker)) {
+        $errors[] = 'Optional section registry invariant missing: ' . $marker;
+    }
+}
+
+$section_service = file_get_contents($root . '/includes/class-section-service.php') ?: '';
+foreach (['MAX_ITEMS_PER_PROVIDER', 'MAX_ITEMS_PER_SECTION', 'Content_Cards::render', 'provider_error_count'] as $marker) {
+    if (! str_contains($section_service, $marker)) {
+        $errors[] = 'Optional section service invariant missing: ' . $marker;
+    }
+}
+if (preg_match('/update_|insert_|delete_|wp_insert_post|wp_update_post|wp_delete_post/i', $section_service)) {
+    $errors[] = 'Optional section service must remain read-only.';
 }
 
 $timeline = file_get_contents($root . '/includes/class-timeline-service.php') ?: '';
