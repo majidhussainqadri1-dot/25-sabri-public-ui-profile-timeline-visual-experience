@@ -6,44 +6,83 @@ $root = dirname(__DIR__);
 $errors = [];
 $required = [
     'includes/providers/class-file-06-knowledge-provider.php',
+    'includes/providers/class-file-10-video-media-provider.php',
+    'includes/providers/class-file-11-reels-media-provider.php',
+    'includes/providers/class-file-12-pdf-media-provider.php',
     'tests/file06-knowledge-provider.php',
+    'tests/file10-12-media-providers.php',
     'assets/css/design-system-components.css',
     'docs/OPTIONAL-PROFILE-SECTIONS-CONTRACT.md',
     'docs/FOURTH-REVIEW-AND-CORRECTION-2026-07-31.md',
 ];
 foreach ($required as $path) {
     if (! is_file($root . '/' . $path)) {
-        $errors[] = 'Missing File 06/component completion artifact: ' . $path;
+        $errors[] = 'Missing native-adapter/component artifact: ' . $path;
     }
 }
 
 $main = file_get_contents($root . '/sabri-public-experience.php') ?: '';
-if (! str_contains($main, 'class-file-06-knowledge-provider.php')) {
-    $errors[] = 'File 06 provider is not loaded by the plugin bootstrap.';
+foreach ([
+    'class-file-06-knowledge-provider.php',
+    'class-file-10-video-media-provider.php',
+    'class-file-11-reels-media-provider.php',
+    'class-file-12-pdf-media-provider.php',
+] as $marker) {
+    if (! str_contains($main, $marker)) {
+        $errors[] = 'Native adapter is not loaded by the plugin bootstrap: ' . $marker;
+    }
 }
 if (! str_contains($main, 'sabri_visual_experience_render_notice')) {
     $errors[] = 'Canonical notice helper is missing.';
 }
 
 $plugin = file_get_contents($root . '/includes/class-plugin.php') ?: '';
-foreach (['File_06_Knowledge_Provider', "get('file-06-knowledge')", 'register_section_providers'] as $marker) {
+foreach ([
+    'File_06_Knowledge_Provider',
+    'File_10_Video_Media_Provider',
+    'File_11_Reels_Media_Provider',
+    'File_12_Pdf_Media_Provider',
+    'register_section_providers',
+] as $marker) {
     if (! str_contains($plugin, $marker)) {
-        $errors[] = 'File 06 provider registration marker missing: ' . $marker;
+        $errors[] = 'Native provider registration marker missing: ' . $marker;
     }
 }
 
-$provider = file_get_contents($root . '/includes/providers/class-file-06-knowledge-provider.php') ?: '';
-foreach (['HE_VERSION', 'HE_Content::TYPE', "'he_entry'", "'publish'", "'author' => \$user_id", "'has_password' => false", "return 'read-only'", 'owns_native_content'] as $marker) {
-    if (! str_contains($provider, $marker)) {
-        $errors[] = 'File 06 adapter boundary missing: ' . $marker;
+$provider_requirements = [
+    'class-file-06-knowledge-provider.php' => ['HE_VERSION', 'HE_Content::TYPE', "'he_entry'", "'publish'", "'author' => \$user_id", "'has_password' => false", "return 'read-only'", 'owns_native_content'],
+    'class-file-10-video-media-provider.php' => ['SVW_VERSION', 'SVW_Helpers::TYPE', "'svw_video'", "'publish'", "'author' => \$user_id", "'has_password' => false", "return 'read-only'", "'is_reel'"],
+    'class-file-11-reels-media-provider.php' => ['SRL_VERSION', 'SVW_VERSION', 'SVW_Helpers::TYPE', "'svw_video'", "'meta_key' => '_svw_is_reel'", "'meta_value' => '1'", '60', '600', "return 'read-only'"],
+    'class-file-12-pdf-media-provider.php' => ['SPL_VERSION', 'SPL_Helpers::TYPE', "'spl_document'", "'publish'", "'author' => \$user_id", "'has_password' => false", "return 'read-only'", 'owns_native_content'],
+];
+foreach ($provider_requirements as $file => $markers) {
+    $provider = file_get_contents($root . '/includes/providers/' . $file) ?: '';
+    foreach ($markers as $marker) {
+        if (! str_contains($provider, $marker)) {
+            $errors[] = $file . ' boundary missing: ' . $marker;
+        }
+    }
+    if (preg_match('/update_|insert_|delete_|wp_insert_post|wp_update_post|wp_delete_post|set_post_thumbnail|media_handle_upload/i', $provider)) {
+        $errors[] = $file . ' must remain strictly read-only.';
+    }
+    if (! str_contains($provider, "version_compare(\$version, self::MINIMUM_VERSION, '<')")
+        || ! str_contains($provider, "version_compare(\$version, self::MAXIMUM_VERSION, '>=')")) {
+        $errors[] = $file . ' reviewed version range is not enforced.';
     }
 }
-if (preg_match('/update_|insert_|delete_|wp_insert_post|wp_update_post|wp_delete_post|set_post_thumbnail/i', $provider)) {
-    $errors[] = 'File 06 provider must remain strictly read-only.';
+
+$registry = file_get_contents($root . '/includes/class-section-registry.php') ?: '';
+foreach (["'maturity' => \$maturity", "'owns_native_content' => false", "hash_equals(\$registered['maturity'], \$maturity)"] as $marker) {
+    if (! str_contains($registry, $marker)) {
+        $errors[] = 'Complete provider metadata immutability marker missing: ' . $marker;
+    }
 }
-if (! str_contains($provider, "version_compare(\$version, self::MINIMUM_VERSION, '<')")
-    || ! str_contains($provider, "version_compare(\$version, self::MAXIMUM_VERSION, '>=')")) {
-    $errors[] = 'File 06 reviewed version range is not enforced.';
+
+$acceptance = file_get_contents($root . '/includes/class-visual-acceptance.php') ?: '';
+foreach (['artifact_ref', 'sha256', 'recorded_at', 'reviewer', 'staging_environment', 'founder_signoff', 'media-section'] as $marker) {
+    if (! str_contains($acceptance, $marker)) {
+        $errors[] = 'Strict visual evidence marker missing: ' . $marker;
+    }
 }
 
 $cards = file_get_contents($root . '/includes/class-content-cards.php') ?: '';
@@ -75,4 +114,4 @@ if ($errors !== []) {
     exit(1);
 }
 
-echo "PASS: File 06 adapter and component completion package boundaries\n";
+echo "PASS: native knowledge/media adapters and component package boundaries\n";
