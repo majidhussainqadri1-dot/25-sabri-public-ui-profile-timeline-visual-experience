@@ -73,7 +73,7 @@ final class File_06_Knowledge_Provider implements Profile_Section_Provider
 
         $class = self::key((string) ($profile['class'] ?? ''));
 
-        return $class !== '' && $class !== 'patient';
+        return in_array($class, ['founder', 'doctor'], true);
     }
 
     /**
@@ -147,13 +147,7 @@ final class File_06_Knowledge_Provider implements Profile_Section_Provider
                 ? (string) (get_the_post_thumbnail_url($post_id, 'medium_large') ?: '')
                 : '';
 
-            $meta = [];
-            if ($knowledge_type !== '') {
-                $meta[] = $knowledge_type;
-            }
-            if ($body_system !== '') {
-                $meta[] = $body_system;
-            }
+            $meta = $body_system !== '' ? [$body_system] : [];
 
             $items[] = [
                 'type' => 'article',
