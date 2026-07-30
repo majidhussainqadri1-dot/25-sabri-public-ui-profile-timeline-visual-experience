@@ -24,20 +24,52 @@ final class System_Check
     /** @param array<string,mixed> $tests @return array<string,mixed> */
     public function site_health_tests(array $tests): array
     {
+        $tests['direct']['sabri_visual_design_system'] = [
+            'label' => __('File 25 global design system', 'sabri-public-experience'),
+            'test' => [$this, 'design_system_test'],
+        ];
         $tests['direct']['sabri_public_experience_dependencies'] = [
-            'label' => __('Sabri Public Experience dependencies', 'sabri-public-experience'),
+            'label' => __('File 25 profile dependencies', 'sabri-public-experience'),
             'test' => [$this, 'dependency_test'],
         ];
         $tests['direct']['sabri_public_experience_providers'] = [
-            'label' => __('Sabri Public Experience timeline providers', 'sabri-public-experience'),
+            'label' => __('File 25 timeline providers', 'sabri-public-experience'),
             'test' => [$this, 'provider_test'],
         ];
         $tests['direct']['sabri_public_experience_safe_mode'] = [
-            'label' => __('Sabri Public Experience Safe Mode', 'sabri-public-experience'),
+            'label' => __('File 25 Safe Mode', 'sabri-public-experience'),
             'test' => [$this, 'safe_mode_test'],
         ];
 
         return $tests;
+    }
+
+    /** @return array<string,mixed> */
+    public function design_system_test(): array
+    {
+        $contract = Design_System::contract();
+        $stylesheet = SABRI_PUBLIC_EXPERIENCE_DIR . 'assets/css/design-system.css';
+        $valid = ($contract['file'] ?? null) === 25
+            && ($contract['contract_version'] ?? '') === Design_System::CONTRACT_VERSION
+            && ($contract['visual_system_owner'] ?? '') === 'file-25'
+            && ($contract['global_shell_owner'] ?? '') === 'file-20'
+            && is_readable($stylesheet);
+
+        if (! $valid) {
+            return $this->result(
+                'design_system',
+                __('The File 25 global design-system contract is incomplete', 'sabri-public-experience'),
+                'critical',
+                __('The canonical contract or local design-system stylesheet is missing or inconsistent.', 'sabri-public-experience')
+            );
+        }
+
+        return $this->result(
+            'design_system',
+            __('The File 25 global design-system contract is available', 'sabri-public-experience'),
+            'good',
+            __('File 25 owns the visual system while File 20 remains the sole application-shell owner. Visual staging acceptance is still required.', 'sabri-public-experience')
+        );
     }
 
     /** @return array<string,mixed> */
@@ -47,9 +79,9 @@ final class System_Check
         $gaps = $this->dependencies->get_production_gaps();
         if ($blockers !== []) {
             $status = 'critical';
-            $label = __('Required File 25 runtime dependencies are missing', 'sabri-public-experience');
+            $label = __('Required File 25 profile dependencies are missing', 'sabri-public-experience');
             $description = sprintf(
-                __('Missing required dependencies: %s', 'sabri-public-experience'),
+                __('Profile and timeline features are fail-closed. Missing dependencies: %s', 'sabri-public-experience'),
                 implode(', ', $blockers)
             );
         } elseif ($gaps !== []) {
@@ -102,7 +134,7 @@ final class System_Check
                 __('The production File 21 timeline provider is not accepted', 'sabri-public-experience'),
                 'recommended',
                 sprintf(
-                    __('Available read providers: %d. The WordPress fallback is not production evidence.', 'sabri-public-experience'),
+                    __('Available read providers: %d. Read-only source integration is not production evidence.', 'sabri-public-experience'),
                     count($available)
                 )
             );
@@ -124,7 +156,7 @@ final class System_Check
                 'safe_mode',
                 __('File 25 Safe Mode is active', 'sabri-public-experience'),
                 'critical',
-                __('Public profile overrides are disabled. Review the recorded incident and use the authenticated Retry File 25 control.', 'sabri-public-experience')
+                __('File 25 public visual overrides are disabled. Review the incident and use the authenticated Retry File 25 control.', 'sabri-public-experience')
             );
         }
 
