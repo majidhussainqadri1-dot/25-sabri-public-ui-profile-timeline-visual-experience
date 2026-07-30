@@ -3,7 +3,7 @@
  * Plugin Name: Sabri Unified Global Visual Experience and Design System
  * Plugin URI:  https://sabrihomeopathy.com/
  * Description: File 25 global design system, public UI, profile timeline, responsive refinement, accessibility, visual consistency, and reusable visual components for the Sabri Social Homeopathy Platform.
- * Version:     0.5.0
+ * Version:     0.6.0
  * Author:      Dr. Allamah Majid Hussain Sabri Muhaddith Mursheed
  * Text Domain: sabri-public-experience
  * Requires at least: 6.5
@@ -61,7 +61,7 @@ if (function_exists('sabri_public_experience_bootstrap')) {
     return;
 }
 
-define('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.5.0');
+define('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.6.0');
 define('SABRI_PUBLIC_EXPERIENCE_SCHEMA_VERSION', '1');
 define('SABRI_PUBLIC_EXPERIENCE_FILE', __FILE__);
 define('SABRI_PUBLIC_EXPERIENCE_DIR', plugin_dir_path(__FILE__));
@@ -75,6 +75,7 @@ $spux_files = [
     'includes/class-content-cards.php',
     'includes/class-design-system.php',
     'includes/contracts/interface-timeline-provider.php',
+    'includes/contracts/interface-profile-section-provider.php',
     'includes/class-normalized-timeline-item.php',
     'includes/class-native-integration.php',
     'includes/class-dependency-manager.php',
@@ -82,6 +83,8 @@ $spux_files = [
     'includes/class-profile-data.php',
     'includes/class-timeline-registry.php',
     'includes/class-timeline-service.php',
+    'includes/class-section-registry.php',
+    'includes/class-section-service.php',
     'includes/providers/class-file-21-provider.php',
     'includes/providers/class-wordpress-posts-provider.php',
     'includes/class-profile-repository.php',
@@ -123,6 +126,14 @@ if (! function_exists('sabri_visual_experience_render_state')) {
     function sabri_visual_experience_render_state(array $args = []): string
     {
         return \Sabri\PublicExperience\Components::render_state($args);
+    }
+}
+
+if (! function_exists('sabri_visual_experience_render_notice')) {
+    /** @param array<string,mixed> $args */
+    function sabri_visual_experience_render_notice(array $args = []): string
+    {
+        return \Sabri\PublicExperience\Components::render_notice($args);
     }
 }
 
