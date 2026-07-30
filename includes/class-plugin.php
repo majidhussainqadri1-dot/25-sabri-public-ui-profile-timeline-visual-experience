@@ -30,11 +30,11 @@ final class Plugin
         global $wp_version;
         if (version_compare(PHP_VERSION, Dependency_Manager::MINIMUM_PHP, '<')) {
             deactivate_plugins(plugin_basename(SABRI_PUBLIC_EXPERIENCE_FILE));
-            wp_die(esc_html__('Sabri Public Experience requires PHP 8.0 or newer.', 'sabri-public-experience'));
+            wp_die(esc_html__('Sabri Unified Global Visual Experience requires PHP 8.0 or newer.', 'sabri-public-experience'));
         }
         if (version_compare((string) $wp_version, Dependency_Manager::MINIMUM_WORDPRESS, '<')) {
             deactivate_plugins(plugin_basename(SABRI_PUBLIC_EXPERIENCE_FILE));
-            wp_die(esc_html__('Sabri Public Experience requires WordPress 6.5 or newer.', 'sabri-public-experience'));
+            wp_die(esc_html__('Sabri Unified Global Visual Experience requires WordPress 6.5 or newer.', 'sabri-public-experience'));
         }
 
         add_option('sabri_public_experience_schema_version', SABRI_PUBLIC_EXPERIENCE_SCHEMA_VERSION, '', false);
@@ -66,6 +66,18 @@ final class Plugin
         $registry = new Timeline_Registry();
         (new System_Check($dependencies, $registry))->register();
 
+        if (Safe_Mode::is_active()) {
+            Safe_Mode::end();
+            return;
+        }
+
+        // The global design system has no identity dependency and may continue
+        // operating while profile-specific integrations fail closed.
+        $router = new Profile_Router();
+        (new Design_System())->register();
+        (new Assets($router))->register();
+        do_action('sabri_visual_experience/design_system_booted', Design_System::contract());
+
         if (! $dependencies->runtime_is_supported()) {
             add_action('admin_notices', static function () use ($dependencies): void {
                 if (! current_user_can('activate_plugins')) {
@@ -73,7 +85,7 @@ final class Plugin
                 }
                 echo '<div class="notice notice-error"><p>';
                 echo esc_html(sprintf(
-                    __('Sabri Public Experience is in fail-closed mode. Missing required dependencies: %s', 'sabri-public-experience'),
+                    __('File 25 profile and timeline features are fail-closed. Missing required dependencies: %s', 'sabri-public-experience'),
                     implode(', ', $dependencies->get_blockers())
                 ));
                 echo '</p></div>';
@@ -82,14 +94,8 @@ final class Plugin
             return;
         }
 
-        if (Safe_Mode::is_active()) {
-            Safe_Mode::end();
-            return;
-        }
-
         $visibility = new Visibility_Policy($native);
         $profiles = new Profile_Repository($visibility, $native);
-        $router = new Profile_Router();
 
         /**
          * Native owners may register richer providers first. Any future File 21
@@ -131,7 +137,6 @@ final class Plugin
         $router->register();
         (new Shell_Integration($router, $profiles, $native))->register();
         $renderer->register();
-        (new Assets($router))->register();
         (new Rest_Controller($profiles, $timeline))->register();
 
         do_action('sabri_public_experience/booted', $this, $registry);
