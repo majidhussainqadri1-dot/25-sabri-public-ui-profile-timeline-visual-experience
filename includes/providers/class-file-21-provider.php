@@ -98,7 +98,9 @@ final class File_21_Provider implements Timeline_Provider
             /** @var array<string,mixed> $result */
             $result = \Sabri\HomeNewsFeed\ProfileTimeline::query($author_id, [
                 'page' => $native_page,
-                'per_page' => min(self::NATIVE_PAGE_SIZE, $candidate_limit - count($items)),
+                // File 21 calculates its offset from page * per_page. Keep this
+                // size stable across every native page, then trim locally.
+                'per_page' => self::NATIVE_PAGE_SIZE,
             ]);
 
             if (($result['status'] ?? '') !== 'ok') {
