@@ -48,6 +48,9 @@ jobs:
       - name: Global design system contract
         run: php tests/design-system.php
 
+      - name: Reusable content card and URL security contract
+        run: php tests/content-cards.php
+
       - name: Nested Safe Mode contract
         run: php tests/safe-mode.php
 
