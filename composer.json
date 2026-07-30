@@ -14,6 +14,7 @@
       "@php tests/design-system.php",
       "@php tests/content-cards.php",
       "@php tests/section-providers.php",
+      "@php tests/section-provider-metadata.php",
       "@php tests/file06-knowledge-provider.php",
       "@php tests/safe-mode.php",
       "@php tools/verify-structure.php",
