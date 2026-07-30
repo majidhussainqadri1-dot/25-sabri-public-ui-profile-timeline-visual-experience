@@ -20,8 +20,9 @@ $context = (array) ($GLOBALS['sabri_public_experience_context'] ?? []);
 $timeline = (array) ($GLOBALS['sabri_public_experience_timeline'] ?? []);
 $section = sanitize_key((string) ($context['section'] ?? 'overview')) ?: 'overview';
 $sections = (array) ($profile['section_labels'] ?? []);
+$profile_class = sanitize_key((string) ($profile['class'] ?? 'member'));
 ?>
-<main id="sabri-main-content" class="spux-profile" tabindex="-1">
+<main id="sabri-main-content" class="spux-profile" tabindex="-1" data-spux-profile-class="<?php echo esc_attr($profile_class); ?>" data-spux-section="<?php echo esc_attr($section); ?>">
     <div class="spux-container">
         <?php if (is_404() || $profile === []) : ?>
             <section class="spux-state spux-state--error" role="alert">
@@ -38,9 +39,9 @@ $sections = (array) ($profile['section_labels'] ?? []);
                         <?php
                         $slug = sanitize_key((string) $slug);
                         $active = $section === $slug;
-                        $base = ($profile['class'] ?? '') === 'founder'
+                        $base = $profile_class === 'founder'
                             ? home_url('/founder/')
-                            : (($profile['class'] ?? '') === 'doctor'
+                            : ($profile_class === 'doctor'
                                 ? home_url('/doctors/' . rawurlencode((string) $profile['slug']) . '/')
                                 : home_url('/profile/' . rawurlencode((string) $profile['slug']) . '/'));
                         $url = $slug === 'overview' ? $base : trailingslashit($base . $slug);
@@ -53,69 +54,40 @@ $sections = (array) ($profile['section_labels'] ?? []);
             <?php endif; ?>
 
             <div class="spux-layout">
-                <section class="spux-main" aria-labelledby="spux-section-title">
+                <section class="spux-main">
                     <?php if ($section === 'timeline') : ?>
                         <?php require SABRI_PUBLIC_EXPERIENCE_DIR . 'templates/partials/timeline.php'; ?>
+                    <?php elseif ($profile_class === 'founder' && $section === 'overview') : ?>
+                        <?php require SABRI_PUBLIC_EXPERIENCE_DIR . 'templates/partials/founder-overview.php'; ?>
+                    <?php elseif ($profile_class === 'doctor' && $section === 'overview') : ?>
+                        <?php require SABRI_PUBLIC_EXPERIENCE_DIR . 'templates/partials/doctor-overview.php'; ?>
+                    <?php elseif ($profile_class === 'founder' && $section === 'books-research') : ?>
+                        <?php require SABRI_PUBLIC_EXPERIENCE_DIR . 'templates/partials/books-research.php'; ?>
                     <?php elseif (in_array($section, ['clinic', 'clinic-contact'], true)) : ?>
-                        <div class="spux-card spux-prose">
-                            <h2 id="spux-section-title"><?php echo esc_html((string) ($sections[$section] ?? __('Clinic and Contact', 'sabri-public-experience'))); ?></h2>
-                            <?php if (! empty($profile['contacts'])) : ?>
-                                <p><?php esc_html_e('Use the approved professional contact methods below.', 'sabri-public-experience'); ?></p>
-                                <div class="spux-actions">
-                                    <?php foreach ((array) $profile['contacts'] as $type => $value) : ?>
-                                        <?php
-                                        $digits = preg_replace('/[^0-9+]/', '', (string) $value) ?? '';
-                                        $href = $type === 'whatsapp'
-                                            ? 'https://wa.me/' . preg_replace('/[^0-9]/', '', $digits)
-                                            : 'tel:' . $digits;
-                                        $label = $type === 'whatsapp'
-                                            ? __('WhatsApp', 'sabri-public-experience')
-                                            : __('Call', 'sabri-public-experience');
-                                        if ($digits === '' || $href === 'tel:' || $href === 'https://wa.me/') {
-                                            continue;
-                                        }
-                                        ?>
-                                        <a class="spux-button spux-button--secondary" href="<?php echo esc_url($href); ?>" rel="noopener noreferrer">
-                                            <?php echo esc_html($label); ?>
-                                        </a>
-                                    <?php endforeach; ?>
-                                </div>
-                            <?php else : ?>
-                                <div class="spux-state spux-state--empty" role="status">
-                                    <p><?php esc_html_e('No approved public contact method is currently available.', 'sabri-public-experience'); ?></p>
-                                </div>
-                            <?php endif; ?>
-                        </div>
+                        <?php require SABRI_PUBLIC_EXPERIENCE_DIR . 'templates/partials/clinic-contact.php'; ?>
                     <?php elseif ($section === 'about') : ?>
-                        <div class="spux-card spux-prose">
-                            <h2 id="spux-section-title"><?php esc_html_e('About', 'sabri-public-experience'); ?></h2>
-                            <?php if (! empty($profile['bio'])) : ?>
-                                <div><?php echo wp_kses_post(wpautop((string) $profile['bio'])); ?></div>
-                            <?php else : ?>
-                                <div class="spux-state spux-state--empty" role="status">
-                                    <p><?php esc_html_e('No public biography is available yet.', 'sabri-public-experience'); ?></p>
-                                </div>
-                            <?php endif; ?>
-                        </div>
+                        <?php require SABRI_PUBLIC_EXPERIENCE_DIR . 'templates/partials/about.php'; ?>
                     <?php else : ?>
-                        <div class="spux-card spux-prose">
-                            <h2 id="spux-section-title"><?php esc_html_e('Overview', 'sabri-public-experience'); ?></h2>
-                            <?php if (! empty($profile['headline'])) : ?>
-                                <p class="spux-overview-headline"><?php echo esc_html((string) $profile['headline']); ?></p>
-                            <?php endif; ?>
-                            <?php if (! empty($profile['bio'])) : ?>
-                                <p><?php echo esc_html(wp_trim_words((string) $profile['bio'], 55)); ?></p>
-                                <?php if (isset($sections['about'])) : ?>
-                                    <a class="spux-read-more" href="<?php echo esc_url(trailingslashit((string) $profile['canonical_url'] . 'about')); ?>">
-                                        <?php esc_html_e('Read full biography', 'sabri-public-experience'); ?>
-                                    </a>
+                        <section class="spux-section-stack" aria-labelledby="spux-section-title">
+                            <div class="spux-card spux-prose">
+                                <h2 id="spux-section-title"><?php esc_html_e('Overview', 'sabri-public-experience'); ?></h2>
+                                <?php if (! empty($profile['headline'])) : ?>
+                                    <p class="spux-overview-headline"><?php echo esc_html((string) $profile['headline']); ?></p>
                                 <?php endif; ?>
-                            <?php elseif (empty($profile['headline'])) : ?>
-                                <div class="spux-state spux-state--empty" role="status">
-                                    <p><?php esc_html_e('No public information is available yet.', 'sabri-public-experience'); ?></p>
-                                </div>
-                            <?php endif; ?>
-                        </div>
+                                <?php if (! empty($profile['bio'])) : ?>
+                                    <p><?php echo esc_html(wp_trim_words((string) $profile['bio'], 55)); ?></p>
+                                    <?php if (isset($sections['about'])) : ?>
+                                        <a class="spux-text-link" href="<?php echo esc_url(trailingslashit((string) $profile['canonical_url'] . 'about')); ?>">
+                                            <?php esc_html_e('Read full biography', 'sabri-public-experience'); ?>
+                                        </a>
+                                    <?php endif; ?>
+                                <?php elseif (empty($profile['headline'])) : ?>
+                                    <div class="spux-state spux-state--empty" role="status">
+                                        <p><?php esc_html_e('No public information is available yet.', 'sabri-public-experience'); ?></p>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </section>
                     <?php endif; ?>
                 </section>
             </div>
