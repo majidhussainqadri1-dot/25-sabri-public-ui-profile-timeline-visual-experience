@@ -73,10 +73,17 @@ namespace {
         }
     };
 
+    $provider_class = \Sabri\PublicExperience\Providers\File_21_Provider::class;
+    $check($provider_class::supports_version('1.0.3'), 'Minimum reviewed File 21 version must be accepted.');
+    $check($provider_class::supports_version('1.9.9'), 'Compatible File 21 1.x versions must be accepted.');
+    $check(! $provider_class::supports_version('1.0.2'), 'Pre-contract File 21 versions must fail closed.');
+    $check(! $provider_class::supports_version('2.0.0'), 'Unknown major File 21 contracts must fail closed.');
+    $check(! $provider_class::supports_version('not-a-version'), 'Malformed File 21 versions must fail closed.');
+
     $provider = new \Sabri\PublicExperience\Providers\File_21_Provider();
     $check($provider->get_provider_id() === 'file-21', 'File 21 provider ID must remain canonical.');
     $check($provider->get_provider_version() === '1.0.3', 'File 21 provider must report the native runtime version.');
-    $check($provider->is_available(), 'File 21 provider must detect the native ProfileTimeline contract.');
+    $check($provider->is_available(), 'File 21 provider must detect the reviewed native ProfileTimeline contract.');
     $check($provider->get_maturity_level() === 'read-only', 'Source integration must not self-promote beyond read-only.');
 
     \Sabri\HomeNewsFeed\ProfileTimeline::$calls = [];
@@ -117,6 +124,7 @@ namespace {
 
     $health = $provider->get_health_status();
     $check(($health['read_only'] ?? false) === true, 'Health output must declare read-only behavior.');
+    $check(($health['compatible_version'] ?? false) === true, 'Health output must confirm the reviewed native version range.');
     $check(($health['owns_native_content'] ?? true) === false, 'Health output must deny native content ownership.');
 
     if ($failures !== []) {
