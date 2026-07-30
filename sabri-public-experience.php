@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Sabri Unified Global Visual Experience and Design System
  * Plugin URI:  https://sabrihomeopathy.com/
- * Description: File 25 global design system, public UI, profile timeline, responsive refinement, accessibility, visual consistency, and reusable visual states for the Sabri Social Homeopathy Platform.
- * Version:     0.4.0
+ * Description: File 25 global design system, public UI, profile timeline, responsive refinement, accessibility, visual consistency, and reusable visual components for the Sabri Social Homeopathy Platform.
+ * Version:     0.5.0
  * Author:      Dr. Allamah Majid Hussain Sabri Muhaddith Mursheed
  * Text Domain: sabri-public-experience
  * Requires at least: 6.5
@@ -61,7 +61,7 @@ if (function_exists('sabri_public_experience_bootstrap')) {
     return;
 }
 
-define('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.4.0');
+define('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.5.0');
 define('SABRI_PUBLIC_EXPERIENCE_SCHEMA_VERSION', '1');
 define('SABRI_PUBLIC_EXPERIENCE_FILE', __FILE__);
 define('SABRI_PUBLIC_EXPERIENCE_DIR', plugin_dir_path(__FILE__));
@@ -70,7 +70,9 @@ define('SABRI_PUBLIC_EXPERIENCE_URL', plugin_dir_url(__FILE__));
 require_once SABRI_PUBLIC_EXPERIENCE_DIR . 'includes/class-safe-mode.php';
 
 $spux_files = [
+    'includes/class-public-url.php',
     'includes/class-components.php',
+    'includes/class-content-cards.php',
     'includes/class-design-system.php',
     'includes/contracts/interface-timeline-provider.php',
     'includes/class-normalized-timeline-item.php',
@@ -121,6 +123,14 @@ if (! function_exists('sabri_visual_experience_render_state')) {
     function sabri_visual_experience_render_state(array $args = []): string
     {
         return \Sabri\PublicExperience\Components::render_state($args);
+    }
+}
+
+if (! function_exists('sabri_visual_experience_render_card')) {
+    /** @param array<string,mixed> $args */
+    function sabri_visual_experience_render_card(array $args = []): string
+    {
+        return \Sabri\PublicExperience\Content_Cards::render($args);
     }
 }
 
