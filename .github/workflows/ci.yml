@@ -8,9 +8,18 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: file-25-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  quality:
+  php-quality:
+    name: PHP ${{ matrix.php }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ["8.0", "8.3"]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -18,17 +27,26 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.3"
+          php-version: ${{ matrix.php }}
           coverage: none
+
+      - name: Validate Composer metadata
+        run: composer validate --strict --no-check-publish
 
       - name: PHP syntax
         run: find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
 
-      - name: Foundation contract tests
+      - name: Reviewed foundation contract tests
         run: php tests/run.php
 
       - name: Package structure
         run: php tools/verify-structure.php
+
+  javascript:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: JavaScript syntax
         run: node --check assets/js/public.js
