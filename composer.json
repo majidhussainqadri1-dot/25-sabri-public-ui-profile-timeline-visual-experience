@@ -16,7 +16,8 @@
       "@php tests/section-providers.php",
       "@php tests/file06-knowledge-provider.php",
       "@php tests/safe-mode.php",
-      "@php tools/verify-structure.php"
+      "@php tools/verify-structure.php",
+      "@php tools/verify-file06-and-components.php"
     ],
     "lint": "find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l"
   }
