@@ -1,42 +1,12 @@
 # Decision Log
 
-## 2026-07-30 — Canonical name upgraded without a new file
+## 2026-07-30 — File number and canonical name frozen
 
-The existing module is now canonically named **File 25 — Sabri Unified Global Visual Experience and Design System**.
-
-Its explanatory subtitle is **Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency**. The former title remains inside this subtitle. This is an upgrade of the same File 25, not a new module.
-
-## 2026-07-30 — File 26 is prohibited for this scope
-
-Global visual design, Facebook-familiar social presentation, profile timeline, responsive polish, accessibility, and visual consistency must not be split into a duplicate File 26. A second visual owner would create competing CSS, tokens, components, and integration rules.
-
-## 2026-07-30 — File 20 shell and File 25 visual ownership are separate
-
-File 20 remains the only global application-shell owner. File 25 owns the global public visual system rendered inside that shell and inherits File 20 shell tokens through semantic `--sabri-visual-*` aliases.
-
-## 2026-07-30 — Global design system is identity-independent
-
-The File 25 semantic token and component layer may boot without File 00. Identity-dependent profile and timeline behavior remains fail-closed when File 00 is unavailable.
-
-## 2026-07-30 — Prefixed components only
-
-Global design-system CSS uses `sabri-ui-*` component classes and `--sabri-visual-*` tokens. It must not broadly restyle arbitrary module elements or reproduce File 20 shell markup.
-
-## 2026-07-30 — No inline token bridge
-
-File 20 token inheritance is implemented in the local versioned stylesheet rather than a profile-only inline `<style>` block. This reduces duplication and supports future Content Security Policy hardening.
-
-## 2026-07-30 — Nested Safe Mode boundaries
-
-Safe Mode must preserve outer recovery boundaries during nested work. Inner `end()` calls may not disable outer fatal monitoring or misattribute incidents.
-
-## 2026-07-30 — File number frozen
-
-The module is **File 25**, not File 22 or File 24.
+The module is **File 25 — Sabri Unified Global Visual Experience and Design System**, not File 22, File 24, or a new File 26. The subtitle is **Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency**.
 
 ## 2026-07-30 — No duplicate shell
 
-File 20 remains the only global application-shell owner. File 25 inherits its layout and base design tokens.
+File 20 remains the only global application-shell owner. File 25 inherits its layout and shell-owned tokens.
 
 ## 2026-07-30 — No duplicate publication backend
 
@@ -56,7 +26,7 @@ Ordinary-member Phone/WhatsApp display requires both a public approved profile a
 
 ## 2026-07-30 — Graded dependencies
 
-File 00 is the hard profile/timeline runtime dependency. Files 03, 20, 21, and 24 are mandatory production integrations but do not all block early foundation coding. The File 25 global design-system layer itself remains identity-independent.
+File 00 is the hard profile/timeline runtime dependency. Files 03, 20, 21, and 24 are mandatory production integrations but do not all block identity-independent design-system coding. Dependency hooks may revoke detected availability but may not fabricate a native contract.
 
 ## 2026-07-30 — Active File 21 may not be bypassed
 
@@ -68,7 +38,7 @@ Providers return a bounded newest-candidate pool beginning at provider page one.
 
 ## 2026-07-30 — Same-site canonical timeline
 
-Foundation timeline items must point to credential-free, fragment-free, exact same-scheme/host/port canonical destinations. External destination support, if ever approved, requires a separate governed provider contract.
+Foundation timeline items must point to credential-free, fragment-free, exact same-scheme/host/port canonical destinations. External destination support requires a separate governed provider contract.
 
 ## 2026-07-30 — No dead public tabs
 
@@ -80,8 +50,24 @@ Public profile HTML and REST responses remain non-cacheable until File 24 suppli
 
 ## 2026-07-30 — Safe Mode is local recovery only
 
-File 25 Safe Mode disables File 25 overrides, records bounded incident metadata, and permits authenticated retry. File 24 remains the canonical security and incident owner.
+File 25 Safe Mode disables File 25 overrides, records bounded incident metadata, preserves nested runtime boundaries, and permits authenticated retry. File 24 remains the canonical security and incident owner.
+
+## 2026-07-30 — File 20 surface tokens remain authoritative
+
+When File 20 is connected, File 25 may inherit shell tokens and define missing semantic derivatives, but it may not replace File 20-owned text, surface, page, border, focus, width, radius, gap, or font-scale decisions.
+
+## 2026-07-30 — Reusable card variants do not transfer ownership
+
+Article, post, news, video, reel, book, PDF, Doctor, clinic, event, and Marketplace card types are visual variants only. Native modules retain data, permissions, moderation, interactions, metrics, transactions, and canonical records.
+
+## 2026-07-30 — Public component links are same-origin by default
+
+State actions, card actions, canonical card destinations, and card media must be root-relative or exact same-origin. Protocol-relative, cross-origin, credential-bearing, downgrade, port-mismatch, control-character, backslash, malformed, and forbidden-fragment URLs fail closed. External navigation requires a separate reviewed contract.
+
+## 2026-07-30 — One keyboard destination per reusable card
+
+A card links its title when no action button is requested. When an action button is requested, the title is plain text and the action is the single destination. Duplicate keyboard links to the same target are avoided by default.
 
 ## 2026-07-30 — Green CI is not completion
 
-Source lint, tests, and CI are necessary but do not replace fresh install, upgrade, migration, rollback, staging, real-user, responsive, accessibility, performance, deployment, and monitoring evidence.
+Source lint, tests, and CI are necessary but do not replace fresh install, upgrade, migration, rollback, staging, real-user, responsive, accessibility, visual-regression, performance, deployment, and monitoring evidence.
