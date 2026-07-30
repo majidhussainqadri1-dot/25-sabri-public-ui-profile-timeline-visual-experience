@@ -19,6 +19,7 @@ $required = [
     'includes/class-timeline-registry.php',
     'includes/class-timeline-service.php',
     'includes/contracts/interface-timeline-provider.php',
+    'includes/providers/class-file-21-provider.php',
     'templates/public-profile.php',
     'templates/partials/profile-hero.php',
     'templates/partials/timeline.php',
@@ -31,12 +32,14 @@ $required = [
     'assets/css/profile-sections.css',
     'assets/js/public.js',
     'tests/profile-data.php',
+    'tests/file21-provider.php',
     'SECURITY.md',
     'PRIVACY.md',
     'docs/ARCHITECTURE.md',
     'docs/GOVERNING-SCOPE.md',
     'docs/DECISION-LOG.md',
     'docs/REVIEW-AND-CORRECTION-2026-07-30.md',
+    'docs/PHASE-25C-25D-IMPLEMENTATION.md',
 ];
 
 $errors = [];
@@ -87,7 +90,7 @@ if (! str_contains($main, "require_once SABRI_PUBLIC_EXPERIENCE_DIR . 'includes/
 if (! str_contains($main, "version_compare(PHP_VERSION, '8.0', '<')")) {
     $errors[] = 'Pre-require PHP runtime guard is missing.';
 }
-foreach (['class-profile-data.php', 'class-shell-integration.php'] as $runtime_file) {
+foreach (['class-profile-data.php', 'class-shell-integration.php', 'class-file-21-provider.php'] as $runtime_file) {
     if (! str_contains($main, $runtime_file)) {
         $errors[] = 'New phase runtime file is not loaded: ' . $runtime_file;
     }
@@ -100,12 +103,25 @@ if (! str_contains($plugin, 'home_news_available')) {
 if (! str_contains($plugin, 'new Shell_Integration')) {
     $errors[] = 'The File 20 shell integration runtime is not registered.';
 }
+if (! str_contains($plugin, 'new File_21_Provider')) {
+    $errors[] = 'The File 21 timeline adapter is not registered.';
+}
 
 $timeline = file_get_contents($root . '/includes/class-timeline-service.php') ?: '';
 foreach (['provider_version', 'canonical_is_allowed', 'to_public_array'] as $marker) {
     if (! str_contains($timeline, $marker)) {
         $errors[] = 'Reviewed timeline invariant missing: ' . $marker;
     }
+}
+
+$file_21 = file_get_contents($root . '/includes/providers/class-file-21-provider.php') ?: '';
+foreach (['ProfileTimeline::query', "'read-only'", 'NATIVE_PAGE_SIZE', 'owns_native_content'] as $marker) {
+    if (! str_contains($file_21, $marker)) {
+        $errors[] = 'File 21 adapter boundary missing: ' . $marker;
+    }
+}
+if (preg_match('/update_|insert_|delete_|wp_insert_post|wp_update_post|wp_delete_post/i', $file_21)) {
+    $errors[] = 'File 21 adapter must remain read-only.';
 }
 
 $repository = file_get_contents($root . '/includes/class-profile-repository.php') ?: '';
