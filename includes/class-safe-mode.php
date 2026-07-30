@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Sabri\PublicExperience;
 
-if (! defined('ABSPATH')) {
+if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
     exit;
 }
 
@@ -21,8 +21,9 @@ final class Safe_Mode
 
     private static bool $registered = false;
     private static bool $shutdown_registered = false;
-    private static bool $boundary_active = false;
-    private static string $boundary = '';
+
+    /** @var list<string> */
+    private static array $boundary_stack = [];
 
     public static function register(): void
     {
@@ -48,14 +49,15 @@ final class Safe_Mode
 
     public static function begin(string $boundary): void
     {
-        self::$boundary_active = true;
-        self::$boundary = sanitize_key($boundary);
+        $boundary = self::sanitize_boundary($boundary);
+        self::$boundary_stack[] = $boundary !== '' ? $boundary : 'runtime';
     }
 
     public static function end(): void
     {
-        self::$boundary_active = false;
-        self::$boundary = '';
+        if (self::$boundary_stack !== []) {
+            array_pop(self::$boundary_stack);
+        }
     }
 
     public static function is_active(): bool
@@ -66,15 +68,15 @@ final class Safe_Mode
     public static function enable(string $reason, ?\Throwable $exception = null): void
     {
         $incident = [
-            'reason' => sanitize_key($reason),
-            'boundary' => self::$boundary,
+            'reason' => self::sanitize_boundary($reason),
+            'boundary' => self::current_boundary(),
             'occurred_at_utc' => gmdate('Y-m-d H:i:s'),
         ];
         if ($exception !== null) {
-            $incident['error_class'] = get_class($exception);
+            $incident['error_class'] = substr(get_class($exception), 0, 190);
             $incident['error_code'] = (int) $exception->getCode();
-            $incident['source_file'] = basename($exception->getFile());
-            $incident['source_line'] = $exception->getLine();
+            $incident['source_file'] = substr(basename($exception->getFile()), 0, 190);
+            $incident['source_line'] = max(0, $exception->getLine());
         }
 
         update_option(self::OPTION, '1', false);
@@ -92,7 +94,7 @@ final class Safe_Mode
 
     public static function shutdown(): void
     {
-        if (! self::$boundary_active) {
+        if (self::$boundary_stack === []) {
             return;
         }
 
@@ -101,16 +103,17 @@ final class Safe_Mode
             return;
         }
 
-        update_option(self::OPTION, '1', false);
         $incident = [
             'reason' => 'fatal-shutdown',
-            'boundary' => self::$boundary,
+            'boundary' => self::current_boundary(),
             'error_type' => (int) ($error['type'] ?? 0),
-            'source_file' => basename((string) ($error['file'] ?? '')),
-            'source_line' => (int) ($error['line'] ?? 0),
+            'source_file' => substr(basename((string) ($error['file'] ?? '')), 0, 190),
+            'source_line' => max(0, (int) ($error['line'] ?? 0)),
             'occurred_at_utc' => gmdate('Y-m-d H:i:s'),
         ];
+        update_option(self::OPTION, '1', false);
         update_option(self::INCIDENT_OPTION, $incident, false);
+        do_action('sabri_public_experience/safe_mode_changed', true, $incident);
     }
 
     public static function handle_enable(): void
@@ -134,11 +137,11 @@ final class Safe_Mode
         }
 
         $incident = get_option(self::INCIDENT_OPTION, []);
-        $reason = is_array($incident) ? sanitize_key((string) ($incident['reason'] ?? 'unknown')) : 'unknown';
+        $reason = is_array($incident) ? self::sanitize_boundary((string) ($incident['reason'] ?? 'unknown')) : 'unknown';
         echo '<div class="notice notice-warning"><p><strong>'
-            . esc_html__('Sabri Public Experience Safe Mode is active.', 'sabri-public-experience')
+            . esc_html__('Sabri Unified Global Visual Experience Safe Mode is active.', 'sabri-public-experience')
             . '</strong> '
-            . esc_html__('Public profile overrides are disabled; native WordPress and companion-module data remain untouched.', 'sabri-public-experience')
+            . esc_html__('File 25 public visual overrides are disabled; native WordPress and companion-module data remain untouched.', 'sabri-public-experience')
             . '</p><p>'
             . esc_html(sprintf(__('Recorded reason: %s', 'sabri-public-experience'), $reason))
             . '</p>';
@@ -147,6 +150,18 @@ final class Safe_Mode
         wp_nonce_field('spux_disable_safe_mode');
         submit_button(__('Retry File 25', 'sabri-public-experience'), 'secondary', 'submit', false);
         echo '</form></div>';
+    }
+
+    /** Exposed only for bounded diagnostics and executable contract tests. */
+    public static function current_boundary(): string
+    {
+        if (self::$boundary_stack === []) {
+            return '';
+        }
+
+        $boundary = end(self::$boundary_stack);
+
+        return is_string($boundary) ? $boundary : '';
     }
 
     private static function authorize(string $action): void
@@ -159,7 +174,19 @@ final class Safe_Mode
 
     private static function redirect(string $state): void
     {
-        wp_safe_redirect(add_query_arg('spux_safe_mode', sanitize_key($state), admin_url('site-health.php')));
+        wp_safe_redirect(add_query_arg('spux_safe_mode', self::sanitize_boundary($state), admin_url('site-health.php')));
         exit;
+    }
+
+    private static function sanitize_boundary(string $value): string
+    {
+        if (function_exists('sanitize_key')) {
+            return substr(sanitize_key($value), 0, 64);
+        }
+
+        $value = strtolower(trim($value));
+        $value = preg_replace('/[^a-z0-9_\-]/', '-', $value) ?? '';
+
+        return substr(trim($value, '-'), 0, 64);
     }
 }
