@@ -1,0 +1,169 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Sabri\PublicExperience;
+
+if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
+    exit;
+}
+
+/**
+ * Canonical design-system contract for File 25.
+ *
+ * File 20 continues to own the global application shell. File 25 owns the
+ * public visual language consumed inside that shell: semantic tokens,
+ * reusable components, responsive refinement, visual states, accessibility,
+ * and cross-module consistency.
+ */
+final class Design_System
+{
+    public const CONTRACT_VERSION = '1.0.0';
+    public const CANONICAL_NAME = 'Sabri Unified Global Visual Experience and Design System';
+    public const SUBTITLE = 'Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency';
+
+    public function register(): void
+    {
+        add_filter('body_class', [$this, 'body_classes'], 5);
+        add_filter('sabri_visual_experience/contract', [self::class, 'filter_contract']);
+        add_filter('sabri_public_experience/design_system_contract', [self::class, 'filter_contract']);
+        add_filter('sabri_visual_experience/tokens', [self::class, 'filter_tokens']);
+        add_filter('sabri_visual_experience/components', [self::class, 'filter_components']);
+    }
+
+    /** @param list<string> $classes @return list<string> */
+    public function body_classes(array $classes): array
+    {
+        if (! self::should_enqueue()) {
+            return $classes;
+        }
+
+        $classes[] = 'sabri-visual-system';
+        $classes[] = 'sabri-visual-system-v1';
+        $classes[] = function_exists('is_rtl') && is_rtl()
+            ? 'sabri-visual-direction-rtl'
+            : 'sabri-visual-direction-ltr';
+        $classes[] = defined('SABRI_SHELL_VERSION')
+            ? 'sabri-visual-shell-connected'
+            : 'sabri-visual-shell-degraded';
+
+        return array_values(array_unique($classes));
+    }
+
+    public static function should_enqueue(): bool
+    {
+        if (function_exists('is_admin') && is_admin()) {
+            return false;
+        }
+        if (function_exists('wp_doing_ajax') && wp_doing_ajax()) {
+            return false;
+        }
+        if (function_exists('wp_doing_cron') && wp_doing_cron()) {
+            return false;
+        }
+        if (defined('REST_REQUEST') && REST_REQUEST) {
+            return false;
+        }
+        if (defined('XMLRPC_REQUEST') && XMLRPC_REQUEST) {
+            return false;
+        }
+
+        foreach (['is_feed', 'is_embed', 'is_robots', 'is_favicon', 'is_trackback'] as $conditional) {
+            if (function_exists($conditional) && $conditional()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /** @return array<string,mixed> */
+    public static function contract(): array
+    {
+        return [
+            'file' => 25,
+            'canonical_name' => self::CANONICAL_NAME,
+            'subtitle' => self::SUBTITLE,
+            'contract_version' => self::CONTRACT_VERSION,
+            'runtime_version' => defined('SABRI_PUBLIC_EXPERIENCE_VERSION')
+                ? (string) SABRI_PUBLIC_EXPERIENCE_VERSION
+                : '',
+            'global_shell_owner' => 'file-20',
+            'visual_system_owner' => 'file-25',
+            'scope' => [
+                'global-design-system',
+                'public-ui',
+                'profile-timeline',
+                'responsive-refinement',
+                'visual-consistency',
+                'accessibility',
+                'visual-regression',
+            ],
+            'tokens' => self::tokens(),
+            'components' => Components::contract(),
+            'asset_handle' => 'sabri-visual-design-system',
+            'css_prefix' => 'sabri-ui-',
+            'duplicates_file_20_shell' => false,
+            'creates_file_26' => false,
+        ];
+    }
+
+    /** @return array<string,array<string,string>> */
+    public static function tokens(): array
+    {
+        return [
+            'color-primary' => self::token('--sabri-visual-primary', '--sabri-shell-primary', '#ff8a1f'),
+            'color-primary-strong' => self::token('--sabri-visual-primary-strong', '--sabri-shell-primary-strong', '#9a3d00'),
+            'color-text' => self::token('--sabri-visual-text', '--sabri-shell-text', '#171717'),
+            'color-muted' => self::token('--sabri-visual-muted', '--sabri-shell-muted', '#5f6368'),
+            'color-surface' => self::token('--sabri-visual-surface', '--sabri-shell-surface', '#ffffff'),
+            'color-page' => self::token('--sabri-visual-page', '--sabri-shell-bg', '#f7f5f1'),
+            'color-border' => self::token('--sabri-visual-border', '--sabri-shell-border', '#dfe2e6'),
+            'color-focus' => self::token('--sabri-visual-focus', '--sabri-shell-focus', '#0b57d0'),
+            'color-success' => self::token('--sabri-visual-success', '--sabri-shell-success', '#137333'),
+            'color-warning' => self::token('--sabri-visual-warning', '--sabri-shell-warning', '#8a4b08'),
+            'color-danger' => self::token('--sabri-visual-danger', '--sabri-shell-danger', '#b42318'),
+            'radius-control' => self::token('--sabri-visual-radius-control', '--sabri-shell-radius', '0.75rem'),
+            'radius-card' => self::token('--sabri-visual-radius-card', '--sabri-shell-radius', '1rem'),
+            'space-layout' => self::token('--sabri-visual-layout-gap', '--sabri-shell-gap', '1.5rem'),
+            'font-scale' => self::token('--sabri-visual-font-scale', '--sabri-shell-font-scale', '1'),
+            'content-wide' => self::token('--sabri-visual-content-wide', '--sabri-shell-max-width', '100rem'),
+        ];
+    }
+
+    /** @param mixed $contract @return array<string,mixed> */
+    public static function filter_contract(mixed $contract): array
+    {
+        $base = is_array($contract) ? $contract : [];
+
+        return array_merge($base, self::contract());
+    }
+
+    /** @param mixed $tokens @return array<string,array<string,string>> */
+    public static function filter_tokens(mixed $tokens): array
+    {
+        $base = is_array($tokens) ? $tokens : [];
+
+        // Canonical File 25 tokens win so another plugin cannot silently redefine
+        // the public visual contract. Modules may add separately named tokens.
+        return array_merge($base, self::tokens());
+    }
+
+    /** @param mixed $components @return array<string,mixed> */
+    public static function filter_components(mixed $components): array
+    {
+        $base = is_array($components) ? $components : [];
+
+        return array_merge($base, Components::contract());
+    }
+
+    /** @return array<string,string> */
+    private static function token(string $variable, string $inherits, string $fallback): array
+    {
+        return [
+            'css_variable' => $variable,
+            'inherits' => $inherits,
+            'fallback' => $fallback,
+        ];
+    }
+}
