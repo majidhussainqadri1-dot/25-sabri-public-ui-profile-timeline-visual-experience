@@ -1,0 +1,235 @@
+:root {
+    --spux-primary: var(--sabri-shell-primary, #ff8a1f);
+    --spux-primary-strong: var(--sabri-shell-primary, #d96300);
+    --spux-text: var(--sabri-shell-text, #111111);
+    --spux-muted: var(--sabri-shell-muted, #5f6368);
+    --spux-surface: var(--sabri-shell-surface, #ffffff);
+    --spux-page: var(--sabri-shell-bg, #f7f5f1);
+    --spux-border: var(--sabri-shell-border, #e2e4e8);
+    --spux-focus: var(--sabri-shell-focus, #0b57d0);
+    --spux-radius: 1rem;
+    --spux-shadow: 0 0.25rem 1.25rem rgb(17 17 17 / 8%);
+}
+
+.spux-profile {
+    background: var(--spux-page);
+    color: var(--spux-text);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    min-block-size: 60vh;
+    overflow-wrap: anywhere;
+    padding-block: 1.5rem 4rem;
+}
+
+.spux-container {
+    inline-size: min(100% - 2rem, 75rem);
+    margin-inline: auto;
+}
+
+.spux-hero,
+.spux-card,
+.spux-state {
+    background: var(--spux-surface);
+    border: 1px solid var(--spux-border);
+    border-radius: var(--spux-radius);
+    box-shadow: var(--spux-shadow);
+}
+
+.spux-hero {
+    overflow: clip;
+}
+
+.spux-hero__cover {
+    background: #fff3e8;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--spux-primary) 28%, white), var(--spux-surface));
+    background-position: center;
+    background-size: cover;
+    block-size: clamp(9rem, 25vw, 18rem);
+}
+
+.spux-hero__body {
+    align-items: end;
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    padding: 1.5rem;
+}
+
+.spux-avatar {
+    aspect-ratio: 1;
+    background: var(--spux-surface);
+    border: 0.35rem solid var(--spux-surface);
+    border-radius: 50%;
+    box-shadow: var(--spux-shadow);
+    inline-size: clamp(6rem, 14vw, 10rem);
+    margin-block-start: -5rem;
+    object-fit: cover;
+}
+
+.spux-identity h1 {
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
+    line-height: 1.15;
+    margin: 0;
+}
+
+.spux-identity__title-row,
+.spux-actions,
+.spux-card__meta,
+.spux-tabs {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.spux-headline,
+.spux-location {
+    color: var(--spux-muted);
+    margin-block: 0.35rem 0;
+}
+
+.spux-badge {
+    background: color-mix(in srgb, var(--spux-primary) 14%, white);
+    border: 1px solid color-mix(in srgb, var(--spux-primary) 42%, white);
+    border-radius: 999px;
+    color: var(--spux-primary-strong);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.25rem 0.65rem;
+}
+
+.spux-button,
+.spux-read-more {
+    align-items: center;
+    background: var(--spux-primary);
+    border: 2px solid transparent;
+    border-radius: 0.75rem;
+    color: #111111;
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    font-weight: 700;
+    justify-content: center;
+    min-block-size: 2.75rem;
+    padding: 0.6rem 1rem;
+    text-decoration: none;
+}
+
+.spux-button--secondary {
+    background: var(--spux-surface);
+    border-color: var(--spux-border);
+}
+
+.spux-button:hover,
+.spux-read-more:hover {
+    filter: brightness(0.96);
+}
+
+.spux-button:focus-visible,
+.spux-read-more:focus-visible,
+.spux-tabs__item:focus-visible,
+.spux-timeline-card a:focus-visible {
+    outline: 3px solid var(--spux-focus);
+    outline-offset: 3px;
+}
+
+.spux-tabs {
+    background: var(--spux-surface);
+    border-block-end: 1px solid var(--spux-border);
+    margin-block: 1.25rem;
+    overflow-x: auto;
+    padding: 0.5rem;
+    scrollbar-width: thin;
+}
+
+.spux-tabs__item {
+    border-radius: 0.65rem;
+    color: var(--spux-text);
+    flex: 0 0 auto;
+    font-weight: 700;
+    min-block-size: 2.75rem;
+    padding: 0.6rem 0.85rem;
+    text-decoration: none;
+}
+
+.spux-tabs__item.is-active {
+    background: color-mix(in srgb, var(--spux-primary) 18%, white);
+    color: var(--spux-primary-strong);
+}
+
+.spux-layout,
+.spux-timeline {
+    display: grid;
+    gap: 1rem;
+}
+
+.spux-card,
+.spux-state {
+    padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+.spux-timeline-card h3 {
+    font-size: clamp(1.2rem, 2vw, 1.5rem);
+    margin-block: 0.5rem;
+}
+
+.spux-timeline-card h3 a {
+    color: var(--spux-text);
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.18em;
+}
+
+.spux-card__meta {
+    color: var(--spux-muted);
+    font-size: 0.875rem;
+    justify-content: space-between;
+}
+
+.spux-type {
+    font-weight: 700;
+}
+
+.spux-state {
+    text-align: center;
+}
+
+.spux-pagination {
+    margin-block-start: 1.25rem;
+    text-align: center;
+}
+
+@media (max-width: 48rem) {
+    .spux-container {
+        inline-size: min(100% - 1rem, 75rem);
+    }
+
+    .spux-hero__body {
+        align-items: start;
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .spux-avatar {
+        justify-self: center;
+        margin-block-start: -4.5rem;
+    }
+
+    .spux-identity__title-row,
+    .spux-actions {
+        justify-content: center;
+    }
+
+    .spux-actions .spux-button {
+        flex: 1 1 8rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+}
