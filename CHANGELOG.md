@@ -1,68 +1,70 @@
 # Changelog
 
+## 0.8.0 — Native Media Adapters and Evidence Integrity
+
+### Added
+
+- Native read-only `file-10-video-media` adapter for published non-Reel Video Wall items.
+- Native read-only `file-11-reels-media` adapter over File 10 objects, enforcing the approved 60–600 second Reel duration.
+- Native read-only `file-12-pdf-media` adapter for published PDF Library documents.
+- Exact 0.1.x compatibility gates for Files 10, 11, and 12 and File 11's dependency on the reviewed File 10 contract.
+- Strict public card projection for canonical title, permalink, excerpt, thumbnail, category/type, duration/pages/language, and publication time only.
+- PHP 8.0/8.3 adapter tests and package rules that forbid write, upload, moderation, interaction, metric, and transaction ownership.
+- Visual-acceptance evidence records requiring artifact reference, SHA-256, timestamp, reviewer, staging runtime data, commit binding, and Founder sign-off.
+
+### Corrected during fifth review
+
+- Froze provider maturity and native-ownership metadata in addition to ID, version, and section.
+- Counted provider metadata and consistency failures truthfully instead of silently presenting a clean partial result.
+- Deduplicated valid cards by exact canonical destination, while preserving case-sensitive paths.
+- Rejected boolean placeholders as visual-acceptance evidence and required bounded cryptographically referenced records.
+- Added the Media section to the required visual-acceptance surfaces.
+
+### Still pending
+
+- Exact Files 00/03/06/10/11/12/20/21/25 staging acceptance.
+- File 24 runtime security/privacy/cache contract.
+- Native Reviews, Research, and Marketplace adapters after source review.
+- Captured visual-regression, RTL, accessibility, performance, migration, rollback, deployment, and Founder-acceptance evidence.
+
+## 0.7.0 — Immutable Providers and Visual Acceptance Contract
+
+- Froze registered provider ID, version, and section and revalidated them at query time.
+- Isolated provider metadata failures and preserved case-sensitive canonical URL paths.
+- Added the machine-readable visual-acceptance Definition-of-Done contract.
+
 ## 0.6.0 — Governed Optional Profile Sections
 
 ### Added
 
 - A read-only `Profile_Section_Provider` contract for native Knowledge, Media, Reviews, Research, and Marketplace modules.
-- A bounded `Section_Registry` with unique validated provider IDs, semantic versions, approved sections, approved maturity levels, and explicit denial of native-content ownership.
-- A `Section_Service` that revalidates provider state, bounds candidates, suppresses duplicates, isolates failures, and renders descriptors only through File 25 content cards.
-- Content-backed profile navigation: optional tabs appear only when an accepted provider returns at least one valid approved public card.
-- A canonical optional-section template with honest partial, truncated, and empty states.
-- Optional-section Site Health diagnostics, PHP 8.0/8.3 tests, package rules, and governance documentation.
-- A public `sabri_visual_experience_render_notice()` helper and a completed reusable component class map.
-- A canonical component-completion stylesheet included through the public `sabri-visual-design-system` handle.
+- A bounded registry and service with approved sections, maturity levels, native-ownership denial, failure isolation, deduplication, and content-backed tabs.
+- A native read-only File 06 Knowledge adapter.
+- A canonical optional-section template, notice renderer, completed reusable components, diagnostics, and tests.
 
-### Corrected during fourth review
+### Corrected
 
-- Prevented optional-section labels from becoming dead tabs before a governed provider and approved public content exist.
-- Prevented arbitrary raw provider HTML from entering public profiles.
-- Revalidated mutable provider maturity and native-ownership claims at query time rather than trusting registration-time state forever.
-- Isolated provider exceptions and exposed only bounded public status, never provider identifiers or diagnostics.
-- Made date-only and offset-less public-card timestamps deterministic in UTC and rejected invalid calendar dates.
-- Completed notice title/message, disabled-control, placeholder, table-caption, focus-within, forced-colors, and print presentation.
+- Prevented dead tabs and arbitrary provider HTML.
+- Revalidated mutable provider state.
+- Made card timestamps deterministic in UTC and rejected invalid dates.
 
-### Still pending
+## 0.5.0 — Reusable Content Cards and URL Security
 
-- Exact native adapters for Knowledge, Media, Reviews, Research, and Marketplace after source-contract review.
-- Exact Files 00/03/20/21/25 staging and File 24 runtime integration.
-- Visual-regression, RTL, accessibility, performance, migration, rollback, deployment, and Founder acceptance evidence.
-
-## 0.5.0 — Reusable Content Cards and URL-Security Correction
-
-### Added
-
-- A strict `Public_URL::sanitize_same_site()` policy for reusable public visual components.
-- A presentation-only `Content_Cards` renderer and versioned contract for article, post, news, video, reel, book, PDF, Doctor, clinic, event, and Marketplace visual variants.
-- The public `sabri_visual_experience_render_card()` integration function.
-- Bounded title, excerpt, eyebrow, badge, metadata, date, media, and action-field allow lists that ignore native IDs and unknown private fields.
-- Single-link keyboard behavior, local lazy media, semantic markup, responsive cards, RTL, forced-colors, reduced-motion, and print behavior.
-- Reusable notice, form-field, input, select, textarea, help/error, and responsive-table CSS primitives.
-- Contrast-safe `on-primary`, `on-danger`, and surface-aware soft-primary semantic tokens.
-
-### Corrected while reviewing 0.4.0
-
-- Closed protocol-relative, cross-origin, credential-bearing, downgrade, port-mismatch, control-character, backslash, and malformed URL paths.
-- Converted variable default-copy translation calls into literal WordPress translation strings.
-- Stopped File 25 dark-mode CSS from replacing File 20-owned theme tokens.
-- Corrected danger-button contrast, badge theming, shell detection, and compact cards without media.
+- Added strict same-origin URL policy, presentation-only content cards, reusable forms/tables/notices, and contrast-safe visual tokens.
+- Corrected protocol-relative URLs, cross-origin actions, dark-mode ownership, translation extraction, contrast, and compact-card layout.
 
 ## 0.4.0 — Unified Global Visual System Foundation
 
-- Added the canonical File 25 identity, global semantic tokens, reusable prefixed components, visual states, independent public design assets, nested Safe Mode, and design-system diagnostics.
-- Removed stale naming, the profile-only inline token bridge, and identity coupling from the global visual layer.
+- Added canonical File 25 identity, global semantic tokens, reusable prefixed components, visual states, independent public assets, nested Safe Mode, and diagnostics.
 
 ## 0.3.0 — Native File 21 Timeline Adapter
 
-- Added the native read-only `file-21` provider, bounded paging, normalization, health evidence, identifier redaction, and no-write tests.
-- Corrected native-page overlap, provider precedence, active File 21 bypass, and premature maturity promotion.
+- Added native read-only File 21 provider, bounded paging, normalization, identifier redaction, and no-write tests.
 
 ## 0.2.0 — File 20 Integration and Founder/Doctor Profiles
 
-- Added File 20 shell-contract integration, canonical author links, structured Founder and verified-Doctor profiles, strict public allow lists, responsive sections, metadata, and profile tests.
-- Corrected Founder naming, dead tabs, native ownership, filter elevation, and cache exposure.
+- Added File 20 integration, canonical author links, structured Founder and verified-Doctor profiles, strict public allow lists, and responsive sections.
 
 ## 0.1.0 — Reviewed Foundation
 
 - Added bootstrap, Safe Mode, dependency diagnostics, privacy-first profiles, canonical routes, federated timeline contracts, REST foundations, responsive profile presentation, and CI.
-- Corrected identity elevation, visibility widening, contact restoration, File 21 bypass, private timeline admission, identifier leakage, pagination, dead tabs, cache exposure, schema, contrast, motion, avatar, and sharing defects.
