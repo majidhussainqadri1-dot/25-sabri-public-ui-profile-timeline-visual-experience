@@ -9,6 +9,10 @@ foreach (array_slice(preg_split('/\s+/u', $display_name) ?: [], 0, 2) as $word) 
     $initials .= function_exists('mb_substr') ? mb_substr($word, 0, 1) : substr($word, 0, 1);
 }
 $initials = function_exists('mb_strtoupper') ? mb_strtoupper($initials) : strtoupper($initials);
+$location = implode(', ', array_filter([(string) ($profile['city'] ?? ''), (string) ($profile['country'] ?? '')]));
+if ($location === '') {
+    $location = trim((string) ($profile['location_text'] ?? ''));
+}
 ?>
 <header class="spux-hero">
     <div class="spux-hero__cover" aria-hidden="true">
@@ -36,8 +40,8 @@ $initials = function_exists('mb_strtoupper') ? mb_strtoupper($initials) : strtou
             <?php if (! empty($profile['headline'])) : ?>
                 <p class="spux-headline"><?php echo esc_html((string) $profile['headline']); ?></p>
             <?php endif; ?>
-            <?php if (! empty($profile['city']) || ! empty($profile['country'])) : ?>
-                <p class="spux-location"><?php echo esc_html(implode(', ', array_filter([(string) $profile['city'], (string) $profile['country']]))); ?></p>
+            <?php if ($location !== '') : ?>
+                <p class="spux-location"><?php echo esc_html($location); ?></p>
             <?php endif; ?>
         </div>
         <div class="spux-actions" aria-label="<?php esc_attr_e('Profile actions', 'sabri-public-experience'); ?>">
