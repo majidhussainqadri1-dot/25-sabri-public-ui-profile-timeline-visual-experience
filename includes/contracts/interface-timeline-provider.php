@@ -31,10 +31,22 @@ interface Timeline_Provider
     public function get_maturity_level(): string;
 
     /**
-     * @param array<string, mixed> $query
+     * Return the newest bounded candidate pool for one author.
+     *
+     * File 25 supplies `page=1`, a bounded `candidate_limit`, the original
+     * `requested_page`, `per_page`, and optional `content_type`. Providers must
+     * not apply the requested global page offset themselves; File 25 merges,
+     * deduplicates, sorts, and paginates all providers together.
+     *
+     * Every returned item must retain the requested author/profile ID, be
+     * publicly approved by its native owner, and point to a canonical same-site
+     * destination.
+     *
+     * @param array<string,mixed> $query
      * @return list<Normalized_Timeline_Item>
      */
     public function get_public_author_items(int $author_id, array $query): array;
 
+    /** @return array<string,mixed> */
     public function get_health_status(): array;
 }
