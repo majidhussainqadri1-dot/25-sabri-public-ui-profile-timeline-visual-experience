@@ -1,22 +1,51 @@
 # File 25 Architecture
 
+## Canonical identity
+
+**File 25 — Sabri Unified Global Visual Experience and Design System**
+
+**Subtitle:** Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency
+
+This is the same existing File 25. No File 26 is created for global visual design or Facebook-familiar social polish.
+
 ## Governing rule
 
-**One Unified Public Experience — Native Ownership Preserved — Public Profiles as Trusted Knowledge Gateways — Every Dynamic Action Executed by Its Native Owner.**
+**One Unified Public Experience — One Global Visual System — Native Ownership Preserved — Public Profiles as Trusted Knowledge Gateways — Every Dynamic Action Executed by Its Native Owner.**
 
-## Current phase
+## Current source phase
 
-This branch implements and reviews phases **25A — Governance and Contracts** and **25B — Plugin Foundation and Safety**. It does not represent staging or production completion.
+The branch contains the reviewed foundation through the global design-system contract, Founder/Doctor public profile foundation, federated timeline registry, and native read-only File 21 adapter. It does not represent staging or production completion.
 
 ## Ownership
 
 - File 00: identity, roles, approval, age/guardian authority, public visibility, and professional eligibility.
 - File 03: profile master data, photographs, and public-contact consent.
-- File 20: global shell, navigation, widths, and base design tokens.
-- File 21: Home/News publications and the production timeline provider.
+- File 20: global shell, header, navigation, sidebars, mobile drawers, widths, layout resolver, and shell-level base tokens.
+- File 21: Home, News, posts, comments, interactions, moderation, and native publication timeline data.
 - Files 22/23: content creation and private publishing operations.
 - File 24: security, privacy, compliance, incidents, cache partitioning, and resilience.
-- File 25: public profile templates, a rebuildable read projection of approved native contributions, public components, states, and visual acceptance.
+- File 25: global public design system, public profile templates, rebuildable timeline projection, reusable public components and states, responsive refinement, accessibility, visual consistency, and visual acceptance.
+
+## Global visual contract
+
+File 25 supplies a versioned semantic layer without replacing File 20:
+
+- globally unique `--sabri-visual-*` semantic tokens;
+- inheritance from equivalent `--sabri-shell-*` tokens with local fallbacks;
+- prefixed `sabri-ui-*` component primitives;
+- loading, empty, error, success, warning, unavailable, and skeleton states;
+- responsive containers, grids, stacks, and clusters;
+- visible focus, logical properties, reduced motion, and forced-colors support;
+- no remote fonts, CSS, JavaScript, or broad unprefixed element restyling.
+
+The design-system stylesheet can load independently of File 00. Identity-dependent profiles and timelines remain fail-closed when File 00 is unavailable.
+
+Public integration functions:
+
+```php
+sabri_visual_experience_contract(): array
+sabri_visual_experience_render_state(array $args = []): string
+```
 
 ## Public profile projection
 
@@ -51,23 +80,14 @@ Providers expose public, approved, canonical objects through a read-only interfa
 - returns public-safe items without provider IDs, native object IDs, WordPress user IDs, metrics pointers, or diagnostic details;
 - reports partial and truncated states honestly.
 
-The WordPress posts provider is a compatibility baseline only. It is registered only while File 21 is absent. An active File 21 installation without a registered production provider yields an honest unavailable timeline instead of bypassing File 21 with raw WordPress queries.
-
-File 21 registers its provider from an integration listener:
-
-```php
-add_action(
-    'sabri_public_experience/register_timeline_providers',
-    static function ($registry): void {
-        $registry->register(new File_21_Timeline_Provider());
-    }
-);
-```
-
-The canonical provider ID must be `file-21`; production readiness requires maturity `production-accepted` after staging acceptance.
+The native read-only File 21 adapter consumes `Sabri\HomeNewsFeed\ProfileTimeline::query()`. A File 21-owned provider registered first with canonical ID `file-21` takes precedence. Raw WordPress fallback is allowed only while File 21 is absent; active-but-incompatible File 21 fails closed.
 
 ## Integration hooks
 
+- `sabri_visual_experience/contract`
+- `sabri_visual_experience/tokens`
+- `sabri_visual_experience/components`
+- `sabri_public_experience/design_system_contract`
 - `sabri_public_experience/dependency/*`
 - `sabri_public_experience/profile_by_slug`
 - `sabri_public_experience/public_profile_data`
@@ -78,19 +98,12 @@ The canonical provider ID must be `file-21`; production readiness requires matur
 - `sabri_public_experience/provider_error`
 - `sabri_public_experience/safe_mode_changed`
 
-All extension hooks are followed by authoritative revalidation where they could affect public identity, contact, visibility, routing, or timeline admission.
+All extension hooks are followed by authoritative revalidation where they could affect public identity, contact, visibility, routing, or timeline admission. Canonical design tokens and ownership fields cannot be silently replaced by another plugin.
 
 ## Safe failure
 
-A missing required dependency prevents public overrides from booting. File 25 Safe Mode disables only File 25 public overrides, records bounded incident metadata, exposes an authenticated administrator retry, and returns control to the native theme and modules without deleting data. File 24 remains the canonical incident owner.
+Safe Mode uses nested boundaries so an inner operation cannot clear an outer fatal guard. It disables only File 25 visual/profile overrides, records bounded incident metadata, emits the File 24 integration event, and leaves native data untouched. File 24 remains the canonical incident owner.
 
-## Existing-module compatibility detected in phase 25A
+## Completion boundary
 
-The foundation consumes the currently shipped module contracts without copying their data:
-
-- File 00: `SMC_VERSION`, `smc_get_profile()`, `smc_is_founder()`, `smc_user_status()`, and documented owned tables.
-- File 03: `SPD_VERSION` and `SPD_Helpers` compatibility reads.
-- File 20: `SABRI_SHELL_VERSION`, `sabri_shell_layout_mode`, and `--sabri-shell-*` design tokens.
-- File 21: `SABRI_HNF_VERSION`; its production provider remains an explicit pending adapter.
-
-See `REVIEW-AND-CORRECTION-2026-07-30.md` for the defect register and corrections.
+Source lint, tests, and green CI are necessary but do not replace full-module screenshots, responsive viewport evidence, RTL, keyboard, screen reader, zoom, forced colors, reduced motion, performance, fresh install, upgrade, migration, rollback, backup restoration, staging, deployment, and Founder acceptance.
