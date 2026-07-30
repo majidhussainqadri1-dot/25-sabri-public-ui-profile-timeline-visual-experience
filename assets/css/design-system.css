@@ -1,6 +1,8 @@
 :root {
     --sabri-visual-primary: var(--sabri-shell-primary, #ff8a1f);
     --sabri-visual-primary-strong: var(--sabri-shell-primary-strong, #9a3d00);
+    --sabri-visual-primary-soft: #fff3e8;
+    --sabri-visual-on-primary: #171717;
     --sabri-visual-text: var(--sabri-shell-text, #171717);
     --sabri-visual-muted: var(--sabri-shell-muted, #5f6368);
     --sabri-visual-surface: var(--sabri-shell-surface, #ffffff);
@@ -10,6 +12,7 @@
     --sabri-visual-success: var(--sabri-shell-success, #137333);
     --sabri-visual-warning: var(--sabri-shell-warning, #8a4b08);
     --sabri-visual-danger: var(--sabri-shell-danger, #b42318);
+    --sabri-visual-on-danger: #ffffff;
     --sabri-visual-radius-control: var(--sabri-shell-radius, 0.75rem);
     --sabri-visual-radius-card: var(--sabri-shell-radius, 1rem);
     --sabri-visual-layout-gap: var(--sabri-shell-gap, 1.5rem);
@@ -42,21 +45,44 @@ body.sabri-visual-system {
     --spux-radius: var(--sabri-visual-radius-card);
     --spux-layout-gap: var(--sabri-visual-layout-gap);
     --spux-shadow: var(--sabri-visual-shadow-2);
+    --sabri-visual-primary-soft: color-mix(in srgb, var(--sabri-visual-primary) 14%, var(--sabri-visual-surface));
     accent-color: var(--sabri-visual-primary);
     text-rendering: optimizeLegibility;
 }
 
+/* File 20 remains authoritative for surface/text/theme tokens. File 25 only
+ * supplies contrast-safe semantic derivatives that File 20 does not expose. */
 body.sabri-visual-system.sabri-shell-theme-dark {
     --sabri-visual-primary-strong: #ffbd80;
-    --sabri-visual-text: #f5f5f5;
-    --sabri-visual-muted: #c2c5ca;
-    --sabri-visual-surface: #1d1f22;
-    --sabri-visual-page: #121315;
-    --sabri-visual-border: #3d4147;
-    --sabri-visual-focus: #8ab4f8;
     --sabri-visual-success: #81c995;
     --sabri-visual-warning: #fdd663;
     --sabri-visual-danger: #f28b82;
+    --sabri-visual-on-danger: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+    body.sabri-visual-system.sabri-shell-theme-system {
+        --sabri-visual-primary-strong: #ffbd80;
+        --sabri-visual-success: #81c995;
+        --sabri-visual-warning: #fdd663;
+        --sabri-visual-danger: #f28b82;
+        --sabri-visual-on-danger: #171717;
+    }
+
+    body.sabri-visual-system.sabri-visual-shell-degraded {
+        color-scheme: dark;
+        --sabri-visual-primary-strong: #ffbd80;
+        --sabri-visual-text: #f3f4f6;
+        --sabri-visual-muted: #b7bec7;
+        --sabri-visual-surface: #181b1f;
+        --sabri-visual-page: #111315;
+        --sabri-visual-border: #30363d;
+        --sabri-visual-focus: #8ab4f8;
+        --sabri-visual-success: #81c995;
+        --sabri-visual-warning: #fdd663;
+        --sabri-visual-danger: #f28b82;
+        --sabri-visual-on-danger: #171717;
+    }
 }
 
 :where(.sabri-ui-container) {
@@ -101,7 +127,7 @@ body.sabri-visual-system.sabri-shell-theme-dark {
     background: var(--sabri-visual-primary);
     border: 2px solid transparent;
     border-radius: var(--sabri-visual-radius-control);
-    color: #171717;
+    color: var(--sabri-visual-on-primary);
     cursor: pointer;
     display: inline-flex;
     font: inherit;
@@ -123,7 +149,7 @@ body.sabri-visual-system.sabri-shell-theme-dark {
 
 :where(.sabri-ui-button--danger) {
     background: var(--sabri-visual-danger);
-    color: #ffffff;
+    color: var(--sabri-visual-on-danger);
 }
 
 :where(.sabri-ui-button:hover) {
@@ -135,14 +161,14 @@ body.sabri-visual-system.sabri-shell-theme-dark {
     opacity: 0.65;
 }
 
-:where(.sabri-ui-button:focus-visible, .sabri-ui-card a:focus-visible, .sabri-ui-state a:focus-visible) {
+:where(.sabri-ui-button:focus-visible, .sabri-ui-card a:focus-visible, .sabri-ui-state a:focus-visible, .sabri-ui-input:focus-visible, .sabri-ui-select:focus-visible, .sabri-ui-textarea:focus-visible) {
     outline: 3px solid var(--sabri-visual-focus);
     outline-offset: 3px;
 }
 
 :where(.sabri-ui-badge) {
-    background: #fff3e8;
-    border: 1px solid #ffc48c;
+    background: var(--sabri-visual-primary-soft);
+    border: 1px solid var(--sabri-visual-border);
     border-radius: 999px;
     color: var(--sabri-visual-primary-strong);
     display: inline-flex;
@@ -152,7 +178,27 @@ body.sabri-visual-system.sabri-shell-theme-dark {
     padding: 0.3rem 0.7rem;
 }
 
-:where(.sabri-ui-state) {
+:where(.sabri-ui-badge--verified, .sabri-ui-badge--success) {
+    border-color: var(--sabri-visual-success);
+    color: var(--sabri-visual-success);
+}
+
+:where(.sabri-ui-badge--warning) {
+    border-color: var(--sabri-visual-warning);
+    color: var(--sabri-visual-warning);
+}
+
+:where(.sabri-ui-badge--danger) {
+    border-color: var(--sabri-visual-danger);
+    color: var(--sabri-visual-danger);
+}
+
+:where(.sabri-ui-badge--info, .sabri-ui-badge--primary) {
+    border-color: var(--sabri-visual-primary);
+    color: var(--sabri-visual-primary-strong);
+}
+
+:where(.sabri-ui-state, .sabri-ui-notice) {
     background: var(--sabri-visual-surface);
     border: 1px solid var(--sabri-visual-border);
     border-inline-start: 0.3rem solid var(--sabri-visual-muted);
@@ -164,11 +210,11 @@ body.sabri-visual-system.sabri-shell-theme-dark {
     padding: clamp(1rem, 3vw, 1.5rem);
 }
 
-:where(.sabri-ui-state--compact) {
+:where(.sabri-ui-state--compact, .sabri-ui-notice--compact) {
     padding: var(--sabri-visual-space-4);
 }
 
-:where(.sabri-ui-state--loading) {
+:where(.sabri-ui-state--loading, .sabri-ui-notice--info) {
     border-inline-start-color: var(--sabri-visual-primary);
 }
 
@@ -176,15 +222,15 @@ body.sabri-visual-system.sabri-shell-theme-dark {
     border-inline-start-color: var(--sabri-visual-muted);
 }
 
-:where(.sabri-ui-state--warning) {
+:where(.sabri-ui-state--warning, .sabri-ui-notice--warning) {
     border-inline-start-color: var(--sabri-visual-warning);
 }
 
-:where(.sabri-ui-state--error) {
+:where(.sabri-ui-state--error, .sabri-ui-notice--error) {
     border-inline-start-color: var(--sabri-visual-danger);
 }
 
-:where(.sabri-ui-state--success) {
+:where(.sabri-ui-state--success, .sabri-ui-notice--success) {
     border-inline-start-color: var(--sabri-visual-success);
 }
 
@@ -198,6 +244,179 @@ body.sabri-visual-system.sabri-shell-theme-dark {
     color: var(--sabri-visual-muted);
     margin: 0;
     max-inline-size: 60ch;
+}
+
+:where(.sabri-ui-content-card) {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    overflow: hidden;
+    padding: 0;
+}
+
+:where(.sabri-ui-content-card--compact.sabri-ui-content-card--has-media) {
+    grid-template-columns: minmax(7rem, 0.35fr) minmax(0, 1fr);
+    grid-template-rows: none;
+}
+
+:where(.sabri-ui-content-card__media) {
+    aspect-ratio: 16 / 9;
+    background: var(--sabri-visual-page);
+    overflow: hidden;
+}
+
+:where(.sabri-ui-content-card--reel .sabri-ui-content-card__media) {
+    aspect-ratio: 9 / 16;
+    max-block-size: 28rem;
+}
+
+:where(.sabri-ui-content-card--doctor .sabri-ui-content-card__media, .sabri-ui-content-card--clinic .sabri-ui-content-card__media) {
+    aspect-ratio: 4 / 3;
+}
+
+:where(.sabri-ui-content-card__media img) {
+    block-size: 100%;
+    inline-size: 100%;
+    object-fit: cover;
+}
+
+:where(.sabri-ui-content-card__body) {
+    align-content: start;
+    display: grid;
+    gap: var(--sabri-visual-space-3);
+    min-inline-size: 0;
+    padding: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+:where(.sabri-ui-content-card__eyebrow) {
+    color: var(--sabri-visual-primary-strong);
+    font-size: 0.8125rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+:where(.sabri-visual-direction-rtl .sabri-ui-content-card__eyebrow) {
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+:where(.sabri-ui-content-card__heading) {
+    align-items: start;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sabri-visual-space-3);
+    justify-content: space-between;
+}
+
+:where(.sabri-ui-content-card__title) {
+    flex: 1 1 12rem;
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    line-height: 1.3;
+    margin: 0;
+}
+
+:where(.sabri-ui-content-card__title a) {
+    color: var(--sabri-visual-text);
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.18em;
+}
+
+:where(.sabri-ui-content-card__meta) {
+    color: var(--sabri-visual-muted);
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 0.875rem;
+    gap: var(--sabri-visual-space-2) var(--sabri-visual-space-4);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+:where(.sabri-ui-content-card__meta li:not(:last-child)::after) {
+    color: var(--sabri-visual-border);
+    content: "•";
+    margin-inline-start: var(--sabri-visual-space-4);
+}
+
+:where(.sabri-ui-content-card__excerpt) {
+    color: var(--sabri-visual-muted);
+    margin: 0;
+}
+
+:where(.sabri-ui-content-card__footer) {
+    align-self: end;
+    padding-block-start: var(--sabri-visual-space-2);
+}
+
+:where(.sabri-ui-field) {
+    display: grid;
+    gap: var(--sabri-visual-space-2);
+}
+
+:where(.sabri-ui-label) {
+    color: var(--sabri-visual-text);
+    font-weight: 750;
+}
+
+:where(.sabri-ui-input, .sabri-ui-select, .sabri-ui-textarea) {
+    background: var(--sabri-visual-surface);
+    border: 1px solid var(--sabri-visual-border);
+    border-radius: var(--sabri-visual-radius-control);
+    color: var(--sabri-visual-text);
+    font: inherit;
+    inline-size: 100%;
+    min-block-size: var(--sabri-visual-touch-target);
+    padding: 0.65rem 0.75rem;
+}
+
+:where(.sabri-ui-textarea) {
+    min-block-size: 8rem;
+    resize: vertical;
+}
+
+:where(.sabri-ui-input[aria-invalid="true"], .sabri-ui-select[aria-invalid="true"], .sabri-ui-textarea[aria-invalid="true"]) {
+    border-color: var(--sabri-visual-danger);
+}
+
+:where(.sabri-ui-help, .sabri-ui-field-error) {
+    color: var(--sabri-visual-muted);
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+:where(.sabri-ui-field-error) {
+    color: var(--sabri-visual-danger);
+}
+
+:where(.sabri-ui-table-wrap) {
+    border: 1px solid var(--sabri-visual-border);
+    border-radius: var(--sabri-visual-radius-card);
+    max-inline-size: 100%;
+    overflow-x: auto;
+}
+
+:where(.sabri-ui-table) {
+    border-collapse: collapse;
+    color: var(--sabri-visual-text);
+    inline-size: 100%;
+    min-inline-size: 36rem;
+}
+
+:where(.sabri-ui-table th, .sabri-ui-table td) {
+    border-block-end: 1px solid var(--sabri-visual-border);
+    padding: 0.8rem 1rem;
+    text-align: start;
+    vertical-align: top;
+}
+
+:where(.sabri-ui-table th) {
+    background: var(--sabri-visual-page);
+    font-weight: 800;
+}
+
+:where(.sabri-ui-table tr:last-child td) {
+    border-block-end: 0;
 }
 
 :where(.sabri-ui-skeleton) {
@@ -238,6 +457,11 @@ body.sabri-visual-system.sabri-shell-theme-dark {
     :where(.sabri-ui-button) {
         max-inline-size: 100%;
     }
+
+    :where(.sabri-ui-content-card--compact.sabri-ui-content-card--has-media) {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -245,20 +469,31 @@ body.sabri-visual-system.sabri-shell-theme-dark {
         animation: none;
     }
 
-    :where(.sabri-ui-button, .sabri-ui-card, .sabri-ui-state) {
+    :where(.sabri-ui-button, .sabri-ui-card, .sabri-ui-state, .sabri-ui-notice) {
         scroll-behavior: auto !important;
         transition-duration: 0.01ms !important;
     }
 }
 
 @media (forced-colors: active) {
-    :where(.sabri-ui-button, .sabri-ui-card, .sabri-ui-state, .sabri-ui-badge) {
+    :where(.sabri-ui-button, .sabri-ui-card, .sabri-ui-state, .sabri-ui-notice, .sabri-ui-badge, .sabri-ui-input, .sabri-ui-select, .sabri-ui-textarea, .sabri-ui-table-wrap) {
         border-color: CanvasText;
         box-shadow: none;
         forced-color-adjust: auto;
     }
 
-    :where(.sabri-ui-button:focus-visible, .sabri-ui-card a:focus-visible, .sabri-ui-state a:focus-visible) {
+    :where(.sabri-ui-button:focus-visible, .sabri-ui-card a:focus-visible, .sabri-ui-state a:focus-visible, .sabri-ui-input:focus-visible, .sabri-ui-select:focus-visible, .sabri-ui-textarea:focus-visible) {
         outline-color: Highlight;
+    }
+}
+
+@media print {
+    :where(.sabri-ui-card, .sabri-ui-state, .sabri-ui-notice, .sabri-ui-table-wrap) {
+        box-shadow: none;
+        break-inside: avoid;
+    }
+
+    :where(.sabri-ui-button) {
+        border-color: currentColor;
     }
 }
