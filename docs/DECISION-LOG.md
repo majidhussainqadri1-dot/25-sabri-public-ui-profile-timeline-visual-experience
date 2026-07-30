@@ -1,5 +1,35 @@
 # Decision Log
 
+## 2026-07-30 — Canonical name upgraded without a new file
+
+The existing module is now canonically named **File 25 — Sabri Unified Global Visual Experience and Design System**.
+
+Its explanatory subtitle is **Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency**. The former title remains inside this subtitle. This is an upgrade of the same File 25, not a new module.
+
+## 2026-07-30 — File 26 is prohibited for this scope
+
+Global visual design, Facebook-familiar social presentation, profile timeline, responsive polish, accessibility, and visual consistency must not be split into a duplicate File 26. A second visual owner would create competing CSS, tokens, components, and integration rules.
+
+## 2026-07-30 — File 20 shell and File 25 visual ownership are separate
+
+File 20 remains the only global application-shell owner. File 25 owns the global public visual system rendered inside that shell and inherits File 20 shell tokens through semantic `--sabri-visual-*` aliases.
+
+## 2026-07-30 — Global design system is identity-independent
+
+The File 25 semantic token and component layer may boot without File 00. Identity-dependent profile and timeline behavior remains fail-closed when File 00 is unavailable.
+
+## 2026-07-30 — Prefixed components only
+
+Global design-system CSS uses `sabri-ui-*` component classes and `--sabri-visual-*` tokens. It must not broadly restyle arbitrary module elements or reproduce File 20 shell markup.
+
+## 2026-07-30 — No inline token bridge
+
+File 20 token inheritance is implemented in the local versioned stylesheet rather than a profile-only inline `<style>` block. This reduces duplication and supports future Content Security Policy hardening.
+
+## 2026-07-30 — Nested Safe Mode boundaries
+
+Safe Mode must preserve outer recovery boundaries during nested work. Inner `end()` calls may not disable outer fatal monitoring or misattribute incidents.
+
 ## 2026-07-30 — File number frozen
 
 The module is **File 25**, not File 22 or File 24.
@@ -26,11 +56,11 @@ Ordinary-member Phone/WhatsApp display requires both a public approved profile a
 
 ## 2026-07-30 — Graded dependencies
 
-File 00 is the hard runtime dependency. Files 03, 20, 21, and 24 are mandatory production integrations but do not all block early foundation coding. Dependency hooks may revoke detected availability but may not fabricate a native contract.
+File 00 is the hard profile/timeline runtime dependency. Files 03, 20, 21, and 24 are mandatory production integrations but do not all block early foundation coding. The File 25 global design-system layer itself remains identity-independent.
 
 ## 2026-07-30 — Active File 21 may not be bypassed
 
-The WordPress-post compatibility provider is registered only while File 21 is absent. If File 21 is active but has not registered a production provider, File 25 shows an honest unavailable timeline instead of querying around File 21.
+The WordPress-post compatibility provider is registered only while File 21 is absent. If File 21 is active but incompatible, File 25 shows an honest unavailable timeline instead of querying around File 21.
 
 ## 2026-07-30 — Federated pagination contract frozen
 
