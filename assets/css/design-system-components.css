@@ -1,0 +1,52 @@
+/* File 25 component-completion layer. The canonical public handle depends on
+ * the immutable semantic-token and primitive stylesheet. */
+
+:where(.sabri-ui-notice__title) {
+    font-size: clamp(1rem, 1.8vw, 1.25rem);
+    line-height: 1.3;
+    margin: 0;
+}
+
+:where(.sabri-ui-notice__message) {
+    color: var(--sabri-visual-muted);
+    margin: 0;
+    max-inline-size: 70ch;
+}
+
+:where(.sabri-ui-notice > .sabri-ui-button, .sabri-ui-state > .sabri-ui-button) {
+    margin-block-start: var(--sabri-visual-space-1);
+}
+
+:where(.sabri-ui-input::placeholder, .sabri-ui-textarea::placeholder) {
+    color: var(--sabri-visual-muted);
+    opacity: 1;
+}
+
+:where(.sabri-ui-input:disabled, .sabri-ui-select:disabled, .sabri-ui-textarea:disabled) {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+:where(.sabri-ui-table caption) {
+    color: var(--sabri-visual-text);
+    font-weight: 800;
+    padding-block: 0 0.75rem;
+    text-align: start;
+}
+
+:where(.sabri-ui-table tbody tr:focus-within) {
+    outline: 2px solid var(--sabri-visual-focus);
+    outline-offset: -2px;
+}
+
+@media (forced-colors: active) {
+    :where(.sabri-ui-table tbody tr:focus-within) {
+        outline-color: Highlight;
+    }
+}
+
+@media print {
+    :where(.sabri-ui-notice, .sabri-ui-state) {
+        border-inline-start-width: 1px;
+    }
+}
