@@ -42,7 +42,7 @@ final class Profile_Repository
         return $user instanceof WP_User ? $user : null;
     }
 
-    /** @return array<string, mixed>|null */
+    /** @return array<string,mixed>|null */
     public function get_public_profile(WP_User $user): ?array
     {
         if (! $this->visibility->can_render_publicly($user)) {
@@ -84,15 +84,13 @@ final class Profile_Repository
         $available_sections = $this->available_sections($profile_class, $bio, $contacts, $clinic);
         $all_labels = $this->section_labels($profile_class);
         $section_labels = array_intersect_key($all_labels, array_flip($available_sections));
+        $default_name = $profile_class === 'founder'
+            ? (string) get_option('sabri_public_experience_founder_display_name', 'Dr. Allamah Majid Hussain Sabri Muhaddith Mursheed')
+            : (string) $user->display_name;
 
         $profile = [
             'slug' => sanitize_title((string) $user->user_nicename),
-            'display_name' => $profile_class === 'founder'
-                ? (string) apply_filters(
-                    'sabri_public_experience/founder_display_name',
-                    get_option('sabri_public_experience_founder_display_name', 'Dr. Allamah Majid Hussain Sabri Muhaddith Mursheed')
-                )
-                : (string) $user->display_name,
+            'display_name' => $default_name,
             'class' => $profile_class,
             'role_label' => $this->role_label($profile_class),
             'verified' => in_array($profile_class, ['founder', 'doctor'], true),
@@ -111,18 +109,16 @@ final class Profile_Repository
         /** @var array<string,mixed> $filtered */
         $filtered = (array) apply_filters('sabri_public_experience/public_profile_data', $profile, $user);
 
-        // Presentation filters may change presentational text or media, but the
-        // authoritative class, badge, contacts, slug, sections, and routing cannot be widened.
-        $profile['display_name'] = $this->plain_text((string) ($filtered['display_name'] ?? $profile['display_name']), 190);
+        $filtered_name = $this->plain_text((string) ($filtered['display_name'] ?? $profile['display_name']), 190);
+        $profile['display_name'] = $filtered_name !== '' ? $filtered_name : $this->plain_text($default_name, 190);
         $profile['headline'] = $this->plain_text((string) ($filtered['headline'] ?? $profile['headline']), 300);
-        $profile['bio'] = $this->safe_html((string) ($filtered['bio'] ?? $profile['bio']), 12000);
+        $profile['bio'] = $this->plain_text((string) ($filtered['bio'] ?? $profile['bio']), 12000);
         $profile['avatar_url'] = esc_url_raw((string) ($filtered['avatar_url'] ?? $profile['avatar_url']));
         $profile['cover_url'] = esc_url_raw((string) ($filtered['cover_url'] ?? $profile['cover_url']));
         $profile['country'] = $this->plain_text((string) $profile['country'], 100);
         $profile['city'] = $this->plain_text((string) $profile['city'], 100);
         $profile['canonical_url'] = esc_url_raw((string) $profile['canonical_url']);
 
-        // No internal WordPress user ID or private native identifiers are exposed.
         return $profile;
     }
 
@@ -201,8 +197,6 @@ final class Profile_Repository
         /** @var array<string,mixed> $filtered */
         $filtered = (array) apply_filters('sabri_public_experience/public_contacts', $contacts, $user_id);
 
-        // Revalidate after filters so an extension cannot add an unapproved field
-        // or restore contact data denied by age, suspension, or consent policy.
         return $this->sanitize_contacts($filtered, $user_id);
     }
 
@@ -227,8 +221,9 @@ final class Profile_Repository
     }
 
     /**
-     * Return only sections with real foundation content. Optional providers may
-     * add sections through the filter after they can render a canonical surface.
+     * Return only sections that File 25 can render truthfully in this phase.
+     * Filters may hide an existing section, but may not create a dead tab. A
+     * later section-provider registry will own additive knowledge/media tabs.
      *
      * @param array<string,string> $contacts
      * @param array<string,mixed> $clinic
@@ -252,16 +247,18 @@ final class Profile_Repository
             $sections,
             $profile_class
         );
-        $allowed = array_keys($this->section_labels($profile_class));
         $clean = [];
         foreach ($filtered as $section) {
             if (! is_scalar($section)) {
                 continue;
             }
             $section = sanitize_key((string) $section);
-            if (in_array($section, $allowed, true)) {
+            if (in_array($section, $sections, true)) {
                 $clean[] = $section;
             }
+        }
+        if (! in_array('overview', $clean, true)) {
+            array_unshift($clean, 'overview');
         }
 
         return array_values(array_unique($clean));
@@ -269,17 +266,10 @@ final class Profile_Repository
 
     private function plain_text(string $value, int $limit): string
     {
-        $value = sanitize_text_field($value);
+        $value = preg_replace('#<(script|style)\b[^>]*>.*?</\1>#is', ' ', $value) ?? $value;
+        $value = sanitize_textarea_field($value);
+        $value = preg_replace('/\s+/u', ' ', $value) ?? $value;
 
-        return function_exists('mb_substr') ? mb_substr($value, 0, $limit) : substr($value, 0, $limit);
-    }
-
-    private function safe_html(string $value, int $limit): string
-    {
-        // Bound input before sanitizing so truncation cannot leave an approved tag
-        // half-open in the returned profile fragment.
-        $value = function_exists('mb_substr') ? mb_substr($value, 0, $limit) : substr($value, 0, $limit);
-
-        return wp_kses_post($value);
+        return function_exists('mb_substr') ? mb_substr(trim($value), 0, $limit) : substr(trim($value), 0, $limit);
     }
 }
