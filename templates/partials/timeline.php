@@ -1,11 +1,27 @@
 <?php
 /** @var array<string,mixed> $timeline */
 $items = (array) ($timeline['items'] ?? []);
+$page = max(1, (int) ($timeline['page'] ?? 1));
+$has_more = ! empty($timeline['has_more']);
+$partial = ! empty($timeline['provider_errors']);
+$truncated = ! empty($timeline['truncated']);
 ?>
 <div class="spux-section-heading">
     <h2 id="spux-section-title"><?php esc_html_e('Timeline', 'sabri-public-experience'); ?></h2>
     <p><?php esc_html_e('Approved public contributions from their native canonical sources.', 'sabri-public-experience'); ?></p>
 </div>
+
+<?php if ($partial) : ?>
+    <div class="spux-notice spux-notice--warning" role="status">
+        <p><?php esc_html_e('Some public contributions could not be loaded. Available verified items are shown below.', 'sabri-public-experience'); ?></p>
+    </div>
+<?php endif; ?>
+
+<?php if ($truncated) : ?>
+    <div class="spux-notice spux-notice--warning" role="status">
+        <p><?php esc_html_e('This foundation view reached its safe retrieval limit. A production timeline index is required for deeper history.', 'sabri-public-experience'); ?></p>
+    </div>
+<?php endif; ?>
 
 <?php if ($items === []) : ?>
     <div class="spux-state spux-state--empty" role="status">
@@ -13,31 +29,58 @@ $items = (array) ($timeline['items'] ?? []);
         <p><?php esc_html_e('Approved contributions will appear here when their native providers publish them.', 'sabri-public-experience'); ?></p>
     </div>
 <?php else : ?>
-    <div class="spux-timeline" aria-live="polite">
+    <div class="spux-timeline">
         <?php foreach ($items as $item) : ?>
+            <?php
+            $url = esc_url((string) ($item['canonical_url'] ?? ''));
+            $title = trim((string) ($item['title'] ?? ''));
+            if ($url === '' || $title === '') {
+                continue;
+            }
+            $published_at = (string) ($item['published_at'] ?? '');
+            $timestamp = strtotime($published_at);
+            $correction = sanitize_key((string) ($item['correction_state'] ?? 'none'));
+            ?>
             <article class="spux-card spux-timeline-card">
                 <div class="spux-card__meta">
                     <span class="spux-type"><?php echo esc_html(ucwords(str_replace('-', ' ', (string) ($item['content_type'] ?? 'publication')))); ?></span>
-                    <time datetime="<?php echo esc_attr((string) ($item['published_at'] ?? '')); ?>">
-                        <?php echo esc_html(wp_date(get_option('date_format'), strtotime((string) ($item['published_at'] ?? 'now')))); ?>
-                    </time>
+                    <?php if ($timestamp !== false) : ?>
+                        <time datetime="<?php echo esc_attr($published_at); ?>">
+                            <?php echo esc_html(wp_date(get_option('date_format'), $timestamp)); ?>
+                        </time>
+                    <?php endif; ?>
                 </div>
-                <h3><a href="<?php echo esc_url((string) ($item['canonical_url'] ?? '#')); ?>"><?php echo esc_html((string) ($item['title'] ?? '')); ?></a></h3>
+                <?php if (in_array($correction, ['corrected', 'retracted'], true)) : ?>
+                    <p class="spux-badge spux-badge--<?php echo esc_attr($correction); ?>">
+                        <?php echo esc_html($correction === 'retracted' ? __('Retracted', 'sabri-public-experience') : __('Corrected', 'sabri-public-experience')); ?>
+                    </p>
+                <?php endif; ?>
+                <h3><a href="<?php echo $url; ?>"><?php echo esc_html($title); ?></a></h3>
                 <?php if (! empty($item['safe_excerpt'])) : ?>
                     <p><?php echo esc_html((string) $item['safe_excerpt']); ?></p>
                 <?php endif; ?>
-                <a class="spux-read-more" href="<?php echo esc_url((string) ($item['canonical_url'] ?? '#')); ?>">
+                <a class="spux-read-more" href="<?php echo $url; ?>">
                     <?php esc_html_e('Read More', 'sabri-public-experience'); ?>
                 </a>
             </article>
         <?php endforeach; ?>
     </div>
 
-    <?php if (! empty($timeline['has_more'])) : ?>
+    <?php if ($page > 1 || $has_more) : ?>
         <nav class="spux-pagination" aria-label="<?php esc_attr_e('Timeline pagination', 'sabri-public-experience'); ?>">
-            <a class="spux-button spux-button--secondary" href="<?php echo esc_url(add_query_arg('paged', ((int) ($timeline['page'] ?? 1)) + 1)); ?>">
-                <?php esc_html_e('Load More', 'sabri-public-experience'); ?>
-            </a>
+            <?php if ($page > 1) : ?>
+                <a class="spux-button spux-button--secondary" rel="prev" href="<?php echo esc_url(add_query_arg('paged', $page - 1)); ?>">
+                    <?php esc_html_e('Previous page', 'sabri-public-experience'); ?>
+                </a>
+            <?php endif; ?>
+            <span class="spux-pagination__current" aria-current="page">
+                <?php echo esc_html(sprintf(__('Page %d', 'sabri-public-experience'), $page)); ?>
+            </span>
+            <?php if ($has_more) : ?>
+                <a class="spux-button spux-button--secondary" rel="next" href="<?php echo esc_url(add_query_arg('paged', $page + 1)); ?>">
+                    <?php esc_html_e('Next page', 'sabri-public-experience'); ?>
+                </a>
+            <?php endif; ?>
         </nav>
     <?php endif; ?>
 <?php endif; ?>
