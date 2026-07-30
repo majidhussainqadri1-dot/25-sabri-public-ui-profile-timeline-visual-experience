@@ -16,6 +16,24 @@ if (! function_exists('do_action')) {
     {
     }
 }
+if (! function_exists('apply_filters')) {
+    function apply_filters(string $hook, mixed $value, mixed ...$args): mixed
+    {
+        return $value;
+    }
+}
+if (! function_exists('home_url')) {
+    function home_url(string $path = ''): string
+    {
+        return 'https://example.test/' . ltrim($path, '/');
+    }
+}
+if (! function_exists('wp_parse_url')) {
+    function wp_parse_url(string $url): array|false
+    {
+        return parse_url($url);
+    }
+}
 
 require_once dirname(__DIR__) . '/includes/contracts/interface-timeline-provider.php';
 require_once dirname(__DIR__) . '/includes/class-normalized-timeline-item.php';
@@ -113,6 +131,13 @@ check(strlen((string) $bounded->get('title')) <= 300, 'Timeline title must be bo
 check(strlen((string) $bounded->get('safe_excerpt')) <= 1200, 'Timeline excerpt must be bounded.');
 check($bounded->get('pin_weight') === 1000, 'Pin weight must be bounded.');
 
+$thumbnail_id = timeline_item(['thumbnail_reference' => '123']);
+check($thumbnail_id->get('thumbnail_reference') === 123, 'Numeric thumbnail strings must normalize to positive integer references.');
+$thumbnail_url = timeline_item(['thumbnail_reference' => 'https://example.test/media/cover.webp']);
+check($thumbnail_url->get('thumbnail_reference') === 'https://example.test/media/cover.webp', 'Safe HTTP thumbnail URLs must remain available.');
+$thumbnail_unsafe = timeline_item(['thumbnail_reference' => 'javascript:alert(1)']);
+check($thumbnail_unsafe->get('thumbnail_reference') === null, 'Unsafe thumbnail references must be removed.');
+
 $provider = new class implements Timeline_Provider {
     public function get_provider_id(): string { return 'test-provider'; }
     public function get_provider_version(): string { return '1.0.0'; }
@@ -132,6 +157,21 @@ try {
     $duplicate_rejected = true;
 }
 check($duplicate_rejected, 'Provider registry must reject duplicate IDs.');
+
+$invalid_id_rejected = false;
+try {
+    $registry->register(new class implements Timeline_Provider {
+        public function get_provider_id(): string { return 'Invalid Provider'; }
+        public function get_provider_version(): string { return '1.0.0'; }
+        public function is_available(): bool { return true; }
+        public function get_maturity_level(): string { return 'read-only'; }
+        public function get_public_author_items(int $author_id, array $query): array { return []; }
+        public function get_health_status(): array { return []; }
+    });
+} catch (InvalidArgumentException) {
+    $invalid_id_rejected = true;
+}
+check($invalid_id_rejected, 'Provider registry must reject non-canonical IDs.');
 
 $invalid_maturity_rejected = false;
 try {
@@ -192,6 +232,47 @@ $mismatch_registry->register(new class implements Timeline_Provider {
 $mismatch = (new Timeline_Service($mismatch_registry))->get_for_author(1);
 check($mismatch['items'] === [], 'Items belonging to another author must not enter the requested timeline.');
 check($mismatch['provider_errors'] === ['wrong-author'], 'Author mismatch must be recorded as a provider error.');
+
+$spoof_registry = new Timeline_Registry();
+$spoof_registry->register(new class implements Timeline_Provider {
+    public function get_provider_id(): string { return 'registered-provider'; }
+    public function get_provider_version(): string { return '1.0.0'; }
+    public function is_available(): bool { return true; }
+    public function get_maturity_level(): string { return 'read-only'; }
+    public function get_health_status(): array { return []; }
+    public function get_public_author_items(int $author_id, array $query): array
+    {
+        return [timeline_item([
+            'provider_id' => 'spoofed-provider',
+            'author_id' => $author_id,
+            'public_profile_id' => $author_id,
+        ])];
+    }
+});
+$spoofed = (new Timeline_Service($spoof_registry))->get_for_author(1);
+check($spoofed['items'] === [], 'Provider identity spoofing must not enter the public timeline.');
+check($spoofed['provider_errors'] === ['registered-provider'], 'Provider identity mismatch must be recorded against the registered provider.');
+
+$external_registry = new Timeline_Registry();
+$external_registry->register(new class implements Timeline_Provider {
+    public function get_provider_id(): string { return 'external-provider'; }
+    public function get_provider_version(): string { return '1.0.0'; }
+    public function is_available(): bool { return true; }
+    public function get_maturity_level(): string { return 'read-only'; }
+    public function get_health_status(): array { return []; }
+    public function get_public_author_items(int $author_id, array $query): array
+    {
+        return [timeline_item([
+            'provider_id' => 'external-provider',
+            'author_id' => $author_id,
+            'public_profile_id' => $author_id,
+            'canonical_url' => 'https://evil.example/publication/1/',
+        ])];
+    }
+});
+$external = (new Timeline_Service($external_registry))->get_for_author(1);
+check($external['items'] === [], 'External canonical destinations must not enter the native public timeline.');
+check($external['provider_errors'] === ['external-provider'], 'External canonical rejection must be recorded as a provider error.');
 
 $pagination_registry = new Timeline_Registry();
 $pagination_provider = new class implements Timeline_Provider {
