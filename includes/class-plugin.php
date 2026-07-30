@@ -26,9 +26,14 @@ final class Plugin
 
     public static function activate(): void
     {
+        global $wp_version;
         if (version_compare(PHP_VERSION, Dependency_Manager::MINIMUM_PHP, '<')) {
             deactivate_plugins(plugin_basename(SABRI_PUBLIC_EXPERIENCE_FILE));
             wp_die(esc_html__('Sabri Public Experience requires PHP 8.0 or newer.', 'sabri-public-experience'));
+        }
+        if (version_compare((string) $wp_version, Dependency_Manager::MINIMUM_WORDPRESS, '<')) {
+            deactivate_plugins(plugin_basename(SABRI_PUBLIC_EXPERIENCE_FILE));
+            wp_die(esc_html__('Sabri Public Experience requires WordPress 6.5 or newer.', 'sabri-public-experience'));
         }
 
         add_option('sabri_public_experience_schema_version', SABRI_PUBLIC_EXPERIENCE_SCHEMA_VERSION, '', false);
@@ -49,10 +54,17 @@ final class Plugin
         }
         $this->booted = true;
 
+        Safe_Mode::register();
+        Safe_Mode::register_shutdown_guard();
+        Safe_Mode::begin('bootstrap');
+
         load_plugin_textdomain('sabri-public-experience', false, dirname(plugin_basename(SABRI_PUBLIC_EXPERIENCE_FILE)) . '/languages');
 
         $native = new Native_Integration();
         $dependencies = new Dependency_Manager($native);
+        $registry = new Timeline_Registry();
+        (new System_Check($dependencies, $registry))->register();
+
         if (! $dependencies->runtime_is_supported()) {
             add_action('admin_notices', static function () use ($dependencies): void {
                 if (! current_user_can('activate_plugins')) {
@@ -65,22 +77,18 @@ final class Plugin
                 ));
                 echo '</p></div>';
             });
+            Safe_Mode::end();
             return;
         }
 
-        if (get_option('sabri_public_experience_safe_mode', '0') === '1') {
-            add_action('admin_notices', static function (): void {
-                if (current_user_can('manage_options')) {
-                    echo '<div class="notice notice-warning"><p>' . esc_html__('Sabri Public Experience Safe Mode is active. Public profile overrides are disabled.', 'sabri-public-experience') . '</p></div>';
-                }
-            });
+        if (Safe_Mode::is_active()) {
+            Safe_Mode::end();
             return;
         }
 
         $visibility = new Visibility_Policy($native);
         $profiles = new Profile_Repository($visibility, $native);
         $router = new Profile_Router();
-        $registry = new Timeline_Registry();
 
         /**
          * Register richer native providers without modifying File 25 internals.
@@ -88,10 +96,18 @@ final class Plugin
          *
          * @param Timeline_Registry $registry
          */
-        do_action('sabri_public_experience/register_timeline_providers', $registry);
+        try {
+            do_action('sabri_public_experience/register_timeline_providers', $registry);
+        } catch (\Throwable $exception) {
+            do_action('sabri_public_experience/provider_registration_error', $exception);
+        }
 
         if ($registry->get('file-21') === null) {
-            $registry->register(new WordPress_Posts_Provider());
+            try {
+                $registry->register(new WordPress_Posts_Provider());
+            } catch (\Throwable $exception) {
+                do_action('sabri_public_experience/provider_registration_error', $exception);
+            }
         }
 
         $timeline = new Timeline_Service($registry);
@@ -101,8 +117,8 @@ final class Plugin
         $renderer->register();
         (new Assets($router))->register();
         (new Rest_Controller($profiles, $timeline))->register();
-        (new System_Check($dependencies, $registry))->register();
 
         do_action('sabri_public_experience/booted', $this, $registry);
+        Safe_Mode::end();
     }
 }
