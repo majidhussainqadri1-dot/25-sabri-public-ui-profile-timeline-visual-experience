@@ -51,6 +51,9 @@ jobs:
       - name: Reusable content card and URL security contract
         run: php tests/content-cards.php
 
+      - name: Optional profile section provider contract
+        run: php tests/section-providers.php
+
       - name: Nested Safe Mode contract
         run: php tests/safe-mode.php
 
