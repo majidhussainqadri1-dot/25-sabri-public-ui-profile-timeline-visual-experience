@@ -27,7 +27,7 @@ final class Rest_Controller
 
     public function register_routes(): void
     {
-        register_rest_route('sabri-public/v1', '/profiles/(?P<slug>[^/]+)', [
+        register_rest_route('sabri-public/v1', '/profiles/(?P<slug>[a-zA-Z0-9_-]+)', [
             'methods' => 'GET',
             'callback' => [$this, 'get_profile'],
             'permission_callback' => '__return_true',
@@ -39,7 +39,7 @@ final class Rest_Controller
             ],
         ]);
 
-        register_rest_route('sabri-public/v1', '/profiles/(?P<slug>[^/]+)/timeline', [
+        register_rest_route('sabri-public/v1', '/profiles/(?P<slug>[a-zA-Z0-9_-]+)/timeline', [
             'methods' => 'GET',
             'callback' => [$this, 'get_timeline'],
             'permission_callback' => '__return_true',
@@ -56,10 +56,12 @@ final class Rest_Controller
     {
         $user = $this->profiles->find_by_slug((string) $request['slug']);
         $profile = $user instanceof WP_User ? $this->profiles->get_public_profile($user) : null;
+
         if ($profile === null) {
-            return new WP_REST_Response(['code' => 'profile_not_found'], 404);
+            return new WP_REST_Response(['code' => 'profile_not_found'], 404, ['Cache-Control' => 'no-store']);
         }
-        return new WP_REST_Response($profile, 200, ['Cache-Control' => 'public, max-age=60']);
+
+        return new WP_REST_Response($profile, 200, ['Cache-Control' => 'no-store']);
     }
 
     public function get_timeline(WP_REST_Request $request): WP_REST_Response
@@ -67,7 +69,7 @@ final class Rest_Controller
         $user = $this->profiles->find_by_slug((string) $request['slug']);
         $profile = $user instanceof WP_User ? $this->profiles->get_public_profile($user) : null;
         if (! $user instanceof WP_User || $profile === null) {
-            return new WP_REST_Response(['code' => 'profile_not_found'], 404);
+            return new WP_REST_Response(['code' => 'profile_not_found'], 404, ['Cache-Control' => 'no-store']);
         }
 
         $result = $this->timeline->get_for_author((int) $user->ID, [
@@ -75,6 +77,7 @@ final class Rest_Controller
             'per_page' => min(50, max(1, (int) $request['per_page'])),
             'content_type' => (string) $request['content_type'],
         ]);
-        return new WP_REST_Response($result, 200, ['Cache-Control' => 'public, max-age=30']);
+
+        return new WP_REST_Response($result, 200, ['Cache-Control' => 'no-store']);
     }
 }
