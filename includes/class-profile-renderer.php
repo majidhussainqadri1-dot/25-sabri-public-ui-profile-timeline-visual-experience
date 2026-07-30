@@ -33,6 +33,7 @@ final class Profile_Renderer
         if (! $this->router->is_profile_request()) {
             return $template;
         }
+
         return SABRI_PUBLIC_EXPERIENCE_DIR . 'templates/public-profile.php';
     }
 
@@ -42,66 +43,123 @@ final class Profile_Renderer
             return;
         }
 
+        // Profile visibility and contacts may change at any moment. Until File 24
+        // provides an audited cache-partition contract, HTML remains no-store.
+        if (! defined('DONOTCACHEPAGE')) {
+            define('DONOTCACHEPAGE', true);
+        }
+        nocache_headers();
+
+        $context = $this->router->context();
         $user = $this->resolve_user();
         $profile = $user instanceof WP_User ? $this->profiles->get_public_profile($user) : null;
         if (! $user instanceof WP_User || $profile === null) {
-            global $wp_query;
-            $wp_query->set_404();
-            status_header(404);
-            nocache_headers();
+            $this->set_not_found();
             return;
         }
 
-        $context = $this->router->context();
-        $canonical = $this->profiles->canonical_url($user, $context['section']);
-        $profile['canonical_url'] = $canonical;
         $requested_type = $context['type'];
         $canonical_type = (string) $profile['class'];
-        if (($requested_type === 'member' && in_array($canonical_type, ['founder', 'doctor'], true))
-            || ($requested_type === 'doctor' && $canonical_type !== 'doctor')) {
+        $available_sections = array_values(array_filter(
+            (array) ($profile['available_sections'] ?? ['overview']),
+            'is_string'
+        ));
+        if (! in_array('overview', $available_sections, true)) {
+            array_unshift($available_sections, 'overview');
+        }
+
+        $requested_section = sanitize_key((string) $context['section']) ?: 'overview';
+        $canonical_section = in_array($requested_section, $available_sections, true)
+            ? $requested_section
+            : 'overview';
+        $canonical = $this->profiles->canonical_url($user, $canonical_section);
+
+        if (
+            ($requested_type === 'member' && in_array($canonical_type, ['founder', 'doctor'], true))
+            || ($requested_type === 'doctor' && $canonical_type !== 'doctor')
+        ) {
             wp_safe_redirect($canonical, 301);
             exit;
         }
 
-        $content_type = '';
-        if (isset($_GET['type']) && is_scalar($_GET['type'])) {
-            $content_type = sanitize_key((string) wp_unslash($_GET['type']));
+        // A syntactically valid but unavailable section must not become a dead,
+        // indexable tab or an empty duplicate of Overview.
+        if (! in_array($requested_section, $available_sections, true)) {
+            $this->set_not_found();
+            return;
+        }
+
+        global $wp_query;
+        $wp_query->is_404 = false;
+        $wp_query->is_home = false;
+        $wp_query->is_archive = false;
+        $wp_query->is_singular = true;
+        status_header(200);
+
+        $profile['canonical_url'] = $canonical;
+        $context['section'] = $requested_section;
+        $context['available_sections'] = $available_sections;
+
+        $timeline = [
+            'items' => [],
+            'page' => 1,
+            'per_page' => 20,
+            'has_more' => false,
+            'truncated' => false,
+            'provider_errors' => [],
+        ];
+        if ($requested_section === 'timeline') {
+            $content_type = '';
+            if (isset($_GET['type']) && is_scalar($_GET['type'])) {
+                $content_type = sanitize_key((string) wp_unslash($_GET['type']));
+            }
+            $timeline = $this->timeline->get_for_author((int) $user->ID, [
+                'page' => max(1, (int) get_query_var('paged')),
+                'per_page' => 20,
+                'content_type' => $content_type,
+            ]);
         }
 
         $GLOBALS['sabri_public_experience_profile_user'] = $user;
         $GLOBALS['sabri_public_experience_profile'] = $profile;
         $GLOBALS['sabri_public_experience_context'] = $context;
-        $GLOBALS['sabri_public_experience_timeline'] = $this->timeline->get_for_author(
-            (int) $user->ID,
-            [
-                'page' => max(1, (int) get_query_var('paged')),
-                'per_page' => 20,
-                'content_type' => $content_type,
-            ]
-        );
-
-        status_header(200);
+        $GLOBALS['sabri_public_experience_timeline'] = $timeline;
     }
 
     /** @param array<string,string> $parts @return array<string,string> */
     public function document_title_parts(array $parts): array
     {
-        if ($this->router->is_profile_request() && ! empty($GLOBALS['sabri_public_experience_profile']['display_name'])) {
-            $parts['title'] = (string) $GLOBALS['sabri_public_experience_profile']['display_name'];
+        if (! $this->router->is_profile_request() || empty($GLOBALS['sabri_public_experience_profile']['display_name'])) {
+            return $parts;
         }
+
+        $profile = (array) $GLOBALS['sabri_public_experience_profile'];
+        $context = (array) ($GLOBALS['sabri_public_experience_context'] ?? []);
+        $section = sanitize_key((string) ($context['section'] ?? 'overview'));
+        $labels = (array) ($profile['section_labels'] ?? []);
+        $title = (string) $profile['display_name'];
+        if ($section !== 'overview' && isset($labels[$section])) {
+            $title = (string) $labels[$section] . ' — ' . $title;
+        }
+        $parts['title'] = $title;
+
         return $parts;
     }
 
     /** @param array<string,bool> $robots @return array<string,bool> */
     public function robots(array $robots): array
     {
-        if ($this->router->is_profile_request() && is_404()) {
+        if (! $this->router->is_profile_request()) {
+            return $robots;
+        }
+
+        $filtered = isset($_GET['type']) || (int) get_query_var('paged') > 1;
+        if (is_404() || $filtered) {
             $robots['noindex'] = true;
             $robots['noarchive'] = true;
+            $robots['nofollow'] = is_404();
         }
-        if ($this->router->is_profile_request() && isset($_GET['type'])) {
-            $robots['noindex'] = true;
-        }
+
         return $robots;
     }
 
@@ -112,27 +170,48 @@ final class Profile_Renderer
         }
 
         $profile = (array) $GLOBALS['sabri_public_experience_profile'];
-        echo '<link rel="canonical" href="' . esc_url((string) ($profile['canonical_url'] ?? '')) . '">' . "\n";
-        echo '<meta name="description" content="' . esc_attr(wp_trim_words((string) ($profile['bio'] ?? ''), 30)) . '">' . "\n";
+        $canonical = esc_url((string) ($profile['canonical_url'] ?? ''));
+        if ($canonical === '') {
+            return;
+        }
+
+        $description_source = trim(wp_strip_all_tags((string) ($profile['bio'] ?? '')));
+        if ($description_source === '') {
+            $description_source = trim((string) ($profile['headline'] ?? $profile['role_label'] ?? ''));
+        }
+        $description = wp_trim_words($description_source, 30);
+
+        echo '<link rel="canonical" href="' . $canonical . '">' . "\n";
+        if ($description !== '') {
+            echo '<meta name="description" content="' . esc_attr($description) . '">' . "\n";
+        }
         echo '<meta property="og:type" content="profile">' . "\n";
         echo '<meta property="og:title" content="' . esc_attr((string) ($profile['display_name'] ?? '')) . '">' . "\n";
-        echo '<meta property="og:url" content="' . esc_url((string) ($profile['canonical_url'] ?? '')) . '">' . "\n";
+        echo '<meta property="og:url" content="' . $canonical . '">' . "\n";
         if (! empty($profile['avatar_url'])) {
             echo '<meta property="og:image" content="' . esc_url((string) $profile['avatar_url']) . '">' . "\n";
+        }
+
+        $person = [
+            '@type' => 'Person',
+            'name' => (string) ($profile['display_name'] ?? ''),
+        ];
+        if ($description !== '') {
+            $person['description'] = $description;
+        }
+        if (! empty($profile['avatar_url'])) {
+            $person['image'] = (string) $profile['avatar_url'];
         }
 
         $schema = [
             '@context' => 'https://schema.org',
             '@type' => 'ProfilePage',
             'url' => (string) ($profile['canonical_url'] ?? ''),
-            'mainEntity' => [
-                '@type' => 'Person',
-                'name' => (string) ($profile['display_name'] ?? ''),
-                'description' => wp_trim_words((string) ($profile['bio'] ?? ''), 40),
-                'image' => (string) ($profile['avatar_url'] ?? ''),
-            ],
+            'mainEntity' => $person,
         ];
-        echo '<script type="application/ld+json">' . wp_json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) . '</script>' . "\n";
+        echo '<script type="application/ld+json">'
+            . wp_json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT)
+            . '</script>' . "\n";
     }
 
     private function resolve_user(): ?WP_User
@@ -141,6 +220,15 @@ final class Profile_Renderer
         if ($context['type'] === 'founder') {
             return $this->profiles->get_founder();
         }
+
         return $this->profiles->find_by_slug($context['slug']);
+    }
+
+    private function set_not_found(): void
+    {
+        global $wp_query;
+        $wp_query->set_404();
+        status_header(404);
+        nocache_headers();
     }
 }
