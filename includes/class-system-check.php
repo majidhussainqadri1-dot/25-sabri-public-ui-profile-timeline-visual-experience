@@ -12,7 +12,8 @@ final class System_Check
 {
     public function __construct(
         private Dependency_Manager $dependencies,
-        private Timeline_Registry $registry
+        private Timeline_Registry $timeline_registry,
+        private Section_Registry $section_registry
     ) {
     }
 
@@ -35,6 +36,10 @@ final class System_Check
         $tests['direct']['sabri_public_experience_providers'] = [
             'label' => __('File 25 timeline providers', 'sabri-public-experience'),
             'test' => [$this, 'provider_test'],
+        ];
+        $tests['direct']['sabri_public_experience_section_providers'] = [
+            'label' => __('File 25 optional profile-section providers', 'sabri-public-experience'),
+            'test' => [$this, 'section_provider_test'],
         ];
         $tests['direct']['sabri_public_experience_safe_mode'] = [
             'label' => __('File 25 Safe Mode', 'sabri-public-experience'),
@@ -60,6 +65,7 @@ final class System_Check
             && ($cards['owns_native_data'] ?? true) === false
             && is_callable('sabri_visual_experience_contract')
             && is_callable('sabri_visual_experience_render_state')
+            && is_callable('sabri_visual_experience_render_notice')
             && is_callable('sabri_visual_experience_render_card')
             && is_readable($stylesheet);
 
@@ -76,7 +82,7 @@ final class System_Check
             'design_system',
             __('The File 25 global design-system contract is available', 'sabri-public-experience'),
             'good',
-            __('File 25 owns the visual system and reusable cards while File 20 remains the sole application-shell owner. Visual staging acceptance is still required.', 'sabri-public-experience')
+            __('File 25 owns the visual system and reusable components while File 20 remains the sole application-shell owner. Visual staging acceptance is still required.', 'sabri-public-experience')
         );
     }
 
@@ -114,7 +120,7 @@ final class System_Check
         $available = [];
         $production = [];
         $errors = [];
-        foreach ($this->registry->all() as $id => $provider) {
+        foreach ($this->timeline_registry->all() as $id => $provider) {
             try {
                 if (! $provider->is_available() || $provider->get_maturity_level() === 'disabled') {
                     continue;
@@ -153,6 +159,52 @@ final class System_Check
             __('The production File 21 timeline provider is registered', 'sabri-public-experience'),
             'good',
             __('Provider registration is healthy; real-content staging tests remain mandatory.', 'sabri-public-experience')
+        );
+    }
+
+    /** @return array<string,mixed> */
+    public function section_provider_test(): array
+    {
+        $registered = 0;
+        $active = 0;
+        $errors = 0;
+        foreach ($this->section_registry->all() as $provider) {
+            $registered++;
+            try {
+                if ($provider->owns_native_content()) {
+                    $errors++;
+                    continue;
+                }
+                if ($provider->get_maturity_level() !== 'disabled' && $provider->is_available()) {
+                    $active++;
+                }
+            } catch (\Throwable) {
+                $errors++;
+            }
+        }
+
+        if ($errors > 0) {
+            return $this->result(
+                'section_providers',
+                __('One or more optional section providers failed health inspection', 'sabri-public-experience'),
+                'critical',
+                sprintf(__('Failed provider count: %d', 'sabri-public-experience'), $errors)
+            );
+        }
+        if ($registered === 0) {
+            return $this->result(
+                'section_providers',
+                __('No optional profile-section provider is registered yet', 'sabri-public-experience'),
+                'recommended',
+                __('Knowledge, Media, Reviews, Research, and Marketplace tabs remain hidden until accepted native providers supply approved public cards.', 'sabri-public-experience')
+            );
+        }
+
+        return $this->result(
+            'section_providers',
+            __('Optional profile-section provider registry is healthy', 'sabri-public-experience'),
+            'good',
+            sprintf(__('Registered providers: %1$d; currently available: %2$d. Staging content acceptance remains required.', 'sabri-public-experience'), $registered, $active)
         );
     }
 
