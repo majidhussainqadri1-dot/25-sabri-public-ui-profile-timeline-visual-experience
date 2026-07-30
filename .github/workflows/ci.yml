@@ -36,8 +36,11 @@ jobs:
       - name: PHP syntax
         run: find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
 
-      - name: Reviewed foundation contract tests
+      - name: Reviewed timeline foundation contracts
         run: php tests/run.php
+
+      - name: Structured public profile contracts
+        run: php tests/profile-data.php
 
       - name: Package structure
         run: php tools/verify-structure.php
