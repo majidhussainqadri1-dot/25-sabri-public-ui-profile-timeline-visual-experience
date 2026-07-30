@@ -19,13 +19,13 @@ if (! defined('ABSPATH')) {
  */
 final class Native_Integration
 {
-    /** @var array<int, array<string,mixed>> */
+    /** @var array<int,array<string,mixed>> */
     private array $profile_cache = [];
 
-    /** @var array<int, array<string,mixed>> */
+    /** @var array<int,array<string,mixed>> */
     private array $credentials_cache = [];
 
-    /** @var array<int, array<string,mixed>> */
+    /** @var array<int,array<string,mixed>> */
     private array $clinic_cache = [];
 
     /** @var array<string,bool> */
@@ -38,7 +38,6 @@ final class Native_Integration
             && function_exists('smc_user_status')
             && function_exists('smc_is_founder');
 
-        // A filter may narrow a detected dependency, but may not fabricate it.
         return $detected && (bool) apply_filters('sabri_public_experience/dependency/membership_core', true);
     }
 
@@ -72,25 +71,31 @@ final class Native_Integration
 
     public function founder_user_id(): int
     {
+        if (! function_exists('smc_is_founder')) {
+            return 0;
+        }
+
         $configured = (int) get_option('sabri_public_experience_founder_user_id', 0);
         $configured = (int) apply_filters('sabri_public_experience/founder_user_id', $configured);
-        if ($configured > 0 && get_user_by('id', $configured) instanceof WP_User) {
+        if (
+            $configured > 0
+            && get_user_by('id', $configured) instanceof WP_User
+            && smc_is_founder($configured)
+        ) {
             return $configured;
         }
 
-        if (function_exists('smc_is_founder')) {
-            $ids = get_users([
-                'meta_key' => '_smc_official_founder',
-                'meta_compare' => 'EXISTS',
-                'number' => 10,
-                'fields' => 'ids',
-                'orderby' => 'ID',
-                'order' => 'ASC',
-            ]);
-            foreach ($ids as $user_id) {
-                if (smc_is_founder((int) $user_id)) {
-                    return (int) $user_id;
-                }
+        $ids = get_users([
+            'meta_key' => '_smc_official_founder',
+            'meta_compare' => 'EXISTS',
+            'number' => 10,
+            'fields' => 'ids',
+            'orderby' => 'ID',
+            'order' => 'ASC',
+        ]);
+        foreach ($ids as $user_id) {
+            if (smc_is_founder((int) $user_id)) {
+                return (int) $user_id;
             }
         }
 
@@ -141,11 +146,7 @@ final class Native_Integration
     public function is_founder(int $user_id): bool
     {
         $detected = function_exists('smc_is_founder') && smc_is_founder($user_id);
-        if (! $detected) {
-            $detected = $this->founder_user_id() === $user_id;
-        }
 
-        // Integrations may revoke presentation, but may not elevate a user.
         return $detected && (bool) apply_filters('sabri_public_experience/is_founder', true, $user_id);
     }
 
@@ -166,13 +167,15 @@ final class Native_Integration
     public function is_verified_doctor(int $user_id): bool
     {
         $profile = $this->membership_profile($user_id);
+        $credentials = $this->professional_credentials($user_id);
         $account_type = sanitize_key((string) ($profile['account_type'] ?? ''));
         $age = $this->age($user_id);
         $eligible = $account_type === 'sabri_doctor'
             && $this->membership_is_approved($user_id)
             && $age !== null
             && $age >= 18
-            && ! $this->professional_document_is_expired($user_id);
+            && trim((string) ($credentials['qualification'] ?? '')) !== ''
+            && $this->professional_document_is_current($credentials);
 
         if (class_exists('SPD_Helpers') && method_exists('SPD_Helpers', 'verification_status')) {
             $profiles_status = sanitize_key((string) \SPD_Helpers::verification_status($user_id));
@@ -181,7 +184,6 @@ final class Native_Integration
             }
         }
 
-        // A provider may narrow eligibility, but File 00 prerequisites remain final.
         $filtered = (bool) apply_filters(
             'sabri_public_experience/is_verified_doctor',
             $eligible,
@@ -214,15 +216,13 @@ final class Native_Integration
         }
 
         $filtered = sanitize_key((string) apply_filters('sabri_public_experience/profile_class', $class, $user));
-        $allowed = ['founder', 'doctor', 'teacher', 'researcher', 'student', 'patient', 'pharmacy', 'institution', 'publisher', 'member'];
-        if (! in_array($filtered, $allowed, true)) {
-            return $class;
-        }
-        if (in_array($filtered, ['founder', 'doctor'], true) && $filtered !== $class) {
-            return $class;
+        // Role classification is authoritative. Extensions may only reduce a
+        // non-privileged profile to the generic member presentation.
+        if ($filtered === 'member' && ! in_array($class, ['founder', 'doctor'], true)) {
+            return 'member';
         }
 
-        return $filtered;
+        return $class;
     }
 
     public function public_visibility(int $user_id): string
@@ -231,7 +231,6 @@ final class Native_Integration
             return 'public';
         }
 
-        // Public presentation requires an approved File 00 identity and known adult age.
         $age = $this->age($user_id);
         if (! $this->membership_is_approved($user_id) || $age === null || $age < 18) {
             return 'private';
@@ -250,17 +249,18 @@ final class Native_Integration
             $visibility = 'members';
         }
 
-        // A filter may make an already-public profile more restrictive, never wider.
         $filtered = sanitize_key((string) apply_filters(
             'sabri_public_experience/profile_visibility',
             $visibility,
             $user_id
         ));
-        if ($visibility !== 'public') {
+        if (! in_array($filtered, ['public', 'members', 'private'], true)) {
             return $visibility;
         }
 
-        return in_array($filtered, ['public', 'members', 'private'], true) ? $filtered : 'public';
+        $rank = ['public' => 0, 'members' => 1, 'private' => 2];
+
+        return $rank[$filtered] >= $rank[$visibility] ? $filtered : $visibility;
     }
 
     public function profile_value(int $user_id, string $key, string $default = ''): string
@@ -312,7 +312,7 @@ final class Native_Integration
     }
 
     /**
-     * Return only an explicitly public/approved clinic projection.
+     * Return only an explicitly approved clinic projection.
      *
      * @return array<string,mixed>
      */
@@ -331,11 +331,13 @@ final class Native_Integration
             return $this->clinic_cache[$user_id] = [];
         }
 
-        $public_statuses = (array) apply_filters(
+        $authoritative = ['approved'];
+        $requested = (array) apply_filters(
             'sabri_public_experience/public_clinic_statuses',
-            ['approved', 'verified', 'active', 'public']
+            $authoritative
         );
-        $public_statuses = array_values(array_filter(array_map('sanitize_key', $public_statuses)));
+        $requested = array_values(array_filter(array_map('sanitize_key', $requested)));
+        $public_statuses = array_values(array_intersect($authoritative, $requested));
         if ($public_statuses === []) {
             return $this->clinic_cache[$user_id] = [];
         }
@@ -360,17 +362,17 @@ final class Native_Integration
         return [];
     }
 
-    private function professional_document_is_expired(int $user_id): bool
+    /** @param array<string,mixed> $credentials */
+    private function professional_document_is_current(array $credentials): bool
     {
-        $credentials = $this->professional_credentials($user_id);
         $expiry = trim((string) ($credentials['license_expiry'] ?? ''));
-        if ($expiry === '') {
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $expiry) !== 1) {
             return false;
         }
 
         $today = function_exists('current_time') ? (string) current_time('Y-m-d') : gmdate('Y-m-d');
 
-        return preg_match('/^\d{4}-\d{2}-\d{2}$/', $expiry) === 1 && $expiry < $today;
+        return $expiry >= $today;
     }
 
     private function table_exists(string $table): bool
