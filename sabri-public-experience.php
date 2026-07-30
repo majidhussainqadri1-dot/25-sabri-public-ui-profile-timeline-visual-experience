@@ -85,6 +85,7 @@ $spux_files = [
     'includes/class-timeline-service.php',
     'includes/class-section-registry.php',
     'includes/class-section-service.php',
+    'includes/providers/class-file-06-knowledge-provider.php',
     'includes/providers/class-file-21-provider.php',
     'includes/providers/class-wordpress-posts-provider.php',
     'includes/class-profile-repository.php',
