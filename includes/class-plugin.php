@@ -102,7 +102,9 @@ final class Plugin
             do_action('sabri_public_experience/provider_registration_error', $exception);
         }
 
-        if ($registry->get('file-21') === null) {
+        // Never bypass an active File 21 installation with a raw WordPress query.
+        // The compatibility fallback is permitted only while File 21 is absent.
+        if ($registry->get('file-21') === null && ! $native->home_news_available()) {
             try {
                 $registry->register(new WordPress_Posts_Provider());
             } catch (\Throwable $exception) {
