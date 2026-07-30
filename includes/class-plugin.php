@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sabri\PublicExperience;
 
+use Sabri\PublicExperience\Providers\File_06_Knowledge_Provider;
 use Sabri\PublicExperience\Providers\File_21_Provider;
 use Sabri\PublicExperience\Providers\WordPress_Posts_Provider;
 
@@ -126,12 +127,23 @@ final class Plugin
             }
         }
 
-        // Optional profile sections are registered by their native owners. The
-        // registry accepts read projections only and cannot take native ownership.
+        // Native modules register first. Reviewed File 25 compatibility adapters
+        // fill only missing canonical provider IDs and remain read-only.
         try {
             do_action('sabri_public_experience/register_section_providers', $section_registry);
         } catch (\Throwable $exception) {
             do_action('sabri_public_experience/section_provider_registration_error', $exception);
+        }
+
+        if ($section_registry->get('file-06-knowledge') === null) {
+            try {
+                $file_06 = new File_06_Knowledge_Provider();
+                if ($file_06->is_available()) {
+                    $section_registry->register($file_06);
+                }
+            } catch (\Throwable $exception) {
+                do_action('sabri_public_experience/section_provider_registration_error', $exception);
+            }
         }
 
         $timeline = new Timeline_Service($timeline_registry);
