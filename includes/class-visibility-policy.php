@@ -38,27 +38,53 @@ final class Visibility_Policy
 
     public function can_render_publicly(WP_User $user): bool
     {
-        $allowed = $this->native->public_visibility((int) $user->ID) === 'public';
-        return (bool) apply_filters('sabri_public_experience/can_render_profile', $allowed, $user);
+        $authoritative = $this->native->public_visibility((int) $user->ID) === 'public';
+        $filtered = (bool) apply_filters(
+            'sabri_public_experience/can_render_profile',
+            $authoritative,
+            $user
+        );
+
+        // The extension hook may make a profile more restrictive, never publicize
+        // a profile denied by File 00 or the minor/suspension rules.
+        return $authoritative && $filtered;
     }
 
     public function can_show_contact(int $user_id, string $field): bool
     {
+        $field = sanitize_key($field);
+        if (! in_array($field, ['phone', 'whatsapp'], true)) {
+            return false;
+        }
         if ($this->is_minor($user_id)) {
             return false;
         }
 
-        if ($this->is_founder($user_id) || $this->is_verified_doctor($user_id)) {
-            $allowed = in_array($field, ['phone', 'whatsapp'], true);
+        if ($this->is_founder($user_id)) {
+            $authoritative = true;
+        } elseif ($this->is_verified_doctor($user_id)) {
+            $authoritative = true;
         } else {
-            $allowed = false;
-            if (class_exists('SPD_Helpers') && method_exists('SPD_Helpers', 'can_show_contact')) {
-                $allowed = \SPD_Helpers::can_show_contact($user_id, false);
+            // General-member contact requires both a public approved profile and
+            // the explicit File 03 public-contact opt-in. File 03's broad helper
+            // also treats any legacy doctor as public, so the stored consent is
+            // read directly instead.
+            $authoritative = $this->native->public_visibility($user_id) === 'public';
+            if ($authoritative && class_exists('SPD_Helpers') && method_exists('SPD_Helpers', 'get')) {
+                $authoritative = (string) \SPD_Helpers::get($user_id, 'public_contact', '0') === '1';
+            } else {
+                $authoritative = false;
             }
-            $meta = get_user_meta($user_id, 'sabri_public_contact_' . sanitize_key($field), true);
-            $allowed = $allowed && $meta === '1';
         }
 
-        return (bool) apply_filters('sabri_public_experience/can_show_contact', $allowed, $user_id, $field);
+        $filtered = (bool) apply_filters(
+            'sabri_public_experience/can_show_contact',
+            $authoritative,
+            $user_id,
+            $field
+        );
+
+        // Privacy filters may revoke contact display but may not bypass a hard denial.
+        return $authoritative && $filtered;
     }
 }
