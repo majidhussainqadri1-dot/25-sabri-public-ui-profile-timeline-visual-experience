@@ -21,6 +21,17 @@ final class Assets
 
     public function enqueue(): void
     {
+        if (! Design_System::should_enqueue()) {
+            return;
+        }
+
+        wp_enqueue_style(
+            'sabri-visual-design-system',
+            SABRI_PUBLIC_EXPERIENCE_URL . 'assets/css/design-system.css',
+            [],
+            SABRI_PUBLIC_EXPERIENCE_VERSION
+        );
+
         if (! $this->router->is_profile_request()) {
             return;
         }
@@ -28,7 +39,7 @@ final class Assets
         wp_enqueue_style(
             'sabri-public-experience',
             SABRI_PUBLIC_EXPERIENCE_URL . 'assets/css/public.css',
-            [],
+            ['sabri-visual-design-system'],
             SABRI_PUBLIC_EXPERIENCE_VERSION
         );
         wp_enqueue_style(
