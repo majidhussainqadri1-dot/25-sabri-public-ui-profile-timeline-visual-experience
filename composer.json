@@ -1,0 +1,16 @@
+{
+  "name": "sabri/file-25-public-experience",
+  "description": "Unified public profiles and federated timeline presentation for the Sabri Social Homeopathy Platform.",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "php": ">=8.0"
+  },
+  "scripts": {
+    "test": [
+      "@php tests/run.php",
+      "@php tools/verify-structure.php"
+    ],
+    "lint": "find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l"
+  }
+}
