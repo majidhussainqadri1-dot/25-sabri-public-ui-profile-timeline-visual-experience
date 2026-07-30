@@ -23,13 +23,17 @@ $sections = (array) ($profile['section_labels'] ?? []);
 $profile_class = sanitize_key((string) ($profile['class'] ?? 'member'));
 ?>
 <main id="sabri-main-content" class="spux-profile" tabindex="-1" data-spux-profile-class="<?php echo esc_attr($profile_class); ?>" data-spux-section="<?php echo esc_attr($section); ?>">
-    <div class="spux-container">
+    <div class="spux-container sabri-ui-container">
         <?php if (is_404() || $profile === []) : ?>
-            <section class="spux-state spux-state--error" role="alert">
-                <h1><?php esc_html_e('Profile unavailable', 'sabri-public-experience'); ?></h1>
-                <p><?php esc_html_e('This profile is private, unavailable, or no longer published.', 'sabri-public-experience'); ?></p>
-                <a class="spux-button" href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('Return Home', 'sabri-public-experience'); ?></a>
-            </section>
+            <?php
+            echo \Sabri\PublicExperience\Components::render_state([
+                'type' => 'error',
+                'title' => __('Profile unavailable', 'sabri-public-experience'),
+                'message' => __('This profile is private, unavailable, or no longer published.', 'sabri-public-experience'),
+                'action_url' => home_url('/'),
+                'action_label' => __('Return Home', 'sabri-public-experience'),
+            ]); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- component renderer escapes all fields.
+            ?>
         <?php else : ?>
             <?php require SABRI_PUBLIC_EXPERIENCE_DIR . 'templates/partials/profile-hero.php'; ?>
 
@@ -69,7 +73,7 @@ $profile_class = sanitize_key((string) ($profile['class'] ?? 'member'));
                         <?php require SABRI_PUBLIC_EXPERIENCE_DIR . 'templates/partials/about.php'; ?>
                     <?php else : ?>
                         <section class="spux-section-stack" aria-labelledby="spux-section-title">
-                            <div class="spux-card spux-prose">
+                            <div class="spux-card sabri-ui-card spux-prose">
                                 <h2 id="spux-section-title"><?php esc_html_e('Overview', 'sabri-public-experience'); ?></h2>
                                 <?php if (! empty($profile['headline'])) : ?>
                                     <p class="spux-overview-headline"><?php echo esc_html((string) $profile['headline']); ?></p>
@@ -82,9 +86,14 @@ $profile_class = sanitize_key((string) ($profile['class'] ?? 'member'));
                                         </a>
                                     <?php endif; ?>
                                 <?php elseif (empty($profile['headline'])) : ?>
-                                    <div class="spux-state spux-state--empty" role="status">
-                                        <p><?php esc_html_e('No public information is available yet.', 'sabri-public-experience'); ?></p>
-                                    </div>
+                                    <?php
+                                    echo \Sabri\PublicExperience\Components::render_state([
+                                        'type' => 'empty',
+                                        'title' => __('No public information yet', 'sabri-public-experience'),
+                                        'message' => __('Approved public profile information will appear here when it becomes available.', 'sabri-public-experience'),
+                                        'compact' => true,
+                                    ]); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- component renderer escapes all fields.
+                                    ?>
                                 <?php endif; ?>
                             </div>
                         </section>
