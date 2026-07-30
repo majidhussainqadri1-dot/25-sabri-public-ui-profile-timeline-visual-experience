@@ -35,15 +35,11 @@ final class Section_Registry
     /** @var array<string,Profile_Section_Provider> */
     private array $providers = [];
 
-    /** @var array<string,array{id:string,version:string,section:string}> */
+    /** @var array<string,array{id:string,version:string,section:string,maturity:string,owns_native_content:bool}> */
     private array $registered_metadata = [];
 
     public function register(Profile_Section_Provider $provider): void
     {
-        if (count($this->providers) >= self::MAX_PROVIDERS) {
-            throw new InvalidArgumentException('The File 25 profile-section provider limit has been reached.');
-        }
-
         try {
             $id = self::key($provider->get_id());
             $version = trim($provider->get_version());
@@ -59,6 +55,9 @@ final class Section_Registry
         }
         if (isset($this->providers[$id])) {
             throw new InvalidArgumentException('Duplicate profile-section provider ID.');
+        }
+        if (count($this->providers) >= self::MAX_PROVIDERS) {
+            throw new InvalidArgumentException('The File 25 profile-section provider limit has been reached.');
         }
         if (! self::version_is_valid($version)) {
             throw new InvalidArgumentException('Profile-section provider version is invalid.');
@@ -78,6 +77,8 @@ final class Section_Registry
             'id' => $id,
             'version' => $version,
             'section' => $section,
+            'maturity' => $maturity,
+            'owns_native_content' => false,
         ];
         ksort($this->providers, SORT_STRING);
         ksort($this->registered_metadata, SORT_STRING);
@@ -118,6 +119,8 @@ final class Section_Registry
             $id = self::key($provider->get_id());
             $version = trim($provider->get_version());
             $section = self::key($provider->get_section());
+            $maturity = self::key($provider->get_maturity_level());
+            $owns_native_content = $provider->owns_native_content();
         } catch (\Throwable) {
             return false;
         }
@@ -130,9 +133,13 @@ final class Section_Registry
         return hash_equals($registered['id'], $id)
             && hash_equals($registered['version'], $version)
             && hash_equals($registered['section'], $section)
+            && hash_equals($registered['maturity'], $maturity)
+            && $registered['owns_native_content'] === $owns_native_content
+            && $owns_native_content === false
             && $section === self::key($expected_section)
             && self::version_is_valid($version)
-            && self::section_is_approved($section);
+            && self::section_is_approved($section)
+            && self::maturity_is_approved($maturity);
     }
 
     /** @return list<string> */
