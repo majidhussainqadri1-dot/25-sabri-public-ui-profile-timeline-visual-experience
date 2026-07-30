@@ -37,6 +37,7 @@ final class Timeline_Service
         $items = [];
         $canonical_items = [];
         $errors = [];
+        $provider_limit_reached = false;
 
         if ($author_id <= 0) {
             return [
@@ -68,6 +69,11 @@ final class Timeline_Service
                 }
 
                 $provider_items = $provider->get_public_author_items($author_id, $provider_query);
+                if (count($provider_items) > $candidate_limit) {
+                    $provider_items = array_slice($provider_items, 0, $candidate_limit);
+                    $provider_limit_reached = true;
+                }
+
                 foreach ($provider_items as $item) {
                     if (! $item instanceof Normalized_Timeline_Item) {
                         throw new \UnexpectedValueException('Timeline providers must return normalized timeline items.');
@@ -120,6 +126,7 @@ final class Timeline_Service
             array_pop($slice);
         }
         $truncated = $requested_page > $max_page
+            || $provider_limit_reached
             || ($candidate_limit === self::MAX_CANDIDATES_PER_PROVIDER && count($items) >= self::MAX_CANDIDATES_PER_PROVIDER);
 
         return [
@@ -143,20 +150,20 @@ final class Timeline_Service
 
         $site = wp_parse_url(home_url('/'));
         $target = wp_parse_url($url);
-        $same_host = is_array($site)
+        $same_site = is_array($site)
             && is_array($target)
+            && strtolower((string) ($site['scheme'] ?? '')) === strtolower((string) ($target['scheme'] ?? ''))
             && strtolower((string) ($site['host'] ?? '')) === strtolower((string) ($target['host'] ?? ''))
             && (int) ($site['port'] ?? 0) === (int) ($target['port'] ?? 0);
 
         $allowed = (bool) apply_filters(
             'sabri_public_experience/canonical_url_allowed',
-            $same_host,
+            $same_site,
             $url,
             $item
         );
 
-        // The default native contract is same-site. Extensions may only narrow it.
-        return $same_host && $allowed;
+        return $same_site && $allowed;
     }
 
     private function canonical_key(string $url): string
