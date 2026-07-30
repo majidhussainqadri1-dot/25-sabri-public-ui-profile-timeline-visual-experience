@@ -5,6 +5,7 @@
  * @var array<string,mixed> $profile
  * @var array<string,mixed> $context
  * @var array<string,mixed> $timeline
+ * @var array<string,mixed> $provider_section
  */
 
 declare(strict_types=1);
@@ -18,6 +19,7 @@ get_header();
 $profile = (array) ($GLOBALS['sabri_public_experience_profile'] ?? []);
 $context = (array) ($GLOBALS['sabri_public_experience_context'] ?? []);
 $timeline = (array) ($GLOBALS['sabri_public_experience_timeline'] ?? []);
+$provider_section = (array) ($GLOBALS['sabri_public_experience_provider_section'] ?? []);
 $section = sanitize_key((string) ($context['section'] ?? 'overview')) ?: 'overview';
 $sections = (array) ($profile['section_labels'] ?? []);
 $profile_class = sanitize_key((string) ($profile['class'] ?? 'member'));
@@ -61,6 +63,8 @@ $profile_class = sanitize_key((string) ($profile['class'] ?? 'member'));
                 <section class="spux-main">
                     <?php if ($section === 'timeline') : ?>
                         <?php require SABRI_PUBLIC_EXPERIENCE_DIR . 'templates/partials/timeline.php'; ?>
+                    <?php elseif (! empty($provider_section['is_provider_section']) && ($provider_section['section'] ?? '') === $section) : ?>
+                        <?php require SABRI_PUBLIC_EXPERIENCE_DIR . 'templates/partials/provider-section.php'; ?>
                     <?php elseif ($profile_class === 'founder' && $section === 'overview') : ?>
                         <?php require SABRI_PUBLIC_EXPERIENCE_DIR . 'templates/partials/founder-overview.php'; ?>
                     <?php elseif ($profile_class === 'doctor' && $section === 'overview') : ?>
