@@ -55,12 +55,12 @@ final class Section_Registry
         }
 
         $section = self::key($provider->get_section());
-        if (! in_array($section, self::SECTIONS, true)) {
+        if (! self::section_is_approved($section)) {
             throw new InvalidArgumentException('Profile-section provider section is not approved.');
         }
 
         $maturity = self::key($provider->get_maturity_level());
-        if (! in_array($maturity, self::MATURITY_LEVELS, true)) {
+        if (! self::maturity_is_approved($maturity)) {
             throw new InvalidArgumentException('Profile-section provider maturity is invalid.');
         }
 
@@ -87,7 +87,7 @@ final class Section_Registry
     public function for_section(string $section): array
     {
         $section = self::key($section);
-        if (! in_array($section, self::SECTIONS, true)) {
+        if (! self::section_is_approved($section)) {
             return [];
         }
 
@@ -101,6 +101,16 @@ final class Section_Registry
     public static function approved_sections(): array
     {
         return self::SECTIONS;
+    }
+
+    public static function section_is_approved(string $section): bool
+    {
+        return in_array(self::key($section), self::SECTIONS, true);
+    }
+
+    public static function maturity_is_approved(string $maturity): bool
+    {
+        return in_array(self::key($maturity), self::MATURITY_LEVELS, true);
     }
 
     private static function key(string $value): string
