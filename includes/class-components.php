@@ -11,6 +11,8 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
 /** Reusable, escaped, low-coupling public components for companion modules. */
 final class Components
 {
+    public const CONTRACT_VERSION = '1.1.0';
+
     private const STATE_TYPES = [
         'loading',
         'empty',
@@ -24,23 +26,31 @@ final class Components
     public static function contract(): array
     {
         return [
-            'contract_version' => '1.0.0',
+            'contract_version' => self::CONTRACT_VERSION,
             'prefix' => 'sabri-ui-',
             'classes' => [
                 'container' => 'sabri-ui-container',
+                'reading_width' => 'sabri-ui-reading-width',
                 'card' => 'sabri-ui-card',
+                'content_card' => 'sabri-ui-content-card',
                 'button' => 'sabri-ui-button',
                 'badge' => 'sabri-ui-badge',
                 'stack' => 'sabri-ui-stack',
                 'cluster' => 'sabri-ui-cluster',
                 'grid' => 'sabri-ui-grid',
                 'state' => 'sabri-ui-state',
+                'notice' => 'sabri-ui-notice',
+                'field' => 'sabri-ui-field',
+                'input' => 'sabri-ui-input',
+                'table_wrap' => 'sabri-ui-table-wrap',
+                'table' => 'sabri-ui-table',
                 'skeleton' => 'sabri-ui-skeleton',
                 'visually_hidden' => 'sabri-ui-visually-hidden',
             ],
             'states' => self::STATE_TYPES,
             'renderers' => [
                 'state' => [self::class, 'render_state'],
+                'content_card' => [Content_Cards::class, 'render'],
             ],
         ];
     }
@@ -61,7 +71,7 @@ final class Components
         $title = self::text($args['title'] ?? $defaults['title'], 240);
         $message = self::text($args['message'] ?? $defaults['message'], 1200);
         $action_label = self::text($args['action_label'] ?? '', 120);
-        $action_url = self::safe_url($args['action_url'] ?? '');
+        $action_url = Public_URL::sanitize_same_site($args['action_url'] ?? '');
         $compact = ! empty($args['compact']);
         $role = $type === 'error' ? 'alert' : 'status';
         $live = $type === 'error' ? 'assertive' : 'polite';
@@ -73,7 +83,8 @@ final class Components
         $attributes = ' class="' . self::escape_attr($classes) . '"'
             . ' data-sabri-visual-state="' . self::escape_attr($type) . '"'
             . ' role="' . $role . '"'
-            . ' aria-live="' . $live . '"';
+            . ' aria-live="' . $live . '"'
+            . ' aria-atomic="true"';
         if ($type === 'loading') {
             $attributes .= ' aria-busy="true"';
         }
@@ -88,7 +99,7 @@ final class Components
         if ($action_url !== '' && $action_label !== '') {
             $html .= '<a class="sabri-ui-button sabri-ui-button--secondary" href="'
                 . self::escape_url($action_url)
-                . '" rel="noopener noreferrer">'
+                . '">'
                 . self::escape_html($action_label)
                 . '</a>';
         }
@@ -100,24 +111,43 @@ final class Components
     /** @return array{title:string,message:string} */
     private static function default_copy(string $type): array
     {
-        $copy = [
-            'loading' => ['Loading', 'The requested content is being prepared.'],
-            'empty' => ['Nothing here yet', 'Approved public content will appear here when it becomes available.'],
-            'error' => ['Unable to load content', 'The requested public content could not be loaded safely.'],
-            'success' => ['Completed', 'The requested action completed successfully.'],
-            'warning' => ['Attention required', 'Some information may be incomplete or require review.'],
-            'unavailable' => ['Temporarily unavailable', 'This public feature is not currently available.'],
-        ];
-        $selected = $copy[$type] ?? $copy['empty'];
-
-        if (function_exists('__')) {
-            return [
-                'title' => __($selected[0], 'sabri-public-experience'),
-                'message' => __($selected[1], 'sabri-public-experience'),
-            ];
+        if (! function_exists('__')) {
+            return match ($type) {
+                'loading' => ['title' => 'Loading', 'message' => 'The requested content is being prepared.'],
+                'error' => ['title' => 'Unable to load content', 'message' => 'The requested public content could not be loaded safely.'],
+                'success' => ['title' => 'Completed', 'message' => 'The requested action completed successfully.'],
+                'warning' => ['title' => 'Attention required', 'message' => 'Some information may be incomplete or require review.'],
+                'unavailable' => ['title' => 'Temporarily unavailable', 'message' => 'This public feature is not currently available.'],
+                default => ['title' => 'Nothing here yet', 'message' => 'Approved public content will appear here when it becomes available.'],
+            };
         }
 
-        return ['title' => $selected[0], 'message' => $selected[1]];
+        return match ($type) {
+            'loading' => [
+                'title' => __('Loading', 'sabri-public-experience'),
+                'message' => __('The requested content is being prepared.', 'sabri-public-experience'),
+            ],
+            'error' => [
+                'title' => __('Unable to load content', 'sabri-public-experience'),
+                'message' => __('The requested public content could not be loaded safely.', 'sabri-public-experience'),
+            ],
+            'success' => [
+                'title' => __('Completed', 'sabri-public-experience'),
+                'message' => __('The requested action completed successfully.', 'sabri-public-experience'),
+            ],
+            'warning' => [
+                'title' => __('Attention required', 'sabri-public-experience'),
+                'message' => __('Some information may be incomplete or require review.', 'sabri-public-experience'),
+            ],
+            'unavailable' => [
+                'title' => __('Temporarily unavailable', 'sabri-public-experience'),
+                'message' => __('This public feature is not currently available.', 'sabri-public-experience'),
+            ],
+            default => [
+                'title' => __('Nothing here yet', 'sabri-public-experience'),
+                'message' => __('Approved public content will appear here when it becomes available.', 'sabri-public-experience'),
+            ],
+        };
     }
 
     private static function key(string $value): string
@@ -142,35 +172,11 @@ final class Components
         $text = html_entity_decode(strip_tags($text), ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $text = preg_replace('/\s+/u', ' ', $text) ?? $text;
         $text = trim($text);
+        $limit = max(1, min(12000, $limit));
 
         return function_exists('mb_substr')
             ? mb_substr($text, 0, $limit)
             : substr($text, 0, $limit);
-    }
-
-    private static function safe_url(mixed $value): string
-    {
-        if (! is_scalar($value)) {
-            return '';
-        }
-
-        $url = trim((string) $value);
-        if ($url === '') {
-            return '';
-        }
-        if (str_starts_with($url, '/') || str_starts_with($url, '#')) {
-            return $url;
-        }
-
-        $parts = parse_url($url);
-        if (! is_array($parts) || ! in_array(strtolower((string) ($parts['scheme'] ?? '')), ['http', 'https'], true)) {
-            return '';
-        }
-        if ((string) ($parts['host'] ?? '') === '' || isset($parts['user']) || isset($parts['pass'])) {
-            return '';
-        }
-
-        return function_exists('esc_url_raw') ? esc_url_raw($url) : $url;
     }
 
     private static function escape_html(string $value): string
