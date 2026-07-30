@@ -20,13 +20,15 @@ This branch implements phases **25A — Governance and Contracts** and **25B —
 
 ## Timeline design
 
-Providers expose public, approved, canonical objects through a read-only interface. The registry deduplicates objects by provider, native type, and native ID. The normalized object rejects private visibility and excludes full bodies or private metadata.
+Providers expose public, approved, canonical objects through a read-only interface. The registry rejects duplicate provider IDs and unknown maturity states. The service suppresses duplicate canonical destinations across providers. The normalized object rejects private visibility and excludes full bodies or private metadata.
 
-The WordPress posts provider is a compatibility baseline only. File 21 must register the production provider through:
+The WordPress posts provider is a compatibility baseline only. File 21 must register the production provider with the canonical `file-21` provider ID through:
 
 ```php
 do_action('sabri_public_experience/register_timeline_providers', $registry);
 ```
+
+When that provider is registered, File 25 does not register its WordPress-post fallback.
 
 ## Integration hooks
 
@@ -40,7 +42,7 @@ do_action('sabri_public_experience/register_timeline_providers', $registry);
 
 ## Safe failure
 
-A missing required dependency prevents public overrides from booting. Safe Mode also returns control to the native theme and modules without deleting data.
+A missing required dependency prevents public overrides from booting. Safe Mode also returns control to the native theme and modules without deleting data. Rejected, suspended, expired-document, minor, and non-public profile states fail closed.
 
 ## Existing-module compatibility detected in phase 25A
 
