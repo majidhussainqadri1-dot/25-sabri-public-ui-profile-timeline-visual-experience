@@ -5,14 +5,33 @@ declare(strict_types=1);
 if (! defined('ABSPATH')) {
     define('ABSPATH', __DIR__ . '/fixtures/');
 }
+if (! function_exists('sanitize_key')) {
+    function sanitize_key(string $value): string
+    {
+        return trim((string) preg_replace('/[^a-z0-9_\-]/', '-', strtolower($value)), '-');
+    }
+}
+if (! function_exists('untrailingslashit')) {
+    function untrailingslashit(string $value): string
+    {
+        return rtrim($value, '/\\');
+    }
+}
+if (! function_exists('do_action')) {
+    function do_action(string $hook, mixed ...$args): void
+    {
+    }
+}
 
 require_once dirname(__DIR__) . '/includes/contracts/interface-timeline-provider.php';
 require_once dirname(__DIR__) . '/includes/class-normalized-timeline-item.php';
 require_once dirname(__DIR__) . '/includes/class-timeline-registry.php';
+require_once dirname(__DIR__) . '/includes/class-timeline-service.php';
 
 use Sabri\PublicExperience\Contracts\Timeline_Provider;
 use Sabri\PublicExperience\Normalized_Timeline_Item;
 use Sabri\PublicExperience\Timeline_Registry;
+use Sabri\PublicExperience\Timeline_Service;
 
 $failures = [];
 
@@ -99,6 +118,53 @@ try {
     $duplicate_rejected = true;
 }
 check($duplicate_rejected, 'Provider registry must reject duplicate IDs.');
+
+$invalid_maturity_rejected = false;
+try {
+    $registry->register(new class implements Timeline_Provider {
+        public function get_provider_id(): string { return 'invalid-maturity'; }
+        public function get_provider_version(): string { return '1.0.0'; }
+        public function is_available(): bool { return true; }
+        public function get_maturity_level(): string { return 'unknown'; }
+        public function get_public_author_items(int $author_id, array $query): array { return []; }
+        public function get_health_status(): array { return []; }
+    });
+} catch (InvalidArgumentException) {
+    $invalid_maturity_rejected = true;
+}
+check($invalid_maturity_rejected, 'Provider registry must reject unknown maturity states.');
+
+$duplicate_registry = new Timeline_Registry();
+foreach (['first-provider', 'second-provider'] as $index => $provider_id) {
+    $duplicate_registry->register(new class($provider_id, $index) implements Timeline_Provider {
+        public function __construct(private string $id, private int $index) {}
+        public function get_provider_id(): string { return $this->id; }
+        public function get_provider_version(): string { return '1.0.0'; }
+        public function is_available(): bool { return true; }
+        public function get_maturity_level(): string { return 'read-only'; }
+        public function get_health_status(): array { return []; }
+        public function get_public_author_items(int $author_id, array $query): array
+        {
+            return [new Normalized_Timeline_Item([
+                'provider_id' => $this->id,
+                'provider_version' => '1.0.0',
+                'native_object_type' => 'publication',
+                'native_object_id' => (string) ($this->index + 1),
+                'author_id' => $author_id,
+                'public_profile_id' => $author_id,
+                'title' => 'Canonical duplicate',
+                'safe_excerpt' => '',
+                'canonical_url' => 'https://example.test/same-publication/',
+                'published_at' => '2026-07-30T12:00:00+00:00',
+                'visibility_state' => 'public',
+                'native_status' => 'publish',
+                'content_type' => 'post',
+            ])];
+        }
+    });
+}
+$deduped = (new Timeline_Service($duplicate_registry))->get_for_author(1);
+check(count($deduped['items']) === 1, 'Timeline service must suppress cross-provider canonical duplicates.');
 
 if ($failures !== []) {
     fwrite(STDERR, "FAILED\n- " . implode("\n- ", $failures) . "\n");
