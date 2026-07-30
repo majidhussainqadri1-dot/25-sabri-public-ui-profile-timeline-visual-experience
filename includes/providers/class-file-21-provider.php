@@ -23,6 +23,8 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
 final class File_21_Provider implements Timeline_Provider
 {
     private const PROVIDER_ID = 'file-21';
+    private const MINIMUM_SUPPORTED_VERSION = '1.0.3';
+    private const NEXT_INCOMPATIBLE_VERSION = '2.0.0';
     private const MAX_CANDIDATES = 500;
     private const NATIVE_PAGE_SIZE = 20;
 
@@ -38,11 +40,23 @@ final class File_21_Provider implements Timeline_Provider
         return $version !== '' ? substr($version, 0, 64) : 'unknown';
     }
 
+    public static function supports_version(string $version): bool
+    {
+        $version = trim($version);
+        if ($version === '' || preg_match('/^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/', $version) !== 1) {
+            return false;
+        }
+
+        return version_compare($version, self::MINIMUM_SUPPORTED_VERSION, '>=')
+            && version_compare($version, self::NEXT_INCOMPATIBLE_VERSION, '<');
+    }
+
     public function is_available(): bool
     {
         return class_exists('Sabri\\HomeNewsFeed\\ProfileTimeline')
             && is_callable(['Sabri\\HomeNewsFeed\\ProfileTimeline', 'query'])
-            && defined('SABRI_HNF_VERSION');
+            && defined('SABRI_HNF_VERSION')
+            && self::supports_version($this->get_provider_version());
     }
 
     public function get_maturity_level(): string
@@ -135,10 +149,15 @@ final class File_21_Provider implements Timeline_Provider
     /** @return array<string,mixed> */
     public function get_health_status(): array
     {
+        $version = $this->get_provider_version();
+
         return [
             'available' => $this->is_available(),
+            'compatible_version' => self::supports_version($version),
             'provider_id' => self::PROVIDER_ID,
-            'provider_version' => $this->get_provider_version(),
+            'provider_version' => $version,
+            'minimum_supported_version' => self::MINIMUM_SUPPORTED_VERSION,
+            'next_incompatible_version' => self::NEXT_INCOMPATIBLE_VERSION,
             'maturity' => $this->get_maturity_level(),
             'contract' => 'Sabri\\HomeNewsFeed\\ProfileTimeline::query',
             'read_only' => true,
