@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: Sabri Public Experience
+ * Plugin Name: Sabri Unified Global Visual Experience and Design System
  * Plugin URI:  https://sabrihomeopathy.com/
- * Description: Unified public profiles, federated profile timelines, reusable public cards, and an accessibility-oriented visual experience for the Sabri Social Homeopathy Platform.
- * Version:     0.3.0
+ * Description: File 25 global design system, public UI, profile timeline, responsive refinement, accessibility, visual consistency, and reusable visual states for the Sabri Social Homeopathy Platform.
+ * Version:     0.4.0
  * Author:      Dr. Allamah Majid Hussain Sabri Muhaddith Mursheed
  * Text Domain: sabri-public-experience
  * Requires at least: 6.5
@@ -23,7 +23,7 @@ if (version_compare(PHP_VERSION, '8.0', '<')) {
         add_action('admin_notices', static function () {
             echo '<div class="notice notice-error"><p>'
                 . esc_html(sprintf(
-                    __('Sabri Public Experience requires PHP 8.0 or newer. Current version: %s', 'sabri-public-experience'),
+                    __('Sabri Unified Global Visual Experience requires PHP 8.0 or newer. Current version: %s', 'sabri-public-experience'),
                     PHP_VERSION
                 ))
                 . '</p></div>';
@@ -49,7 +49,7 @@ if (defined('SABRI_PUBLIC_EXPERIENCE_FILE')) {
                     return;
                 }
                 echo '<div class="notice notice-error"><p>'
-                    . esc_html__('A duplicate Sabri Public Experience plugin copy was ignored to prevent class collisions. Remove the obsolete copy before release.', 'sabri-public-experience')
+                    . esc_html__('A duplicate File 25 visual-system plugin copy was ignored to prevent class and CSS ownership collisions. Remove the obsolete copy before release.', 'sabri-public-experience')
                     . '</p></div>';
             });
         }
@@ -61,7 +61,7 @@ if (function_exists('sabri_public_experience_bootstrap')) {
     return;
 }
 
-define('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.3.0');
+define('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.4.0');
 define('SABRI_PUBLIC_EXPERIENCE_SCHEMA_VERSION', '1');
 define('SABRI_PUBLIC_EXPERIENCE_FILE', __FILE__);
 define('SABRI_PUBLIC_EXPERIENCE_DIR', plugin_dir_path(__FILE__));
@@ -70,6 +70,8 @@ define('SABRI_PUBLIC_EXPERIENCE_URL', plugin_dir_url(__FILE__));
 require_once SABRI_PUBLIC_EXPERIENCE_DIR . 'includes/class-safe-mode.php';
 
 $spux_files = [
+    'includes/class-components.php',
+    'includes/class-design-system.php',
     'includes/contracts/interface-timeline-provider.php',
     'includes/class-normalized-timeline-item.php',
     'includes/class-native-integration.php',
@@ -104,6 +106,22 @@ try {
     \Sabri\PublicExperience\Safe_Mode::enable('file-loading-exception', $exception);
     \Sabri\PublicExperience\Safe_Mode::end();
     return;
+}
+
+if (! function_exists('sabri_visual_experience_contract')) {
+    /** @return array<string,mixed> */
+    function sabri_visual_experience_contract(): array
+    {
+        return \Sabri\PublicExperience\Design_System::contract();
+    }
+}
+
+if (! function_exists('sabri_visual_experience_render_state')) {
+    /** @param array<string,mixed> $args */
+    function sabri_visual_experience_render_state(array $args = []): string
+    {
+        return \Sabri\PublicExperience\Components::render_state($args);
+    }
 }
 
 function sabri_public_experience_activate(): void
