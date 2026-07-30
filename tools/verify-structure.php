@@ -10,7 +10,9 @@ $required = [
     'composer.json',
     'includes/class-plugin.php',
     'includes/class-safe-mode.php',
+    'includes/class-public-url.php',
     'includes/class-components.php',
+    'includes/class-content-cards.php',
     'includes/class-design-system.php',
     'includes/class-native-integration.php',
     'includes/class-visibility-policy.php',
@@ -18,6 +20,7 @@ $required = [
     'includes/class-profile-repository.php',
     'includes/class-profile-renderer.php',
     'includes/class-shell-integration.php',
+    'includes/class-system-check.php',
     'includes/class-timeline-registry.php',
     'includes/class-timeline-service.php',
     'includes/contracts/interface-timeline-provider.php',
@@ -37,6 +40,7 @@ $required = [
     'tests/profile-data.php',
     'tests/file21-provider.php',
     'tests/design-system.php',
+    'tests/content-cards.php',
     'tests/safe-mode.php',
     'SECURITY.md',
     'PRIVACY.md',
@@ -44,6 +48,8 @@ $required = [
     'docs/GOVERNING-SCOPE.md',
     'docs/DECISION-LOG.md',
     'docs/DESIGN-SYSTEM-CONTRACT.md',
+    'docs/CONTENT-CARD-CONTRACT.md',
+    'docs/THIRD-REVIEW-AND-CORRECTION-2026-07-30.md',
     'docs/SECOND-REVIEW-AND-CORRECTION-2026-07-30.md',
     'docs/REVIEW-AND-CORRECTION-2026-07-30.md',
     'docs/PHASE-25C-25D-IMPLEMENTATION.md',
@@ -69,13 +75,30 @@ if (! str_contains($css, '.spux-profile *')) {
 if (! str_contains($css, '--sabri-shell-primary') || ! str_contains($css, '--sabri-visual-primary')) {
     $errors[] = 'File 20 inheritance or File 25 semantic design tokens are missing.';
 }
-foreach (['.sabri-ui-card', '.sabri-ui-button', '.sabri-ui-state', '.sabri-ui-skeleton'] as $component) {
+foreach ([
+    '.sabri-ui-card',
+    '.sabri-ui-content-card',
+    '.sabri-ui-button',
+    '.sabri-ui-state',
+    '.sabri-ui-notice',
+    '.sabri-ui-field',
+    '.sabri-ui-table-wrap',
+    '.sabri-ui-skeleton',
+] as $component) {
     if (! str_contains($css, $component)) {
         $errors[] = 'Global visual component missing: ' . $component;
     }
 }
+foreach (['--sabri-visual-on-primary', '--sabri-visual-on-danger', '--sabri-visual-primary-soft'] as $contrast_token) {
+    if (! str_contains($css, $contrast_token)) {
+        $errors[] = 'Contrast-safe semantic token missing: ' . $contrast_token;
+    }
+}
 if (! str_contains($css, '@media (forced-colors: active)')) {
     $errors[] = 'Forced-colors accessibility support is missing.';
+}
+if (! str_contains($css, '@media print')) {
+    $errors[] = 'Print-safe public component behavior is missing.';
 }
 
 $javascript = file_get_contents($root . '/assets/js/public.js') ?: '';
@@ -108,12 +131,24 @@ if (! str_contains($main, "require_once SABRI_PUBLIC_EXPERIENCE_DIR . 'includes/
 if (! str_contains($main, "version_compare(PHP_VERSION, '8.0', '<')")) {
     $errors[] = 'Pre-require PHP runtime guard is missing.';
 }
-foreach (['class-components.php', 'class-design-system.php', 'class-profile-data.php', 'class-shell-integration.php', 'class-file-21-provider.php'] as $runtime_file) {
+foreach ([
+    'class-public-url.php',
+    'class-components.php',
+    'class-content-cards.php',
+    'class-design-system.php',
+    'class-profile-data.php',
+    'class-shell-integration.php',
+    'class-file-21-provider.php',
+] as $runtime_file) {
     if (! str_contains($main, $runtime_file)) {
         $errors[] = 'Required runtime file is not loaded: ' . $runtime_file;
     }
 }
-foreach (['sabri_visual_experience_contract', 'sabri_visual_experience_render_state'] as $function) {
+foreach ([
+    'sabri_visual_experience_contract',
+    'sabri_visual_experience_render_state',
+    'sabri_visual_experience_render_card',
+] as $function) {
     if (! str_contains($main, $function)) {
         $errors[] = 'Public design-system integration function missing: ' . $function;
     }
@@ -132,6 +167,30 @@ if (str_contains($shell, '<style') || str_contains($shell, 'wp_add_inline_style'
 }
 if (! str_contains($shell, '$base[\'owns_global_shell\'] = false')) {
     $errors[] = 'File 20 shell ownership denial is missing.';
+}
+
+$design_system = file_get_contents($root . '/includes/class-design-system.php') ?: '';
+foreach (['reusable-content-cards', 'Content_Cards::contract', 'creates_file_26', 'shell_is_available'] as $marker) {
+    if (! str_contains($design_system, $marker)) {
+        $errors[] = 'Design-system contract marker missing: ' . $marker;
+    }
+}
+
+$public_url = file_get_contents($root . '/includes/class-public-url.php') ?: '';
+foreach (["str_starts_with(\$url, '//')", "str_contains(\$url, '\\\\')", 'home_url', 'isset($parts[\'user\'])'] as $marker) {
+    if (! str_contains($public_url, $marker)) {
+        $errors[] = 'Same-origin URL protection marker missing: ' . $marker;
+    }
+}
+
+$content_cards = file_get_contents($root . '/includes/class-content-cards.php') ?: '';
+foreach (['owns_native_data', 'same_site_destinations', 'Public_URL::sanitize_same_site', 'sabri-ui-content-card'] as $marker) {
+    if (! str_contains($content_cards, $marker)) {
+        $errors[] = 'Content-card boundary marker missing: ' . $marker;
+    }
+}
+if (preg_match('/update_|insert_|delete_|wp_insert_post|wp_update_post|wp_delete_post/i', $content_cards)) {
+    $errors[] = 'Content-card renderer must remain presentation-only.';
 }
 
 $timeline = file_get_contents($root . '/includes/class-timeline-service.php') ?: '';
