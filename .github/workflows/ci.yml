@@ -63,6 +63,9 @@ jobs:
       - name: Package and local asset policy
         run: php tools/verify-structure.php
 
+      - name: File 06 and component completion package policy
+        run: php tools/verify-file06-and-components.php
+
   javascript:
     runs-on: ubuntu-latest
     steps:
