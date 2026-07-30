@@ -8,17 +8,10 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
     exit;
 }
 
-/**
- * Canonical design-system contract for File 25.
- *
- * File 20 continues to own the global application shell. File 25 owns the
- * public visual language consumed inside that shell: semantic tokens,
- * reusable components, responsive refinement, visual states, accessibility,
- * and cross-module consistency.
- */
+/** Canonical design-system contract for File 25. */
 final class Design_System
 {
-    public const CONTRACT_VERSION = '1.2.0';
+    public const CONTRACT_VERSION = '1.3.0';
     public const CANONICAL_NAME = 'Sabri Unified Global Visual Experience and Design System';
     public const SUBTITLE = 'Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency';
 
@@ -30,6 +23,7 @@ final class Design_System
         add_filter('sabri_visual_experience/tokens', [self::class, 'filter_tokens']);
         add_filter('sabri_visual_experience/components', [self::class, 'filter_components']);
         add_filter('sabri_visual_experience/content_cards', [Content_Cards::class, 'filter_contract']);
+        add_filter('sabri_visual_experience/acceptance', [Visual_Acceptance::class, 'filter_contract']);
     }
 
     /** @param list<string> $classes @return list<string> */
@@ -102,10 +96,12 @@ final class Design_System
                 'visual-regression',
                 'reusable-content-cards',
                 'optional-profile-sections',
+                'visual-acceptance-evidence',
             ],
             'tokens' => self::tokens(),
             'components' => Components::contract(),
             'content_cards' => Content_Cards::contract(),
+            'visual_acceptance' => Visual_Acceptance::contract(),
             'optional_sections' => [
                 'contract_version' => '1.0.0',
                 'allowed_sections' => Section_Registry::approved_sections(),
@@ -160,8 +156,6 @@ final class Design_System
     {
         $base = is_array($tokens) ? $tokens : [];
 
-        // Canonical File 25 tokens win so another plugin cannot silently redefine
-        // the public visual contract. Modules may add separately named tokens.
         return array_merge($base, self::tokens());
     }
 
