@@ -20,6 +20,7 @@ final class Plugin
         if (self::$instance === null) {
             self::$instance = new self();
         }
+
         return self::$instance;
     }
 
@@ -80,14 +81,18 @@ final class Plugin
         $profiles = new Profile_Repository($visibility, $native);
         $router = new Profile_Router();
         $registry = new Timeline_Registry();
-        $registry->register(new WordPress_Posts_Provider());
 
         /**
          * Register richer native providers without modifying File 25 internals.
+         * File 21's production provider must use the canonical `file-21` ID.
          *
          * @param Timeline_Registry $registry
          */
         do_action('sabri_public_experience/register_timeline_providers', $registry);
+
+        if ($registry->get('file-21') === null) {
+            $registry->register(new WordPress_Posts_Provider());
+        }
 
         $timeline = new Timeline_Service($registry);
         $renderer = new Profile_Renderer($router, $profiles, $timeline);
