@@ -64,6 +64,7 @@ final class Timeline_Service
             }
 
             try {
+                $provider_version = trim($provider->get_provider_version());
                 if (! $provider->is_available() || $provider->get_maturity_level() === 'disabled') {
                     continue;
                 }
@@ -78,6 +79,9 @@ final class Timeline_Service
                     if (! $item instanceof Normalized_Timeline_Item) {
                         throw new \UnexpectedValueException('Timeline providers must return normalized timeline items.');
                     }
+                    if ((string) $item->get('provider_id') !== $provider_id || (string) $item->get('provider_version') !== $provider_version) {
+                        throw new \UnexpectedValueException('Timeline item provider identity does not match the registered provider.');
+                    }
                     if ((int) $item->get('author_id') !== $author_id || (int) $item->get('public_profile_id') !== $author_id) {
                         throw new \UnexpectedValueException('Timeline provider returned an item for a different author or profile.');
                     }
@@ -88,7 +92,7 @@ final class Timeline_Service
                         throw new \UnexpectedValueException('Timeline provider returned a non-canonical external destination.');
                     }
 
-                    $key = $item->get('provider_id') . ':' . $item->get('native_object_type') . ':' . $item->get('native_object_id');
+                    $key = $provider_id . ':' . $item->get('native_object_type') . ':' . $item->get('native_object_id');
                     $canonical_key = $this->canonical_key((string) $item->get('canonical_url'));
                     if (isset($items[$key]) || ($canonical_key !== '' && isset($canonical_items[$canonical_key]))) {
                         continue;
