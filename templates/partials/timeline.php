@@ -5,11 +5,54 @@ $page = max(1, (int) ($timeline['page'] ?? 1));
 $has_more = ! empty($timeline['has_more']);
 $partial = ! empty($timeline['provider_errors']);
 $truncated = ! empty($timeline['truncated']);
+$current_type = isset($_GET['type']) && is_scalar($_GET['type'])
+    ? sanitize_key((string) wp_unslash($_GET['type']))
+    : '';
+$base_filters = [
+    '' => __('All', 'sabri-public-experience'),
+    'post' => __('Posts', 'sabri-public-experience'),
+];
+$requested_filters = (array) apply_filters(
+    'sabri_public_experience/timeline_filters',
+    $base_filters,
+    (array) ($profile ?? [])
+);
+$filters = [];
+foreach (array_slice($requested_filters, 0, 20, true) as $type => $label) {
+    if (! is_scalar($type) || ! is_scalar($label)) {
+        continue;
+    }
+    $type = sanitize_key((string) $type);
+    $label = sanitize_text_field((string) $label);
+    if ($label !== '' && ($type === '' || preg_match('/^[a-z0-9_\-]{1,64}$/', $type) === 1)) {
+        $filters[$type] = $label;
+    }
+}
+if (! isset($filters[''])) {
+    $filters = ['' => __('All', 'sabri-public-experience')] + $filters;
+}
 ?>
 <div class="spux-section-heading">
     <h2 id="spux-section-title"><?php esc_html_e('Timeline', 'sabri-public-experience'); ?></h2>
     <p><?php esc_html_e('Approved public contributions from their native canonical sources.', 'sabri-public-experience'); ?></p>
 </div>
+
+<?php if (count($filters) > 1) : ?>
+    <nav class="spux-filter-bar" aria-label="<?php esc_attr_e('Timeline filters', 'sabri-public-experience'); ?>">
+        <?php foreach ($filters as $type => $label) : ?>
+            <?php
+            $url = remove_query_arg(['type', 'paged']);
+            if ($type !== '') {
+                $url = add_query_arg('type', $type, $url);
+            }
+            $active = $current_type === $type;
+            ?>
+            <a class="spux-filter-bar__item<?php echo $active ? ' is-active' : ''; ?>" href="<?php echo esc_url($url); ?>"<?php echo $active ? ' aria-current="page"' : ''; ?>>
+                <?php echo esc_html($label); ?>
+            </a>
+        <?php endforeach; ?>
+    </nav>
+<?php endif; ?>
 
 <?php if ($partial) : ?>
     <div class="spux-notice spux-notice--warning" role="status">
@@ -59,7 +102,7 @@ $truncated = ! empty($timeline['truncated']);
                 <?php if (! empty($item['safe_excerpt'])) : ?>
                     <p><?php echo esc_html((string) $item['safe_excerpt']); ?></p>
                 <?php endif; ?>
-                <a class="spux-read-more" href="<?php echo $url; ?>">
+                <a class="spux-read-more" href="<?php echo $url; ?>" aria-label="<?php echo esc_attr(sprintf(__('Read more: %s', 'sabri-public-experience'), $title)); ?>">
                     <?php esc_html_e('Read More', 'sabri-public-experience'); ?>
                 </a>
             </article>
