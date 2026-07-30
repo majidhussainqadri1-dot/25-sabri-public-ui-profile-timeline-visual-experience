@@ -35,41 +35,52 @@ final class Section_Registry
     /** @var array<string,Profile_Section_Provider> */
     private array $providers = [];
 
+    /** @var array<string,array{id:string,version:string,section:string}> */
+    private array $registered_metadata = [];
+
     public function register(Profile_Section_Provider $provider): void
     {
         if (count($this->providers) >= self::MAX_PROVIDERS) {
             throw new InvalidArgumentException('The File 25 profile-section provider limit has been reached.');
         }
 
-        $id = self::key($provider->get_id());
+        try {
+            $id = self::key($provider->get_id());
+            $version = trim($provider->get_version());
+            $section = self::key($provider->get_section());
+            $maturity = self::key($provider->get_maturity_level());
+            $owns_native_content = $provider->owns_native_content();
+        } catch (\Throwable $exception) {
+            throw new InvalidArgumentException('Profile-section provider metadata could not be read safely.', 0, $exception);
+        }
+
         if ($id === '' || preg_match('/^[a-z0-9][a-z0-9_-]{0,63}$/', $id) !== 1) {
             throw new InvalidArgumentException('Profile-section provider ID is invalid.');
         }
         if (isset($this->providers[$id])) {
             throw new InvalidArgumentException('Duplicate profile-section provider ID.');
         }
-
-        $version = trim($provider->get_version());
-        if (preg_match('/^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/', $version) !== 1) {
+        if (! self::version_is_valid($version)) {
             throw new InvalidArgumentException('Profile-section provider version is invalid.');
         }
-
-        $section = self::key($provider->get_section());
         if (! self::section_is_approved($section)) {
             throw new InvalidArgumentException('Profile-section provider section is not approved.');
         }
-
-        $maturity = self::key($provider->get_maturity_level());
         if (! self::maturity_is_approved($maturity)) {
             throw new InvalidArgumentException('Profile-section provider maturity is invalid.');
         }
-
-        if ($provider->owns_native_content()) {
+        if ($owns_native_content) {
             throw new InvalidArgumentException('File 25 profile-section providers may not own native content.');
         }
 
         $this->providers[$id] = $provider;
+        $this->registered_metadata[$id] = [
+            'id' => $id,
+            'version' => $version,
+            'section' => $section,
+        ];
         ksort($this->providers, SORT_STRING);
+        ksort($this->registered_metadata, SORT_STRING);
     }
 
     public function get(string $id): ?Profile_Section_Provider
@@ -91,10 +102,37 @@ final class Section_Registry
             return [];
         }
 
-        return array_filter(
-            $this->providers,
-            static fn (Profile_Section_Provider $provider): bool => self::key($provider->get_section()) === $section
-        );
+        $matches = [];
+        foreach ($this->providers as $id => $provider) {
+            if (($this->registered_metadata[$id]['section'] ?? '') === $section) {
+                $matches[$id] = $provider;
+            }
+        }
+
+        return $matches;
+    }
+
+    public function provider_is_consistent(Profile_Section_Provider $provider, string $expected_section): bool
+    {
+        try {
+            $id = self::key($provider->get_id());
+            $version = trim($provider->get_version());
+            $section = self::key($provider->get_section());
+        } catch (\Throwable) {
+            return false;
+        }
+
+        $registered = $this->registered_metadata[$id] ?? null;
+        if (! is_array($registered)) {
+            return false;
+        }
+
+        return hash_equals($registered['id'], $id)
+            && hash_equals($registered['version'], $version)
+            && hash_equals($registered['section'], $section)
+            && $section === self::key($expected_section)
+            && self::version_is_valid($version)
+            && self::section_is_approved($section);
     }
 
     /** @return list<string> */
@@ -111,6 +149,11 @@ final class Section_Registry
     public static function maturity_is_approved(string $maturity): bool
     {
         return in_array(self::key($maturity), self::MATURITY_LEVELS, true);
+    }
+
+    private static function version_is_valid(string $version): bool
+    {
+        return preg_match('/^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/', $version) === 1;
     }
 
     private static function key(string $value): string
