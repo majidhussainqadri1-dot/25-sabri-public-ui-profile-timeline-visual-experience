@@ -45,7 +45,13 @@ jobs:
       - name: File 21 timeline adapter contract
         run: php tests/file21-provider.php
 
-      - name: Package structure
+      - name: Global design system contract
+        run: php tests/design-system.php
+
+      - name: Nested Safe Mode contract
+        run: php tests/safe-mode.php
+
+      - name: Package and local asset policy
         run: php tools/verify-structure.php
 
   javascript:
