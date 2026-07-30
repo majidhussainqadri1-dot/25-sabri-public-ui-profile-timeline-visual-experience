@@ -10,6 +10,7 @@
     "test": [
       "@php tests/run.php",
       "@php tests/profile-data.php",
+      "@php tests/file21-provider.php",
       "@php tools/verify-structure.php"
     ],
     "lint": "find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l"
