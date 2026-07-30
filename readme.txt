@@ -1,70 +1,67 @@
 === Sabri Unified Global Visual Experience and Design System ===
 Contributors: majidhussainqadri1-dot
-Tags: design-system, public-ui, profiles, timeline, accessibility, responsive, rtl
+Tags: design-system, profiles, timeline, accessibility, responsive, public-ui, content-cards
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 0.4.0
+Stable tag: 0.5.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-File 25 global design system, public UI, profile timeline, responsive refinement, accessibility, and visual consistency for the Sabri Social Homeopathy Platform.
+File 25 global public design system, reusable components, public profiles, federated timelines, responsive refinement, and accessibility for the Sabri Social Homeopathy Platform.
 
 == Description ==
 
-File 25 is canonically **Sabri Unified Global Visual Experience and Design System**.
+This is the same existing File 25, canonically named “Sabri Unified Global Visual Experience and Design System,” with the subtitle “Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency.” No duplicate File 26 is created for this scope.
 
-Subtitle: **Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency**.
+The reviewed 0.5.0 source foundation includes:
 
-This is the same existing File 25 and does not create File 26. File 20 remains the sole application-shell owner; File 21 remains the Home, News, posts, comments, interactions, moderation, and social owner.
-
-The reviewed 0.4.0 source includes:
-
-* global `--sabri-visual-*` semantic tokens inheriting File 20 shell tokens with safe fallbacks;
-* prefixed `sabri-ui-*` cards, buttons, badges, layouts, skeletons, and loading/empty/error/success/warning/unavailable states;
-* a versioned design-system contract, public integration functions, and WordPress filters;
-* global public CSS that does not depend on File 00 identity services;
-* profile/timeline features that remain fail-closed when required identity dependencies are absent;
-* removal of the former profile-only inline token bridge;
-* nested Safe Mode boundaries with correct fatal attribution;
-* early PHP and duplicate-copy guards;
+* global semantic visual tokens that inherit File 20 without duplicating its application shell;
+* contrast-safe light, dark, system, and shell-degraded visual derivatives;
+* reusable containers, layouts, cards, buttons, badges, notices, form controls, tables, skeletons, and visual states;
+* presentation-only cards for article, post, news, video, reel, book, PDF, Doctor, clinic, event, and Marketplace visual variants;
+* exact same-origin URL enforcement against protocol-relative, external, downgrade, credential-bearing, malformed, port-mismatched, and backslash destinations;
+* public card and state renderers with strict display allow lists and no native data ownership;
+* nested non-destructive Safe Mode and truthful Site Health diagnostics;
 * canonical Founder, verified-Doctor, and permitted-Member profile routes;
-* File 00-authoritative identity, visibility, and contact projection;
-* structured Founder and verified-Doctor public presentations;
+* File 00-authoritative public profile and contact projection;
 * a bounded read-only timeline provider contract and registry;
+* public-status, author, provider-identity, and same-site canonical validation;
 * a native read-only File 21 adapter using `Sabri\HomeNewsFeed\ProfileTimeline::query()`;
-* same-site canonical validation, author/provider binding, deduplication, pagination, and identifier redaction;
-* public profile/timeline REST endpoints with no-store;
-* visible focus, 44px-compatible targets, logical RTL/LTR properties, reduced motion, forced colors, and responsive refinement;
-* PHP 8.0/8.3 design-system, Safe Mode, timeline, File 21 adapter, profile, package, and JavaScript CI.
+* stable bounded paging across File 21 native pages with local normalization and redaction;
+* public profile and timeline REST endpoints with no-store and identifier redaction;
+* File 20 shell integration without creating a second header, navigation, sidebar, drawer, or bottom navigation;
+* structured Founder and verified-Doctor profiles using privacy-safe public allow lists;
+* visible focus, RTL/LTR logical properties, reduced motion, forced colors, print handling, local/system fonts, and responsive components;
+* PHP 8.0/8.3 timeline, profile, File 21, design-system, URL-security, content-card, Safe Mode, package, and JavaScript CI.
 
-This release is not production-complete. Exact multi-plugin staging, File 24 runtime integration, cross-module visual adoption, full viewport/RTL/accessibility/performance evidence, migration, rollback, real-user testing, packaging, deployment, and monitoring remain pending.
+This release is not production-complete. Exact multi-plugin staging, File 24 runtime integration, native-module adoption, optional providers, visual-regression evidence, migration, rollback, real-user testing, performance, packaging, and deployment remain pending.
 
 == Installation ==
 
-1. Upload the plugin folder to `/wp-content/plugins/` on a backed-up staging installation.
-2. Activate File 25.
-3. Confirm the File 25 global design-system Site Health test is available.
-4. Install and activate approved File 00/03/20/21 integrations for profile and timeline functionality.
-5. Refresh permalinks if profile routes are unresolved.
-6. Treat read-only source integration and green CI as development evidence, not production acceptance.
+1. Install and activate the approved Sabri Membership Core dependency for profile and timeline features.
+2. Upload the plugin folder to `/wp-content/plugins/`.
+3. Activate the plugin only on a backed-up staging installation.
+4. Confirm File 00 Founder identity and refresh permalinks if profile routes are unresolved.
+5. Review Site Health; source contracts and reusable components are not production-acceptance evidence.
 
 == Changelog ==
 
+= 0.5.0 =
+* Added exact same-origin URL security for reusable visual actions and cards.
+* Added reusable presentation-only content cards for eleven platform content/profile types.
+* Added notice, form-field, input, select, textarea, responsive table, print, and expanded contrast tokens.
+* Corrected protocol-relative link escape, dark-theme File 20 token overrides, variable translation strings, badge theming, danger-button contrast, and shell-detection accuracy.
+* Added `sabri_visual_experience_render_card()` and PHP 8.0/8.3 content-card security tests.
+
 = 0.4.0 =
-* Renamed the same existing File 25 to Sabri Unified Global Visual Experience and Design System; no File 26 is created.
-* Added the global semantic token and reusable component/state contract.
-* Added independent global design-system asset loading while profile features remain identity-dependent and fail-closed.
-* Removed the inline File 20 token bridge and retained one shell owner.
-* Corrected Safe Mode to preserve nested recovery boundaries.
-* Added design-system, Safe Mode, package, and Site Health evidence.
+* Added the canonical global visual-system contract, reusable visual states, semantic tokens, independent public design assets, and nested Safe Mode boundaries.
 
 = 0.3.0 =
-* Added a native read-only File 21 timeline adapter over File 21's visibility-safe ProfileTimeline query contract.
-* Added bounded native paging, normalization, provider health evidence, and no-write ownership checks.
+* Added a native read-only File 21 timeline adapter, bounded native paging, public normalization, health evidence, and no-write tests.
 
 = 0.2.0 =
-* Added File 20 shell-contract integration and Founder/verified-Doctor public profile foundations.
+* Added File 20 shell-contract integration and the first complete Founder and verified-Doctor public profile presentations.
 
 = 0.1.0 =
-* Initial foundation followed by source review and defect correction.
+* Initial 25A/25B coding foundation, followed by source review, defect correction, and strengthened CI.
