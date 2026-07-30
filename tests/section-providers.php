@@ -76,6 +76,8 @@ namespace {
         {
         }
     }
+
+    require_once dirname(__DIR__) . '/includes/contracts/interface-profile-section-provider.php';
 }
 
 namespace Sabri\PublicExperience\Tests {
@@ -145,7 +147,6 @@ namespace Sabri\PublicExperience\Tests {
 namespace {
     require_once dirname(__DIR__) . '/includes/class-public-url.php';
     require_once dirname(__DIR__) . '/includes/class-content-cards.php';
-    require_once dirname(__DIR__) . '/includes/contracts/interface-profile-section-provider.php';
     require_once dirname(__DIR__) . '/includes/class-section-registry.php';
     require_once dirname(__DIR__) . '/includes/class-section-service.php';
 
