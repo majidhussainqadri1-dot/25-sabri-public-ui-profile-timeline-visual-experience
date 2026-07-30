@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.3.0 — Native File 21 Timeline Adapter
+
+### Added
+
+- A native read-only `file-21` provider over File 21's existing visibility-safe `Sabri\HomeNewsFeed\ProfileTimeline::query()` contract.
+- Bounded multi-page retrieval using File 21's fixed twenty-item native page size, followed by File 25 normalization, same-site canonical enforcement, global sorting, deduplication, and pagination.
+- Provider health evidence that explicitly records read-only behavior and denies native content ownership.
+- PHP 8.0/8.3 contract coverage for native version detection, availability, maturity, multi-page retrieval, stable native offsets, identifier redaction, unsupported-content rejection, and disabled-state fail-closed behavior.
+- Package checks that prohibit write primitives in the File 21 adapter and require the adapter runtime/test files.
+
+### Corrected while coding
+
+- Fixed a discovered native-page offset defect: the final File 21 request now keeps `per_page=20` instead of shrinking the page size and overlapping earlier results.
+- Preserved native-owner precedence: a future provider registered by File 21 itself with the canonical `file-21` ID wins before File 25's compatibility adapter.
+- Preserved fail-closed behavior: an active but incompatible File 21 installation is never bypassed through raw WordPress post queries.
+- Prevented source-level integration from self-promoting to staging-accepted or production-accepted status; exact multi-plugin staging remains mandatory.
+
+### Still pending
+
+- Exact Files 00/03/20/21/25 staging acceptance and promotion of the File 21 provider beyond read-only.
+- File 24 runtime security/privacy contract.
+- Knowledge, media, reviews, research, Marketplace, and other optional section providers.
+- Fresh install, upgrade, migration, rollback, responsive/accessibility evidence, Hostinger staging acceptance, real-user workflows, release packaging, deployment, and post-deployment monitoring.
+
 ## 0.2.0 — File 20 Integration and Complete Founder Profile Foundation
 
 ### Added
@@ -21,13 +45,6 @@
 - Preserved the native-owner boundary: publications remain labels/index entries until their owning Book, Learn, Encyclopedia, Video, PDF, or Research provider is accepted.
 - Prevented public filters from changing identity class, verified state, contacts, canonical routes, or section authority.
 - Kept all profile HTML and REST responses non-cacheable until the File 24 privacy/cache contract is operational.
-
-### Still pending
-
-- Production File 21 timeline provider.
-- File 24 runtime security/privacy contract.
-- Knowledge, media, reviews, research, Marketplace, and other optional section providers.
-- Fresh install, upgrade, migration, rollback, responsive/accessibility evidence, Hostinger staging acceptance, real-user workflows, release packaging, deployment, and post-deployment monitoring.
 
 ## 0.1.0 — Reviewed 25A/25B Foundation
 
