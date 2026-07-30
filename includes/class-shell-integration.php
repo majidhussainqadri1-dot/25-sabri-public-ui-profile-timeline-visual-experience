@@ -10,9 +10,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-/**
- * File 20 integration without duplicating its shell, navigation, or settings.
- */
+/** File 20 integration without duplicating its shell, navigation, or settings. */
 final class Shell_Integration
 {
     public function __construct(
@@ -27,7 +25,6 @@ final class Shell_Integration
         add_filter('body_class', [$this, 'body_classes']);
         add_filter('author_link', [$this, 'canonical_author_link'], 20, 3);
         add_filter('sabri_public_experience/shell_contract', [$this, 'contract']);
-        add_action('wp_head', [$this, 'print_token_bridge'], 25);
     }
 
     /** @param list<string> $classes @return list<string> */
@@ -50,6 +47,7 @@ final class Shell_Integration
 
     public function canonical_author_link(string $link, int $author_id, string $author_nicename = ''): string
     {
+        unset($author_nicename);
         if ($author_id <= 0) {
             return $link;
         }
@@ -75,33 +73,27 @@ final class Shell_Integration
         $base = is_array($contract) ? $contract : [];
         $base['file'] = 25;
         $base['version'] = SABRI_PUBLIC_EXPERIENCE_VERSION;
+        $base['canonical_name'] = Design_System::CANONICAL_NAME;
         $base['shell_detected'] = $this->native->shell_available();
         $base['layout_filter'] = 'sabri_shell_layout_mode';
         $base['inherited_tokens'] = [
             '--sabri-shell-primary',
+            '--sabri-shell-primary-strong',
+            '--sabri-shell-text',
+            '--sabri-shell-muted',
+            '--sabri-shell-surface',
+            '--sabri-shell-bg',
+            '--sabri-shell-border',
+            '--sabri-shell-focus',
             '--sabri-shell-radius',
             '--sabri-shell-font-scale',
             '--sabri-shell-gap',
+            '--sabri-shell-max-width',
         ];
         $base['owns_global_shell'] = false;
+        $base['owns_global_visual_system'] = true;
+        $base['inline_token_bridge'] = false;
 
         return $base;
-    }
-
-    public function print_token_bridge(): void
-    {
-        if (! $this->router->is_profile_request()) {
-            return;
-        }
-        ?>
-        <style id="sabri-public-experience-shell-bridge">
-            body.sabri-shell-enabled .spux-profile {
-                --spux-primary: var(--sabri-shell-primary, #ff8a1f);
-                --spux-radius: var(--sabri-shell-radius, 1rem);
-                --spux-layout-gap: var(--sabri-shell-gap, 1.5rem);
-                font-size: calc(1rem * var(--sabri-shell-font-scale, 1));
-            }
-        </style>
-        <?php
     }
 }
