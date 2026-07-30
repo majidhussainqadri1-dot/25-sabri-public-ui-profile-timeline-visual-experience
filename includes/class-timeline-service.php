@@ -20,11 +20,12 @@ final class Timeline_Service
      */
     public function get_for_author(int $author_id, array $query = []): array
     {
-        $page = max(1, (int) ($query['page'] ?? 1));
+        $page = min(10000, max(1, (int) ($query['page'] ?? 1)));
         $per_page = min(50, max(1, (int) ($query['per_page'] ?? 20)));
         $content_type = sanitize_key((string) ($query['content_type'] ?? ''));
         $provider_filter = sanitize_key((string) ($query['provider'] ?? ''));
         $items = [];
+        $canonical_items = [];
         $errors = [];
 
         foreach ($this->registry->all() as $provider_id => $provider) {
@@ -41,7 +42,14 @@ final class Timeline_Service
                         continue;
                     }
                     $key = $item->get('provider_id') . ':' . $item->get('native_object_type') . ':' . $item->get('native_object_id');
+                    $canonical_key = strtolower(untrailingslashit((string) $item->get('canonical_url')));
+                    if ($canonical_key !== '' && isset($canonical_items[$canonical_key])) {
+                        continue;
+                    }
                     $items[$key] = $item;
+                    if ($canonical_key !== '') {
+                        $canonical_items[$canonical_key] = $key;
+                    }
                 }
             } catch (\Throwable $exception) {
                 $errors[] = $provider_id;
@@ -56,6 +64,7 @@ final class Timeline_Service
                 if ($pin !== 0) {
                     return $pin;
                 }
+
                 return strcmp((string) $right->get('published_at'), (string) $left->get('published_at'));
             }
         );
@@ -68,7 +77,10 @@ final class Timeline_Service
         }
 
         return [
-            'items' => array_map(static fn (Normalized_Timeline_Item $item): array => $item->to_array(), array_values($slice)),
+            'items' => array_map(
+                static fn (Normalized_Timeline_Item $item): array => $item->to_array(),
+                array_values($slice)
+            ),
             'page' => $page,
             'per_page' => $per_page,
             'has_more' => $has_more,
