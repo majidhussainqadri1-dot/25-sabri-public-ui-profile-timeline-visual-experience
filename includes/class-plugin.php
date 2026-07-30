@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sabri\PublicExperience;
 
+use Sabri\PublicExperience\Providers\File_21_Provider;
 use Sabri\PublicExperience\Providers\WordPress_Posts_Provider;
 
 if (! defined('ABSPATH')) {
@@ -91,8 +92,9 @@ final class Plugin
         $router = new Profile_Router();
 
         /**
-         * Register richer native providers without modifying File 25 internals.
-         * File 21's production provider must use the canonical `file-21` ID.
+         * Native owners may register richer providers first. Any future File 21
+         * provider must retain the canonical `file-21` ID and therefore takes
+         * precedence over File 25's compatibility adapter.
          *
          * @param Timeline_Registry $registry
          */
@@ -102,8 +104,19 @@ final class Plugin
             do_action('sabri_public_experience/provider_registration_error', $exception);
         }
 
-        // Never bypass an active File 21 installation with a raw WordPress query.
-        // The compatibility fallback is permitted only while File 21 is absent.
+        if ($registry->get('file-21') === null && $native->home_news_available()) {
+            try {
+                $file_21 = new File_21_Provider();
+                if ($file_21->is_available()) {
+                    $registry->register($file_21);
+                }
+            } catch (\Throwable $exception) {
+                do_action('sabri_public_experience/provider_registration_error', $exception);
+            }
+        }
+
+        // Never bypass an active but incompatible File 21 installation with a
+        // raw WordPress query. The fallback is allowed only while File 21 is absent.
         if ($registry->get('file-21') === null && ! $native->home_news_available()) {
             try {
                 $registry->register(new WordPress_Posts_Provider());
