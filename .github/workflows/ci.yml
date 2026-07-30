@@ -60,6 +60,9 @@ jobs:
       - name: Native File 06 knowledge provider contract
         run: php tests/file06-knowledge-provider.php
 
+      - name: Visual acceptance Definition-of-Done contract
+        run: php tests/visual-acceptance.php
+
       - name: Nested Safe Mode contract
         run: php tests/safe-mode.php
 
