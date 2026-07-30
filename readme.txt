@@ -4,34 +4,35 @@ Tags: design-system, profiles, timeline, accessibility, responsive, public-ui, c
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 0.7.0
+Stable tag: 0.8.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-File 25 global public design system, reusable components, public profiles, federated timelines, optional profile sections, responsive refinement, accessibility, and governed visual-acceptance evidence for the Sabri Social Homeopathy Platform.
+File 25 global public design system, reusable components, public profiles, federated timelines, governed Knowledge and Media profile sections, responsive refinement, accessibility, and visual-acceptance evidence for the Sabri Social Homeopathy Platform.
 
 == Description ==
 
 This is the same existing File 25, canonically named “Sabri Unified Global Visual Experience and Design System,” with the subtitle “Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency.” No duplicate File 26 is created for this scope.
 
-The reviewed 0.7.0 source foundation includes:
+The reviewed 0.8.0 source foundation includes:
 
 * global semantic visual tokens that inherit File 20 without duplicating its application shell;
 * reusable containers, layouts, cards, buttons, badges, notices, form controls, tables, skeletons, and visual states;
-* escaped public state, notice, and content-card rendering helpers;
 * exact same-origin URL enforcement for reusable actions, cards, and media;
 * a bounded optional profile-section provider contract for Knowledge, Media, Reviews, Research, and Marketplace;
-* immutable registered provider identity/version/section snapshots with query-time consistency validation;
-* provider metadata-failure isolation and case-sensitive canonical-path deduplication;
-* a native read-only File 06 Knowledge adapter and File 21 timeline adapter;
+* immutable provider ID, version, section, maturity, and ownership snapshots with query-time consistency validation;
+* truthful provider metadata-failure counting and canonical-URL deduplication;
+* native read-only File 06 Knowledge, File 10 Video Wall, File 11 Reels, File 12 PDF Library, and File 21 timeline adapters;
+* strict File 11 duration enforcement from 60 to 600 seconds;
+* strict public-status, author, password, post-type, version-range, and no-write boundaries for native adapters;
 * nested non-destructive Safe Mode and truthful Site Health diagnostics;
 * canonical Founder, verified-Doctor, and permitted-Member profile routes;
 * File 00-authoritative public profile and contact projection;
-* a machine-readable visual-acceptance Definition-of-Done matrix covering six viewports, RTL/LTR, light/dark/forced-colors, normal/reduced motion, 100/200/400 percent zoom, keyboard/pointer/touch/screen-reader input, critical surfaces, staging evidence, and Founder sign-off;
+* a machine-readable visual-acceptance Definition-of-Done matrix with cryptographically referenced evidence records, six viewports, RTL/LTR, light/dark/forced-colors, normal/reduced motion, 100/200/400 percent zoom, keyboard/pointer/touch/screen-reader input, critical surfaces, staging evidence, and Founder sign-off;
 * an explicit rule that source contracts and green CI are not visual acceptance;
 * PHP 8.0/8.3 and JavaScript CI.
 
-This release is not production-complete. Exact multi-plugin staging, File 24 runtime integration, native Media/Reviews/Research/Marketplace adapters, captured visual-regression evidence, migration, rollback, real-user testing, performance, packaging, and deployment remain pending.
+This release is not production-complete. Exact multi-plugin staging, File 24 runtime integration, native Reviews/Research/Marketplace adapters, captured visual-regression evidence, migration, rollback, real-user testing, performance, packaging, and deployment remain pending.
 
 == Installation ==
 
@@ -43,16 +44,18 @@ This release is not production-complete. Exact multi-plugin staging, File 24 run
 
 == Changelog ==
 
+= 0.8.0 =
+* Added native read-only File 10 Video Wall, File 11 Reels, and File 12 PDF Library Media adapters after exact package review.
+* Froze provider maturity and ownership metadata and reported consistency failures truthfully.
+* Deduplicated cards by exact canonical destination before fallback metadata.
+* Replaced boolean visual evidence placeholders with bounded artifact references, SHA-256 hashes, timestamps, reviewers, staging runtime evidence, and commit-bound Founder sign-off.
+
 = 0.7.0 =
 * Froze registered optional-provider ID, version, and section metadata and added query-time consistency checks.
-* Isolated provider metadata exceptions before query execution.
-* Preserved case-sensitive canonical URL paths during card deduplication.
-* Added the governed visual-acceptance evidence contract and public helper.
-* Added mandatory viewport, direction, color, motion, zoom, input, critical-surface, staging, and Founder-sign-off gates.
+* Added the governed visual-acceptance Definition-of-Done contract.
 
 = 0.6.0 =
 * Added bounded optional profile sections and the native read-only File 06 Knowledge adapter.
-* Completed notice and reusable component contracts.
 
 = 0.5.0 =
 * Added same-origin URL security and reusable content cards.
