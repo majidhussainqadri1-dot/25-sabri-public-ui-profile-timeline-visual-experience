@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.4.0 — Unified Global Visual Experience and Design System
+
+### Added
+
+- The Founder-approved canonical identity **File 25 — Sabri Unified Global Visual Experience and Design System**, retaining **Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency** as the explanatory subtitle.
+- An explicit architectural contract that this is the same File 25 and must not create a duplicate File 26.
+- A versioned global design-system API exposing ownership, semantic tokens, reusable component classes, visual states, and the canonical stylesheet handle.
+- Global `--sabri-visual-*` tokens inheriting File 20 `--sabri-shell-*` variables with local fallbacks.
+- Prefixed `sabri-ui-*` containers, reading widths, stacks, clusters, grids, cards, buttons, badges, skeletons, and loading/empty/error/success/warning/unavailable states.
+- Public integration functions `sabri_visual_experience_contract()` and `sabri_visual_experience_render_state()`.
+- WordPress filters for design-system contract, tokens, and components.
+- Visible focus, 44px-compatible targets, logical RTL/LTR properties, reduced-motion handling, forced-colors support, responsive containers, and local/system-font policy.
+- A direct Site Health design-system test and PHP 8.0/8.3 design-system contract coverage.
+
+### Corrected after second review
+
+- Split the global design-system stylesheet from profile-only CSS/JavaScript so all supported public modules can consume File 25 without loading profile behavior.
+- Allowed the identity-independent visual system to boot when File 00 is unavailable while keeping profile and timeline behavior fail-closed.
+- Removed the profile-only inline File 20 token bridge; static versioned CSS now owns semantic inheritance and is compatible with future CSP hardening.
+- Replaced the single Safe Mode boundary flag with a nested boundary stack so inner operations cannot clear an outer fatal guard or misattribute an incident.
+- Emitted fatal Safe Mode changes through the File 24 integration event and bounded incident fields.
+- Added package rules that require the canonical name, design-system runtime, prefixed components, File 20 ownership denial, no inline bridge, forced-colors support, and nested Safe Mode protection.
+- Updated governance, architecture, decision log, README, WordPress readme, changelog, CI, and PR scope to one canonical File 25 ownership model.
+
+### Still pending
+
+- Cross-module adoption by native module templates and full reusable content-card catalog.
+- Exact Files 00/03/20/21/25 staging and promotion of the File 21 provider beyond read-only.
+- File 24 runtime security/privacy/cache contract.
+- Knowledge, media, reviews, research, Marketplace, and other optional providers.
+- Fresh install, upgrade, migration, rollback, viewport screenshots, Urdu RTL, keyboard, screen reader, zoom, forced-colors, reduced-motion, performance, Hostinger staging, real-user workflows, release packaging, deployment, and monitoring.
+
 ## 0.3.0 — Native File 21 Timeline Adapter
 
 ### Added
@@ -16,13 +48,6 @@
 - Preserved native-owner precedence: a future provider registered by File 21 itself with the canonical `file-21` ID wins before File 25's compatibility adapter.
 - Preserved fail-closed behavior: an active but incompatible File 21 installation is never bypassed through raw WordPress post queries.
 - Prevented source-level integration from self-promoting to staging-accepted or production-accepted status; exact multi-plugin staging remains mandatory.
-
-### Still pending
-
-- Exact Files 00/03/20/21/25 staging acceptance and promotion of the File 21 provider beyond read-only.
-- File 24 runtime security/privacy contract.
-- Knowledge, media, reviews, research, Marketplace, and other optional section providers.
-- Fresh install, upgrade, migration, rollback, responsive/accessibility evidence, Hostinger staging acceptance, real-user workflows, release packaging, deployment, and post-deployment monitoring.
 
 ## 0.2.0 — File 20 Integration and Complete Founder Profile Foundation
 
@@ -46,27 +71,7 @@
 - Prevented public filters from changing identity class, verified state, contacts, canonical routes, or section authority.
 - Kept all profile HTML and REST responses non-cacheable until the File 24 privacy/cache contract is operational.
 
-## 0.1.0 — Reviewed 25A/25B Foundation
+## 0.1.0 — Reviewed Foundation
 
-### Added
-
-- WordPress plugin bootstrap with an early PHP runtime guard, duplicate-copy collision protection, activation/deactivation boundaries, and non-destructive Safe Mode recovery.
-- Graded dependency manager with File 00 as the authoritative identity dependency and truthful production-gap reporting for Files 03, 20, 21, and 24.
-- Privacy-first Founder, verified-doctor, and permitted-member profile projection.
-- Canonical Founder, Doctor, and Member profile routes with canonical redirects and unavailable-section rejection.
-- Federated read-only timeline provider contract, bounded registry, global cross-provider pagination, canonical deduplication, and public-safe normalized items.
-- Read-only WordPress posts compatibility provider used only when File 21 is absent.
-- Public profile and timeline REST endpoints with no-store responses and internal-identifier redaction.
-- Responsive profile hero, initials fallback, honest tabs and states, accessible sharing, scoped reduced motion, and File 20 token inheritance.
-- Site Health diagnostics, reviewed contract tests, package/local-asset verification, and PHP 8.0/8.3 GitHub Actions CI.
-
-### Corrected after review
-
-- Closed filters that could elevate Founder/Doctor roles, widen visibility, restore denied contact fields, fabricate dependencies, or admit unapproved clinic states.
-- Required approved adult identity and current professional evidence before a Doctor profile is publicly verified.
-- Prevented active File 21 installations from being bypassed by raw WordPress post queries.
-- Rejected private, draft, pending-review, wrong-author, provider-spoofed, externally canonicalized, password-protected, or malformed timeline items.
-- Removed provider, native-object, WordPress-user, metrics, and diagnostic identifiers from public REST and timeline output.
-- Repaired global timeline pagination, provider bounds, duplicate suppression, partial/truncated states, and accessible previous/next navigation.
-- Prevented dead profile tabs, duplicate Overview/About bodies, malformed profile query contexts, alias-slug duplicates, unsafe media references, and stale cache exposure.
-- Corrected profile schema entity types, dark-mode contrast, unscoped reduced-motion rules, avatar fallback, and share feedback.
+- Added WordPress bootstrap, Safe Mode, dependency diagnostics, privacy-first profiles, canonical routes, federated timeline contracts, REST foundations, responsive profile presentation, and CI.
+- Corrected identity elevation, visibility widening, contact restoration, active File 21 bypass, private/draft timeline admission, identifier leakage, pagination, dead tabs, cache exposure, schema, contrast, reduced motion, avatar fallback, and share feedback defects.
