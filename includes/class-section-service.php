@@ -72,7 +72,7 @@ final class Section_Service
         $truncated = false;
 
         foreach ($this->registry->for_section($section) as $provider) {
-            if (! $this->provider_is_usable($provider, $profile)) {
+            if (! $this->provider_is_usable($provider, $profile, $section)) {
                 continue;
             }
 
@@ -130,9 +130,13 @@ final class Section_Service
     }
 
     /** @param array<string,mixed> $profile */
-    private function provider_is_usable(Profile_Section_Provider $provider, array $profile): bool
+    private function provider_is_usable(Profile_Section_Provider $provider, array $profile, string $section): bool
     {
         try {
+            if (! $this->registry->provider_is_consistent($provider, $section)) {
+                return false;
+            }
+
             $maturity = self::key($provider->get_maturity_level());
             if (! Section_Registry::maturity_is_approved($maturity) || $maturity === 'disabled') {
                 return false;
@@ -143,7 +147,7 @@ final class Section_Service
 
             return $provider->is_available() && $provider->supports_profile($profile);
         } catch (\Throwable $exception) {
-            self::emit_error($exception, self::key($provider->get_section()));
+            self::emit_error($exception, $section);
             return false;
         }
     }
@@ -160,7 +164,9 @@ final class Section_Service
         $type = self::key((string) ($candidate['type'] ?? 'article'));
         $date = self::text($candidate['published_at'] ?? '', 80);
 
-        return hash('sha256', strtolower($url) . '|' . $type . '|' . $title . '|' . $date);
+        // URL paths may be case-sensitive. Preserve the exact sanitized URL so
+        // distinct canonical resources are not collapsed accidentally.
+        return hash('sha256', $url . '|' . $type . '|' . $title . '|' . $date);
     }
 
     private static function emit_error(\Throwable $exception, string $section): void
