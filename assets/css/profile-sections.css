@@ -54,6 +54,41 @@
     outline-offset: 3px;
 }
 
+.spux-filter-bar {
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    margin-block: 0 1rem;
+    max-width: 100%;
+    overflow-x: auto;
+    padding: 0.25rem 0.15rem 0.5rem;
+    scrollbar-width: thin;
+}
+
+.spux-filter-bar__item {
+    background: var(--spux-surface);
+    border: 1px solid var(--spux-border);
+    border-radius: 999px;
+    color: var(--spux-text);
+    flex: 0 0 auto;
+    font-weight: 750;
+    min-height: 2.75rem;
+    padding: 0.65rem 1rem;
+    text-decoration: none;
+}
+
+.spux-filter-bar__item:hover,
+.spux-filter-bar__item.is-active {
+    background: var(--spux-primary-soft);
+    border-color: var(--spux-primary);
+    color: var(--spux-primary-strong);
+}
+
+.spux-filter-bar__item:focus-visible {
+    outline: 3px solid var(--spux-focus);
+    outline-offset: 2px;
+}
+
 .spux-publication-list {
     display: grid;
     gap: 0.65rem;
