@@ -115,7 +115,7 @@ final class Normalized_Timeline_Item implements JsonSerializable
             'content_type' => $content_type,
             'topic' => $this->plain_text((string) ($data['topic'] ?? ''), 300),
             'language' => $this->language((string) ($data['language'] ?? 'en-US')),
-            'thumbnail_reference' => $this->scalar_reference($data['thumbnail_reference'] ?? null),
+            'thumbnail_reference' => $this->media_reference($data['thumbnail_reference'] ?? null),
             'media_type' => $this->clean_key((string) ($data['media_type'] ?? 'none'), 64) ?: 'none',
             'verification_state' => $this->clean_key((string) ($data['verification_state'] ?? 'unverified'), 64) ?: 'unverified',
             'review_state' => $review_state,
@@ -195,10 +195,36 @@ final class Normalized_Timeline_Item implements JsonSerializable
         if (is_string($value)) {
             $value = trim($value);
 
-            return $value === '' ? null : $this->limit($value, 2048);
+            return $value === '' ? null : $this->limit($value, 191);
         }
 
         return null;
+    }
+
+    private function media_reference(mixed $value): int|string|null
+    {
+        if (is_int($value)) {
+            return $value > 0 ? $value : null;
+        }
+        if (! is_string($value)) {
+            return null;
+        }
+
+        $value = trim($value);
+        if ($value === '') {
+            return null;
+        }
+        if (ctype_digit($value)) {
+            $id = (int) $value;
+
+            return $id > 0 ? $id : null;
+        }
+
+        try {
+            return $this->validated_url($value);
+        } catch (InvalidArgumentException) {
+            return null;
+        }
     }
 
     private function plain_text(string $value, int $length): string
@@ -234,7 +260,7 @@ final class Normalized_Timeline_Item implements JsonSerializable
             || $has_credentials
             || $has_fragment
         ) {
-            throw new InvalidArgumentException('Timeline canonical URL must be a credential-free HTTP(S) canonical URL without a fragment.');
+            throw new InvalidArgumentException('Timeline URL must be a credential-free HTTP(S) URL without a fragment.');
         }
 
         return $url;
