@@ -17,12 +17,12 @@ final class Dependency_Manager
     {
     }
 
-    /** @return array<string, array<string, mixed>> */
+    /** @return array<string,array<string,mixed>> */
     public function get_statuses(): array
     {
         global $wp_version;
 
-        $statuses = [
+        $base = [
             'php' => [
                 'required' => true,
                 'available' => version_compare(PHP_VERSION, self::MINIMUM_PHP, '>='),
@@ -66,12 +66,43 @@ final class Dependency_Manager
                 'required' => false,
                 'production_required' => true,
                 'available' => $this->native->security_center_available(),
+                'version' => defined('SABRI_SECURITY_CENTER_VERSION')
+                    ? (string) SABRI_SECURITY_CENTER_VERSION
+                    : (defined('SABRI_SPRC_VERSION') ? (string) SABRI_SPRC_VERSION : ''),
                 'contract' => 'File 24 security, privacy, compliance, and resilience API',
             ],
         ];
 
-        /** @var array<string, array<string, mixed>> $statuses */
-        return apply_filters('sabri_public_experience/dependency_statuses', $statuses);
+        /** @var array<string,array<string,mixed>> $filtered */
+        $filtered = (array) apply_filters('sabri_public_experience/dependency_statuses', $base);
+        $statuses = [];
+        foreach ($base as $id => $authoritative) {
+            $candidate = isset($filtered[$id]) && is_array($filtered[$id]) ? $filtered[$id] : [];
+            $statuses[$id] = array_merge($authoritative, $candidate);
+            $statuses[$id]['required'] = ! empty($authoritative['required']);
+            $statuses[$id]['production_required'] = ! empty($authoritative['production_required']);
+            // Integration filters may revoke availability, never fabricate a native contract.
+            $statuses[$id]['available'] = ! empty($authoritative['available']) && ! empty($candidate['available'] ?? true);
+            $statuses[$id]['version'] = substr(sanitize_text_field((string) ($statuses[$id]['version'] ?? '')), 0, 64);
+        }
+
+        // Additional dependencies may be registered, but are normalized and can
+        // only make File 25 more restrictive.
+        foreach ($filtered as $id => $candidate) {
+            $id = sanitize_key((string) $id);
+            if ($id === '' || isset($statuses[$id]) || ! is_array($candidate)) {
+                continue;
+            }
+            $statuses[$id] = [
+                'required' => ! empty($candidate['required']),
+                'production_required' => ! empty($candidate['production_required']),
+                'available' => ! empty($candidate['available']),
+                'version' => substr(sanitize_text_field((string) ($candidate['version'] ?? '')), 0, 64),
+                'contract' => substr(sanitize_text_field((string) ($candidate['contract'] ?? '')), 0, 300),
+            ];
+        }
+
+        return $statuses;
     }
 
     public function runtime_is_supported(): bool
@@ -81,6 +112,7 @@ final class Dependency_Manager
                 return false;
             }
         }
+
         return true;
     }
 
@@ -93,6 +125,7 @@ final class Dependency_Manager
                 $blockers[] = (string) $id;
             }
         }
+
         return $blockers;
     }
 
@@ -105,6 +138,7 @@ final class Dependency_Manager
                 $gaps[] = (string) $id;
             }
         }
+
         return $gaps;
     }
 }
