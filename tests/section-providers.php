@@ -61,9 +61,14 @@ namespace {
         }
     }
     if (! function_exists('wp_date')) {
-        function wp_date(string $format, int $timestamp): string
+        function wp_date(string $format, int $timestamp, ?\DateTimeZone $timezone = null): string
         {
-            return gmdate($format, $timestamp);
+            $date = new \DateTimeImmutable('@' . $timestamp);
+            if ($timezone instanceof \DateTimeZone) {
+                $date = $date->setTimezone($timezone);
+            }
+
+            return $date->format($format);
         }
     }
     if (! function_exists('do_action')) {
