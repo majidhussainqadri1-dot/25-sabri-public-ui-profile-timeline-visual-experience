@@ -1,0 +1,264 @@
+:root {
+    --sabri-visual-primary: var(--sabri-shell-primary, #ff8a1f);
+    --sabri-visual-primary-strong: var(--sabri-shell-primary-strong, #9a3d00);
+    --sabri-visual-text: var(--sabri-shell-text, #171717);
+    --sabri-visual-muted: var(--sabri-shell-muted, #5f6368);
+    --sabri-visual-surface: var(--sabri-shell-surface, #ffffff);
+    --sabri-visual-page: var(--sabri-shell-bg, #f7f5f1);
+    --sabri-visual-border: var(--sabri-shell-border, #dfe2e6);
+    --sabri-visual-focus: var(--sabri-shell-focus, #0b57d0);
+    --sabri-visual-success: var(--sabri-shell-success, #137333);
+    --sabri-visual-warning: var(--sabri-shell-warning, #8a4b08);
+    --sabri-visual-danger: var(--sabri-shell-danger, #b42318);
+    --sabri-visual-radius-control: var(--sabri-shell-radius, 0.75rem);
+    --sabri-visual-radius-card: var(--sabri-shell-radius, 1rem);
+    --sabri-visual-layout-gap: var(--sabri-shell-gap, 1.5rem);
+    --sabri-visual-font-scale: var(--sabri-shell-font-scale, 1);
+    --sabri-visual-content-wide: var(--sabri-shell-max-width, 100rem);
+    --sabri-visual-content-reading: 48rem;
+    --sabri-visual-touch-target: 2.75rem;
+    --sabri-visual-shadow-1: 0 0.125rem 0.5rem rgb(17 17 17 / 8%);
+    --sabri-visual-shadow-2: 0 0.35rem 1.5rem rgb(17 17 17 / 10%);
+    --sabri-visual-space-1: 0.25rem;
+    --sabri-visual-space-2: 0.5rem;
+    --sabri-visual-space-3: 0.75rem;
+    --sabri-visual-space-4: 1rem;
+    --sabri-visual-space-5: 1.5rem;
+    --sabri-visual-space-6: 2rem;
+    --sabri-visual-space-7: 3rem;
+}
+
+body.sabri-visual-system {
+    --spux-primary: var(--sabri-visual-primary);
+    --spux-primary-strong: var(--sabri-visual-primary-strong);
+    --spux-text: var(--sabri-visual-text);
+    --spux-muted: var(--sabri-visual-muted);
+    --spux-surface: var(--sabri-visual-surface);
+    --spux-page: var(--sabri-visual-page);
+    --spux-border: var(--sabri-visual-border);
+    --spux-focus: var(--sabri-visual-focus);
+    --spux-danger: var(--sabri-visual-danger);
+    --spux-warning: var(--sabri-visual-warning);
+    --spux-radius: var(--sabri-visual-radius-card);
+    --spux-layout-gap: var(--sabri-visual-layout-gap);
+    --spux-shadow: var(--sabri-visual-shadow-2);
+    accent-color: var(--sabri-visual-primary);
+    text-rendering: optimizeLegibility;
+}
+
+body.sabri-visual-system.sabri-shell-theme-dark {
+    --sabri-visual-primary-strong: #ffbd80;
+    --sabri-visual-text: #f5f5f5;
+    --sabri-visual-muted: #c2c5ca;
+    --sabri-visual-surface: #1d1f22;
+    --sabri-visual-page: #121315;
+    --sabri-visual-border: #3d4147;
+    --sabri-visual-focus: #8ab4f8;
+    --sabri-visual-success: #81c995;
+    --sabri-visual-warning: #fdd663;
+    --sabri-visual-danger: #f28b82;
+}
+
+:where(.sabri-ui-container) {
+    inline-size: min(100% - 2rem, var(--sabri-visual-content-wide));
+    margin-inline: auto;
+}
+
+:where(.sabri-ui-reading-width) {
+    inline-size: min(100%, var(--sabri-visual-content-reading));
+}
+
+:where(.sabri-ui-stack) {
+    display: grid;
+    gap: var(--sabri-visual-space-4);
+}
+
+:where(.sabri-ui-cluster) {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sabri-visual-space-3);
+}
+
+:where(.sabri-ui-grid) {
+    display: grid;
+    gap: var(--sabri-visual-layout-gap);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+}
+
+:where(.sabri-ui-card) {
+    background: var(--sabri-visual-surface);
+    border: 1px solid var(--sabri-visual-border);
+    border-radius: var(--sabri-visual-radius-card);
+    box-shadow: var(--sabri-visual-shadow-1);
+    color: var(--sabri-visual-text);
+    overflow-wrap: anywhere;
+    padding: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+:where(.sabri-ui-button) {
+    align-items: center;
+    background: var(--sabri-visual-primary);
+    border: 2px solid transparent;
+    border-radius: var(--sabri-visual-radius-control);
+    color: #171717;
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    font-weight: 750;
+    gap: var(--sabri-visual-space-2);
+    justify-content: center;
+    min-block-size: var(--sabri-visual-touch-target);
+    min-inline-size: var(--sabri-visual-touch-target);
+    padding: 0.6rem 1rem;
+    text-align: center;
+    text-decoration: none;
+}
+
+:where(.sabri-ui-button--secondary) {
+    background: var(--sabri-visual-surface);
+    border-color: var(--sabri-visual-border);
+    color: var(--sabri-visual-text);
+}
+
+:where(.sabri-ui-button--danger) {
+    background: var(--sabri-visual-danger);
+    color: #ffffff;
+}
+
+:where(.sabri-ui-button:hover) {
+    filter: brightness(0.96);
+}
+
+:where(.sabri-ui-button[aria-busy="true"], .sabri-ui-button:disabled) {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+:where(.sabri-ui-button:focus-visible, .sabri-ui-card a:focus-visible, .sabri-ui-state a:focus-visible) {
+    outline: 3px solid var(--sabri-visual-focus);
+    outline-offset: 3px;
+}
+
+:where(.sabri-ui-badge) {
+    background: #fff3e8;
+    border: 1px solid #ffc48c;
+    border-radius: 999px;
+    color: var(--sabri-visual-primary-strong);
+    display: inline-flex;
+    font-size: 0.8125rem;
+    font-weight: 750;
+    line-height: 1.2;
+    padding: 0.3rem 0.7rem;
+}
+
+:where(.sabri-ui-state) {
+    background: var(--sabri-visual-surface);
+    border: 1px solid var(--sabri-visual-border);
+    border-inline-start: 0.3rem solid var(--sabri-visual-muted);
+    border-radius: var(--sabri-visual-radius-card);
+    color: var(--sabri-visual-text);
+    display: grid;
+    gap: var(--sabri-visual-space-3);
+    justify-items: start;
+    padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+:where(.sabri-ui-state--compact) {
+    padding: var(--sabri-visual-space-4);
+}
+
+:where(.sabri-ui-state--loading) {
+    border-inline-start-color: var(--sabri-visual-primary);
+}
+
+:where(.sabri-ui-state--empty, .sabri-ui-state--unavailable) {
+    border-inline-start-color: var(--sabri-visual-muted);
+}
+
+:where(.sabri-ui-state--warning) {
+    border-inline-start-color: var(--sabri-visual-warning);
+}
+
+:where(.sabri-ui-state--error) {
+    border-inline-start-color: var(--sabri-visual-danger);
+}
+
+:where(.sabri-ui-state--success) {
+    border-inline-start-color: var(--sabri-visual-success);
+}
+
+:where(.sabri-ui-state__title) {
+    font-size: clamp(1.15rem, 2vw, 1.45rem);
+    line-height: 1.25;
+    margin: 0;
+}
+
+:where(.sabri-ui-state__message) {
+    color: var(--sabri-visual-muted);
+    margin: 0;
+    max-inline-size: 60ch;
+}
+
+:where(.sabri-ui-skeleton) {
+    animation: sabri-ui-skeleton-pulse 1.4s ease-in-out infinite;
+    background: linear-gradient(90deg, var(--sabri-visual-border), var(--sabri-visual-surface), var(--sabri-visual-border));
+    background-size: 200% 100%;
+    border-radius: var(--sabri-visual-radius-control);
+    min-block-size: 1rem;
+}
+
+:where(.sabri-ui-visually-hidden) {
+    block-size: 1px;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    inline-size: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+}
+
+@keyframes sabri-ui-skeleton-pulse {
+    from {
+        background-position: 200% 0;
+    }
+
+    to {
+        background-position: -200% 0;
+    }
+}
+
+@media (max-width: 48rem) {
+    :where(.sabri-ui-container) {
+        inline-size: min(100% - 1rem, var(--sabri-visual-content-wide));
+    }
+
+    :where(.sabri-ui-button) {
+        max-inline-size: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :where(.sabri-ui-skeleton) {
+        animation: none;
+    }
+
+    :where(.sabri-ui-button, .sabri-ui-card, .sabri-ui-state) {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+@media (forced-colors: active) {
+    :where(.sabri-ui-button, .sabri-ui-card, .sabri-ui-state, .sabri-ui-badge) {
+        border-color: CanvasText;
+        box-shadow: none;
+        forced-color-adjust: auto;
+    }
+
+    :where(.sabri-ui-button:focus-visible, .sabri-ui-card a:focus-visible, .sabri-ui-state a:focus-visible) {
+        outline-color: Highlight;
+    }
+}
