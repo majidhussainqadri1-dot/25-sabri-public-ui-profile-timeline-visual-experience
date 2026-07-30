@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.2.0 — File 20 Integration and Complete Founder Profile Foundation
+
+### Added
+
+- A bounded File 20 integration layer that consumes the real `sabri_shell_layout_mode` contract and inherited shell custom properties without rendering a second header, navigation, sidebar, or global shell.
+- Canonical public author links, profile-route body classes, shell connection diagnostics, and a versioned public shell contract.
+- Structured Founder public data for mission, vision, objectives, methodology, experience, research areas, location, and an ordered publication list.
+- A complete Founder Overview, Books and Research, About, and Clinic and Contact presentation using only approved File 03/File 00 data.
+- Structured verified-Doctor public data for qualification, institution, reviewing authority, specialization, experience, languages, consultation modes, studied books, and approved clinic details.
+- A verified-Doctor Overview with an explicit verification-scope notice and no treatment-outcome guarantee.
+- A strict public-data allow-list normalizer that excludes identity evidence, registration numbers, internal user/clinic IDs, private notes, and patient data.
+- Dedicated PHP 8.0/8.3 profile-data contract tests and package checks for the new runtime, templates, and local assets.
+- Nonprofessional public-profile `noindex/noarchive` defaults, richer ProfilePage metadata, and privacy-safe Person/Organization schema fields.
+
+### Corrected while coding
+
+- Prevented File 03's older Founder display name from overriding the approved File 25 public spelling.
+- Prevented dead Founder Books and Research tabs by enabling the section only when approved source data exists.
+- Preserved the native-owner boundary: publications remain labels/index entries until their owning Book, Learn, Encyclopedia, Video, PDF, or Research provider is accepted.
+- Prevented public filters from changing identity class, verified state, contacts, canonical routes, or section authority.
+- Kept all profile HTML and REST responses non-cacheable until the File 24 privacy/cache contract is operational.
+
+### Still pending
+
+- Production File 21 timeline provider.
+- File 24 runtime security/privacy contract.
+- Knowledge, media, reviews, research, Marketplace, and other optional section providers.
+- Fresh install, upgrade, migration, rollback, responsive/accessibility evidence, Hostinger staging acceptance, real-user workflows, release packaging, deployment, and post-deployment monitoring.
+
 ## 0.1.0 — Reviewed 25A/25B Foundation
 
 ### Added
@@ -24,10 +53,3 @@
 - Repaired global timeline pagination, provider bounds, duplicate suppression, partial/truncated states, and accessible previous/next navigation.
 - Prevented dead profile tabs, duplicate Overview/About bodies, malformed profile query contexts, alias-slug duplicates, unsafe media references, and stale cache exposure.
 - Corrected profile schema entity types, dark-mode contrast, unscoped reduced-motion rules, avatar fallback, and share feedback.
-
-### Still pending
-
-- Production File 21 timeline provider.
-- File 24 runtime security/privacy contract.
-- Knowledge, media, reviews, and other optional section providers.
-- Fresh install, upgrade, migration, rollback, responsive/accessibility evidence, Hostinger staging acceptance, real-user workflows, release packaging, deployment, and post-deployment monitoring.
