@@ -130,7 +130,7 @@ $shell = file_get_contents($root . '/includes/class-shell-integration.php') ?: '
 if (str_contains($shell, '<style') || str_contains($shell, 'wp_add_inline_style')) {
     $errors[] = 'File 20 token integration must not depend on an inline CSS bridge.';
 }
-if (! str_contains($shell, "'owns_global_shell' => false") && ! str_contains($shell, "$base['owns_global_shell'] = false")) {
+if (! str_contains($shell, '$base[\'owns_global_shell\'] = false')) {
     $errors[] = 'File 20 shell ownership denial is missing.';
 }
 
