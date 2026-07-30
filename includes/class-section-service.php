@@ -72,7 +72,12 @@ final class Section_Service
         $truncated = false;
 
         foreach ($this->registry->for_section($section) as $provider) {
-            if (! $this->provider_is_usable($provider, $profile, $section)) {
+            $status = $this->provider_status($provider, $profile, $section);
+            if ($status === 'error') {
+                $errors++;
+                continue;
+            }
+            if ($status !== 'usable') {
                 continue;
             }
 
@@ -130,25 +135,33 @@ final class Section_Service
     }
 
     /** @param array<string,mixed> $profile */
-    private function provider_is_usable(Profile_Section_Provider $provider, array $profile, string $section): bool
+    private function provider_status(Profile_Section_Provider $provider, array $profile, string $section): string
     {
         try {
             if (! $this->registry->provider_is_consistent($provider, $section)) {
-                return false;
+                self::emit_error(new \RuntimeException('Profile-section provider metadata changed after registration.'), $section);
+                return 'error';
             }
 
             $maturity = self::key($provider->get_maturity_level());
-            if (! Section_Registry::maturity_is_approved($maturity) || $maturity === 'disabled') {
-                return false;
+            if (! Section_Registry::maturity_is_approved($maturity)) {
+                self::emit_error(new \RuntimeException('Profile-section provider maturity is invalid.'), $section);
+                return 'error';
+            }
+            if ($maturity === 'disabled') {
+                return 'skip';
             }
             if ($provider->owns_native_content()) {
-                return false;
+                self::emit_error(new \RuntimeException('Profile-section provider attempted to claim native ownership.'), $section);
+                return 'error';
             }
 
-            return $provider->is_available() && $provider->supports_profile($profile);
+            return $provider->is_available() && $provider->supports_profile($profile)
+                ? 'usable'
+                : 'skip';
         } catch (\Throwable $exception) {
             self::emit_error($exception, $section);
-            return false;
+            return 'error';
         }
     }
 
@@ -161,12 +174,16 @@ final class Section_Service
         }
 
         $url = Public_URL::sanitize_same_site($candidate['url'] ?? '', false);
+        if ($url !== '') {
+            // The canonical destination is the strongest identity. Preserve path
+            // case while collapsing duplicate cards from multiple providers.
+            return hash('sha256', 'url|' . $url);
+        }
+
         $type = self::key((string) ($candidate['type'] ?? 'article'));
         $date = self::text($candidate['published_at'] ?? '', 80);
 
-        // URL paths may be case-sensitive. Preserve the exact sanitized URL so
-        // distinct canonical resources are not collapsed accidentally.
-        return hash('sha256', $url . '|' . $type . '|' . $title . '|' . $date);
+        return hash('sha256', 'fallback|' . $type . '|' . $title . '|' . $date);
     }
 
     private static function emit_error(\Throwable $exception, string $section): void
