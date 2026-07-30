@@ -21,6 +21,7 @@ final class Profile_Repository
     public function get_founder(): ?WP_User
     {
         $user_id = $this->native->founder_user_id();
+
         return $user_id > 0 ? get_user_by('id', $user_id) ?: null : null;
     }
 
@@ -37,6 +38,7 @@ final class Profile_Repository
         }
 
         $user = get_user_by('slug', $slug);
+
         return $user instanceof WP_User ? $user : null;
     }
 
@@ -60,7 +62,9 @@ final class Profile_Repository
             $cover_id = (int) ($founder['cover_id'] ?? $cover_id);
         }
 
-        $avatar = $photo_id > 0 ? wp_get_attachment_image_url($photo_id, 'medium') : get_avatar_url($user_id, ['size' => 256]);
+        $avatar = $photo_id > 0
+            ? wp_get_attachment_image_url($photo_id, 'medium')
+            : get_avatar_url($user_id, ['size' => 256]);
         $cover = $cover_id > 0 ? wp_get_attachment_image_url($cover_id, 'large') : '';
         $headline = $profile_class === 'founder'
             ? (string) ($founder['title'] ?? '')
@@ -69,15 +73,23 @@ final class Profile_Repository
             ? (string) ($founder['introduction'] ?? '')
             : $this->native->profile_value($user_id, 'bio', $user->description);
 
+        $show_professional_location = in_array($profile_class, ['founder', 'doctor', 'institution'], true);
+        $country = $show_professional_location
+            ? $this->native->profile_value($user_id, 'country', (string) ($clinic['country'] ?? ''))
+            : '';
+        $city = $show_professional_location
+            ? $this->native->profile_value($user_id, 'city', (string) ($clinic['city'] ?? ''))
+            : '';
+        $contacts = $this->public_contacts($user_id, $clinic, $founder);
+
         $profile = [
-            'id' => $user_id,
-            'slug' => $user->user_nicename,
+            'slug' => sanitize_title((string) $user->user_nicename),
             'display_name' => $profile_class === 'founder'
                 ? (string) apply_filters(
                     'sabri_public_experience/founder_display_name',
                     get_option('sabri_public_experience_founder_display_name', 'Dr. Allamah Majid Hussain Sabri Muhaddith Mursheed')
                 )
-                : $user->display_name,
+                : (string) $user->display_name,
             'class' => $profile_class,
             'role_label' => $this->role_label($profile_class),
             'verified' => in_array($profile_class, ['founder', 'doctor'], true),
@@ -85,26 +97,74 @@ final class Profile_Repository
             'cover_url' => is_string($cover) ? $cover : '',
             'headline' => $headline,
             'bio' => $bio,
-            'country' => $this->native->profile_value($user_id, 'country', (string) ($clinic['country'] ?? '')),
-            'city' => $this->native->profile_value($user_id, 'city', (string) ($clinic['city'] ?? '')),
-            'contacts' => $this->public_contacts($user_id, $clinic),
+            'country' => $country,
+            'city' => $city,
+            'contacts' => $contacts,
             'canonical_url' => $this->canonical_url($user),
+            'available_sections' => $this->available_sections($profile_class, $bio, $contacts, $clinic),
         ];
 
-        /** @var array<string, mixed> $profile */
-        return apply_filters('sabri_public_experience/public_profile_data', $profile, $user);
+        /** @var array<string,mixed> $filtered */
+        $filtered = (array) apply_filters('sabri_public_experience/public_profile_data', $profile, $user);
+
+        // Presentation filters may change presentational text or media, but the
+        // authoritative class, badge, contacts, slug, and routing cannot be widened.
+        $profile['display_name'] = $this->plain_text((string) ($filtered['display_name'] ?? $profile['display_name']), 190);
+        $profile['headline'] = $this->plain_text((string) ($filtered['headline'] ?? $profile['headline']), 300);
+        $profile['bio'] = $this->safe_html((string) ($filtered['bio'] ?? $profile['bio']), 12000);
+        $profile['avatar_url'] = esc_url_raw((string) ($filtered['avatar_url'] ?? $profile['avatar_url']));
+        $profile['cover_url'] = esc_url_raw((string) ($filtered['cover_url'] ?? $profile['cover_url']));
+        $profile['country'] = $this->plain_text((string) $profile['country'], 100);
+        $profile['city'] = $this->plain_text((string) $profile['city'], 100);
+        $profile['canonical_url'] = esc_url_raw((string) $profile['canonical_url']);
+
+        // No internal WordPress user ID or private native identifiers are exposed.
+        return $profile;
     }
 
     public function canonical_url(WP_User $user, string $section = 'overview'): string
     {
         $profile_class = $this->visibility->profile_class($user);
+        $slug = rawurlencode(sanitize_title((string) $user->user_nicename));
         $base = match ($profile_class) {
             'founder' => home_url('/founder/'),
-            'doctor' => home_url('/doctors/' . rawurlencode($user->user_nicename) . '/'),
-            default => home_url('/profile/' . rawurlencode($user->user_nicename) . '/'),
+            'doctor' => home_url('/doctors/' . $slug . '/'),
+            default => home_url('/profile/' . $slug . '/'),
         };
 
         return $section === 'overview' ? $base : trailingslashit($base . sanitize_key($section));
+    }
+
+    /** @return array<string,string> */
+    public function section_labels(string $profile_class): array
+    {
+        $all = match ($profile_class) {
+            'founder' => [
+                'overview' => __('Overview', 'sabri-public-experience'),
+                'timeline' => __('Timeline', 'sabri-public-experience'),
+                'knowledge' => __('Knowledge', 'sabri-public-experience'),
+                'books-research' => __('Books and Research', 'sabri-public-experience'),
+                'media' => __('Media', 'sabri-public-experience'),
+                'clinic-contact' => __('Clinic and Contact', 'sabri-public-experience'),
+                'about' => __('About', 'sabri-public-experience'),
+            ],
+            'doctor' => [
+                'overview' => __('Overview', 'sabri-public-experience'),
+                'timeline' => __('Timeline', 'sabri-public-experience'),
+                'knowledge' => __('Knowledge', 'sabri-public-experience'),
+                'media' => __('Media', 'sabri-public-experience'),
+                'clinic' => __('Clinic', 'sabri-public-experience'),
+                'reviews' => __('Reviews', 'sabri-public-experience'),
+                'about' => __('About', 'sabri-public-experience'),
+            ],
+            default => [
+                'overview' => __('Overview', 'sabri-public-experience'),
+                'timeline' => __('Public Contributions', 'sabri-public-experience'),
+                'about' => __('About', 'sabri-public-experience'),
+            ],
+        };
+
+        return $all;
     }
 
     private function role_label(string $profile_class): string
@@ -115,25 +175,107 @@ final class Profile_Repository
             'teacher' => __('Teacher', 'sabri-public-experience'),
             'researcher' => __('Researcher', 'sabri-public-experience'),
             'student' => __('Student', 'sabri-public-experience'),
+            'patient' => __('Patient', 'sabri-public-experience'),
+            'pharmacy' => __('Pharmacy', 'sabri-public-experience'),
+            'institution' => __('Clinic or Institution', 'sabri-public-experience'),
+            'publisher' => __('Publisher', 'sabri-public-experience'),
             default => __('Member', 'sabri-public-experience'),
         };
     }
 
-    /** @param array<string,mixed> $clinic @return array<string, string> */
-    private function public_contacts(int $user_id, array $clinic): array
+    /**
+     * @param array<string,mixed> $clinic
+     * @param array<string,mixed> $founder
+     * @return array<string,string>
+     */
+    private function public_contacts(int $user_id, array $clinic, array $founder): array
+    {
+        $values = [
+            'phone' => (string) ($founder['phone'] ?? $clinic['phone'] ?? $this->native->profile_value($user_id, 'phone')),
+            'whatsapp' => (string) ($founder['whatsapp'] ?? $clinic['whatsapp'] ?? $this->native->profile_value($user_id, 'whatsapp')),
+        ];
+        $contacts = $this->sanitize_contacts($values, $user_id);
+
+        /** @var array<string,mixed> $filtered */
+        $filtered = (array) apply_filters('sabri_public_experience/public_contacts', $contacts, $user_id);
+
+        // Revalidate after filters so an extension cannot add an unapproved field
+        // or restore contact data denied by age, suspension, or consent policy.
+        return $this->sanitize_contacts($filtered, $user_id);
+    }
+
+    /** @param array<string,mixed> $values @return array<string,string> */
+    private function sanitize_contacts(array $values, int $user_id): array
     {
         $contacts = [];
-        $values = [
-            'phone' => (string) ($clinic['phone'] ?? $this->native->profile_value($user_id, 'phone')),
-            'whatsapp' => (string) ($clinic['whatsapp'] ?? $this->native->profile_value($user_id, 'whatsapp')),
-        ];
-
-        foreach ($values as $field => $value) {
-            if ($value !== '' && $this->visibility->can_show_contact($user_id, $field)) {
-                $contacts[$field] = $value;
+        foreach (['phone', 'whatsapp'] as $field) {
+            $value = isset($values[$field]) && is_scalar($values[$field]) ? (string) $values[$field] : '';
+            $clean = preg_replace('/[^0-9+]/', '', $value) ?? '';
+            $clean = preg_replace('/(?!^)\+/', '', $clean) ?? '';
+            $clean = substr($clean, 0, 18);
+            if ($clean === '' || $clean === '+') {
+                continue;
+            }
+            if ($this->visibility->can_show_contact($user_id, $field)) {
+                $contacts[$field] = $clean;
             }
         }
 
-        return (array) apply_filters('sabri_public_experience/public_contacts', $contacts, $user_id);
+        return $contacts;
+    }
+
+    /**
+     * Return only sections with real foundation content. Optional providers may
+     * add sections through the filter after they can render a canonical surface.
+     *
+     * @param array<string,string> $contacts
+     * @param array<string,mixed> $clinic
+     * @return list<string>
+     */
+    private function available_sections(string $profile_class, string $bio, array $contacts, array $clinic): array
+    {
+        $sections = ['overview', 'timeline'];
+        if (trim(wp_strip_all_tags($bio)) !== '') {
+            $sections[] = 'about';
+        }
+        if ($profile_class === 'founder' && ($contacts !== [] || $clinic !== [])) {
+            $sections[] = 'clinic-contact';
+        }
+        if ($profile_class === 'doctor' && ($contacts !== [] || $clinic !== [])) {
+            $sections[] = 'clinic';
+        }
+
+        $filtered = (array) apply_filters(
+            'sabri_public_experience/available_profile_sections',
+            $sections,
+            $profile_class
+        );
+        $allowed = array_keys($this->section_labels($profile_class));
+        $clean = [];
+        foreach ($filtered as $section) {
+            if (! is_scalar($section)) {
+                continue;
+            }
+            $section = sanitize_key((string) $section);
+            if (in_array($section, $allowed, true)) {
+                $clean[] = $section;
+            }
+        }
+
+        return array_values(array_unique($clean));
+    }
+
+    private function plain_text(string $value, int $limit): string
+    {
+        $value = sanitize_text_field($value);
+
+        return function_exists('mb_substr') ? mb_substr($value, 0, $limit) : substr($value, 0, $limit);
+    }
+
+    private function safe_html(string $value, int $limit): string
+    {
+        $value = wp_kses_post($value);
+
+        return function_exists('mb_substr') ? mb_substr($value, 0, $limit) : substr($value, 0, $limit);
     }
 }
