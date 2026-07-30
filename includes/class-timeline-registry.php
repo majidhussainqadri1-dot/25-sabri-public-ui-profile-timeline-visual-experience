@@ -13,6 +13,7 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
 
 final class Timeline_Registry
 {
+    private const MAX_PROVIDERS = 25;
     private const MATURITY_LEVELS = [
         'detected',
         'read-only',
@@ -27,6 +28,10 @@ final class Timeline_Registry
 
     public function register(Timeline_Provider $provider): void
     {
+        if (count($this->providers) >= self::MAX_PROVIDERS) {
+            throw new InvalidArgumentException('Timeline provider registry reached its safe provider limit.');
+        }
+
         $raw_id = trim($provider->get_provider_id());
         $id = $this->provider_key($raw_id);
         if ($id === '' || $raw_id !== $id) {
