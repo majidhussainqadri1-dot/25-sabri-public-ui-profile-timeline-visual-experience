@@ -18,7 +18,7 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
  */
 final class Design_System
 {
-    public const CONTRACT_VERSION = '1.1.0';
+    public const CONTRACT_VERSION = '1.2.0';
     public const CANONICAL_NAME = 'Sabri Unified Global Visual Experience and Design System';
     public const SUBTITLE = 'Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency';
 
@@ -101,10 +101,19 @@ final class Design_System
                 'accessibility',
                 'visual-regression',
                 'reusable-content-cards',
+                'optional-profile-sections',
             ],
             'tokens' => self::tokens(),
             'components' => Components::contract(),
             'content_cards' => Content_Cards::contract(),
+            'optional_sections' => [
+                'contract_version' => '1.0.0',
+                'allowed_sections' => Section_Registry::approved_sections(),
+                'registration_hook' => 'sabri_public_experience/register_section_providers',
+                'provider_interface' => 'Sabri\\PublicExperience\\Contracts\\Profile_Section_Provider',
+                'owns_native_content' => false,
+                'requires_content_before_tab' => true,
+            ],
             'asset_handle' => 'sabri-visual-design-system',
             'css_prefix' => 'sabri-ui-',
             'duplicates_file_20_shell' => false,
