@@ -57,12 +57,14 @@ A descriptor is admitted only when:
 
 - File 06 is active and its reviewed post type exists;
 - the profile is already public under File 00/File 03 policy;
-- the profile is not a patient profile;
+- the public profile class is `founder` or verified `doctor`;
 - the native entry is `publish`;
 - the native `post_author` equals the displayed profile user;
 - the entry has no password;
 - the native object remains an `he_entry`;
 - the native title and permalink are present.
+
+Patient, student, teacher, researcher, institution, publisher, pharmacy, and generic-member profiles are not admitted by this compatibility adapter. A broader future policy requires an explicit architectural decision and new tests.
 
 ## Public descriptor
 
