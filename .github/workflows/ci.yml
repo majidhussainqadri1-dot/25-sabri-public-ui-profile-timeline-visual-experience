@@ -54,6 +54,9 @@ jobs:
       - name: Optional profile section provider contract
         run: php tests/section-providers.php
 
+      - name: Native File 06 knowledge provider contract
+        run: php tests/file06-knowledge-provider.php
+
       - name: Nested Safe Mode contract
         run: php tests/safe-mode.php
 
