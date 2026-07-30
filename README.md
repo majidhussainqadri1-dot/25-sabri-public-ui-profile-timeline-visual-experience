@@ -4,43 +4,62 @@ Production-grade WordPress module for the **Sabri Social Homeopathy Platform**.
 
 ## Current implementation status
 
-Coding has begun on phases **25A (Governance and Contracts)** and **25B (Plugin Foundation and Safety)**.
+Phases **25A — Governance and Contracts** and **25B — Plugin Foundation and Safety** have been coded, reviewed, and corrected on a draft pull-request branch.
 
 Implemented in `0.1.0`:
 
-- activation-safe WordPress bootstrap;
-- graded dependency and fail-closed runtime checks;
-- privacy-first Founder, verified-doctor, and permitted-member profile projection;
-- canonical `/founder/`, `/doctors/{slug}/`, and `/profile/{slug}/` routes;
-- federated read-only timeline provider interface, registry, service, and normalized object contract;
-- read-only WordPress posts compatibility provider;
-- responsive profile hero, tabs, timeline cards, public empty/error states, and visible keyboard focus;
-- public profile and timeline REST endpoints;
-- Site Health diagnostics, contract tests, package verification, and CI.
+- early PHP guard, duplicate-copy protection, activation boundaries, and non-destructive Safe Mode;
+- File 00-authoritative identity, age, role, visibility, and professional-eligibility checks;
+- privacy-first Founder, verified-Doctor, and permitted-member profile projection;
+- canonical `/founder/`, `/doctors/{slug}/`, and `/profile/{slug}/` routes with role/slug canonicalization;
+- truthful section navigation: only currently renderable tabs are exposed;
+- federated read-only timeline provider interface, bounded registry, public-safe normalized contract, same-site canonical validation, deduplication, and global pagination;
+- a read-only WordPress-post compatibility provider used only while File 21 is absent;
+- responsive profile hero, initials fallback, accessible sharing, honest empty/error/partial/truncated states, and File 20 token inheritance;
+- public profile and timeline REST endpoints with no-store responses and internal-identifier redaction;
+- truthful Site Health diagnostics, reviewed contract tests, package verification, and PHP 8.0/8.3 CI.
 
 ## Architecture boundary
 
-- **File 20** remains the global application-shell owner.
-- **File 21** remains the Home/News publication owner and will provide the production timeline adapter.
+- **File 00** remains authoritative for identity, membership approval, age, public visibility, and professional eligibility.
+- **File 03** remains the profile-master and public-contact-consent owner.
+- **File 20** remains the global application-shell and base-design-token owner.
+- **File 21** remains the Home/News/publication owner and must provide the production `file-21` timeline provider.
 - **Files 22/23** own creation and private publishing operations.
-- **File 24** remains the security, privacy, compliance, and resilience owner.
-- **File 25** owns public profile presentation, timeline projection, reusable public components, and visual acceptance.
+- **File 24** remains the security, privacy, compliance, incident, and resilience owner.
+- **File 25** owns public profile presentation, a rebuildable read projection of approved native contributions, reusable public components, and visual acceptance.
 
-File 25 does not duplicate native content bodies, comments, reactions, identity evidence, patient information, messages, appointments, or analytics ledgers.
+File 25 does not duplicate native content bodies, comments, reactions, identity evidence, patient information, messages, appointments, clinic records, or analytics ledgers.
 
-## Governing documentation
+## Review record
 
-See [`docs/GOVERNING-SCOPE.md`](docs/GOVERNING-SCOPE.md), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), and [`docs/DECISION-LOG.md`](docs/DECISION-LOG.md). The Founder-approved Microsoft Word specification remains the full project-governance source for File 25.
+The source review and defect-correction record is documented in [`docs/REVIEW-AND-CORRECTION-2026-07-30.md`](docs/REVIEW-AND-CORRECTION-2026-07-30.md).
+
+Additional governing documents:
+
+- [`docs/GOVERNING-SCOPE.md`](docs/GOVERNING-SCOPE.md)
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+- [`docs/DECISION-LOG.md`](docs/DECISION-LOG.md)
+
+The Founder-approved Microsoft Word specification remains the full project-governance source for File 25.
 
 ## Quality commands
 
 ```bash
+composer validate --strict --no-check-publish
 find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
 php tests/run.php
 php tools/verify-structure.php
 node --check assets/js/public.js
 ```
 
+## Known production gaps
+
+- File 21 has not registered a production-accepted `file-21` timeline provider.
+- File 24 currently has no runtime contract available to File 25.
+- Knowledge, Media, Reviews, and other optional profile-section providers remain later phases.
+- Fresh install, upgrade, migration, rollback, Hostinger staging, real-user workflows, responsive/accessibility evidence, performance measurement, release packaging, deployment, and post-deployment monitoring remain mandatory.
+
 ## Release policy
 
-Code presence, a ZIP, or a green CI run is not production completion. Fresh install, upgrade, migration, rollback, staging acceptance, responsive/accessibility evidence, real-user workflows, deployment, and post-deployment monitoring remain mandatory.
+Code presence, a ZIP, or a green CI run is not production completion. File 25 remains a draft implementation until all staged Definition-of-Done gates are evidenced and accepted.
