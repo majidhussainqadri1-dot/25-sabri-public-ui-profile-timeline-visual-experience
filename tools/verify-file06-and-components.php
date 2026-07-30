@@ -65,6 +65,18 @@ foreach ($provider_requirements as $file => $markers) {
     if (preg_match('/update_|insert_|delete_|wp_insert_post|wp_update_post|wp_delete_post|set_post_thumbnail|media_handle_upload/i', $provider)) {
         $errors[] = $file . ' must remain strictly read-only.';
     }
+
+    if ($file === 'class-file-11-reels-media-provider.php') {
+        $file_11_gate = str_contains($provider, 'version_supported($this->get_version(), self::MINIMUM_VERSION, self::MAXIMUM_VERSION)');
+        $file_10_gate = str_contains($provider, 'version_supported($file_10, self::FILE_10_MINIMUM, self::FILE_10_MAXIMUM)');
+        $helper_bounds = str_contains($provider, "version_compare(\$version, \$minimum, '<')")
+            && str_contains($provider, "version_compare(\$version, \$maximum, '>=')");
+        if (! $file_11_gate || ! $file_10_gate || ! $helper_bounds) {
+            $errors[] = $file . ' reviewed File 10/File 11 version ranges are not enforced.';
+        }
+        continue;
+    }
+
     if (! str_contains($provider, "version_compare(\$version, self::MINIMUM_VERSION, '<')")
         || ! str_contains($provider, "version_compare(\$version, self::MAXIMUM_VERSION, '>=')")) {
         $errors[] = $file . ' reviewed version range is not enforced.';
