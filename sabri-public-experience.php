@@ -3,7 +3,7 @@
  * Plugin Name: Sabri Public Experience
  * Plugin URI:  https://sabrihomeopathy.com/
  * Description: Unified public profiles, federated profile timelines, reusable public cards, and an accessibility-oriented visual experience for the Sabri Social Homeopathy Platform.
- * Version:     0.2.0
+ * Version:     0.3.0
  * Author:      Dr. Allamah Majid Hussain Sabri Muhaddith Mursheed
  * Text Domain: sabri-public-experience
  * Requires at least: 6.5
@@ -61,7 +61,7 @@ if (function_exists('sabri_public_experience_bootstrap')) {
     return;
 }
 
-define('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.2.0');
+define('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.3.0');
 define('SABRI_PUBLIC_EXPERIENCE_SCHEMA_VERSION', '1');
 define('SABRI_PUBLIC_EXPERIENCE_FILE', __FILE__);
 define('SABRI_PUBLIC_EXPERIENCE_DIR', plugin_dir_path(__FILE__));
@@ -78,6 +78,7 @@ $spux_files = [
     'includes/class-profile-data.php',
     'includes/class-timeline-registry.php',
     'includes/class-timeline-service.php',
+    'includes/providers/class-file-21-provider.php',
     'includes/providers/class-wordpress-posts-provider.php',
     'includes/class-profile-repository.php',
     'includes/class-profile-router.php',
