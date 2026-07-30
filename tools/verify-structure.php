@@ -14,6 +14,7 @@ $required = [
     'includes/class-visibility-policy.php',
     'includes/class-profile-repository.php',
     'includes/class-profile-renderer.php',
+    'includes/class-timeline-registry.php',
     'includes/class-timeline-service.php',
     'includes/contracts/interface-timeline-provider.php',
     'templates/public-profile.php',
@@ -26,6 +27,7 @@ $required = [
     'docs/ARCHITECTURE.md',
     'docs/GOVERNING-SCOPE.md',
     'docs/DECISION-LOG.md',
+    'docs/REVIEW-AND-CORRECTION-2026-07-30.md',
 ];
 
 $errors = [];
@@ -69,6 +71,18 @@ if (! str_contains($main, "require_once SABRI_PUBLIC_EXPERIENCE_DIR . 'includes/
 }
 if (! str_contains($main, "version_compare(PHP_VERSION, '8.0', '<')")) {
     $errors[] = 'Pre-require PHP runtime guard is missing.';
+}
+
+$plugin = file_get_contents($root . '/includes/class-plugin.php') ?: '';
+if (! str_contains($plugin, 'home_news_available')) {
+    $errors[] = 'The File 21 availability boundary is missing from plugin bootstrap.';
+}
+
+$timeline = file_get_contents($root . '/includes/class-timeline-service.php') ?: '';
+foreach (['provider_version', 'canonical_is_allowed', 'to_public_array'] as $marker) {
+    if (! str_contains($timeline, $marker)) {
+        $errors[] = 'Reviewed timeline invariant missing: ' . $marker;
+    }
 }
 
 $composer_raw = file_get_contents($root . '/composer.json') ?: '';
