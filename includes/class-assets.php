@@ -31,6 +31,12 @@ final class Assets
             [],
             SABRI_PUBLIC_EXPERIENCE_VERSION
         );
+        wp_enqueue_style(
+            'sabri-public-experience-profile-sections',
+            SABRI_PUBLIC_EXPERIENCE_URL . 'assets/css/profile-sections.css',
+            ['sabri-public-experience'],
+            SABRI_PUBLIC_EXPERIENCE_VERSION
+        );
         wp_enqueue_script(
             'sabri-public-experience',
             SABRI_PUBLIC_EXPERIENCE_URL . 'assets/js/public.js',
