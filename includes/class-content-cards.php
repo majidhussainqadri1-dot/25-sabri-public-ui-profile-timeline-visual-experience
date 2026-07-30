@@ -17,7 +17,7 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
  */
 final class Content_Cards
 {
-    public const CONTRACT_VERSION = '1.0.0';
+    public const CONTRACT_VERSION = '1.1.0';
 
     private const TYPES = [
         'article',
@@ -71,6 +71,8 @@ final class Content_Cards
             'renderer' => [self::class, 'render'],
             'owns_native_data' => false,
             'same_site_destinations' => true,
+            'date_timezone' => 'UTC',
+            'deterministic_dates' => true,
         ];
     }
 
@@ -202,7 +204,7 @@ final class Content_Cards
                     $format = 'M j, Y';
                 }
                 $date_display = function_exists('wp_date')
-                    ? wp_date($format, $timestamp)
+                    ? wp_date($format, $timestamp, new \DateTimeZone('UTC'))
                     : gmdate($format, $timestamp);
             }
         }
@@ -237,7 +239,20 @@ final class Content_Cards
         }
 
         try {
-            $date = new \DateTimeImmutable($raw);
+            $utc = new \DateTimeZone('UTC');
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $raw) === 1) {
+                $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $raw, $utc);
+                if (! $date instanceof \DateTimeImmutable || $date->format('Y-m-d') !== $raw) {
+                    return null;
+                }
+            } else {
+                $has_timezone = preg_match('/(?:Z|[+\-]\d{2}:\d{2})$/i', $raw) === 1;
+                $date = new \DateTimeImmutable($raw, $has_timezone ? null : $utc);
+                $errors = \DateTimeImmutable::getLastErrors();
+                if (is_array($errors) && ((int) ($errors['warning_count'] ?? 0) > 0 || (int) ($errors['error_count'] ?? 0) > 0)) {
+                    return null;
+                }
+            }
         } catch (\Throwable) {
             return null;
         }
