@@ -60,7 +60,10 @@ jobs:
       - name: Native File 06 knowledge provider contract
         run: php tests/file06-knowledge-provider.php
 
-      - name: Visual acceptance Definition-of-Done contract
+      - name: Native File 10 11 12 media provider contracts
+        run: php tests/file10-12-media-providers.php
+
+      - name: Strict visual acceptance evidence contract
         run: php tests/visual-acceptance.php
 
       - name: Nested Safe Mode contract
@@ -69,7 +72,7 @@ jobs:
       - name: Package and local asset policy
         run: php tools/verify-structure.php
 
-      - name: File 06 and component completion package policy
+      - name: Native adapters and component completion package policy
         run: php tools/verify-file06-and-components.php
 
   javascript:
