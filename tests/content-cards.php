@@ -61,9 +61,14 @@ namespace {
         }
     }
     if (! function_exists('wp_date')) {
-        function wp_date(string $format, int $timestamp): string
+        function wp_date(string $format, int $timestamp, ?\DateTimeZone $timezone = null): string
         {
-            return gmdate($format, $timestamp);
+            $date = new \DateTimeImmutable('@' . $timestamp);
+            if ($timezone instanceof \DateTimeZone) {
+                $date = $date->setTimezone($timezone);
+            }
+
+            return $date->format($format);
         }
     }
 }
@@ -106,6 +111,16 @@ namespace {
     $check(! str_contains($state, 'evil.example'), 'State renderer must reject protocol-relative external actions.');
     $check(str_contains($state, 'aria-atomic="true"'), 'State renderer must announce one atomic status.');
 
+    $notice = Components::render_notice([
+        'type' => 'info',
+        'title' => 'Public notice',
+        'message' => 'Approved information.',
+        'action_url' => 'https://evil.example/path',
+        'action_label' => 'Open',
+    ]);
+    $check(str_contains($notice, 'sabri-ui-notice--info'), 'Notice renderer must expose the requested approved type.');
+    $check(! str_contains($notice, 'evil.example'), 'Notice renderer must reject cross-origin actions.');
+
     $card = Content_Cards::render([
         'type' => 'news',
         'title' => '<script>bad()</script>Public Update',
@@ -147,9 +162,30 @@ namespace {
     ]);
     $check(! str_contains($natural_date, '<time'), 'Natural-language dates must not enter deterministic public card metadata.');
 
+    $original_timezone = date_default_timezone_get();
+    date_default_timezone_set('Asia/Karachi');
+    $date_only = Content_Cards::render([
+        'type' => 'event',
+        'title' => 'Date-only Event',
+        'published_at' => '2026-07-31',
+    ]);
+    date_default_timezone_set($original_timezone);
+    $check(str_contains($date_only, 'datetime="2026-07-31T00:00:00+00:00"'), 'Date-only metadata must remain midnight UTC regardless of PHP default timezone.');
+    $check(str_contains($date_only, '>Jul 31, 2026</time>'), 'Displayed date must use the deterministic UTC calendar date.');
+
+    $invalid_calendar_date = Content_Cards::render([
+        'type' => 'event',
+        'title' => 'Invalid Event',
+        'published_at' => '2026-02-30',
+    ]);
+    $check(! str_contains($invalid_calendar_date, '<time'), 'Invalid calendar dates must fail closed instead of normalizing silently.');
+
     $contract = Content_Cards::contract();
+    $check(($contract['contract_version'] ?? '') === '1.1.0', 'Content-card contract must record deterministic dates.');
     $check(($contract['owns_native_data'] ?? true) === false, 'Card contract must deny native data ownership.');
     $check(($contract['same_site_destinations'] ?? false) === true, 'Card contract must require same-site destinations.');
+    $check(($contract['deterministic_dates'] ?? false) === true, 'Card contract must guarantee deterministic dates.');
+    $check(($contract['date_timezone'] ?? '') === 'UTC', 'Card contract must publish the UTC date policy.');
     $check(in_array('doctor', (array) ($contract['types'] ?? []), true), 'Doctor card type must be available.');
     $check(in_array('marketplace-item', (array) ($contract['types'] ?? []), true), 'Marketplace visual card type must be available without taking Marketplace ownership.');
 
