@@ -153,7 +153,16 @@ final class Profile_Renderer
         }
 
         $filtered = isset($_GET['type']) || (int) get_query_var('paged') > 1;
-        if (is_404() || $filtered) {
+        $profile = (array) ($GLOBALS['sabri_public_experience_profile'] ?? []);
+        $profile_class = sanitize_key((string) ($profile['class'] ?? ''));
+        $professional = in_array($profile_class, ['founder', 'doctor'], true);
+        $member_indexing = $profile !== [] && (bool) apply_filters(
+            'sabri_public_experience/index_nonprofessional_profile',
+            false,
+            $profile
+        );
+
+        if (is_404() || $filtered || (! $professional && ! $member_indexing)) {
             $robots['noindex'] = true;
             $robots['noarchive'] = true;
             $robots['nofollow'] = is_404();
@@ -183,6 +192,7 @@ final class Profile_Renderer
         echo '<link rel="canonical" href="' . $canonical . '">' . "\n";
         if ($description !== '') {
             echo '<meta name="description" content="' . esc_attr($description) . '">' . "\n";
+            echo '<meta property="og:description" content="' . esc_attr($description) . '">' . "\n";
         }
         echo '<meta property="og:type" content="profile">' . "\n";
         echo '<meta property="og:title" content="' . esc_attr((string) ($profile['display_name'] ?? '')) . '">' . "\n";
@@ -198,6 +208,7 @@ final class Profile_Renderer
         $entity = [
             '@type' => $entity_type,
             'name' => (string) ($profile['display_name'] ?? ''),
+            'url' => (string) ($profile['canonical_url'] ?? ''),
         ];
         if ($description !== '') {
             $entity['description'] = $description;
@@ -205,12 +216,31 @@ final class Profile_Renderer
         if (! empty($profile['avatar_url'])) {
             $entity['image'] = (string) $profile['avatar_url'];
         }
+        if (! empty($profile['headline'])) {
+            $entity['jobTitle'] = (string) $profile['headline'];
+        }
+        $location = array_filter([
+            'addressLocality' => (string) ($profile['city'] ?? ''),
+            'addressCountry' => (string) ($profile['country'] ?? ''),
+        ]);
+        if ($location !== []) {
+            $entity['address'] = array_merge(['@type' => 'PostalAddress'], $location);
+        }
+        $professional = (array) ($profile['professional'] ?? []);
+        if (! empty($professional['languages'])) {
+            $entity['knowsLanguage'] = array_values((array) $professional['languages']);
+        }
 
         $schema = [
             '@context' => 'https://schema.org',
             '@type' => 'ProfilePage',
             'url' => (string) ($profile['canonical_url'] ?? ''),
             'mainEntity' => $entity,
+            'isPartOf' => [
+                '@type' => 'WebSite',
+                'name' => 'Sabri Social Homeopathy Platform',
+                'url' => home_url('/'),
+            ],
         ];
         echo '<script type="application/ld+json">'
             . wp_json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT)
