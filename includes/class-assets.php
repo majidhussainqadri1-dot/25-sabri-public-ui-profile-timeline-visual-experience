@@ -40,7 +40,8 @@ final class Assets
         );
         wp_script_add_data('sabri-public-experience', 'strategy', 'defer');
         wp_localize_script('sabri-public-experience', 'sabriPublicExperience', [
-            'linkCopied' => __('Link copied', 'sabri-public-experience'),
+            'linkCopied' => __('Link copied.', 'sabri-public-experience'),
+            'shareSucceeded' => __('Profile shared.', 'sabri-public-experience'),
             'shareFailed' => __('Unable to share this profile.', 'sabri-public-experience'),
         ]);
     }
