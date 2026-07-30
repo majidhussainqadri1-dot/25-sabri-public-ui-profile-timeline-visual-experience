@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Sabri\PublicExperience;
 
 use Sabri\PublicExperience\Providers\File_06_Knowledge_Provider;
+use Sabri\PublicExperience\Providers\File_10_Video_Media_Provider;
+use Sabri\PublicExperience\Providers\File_11_Reels_Media_Provider;
+use Sabri\PublicExperience\Providers\File_12_Pdf_Media_Provider;
 use Sabri\PublicExperience\Providers\File_21_Provider;
 use Sabri\PublicExperience\Providers\WordPress_Posts_Provider;
 
@@ -73,8 +76,6 @@ final class Plugin
             return;
         }
 
-        // The global design system has no identity dependency and may continue
-        // operating while profile-specific integrations fail closed.
         $router = new Profile_Router();
         (new Design_System())->register();
         (new Assets($router))->register();
@@ -99,7 +100,6 @@ final class Plugin
         $visibility = new Visibility_Policy($native);
         $profiles = new Profile_Repository($visibility, $native);
 
-        /** Native owners may register accepted timeline providers first. */
         try {
             do_action('sabri_public_experience/register_timeline_providers', $timeline_registry);
         } catch (\Throwable $exception) {
@@ -107,44 +107,22 @@ final class Plugin
         }
 
         if ($timeline_registry->get('file-21') === null && $native->home_news_available()) {
-            try {
-                $file_21 = new File_21_Provider();
-                if ($file_21->is_available()) {
-                    $timeline_registry->register($file_21);
-                }
-            } catch (\Throwable $exception) {
-                do_action('sabri_public_experience/provider_registration_error', $exception);
-            }
+            self::register_timeline_provider($timeline_registry, new File_21_Provider());
         }
-
-        // Never bypass an active but incompatible File 21 installation with a
-        // raw WordPress query. The fallback is allowed only while File 21 is absent.
         if ($timeline_registry->get('file-21') === null && ! $native->home_news_available()) {
-            try {
-                $timeline_registry->register(new WordPress_Posts_Provider());
-            } catch (\Throwable $exception) {
-                do_action('sabri_public_experience/provider_registration_error', $exception);
-            }
+            self::register_timeline_provider($timeline_registry, new WordPress_Posts_Provider());
         }
 
-        // Native modules register first. Reviewed File 25 compatibility adapters
-        // fill only missing canonical provider IDs and remain read-only.
         try {
             do_action('sabri_public_experience/register_section_providers', $section_registry);
         } catch (\Throwable $exception) {
             do_action('sabri_public_experience/section_provider_registration_error', $exception);
         }
 
-        if ($section_registry->get('file-06-knowledge') === null) {
-            try {
-                $file_06 = new File_06_Knowledge_Provider();
-                if ($file_06->is_available()) {
-                    $section_registry->register($file_06);
-                }
-            } catch (\Throwable $exception) {
-                do_action('sabri_public_experience/section_provider_registration_error', $exception);
-            }
-        }
+        self::register_section_provider($section_registry, 'file-06-knowledge', new File_06_Knowledge_Provider());
+        self::register_section_provider($section_registry, 'file-10-video-media', new File_10_Video_Media_Provider());
+        self::register_section_provider($section_registry, 'file-11-reels-media', new File_11_Reels_Media_Provider());
+        self::register_section_provider($section_registry, 'file-12-pdf-media', new File_12_Pdf_Media_Provider());
 
         $timeline = new Timeline_Service($timeline_registry);
         $sections = new Section_Service($section_registry);
@@ -157,5 +135,30 @@ final class Plugin
 
         do_action('sabri_public_experience/booted', $this, $timeline_registry, $section_registry);
         Safe_Mode::end();
+    }
+
+    private static function register_timeline_provider(Timeline_Registry $registry, Contracts\Timeline_Provider $provider): void
+    {
+        try {
+            if ($provider->is_available()) {
+                $registry->register($provider);
+            }
+        } catch (\Throwable $exception) {
+            do_action('sabri_public_experience/provider_registration_error', $exception);
+        }
+    }
+
+    private static function register_section_provider(Section_Registry $registry, string $canonical_id, Contracts\Profile_Section_Provider $provider): void
+    {
+        if ($registry->get($canonical_id) !== null) {
+            return;
+        }
+        try {
+            if ($provider->is_available()) {
+                $registry->register($provider);
+            }
+        } catch (\Throwable $exception) {
+            do_action('sabri_public_experience/section_provider_registration_error', $exception);
+        }
     }
 }
