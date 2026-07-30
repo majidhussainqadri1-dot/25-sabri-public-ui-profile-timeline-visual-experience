@@ -1,12 +1,14 @@
 :root {
     --spux-primary: var(--sabri-shell-primary, #ff8a1f);
-    --spux-primary-strong: var(--sabri-shell-primary, #d96300);
+    --spux-primary-strong: var(--sabri-shell-primary-strong, #b94700);
     --spux-text: var(--sabri-shell-text, #111111);
     --spux-muted: var(--sabri-shell-muted, #5f6368);
     --spux-surface: var(--sabri-shell-surface, #ffffff);
     --spux-page: var(--sabri-shell-bg, #f7f5f1);
     --spux-border: var(--sabri-shell-border, #e2e4e8);
     --spux-focus: var(--sabri-shell-focus, #0b57d0);
+    --spux-danger: var(--sabri-shell-danger, #b42318);
+    --spux-warning: var(--sabri-shell-warning, #8a4b08);
     --spux-radius: 1rem;
     --spux-shadow: 0 0.25rem 1.25rem rgb(17 17 17 / 8%);
 }
@@ -14,7 +16,7 @@
 .spux-profile {
     background: var(--spux-page);
     color: var(--spux-text);
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: inherit;
     font-size: 1rem;
     line-height: 1.6;
     min-block-size: 60vh;
@@ -29,7 +31,8 @@
 
 .spux-hero,
 .spux-card,
-.spux-state {
+.spux-state,
+.spux-notice {
     background: var(--spux-surface);
     border: 1px solid var(--spux-border);
     border-radius: var(--spux-radius);
@@ -37,6 +40,7 @@
 }
 
 .spux-hero {
+    overflow: hidden;
     overflow: clip;
 }
 
@@ -72,6 +76,17 @@
     object-fit: cover;
 }
 
+.spux-avatar--initials {
+    align-items: center;
+    background: #fff3e8;
+    color: var(--spux-primary-strong);
+    display: inline-flex;
+    font-size: clamp(1.75rem, 6vw, 3rem);
+    font-weight: 800;
+    justify-content: center;
+    text-transform: uppercase;
+}
+
 .spux-identity h1 {
     font-size: clamp(1.6rem, 4vw, 2.6rem);
     line-height: 1.15;
@@ -81,7 +96,8 @@
 .spux-identity__title-row,
 .spux-actions,
 .spux-card__meta,
-.spux-tabs {
+.spux-tabs,
+.spux-pagination {
     align-items: center;
     display: flex;
     flex-wrap: wrap;
@@ -89,19 +105,33 @@
 }
 
 .spux-headline,
-.spux-location {
+.spux-location,
+.spux-role-label {
     color: var(--spux-muted);
     margin-block: 0.35rem 0;
 }
 
 .spux-badge {
-    background: color-mix(in srgb, var(--spux-primary) 14%, white);
-    border: 1px solid color-mix(in srgb, var(--spux-primary) 42%, white);
+    background: #fff3e8;
+    background: color-mix(in srgb, var(--spux-primary) 14%, var(--spux-surface));
+    border: 1px solid #ffc48c;
+    border-color: color-mix(in srgb, var(--spux-primary) 42%, var(--spux-surface));
     border-radius: 999px;
     color: var(--spux-primary-strong);
+    display: inline-block;
     font-size: 0.8rem;
     font-weight: 700;
+    margin-block: 0.5rem;
     padding: 0.25rem 0.65rem;
+}
+
+.spux-badge--corrected {
+    color: var(--spux-warning);
+}
+
+.spux-badge--retracted {
+    border-color: var(--spux-danger);
+    color: var(--spux-danger);
 }
 
 .spux-button,
@@ -124,11 +154,21 @@
 .spux-button--secondary {
     background: var(--spux-surface);
     border-color: var(--spux-border);
+    color: var(--spux-text);
 }
 
 .spux-button:hover,
 .spux-read-more:hover {
     filter: brightness(0.96);
+}
+
+.spux-button:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+.spux-button[data-share-error="true"] {
+    border-color: var(--spux-danger);
 }
 
 .spux-button:focus-visible,
@@ -159,7 +199,8 @@
 }
 
 .spux-tabs__item.is-active {
-    background: color-mix(in srgb, var(--spux-primary) 18%, white);
+    background: #fff3e8;
+    background: color-mix(in srgb, var(--spux-primary) 18%, var(--spux-surface));
     color: var(--spux-primary-strong);
 }
 
@@ -170,8 +211,18 @@
 }
 
 .spux-card,
-.spux-state {
+.spux-state,
+.spux-notice {
     padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+.spux-notice {
+    box-shadow: none;
+    margin-block: 1rem;
+}
+
+.spux-notice--warning {
+    border-inline-start: 0.3rem solid var(--spux-warning);
 }
 
 .spux-timeline-card h3 {
@@ -200,8 +251,27 @@
 }
 
 .spux-pagination {
+    justify-content: center;
     margin-block-start: 1.25rem;
     text-align: center;
+}
+
+.spux-pagination__current {
+    color: var(--spux-muted);
+    font-weight: 700;
+    padding-inline: 0.5rem;
+}
+
+.spux-sr-only {
+    block-size: 1px;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    inline-size: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
 }
 
 @media (max-width: 48rem) {
@@ -231,9 +301,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
+    .spux-profile,
+    .spux-profile *,
+    .spux-profile *::before,
+    .spux-profile *::after {
         scroll-behavior: auto !important;
         transition-duration: 0.01ms !important;
     }
