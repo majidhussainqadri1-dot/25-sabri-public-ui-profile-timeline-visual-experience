@@ -1,6 +1,6 @@
 {
   "name": "sabri/file-25-global-visual-experience",
-  "description": "File 25 global design system, public profiles, responsive refinement, visual consistency, and federated timeline presentation for the Sabri Social Homeopathy Platform.",
+  "description": "File 25 global design system, public profiles, federated timelines, responsive refinement, and reusable public components for the Sabri Social Homeopathy Platform.",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
   "require": {
@@ -12,6 +12,7 @@
       "@php tests/profile-data.php",
       "@php tests/file21-provider.php",
       "@php tests/design-system.php",
+      "@php tests/content-cards.php",
       "@php tests/safe-mode.php",
       "@php tools/verify-structure.php"
     ],
