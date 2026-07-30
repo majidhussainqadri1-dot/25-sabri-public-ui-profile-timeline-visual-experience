@@ -18,7 +18,7 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
  */
 final class Design_System
 {
-    public const CONTRACT_VERSION = '1.0.0';
+    public const CONTRACT_VERSION = '1.1.0';
     public const CANONICAL_NAME = 'Sabri Unified Global Visual Experience and Design System';
     public const SUBTITLE = 'Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency';
 
@@ -29,6 +29,7 @@ final class Design_System
         add_filter('sabri_public_experience/design_system_contract', [self::class, 'filter_contract']);
         add_filter('sabri_visual_experience/tokens', [self::class, 'filter_tokens']);
         add_filter('sabri_visual_experience/components', [self::class, 'filter_components']);
+        add_filter('sabri_visual_experience/content_cards', [Content_Cards::class, 'filter_contract']);
     }
 
     /** @param list<string> $classes @return list<string> */
@@ -43,7 +44,7 @@ final class Design_System
         $classes[] = function_exists('is_rtl') && is_rtl()
             ? 'sabri-visual-direction-rtl'
             : 'sabri-visual-direction-ltr';
-        $classes[] = defined('SABRI_SHELL_VERSION')
+        $classes[] = self::shell_is_available()
             ? 'sabri-visual-shell-connected'
             : 'sabri-visual-shell-degraded';
 
@@ -90,6 +91,7 @@ final class Design_System
                 : '',
             'global_shell_owner' => 'file-20',
             'visual_system_owner' => 'file-25',
+            'shell_detected' => self::shell_is_available(),
             'scope' => [
                 'global-design-system',
                 'public-ui',
@@ -98,9 +100,11 @@ final class Design_System
                 'visual-consistency',
                 'accessibility',
                 'visual-regression',
+                'reusable-content-cards',
             ],
             'tokens' => self::tokens(),
             'components' => Components::contract(),
+            'content_cards' => Content_Cards::contract(),
             'asset_handle' => 'sabri-visual-design-system',
             'css_prefix' => 'sabri-ui-',
             'duplicates_file_20_shell' => false,
@@ -114,6 +118,8 @@ final class Design_System
         return [
             'color-primary' => self::token('--sabri-visual-primary', '--sabri-shell-primary', '#ff8a1f'),
             'color-primary-strong' => self::token('--sabri-visual-primary-strong', '--sabri-shell-primary-strong', '#9a3d00'),
+            'color-primary-soft' => self::token('--sabri-visual-primary-soft', '', '#fff3e8'),
+            'color-on-primary' => self::token('--sabri-visual-on-primary', '', '#171717'),
             'color-text' => self::token('--sabri-visual-text', '--sabri-shell-text', '#171717'),
             'color-muted' => self::token('--sabri-visual-muted', '--sabri-shell-muted', '#5f6368'),
             'color-surface' => self::token('--sabri-visual-surface', '--sabri-shell-surface', '#ffffff'),
@@ -123,6 +129,7 @@ final class Design_System
             'color-success' => self::token('--sabri-visual-success', '--sabri-shell-success', '#137333'),
             'color-warning' => self::token('--sabri-visual-warning', '--sabri-shell-warning', '#8a4b08'),
             'color-danger' => self::token('--sabri-visual-danger', '--sabri-shell-danger', '#b42318'),
+            'color-on-danger' => self::token('--sabri-visual-on-danger', '', '#ffffff'),
             'radius-control' => self::token('--sabri-visual-radius-control', '--sabri-shell-radius', '0.75rem'),
             'radius-card' => self::token('--sabri-visual-radius-card', '--sabri-shell-radius', '1rem'),
             'space-layout' => self::token('--sabri-visual-layout-gap', '--sabri-shell-gap', '1.5rem'),
@@ -155,6 +162,16 @@ final class Design_System
         $base = is_array($components) ? $components : [];
 
         return array_merge($base, Components::contract());
+    }
+
+    private static function shell_is_available(): bool
+    {
+        if (! defined('SABRI_SHELL_VERSION')) {
+            return false;
+        }
+
+        return ! function_exists('apply_filters')
+            || (bool) apply_filters('sabri_public_experience/dependency/application_shell', true);
     }
 
     /** @return array<string,string> */
