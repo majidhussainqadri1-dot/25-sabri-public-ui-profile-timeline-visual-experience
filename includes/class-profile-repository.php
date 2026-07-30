@@ -52,14 +52,21 @@ final class Profile_Repository
         $user_id = (int) $user->ID;
         $profile_class = $this->visibility->profile_class($user);
         $credentials = $this->native->professional_credentials($user_id);
-        $clinic = $this->native->clinic($user_id);
-        $founder = $profile_class === 'founder' ? $this->native->founder_profile() : [];
+        $clinic_source = $this->native->clinic($user_id);
+        $founder_source = $profile_class === 'founder' ? $this->native->founder_profile() : [];
+        $founder_details = $profile_class === 'founder'
+            ? Profile_Data::founder_details($founder_source)
+            : [];
+        $professional = $profile_class === 'doctor'
+            ? Profile_Data::professional_details($credentials)
+            : [];
+        $clinic = Profile_Data::clinic($clinic_source);
 
         $photo_id = (int) get_user_meta($user_id, '_spd_profile_photo_id', true);
         $cover_id = (int) get_user_meta($user_id, '_spd_cover_photo_id', true);
         if ($profile_class === 'founder') {
-            $photo_id = (int) ($founder['photo_id'] ?? $photo_id);
-            $cover_id = (int) ($founder['cover_id'] ?? $cover_id);
+            $photo_id = (int) ($founder_source['photo_id'] ?? $photo_id);
+            $cover_id = (int) ($founder_source['cover_id'] ?? $cover_id);
         }
 
         $avatar = $photo_id > 0
@@ -67,10 +74,10 @@ final class Profile_Repository
             : get_avatar_url($user_id, ['size' => 256]);
         $cover = $cover_id > 0 ? wp_get_attachment_image_url($cover_id, 'large') : '';
         $headline = $profile_class === 'founder'
-            ? (string) ($founder['title'] ?? '')
-            : (string) ($credentials['specialization'] ?? $this->native->profile_value($user_id, 'specialty'));
+            ? (string) ($founder_source['title'] ?? '')
+            : (string) ($professional['specialization'] ?? $this->native->profile_value($user_id, 'specialty'));
         $bio = $profile_class === 'founder'
-            ? (string) ($founder['introduction'] ?? '')
+            ? (string) ($founder_source['introduction'] ?? '')
             : $this->native->profile_value($user_id, 'bio', $user->description);
 
         $show_professional_location = in_array($profile_class, ['founder', 'doctor', 'institution'], true);
@@ -80,8 +87,18 @@ final class Profile_Repository
         $city = $show_professional_location
             ? $this->native->profile_value($user_id, 'city', (string) ($clinic['city'] ?? ''))
             : '';
-        $contacts = $this->public_contacts($user_id, $clinic, $founder);
-        $available_sections = $this->available_sections($profile_class, $bio, $contacts, $clinic);
+        $location_text = $profile_class === 'founder'
+            ? (string) ($founder_details['location'] ?? '')
+            : '';
+        $contacts = $this->public_contacts($user_id, $clinic_source, $founder_source);
+        $available_sections = $this->available_sections(
+            $profile_class,
+            $bio,
+            $contacts,
+            $clinic,
+            $founder_details,
+            $professional
+        );
         $all_labels = $this->section_labels($profile_class);
         $section_labels = array_intersect_key($all_labels, array_flip($available_sections));
         $default_name = $profile_class === 'founder'
@@ -100,15 +117,21 @@ final class Profile_Repository
             'bio' => $bio,
             'country' => $country,
             'city' => $city,
+            'location_text' => $location_text,
             'contacts' => $contacts,
             'canonical_url' => $this->canonical_url($user),
             'available_sections' => $available_sections,
             'section_labels' => $section_labels,
+            'founder_details' => $founder_details,
+            'professional' => $professional,
+            'clinic' => $clinic,
         ];
 
         /** @var array<string,mixed> $filtered */
         $filtered = (array) apply_filters('sabri_public_experience/public_profile_data', $profile, $user);
 
+        // Public identity and policy fields remain authoritative. Extensions may
+        // modify bounded presentation text and media only.
         $filtered_name = $this->plain_text((string) ($filtered['display_name'] ?? $profile['display_name']), 190);
         $profile['display_name'] = $filtered_name !== '' ? $filtered_name : $this->plain_text($default_name, 190);
         $profile['headline'] = $this->plain_text((string) ($filtered['headline'] ?? $profile['headline']), 300);
@@ -117,6 +140,7 @@ final class Profile_Repository
         $profile['cover_url'] = esc_url_raw((string) ($filtered['cover_url'] ?? $profile['cover_url']));
         $profile['country'] = $this->plain_text((string) $profile['country'], 100);
         $profile['city'] = $this->plain_text((string) $profile['city'], 100);
+        $profile['location_text'] = $this->plain_text((string) $profile['location_text'], 240);
         $profile['canonical_url'] = esc_url_raw((string) $profile['canonical_url']);
 
         return $profile;
@@ -221,19 +245,36 @@ final class Profile_Repository
     }
 
     /**
-     * Return only sections that File 25 can render truthfully in this phase.
-     * Filters may hide an existing section, but may not create a dead tab. A
-     * later section-provider registry will own additive knowledge/media tabs.
+     * Return only sections File 25 can render truthfully now. Filters may hide
+     * an existing section, but cannot create a dead destination.
      *
      * @param array<string,string> $contacts
-     * @param array<string,mixed> $clinic
+     * @param array<string,string> $clinic
+     * @param array<string,mixed> $founder_details
+     * @param array<string,mixed> $professional
      * @return list<string>
      */
-    private function available_sections(string $profile_class, string $bio, array $contacts, array $clinic): array
-    {
+    private function available_sections(
+        string $profile_class,
+        string $bio,
+        array $contacts,
+        array $clinic,
+        array $founder_details,
+        array $professional
+    ): array {
         $sections = ['overview', 'timeline'];
-        if (trim(wp_strip_all_tags($bio)) !== '') {
+        if (
+            trim(wp_strip_all_tags($bio)) !== ''
+            || $professional !== []
+            || array_intersect_key($founder_details, array_flip(['objectives', 'methodology', 'experience'])) !== []
+        ) {
             $sections[] = 'about';
+        }
+        if (
+            $profile_class === 'founder'
+            && (! empty($founder_details['publications']) || ! empty($founder_details['research']))
+        ) {
+            $sections[] = 'books-research';
         }
         if ($profile_class === 'founder' && ($contacts !== [] || $clinic !== [])) {
             $sections[] = 'clinic-contact';
