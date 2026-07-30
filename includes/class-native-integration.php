@@ -21,30 +21,35 @@ final class Native_Integration
     public function membership_available(): bool
     {
         $detected = defined('SMC_VERSION') && function_exists('smc_get_profile');
+
         return (bool) apply_filters('sabri_public_experience/dependency/membership_core', $detected);
     }
 
     public function profiles_available(): bool
     {
         $detected = defined('SPD_VERSION') && class_exists('SPD_Helpers');
+
         return (bool) apply_filters('sabri_public_experience/dependency/profiles', $detected);
     }
 
     public function shell_available(): bool
     {
         $detected = defined('SABRI_SHELL_VERSION');
+
         return (bool) apply_filters('sabri_public_experience/dependency/application_shell', $detected);
     }
 
     public function home_news_available(): bool
     {
         $detected = defined('SABRI_HNF_VERSION') && function_exists('sabri_hnf_bootstrap');
+
         return (bool) apply_filters('sabri_public_experience/dependency/home_news', $detected);
     }
 
     public function security_center_available(): bool
     {
         $detected = defined('SABRI_SECURITY_CENTER_VERSION') || defined('SABRI_SPRC_VERSION');
+
         return (bool) apply_filters('sabri_public_experience/dependency/security_center', $detected);
     }
 
@@ -79,7 +84,9 @@ final class Native_Integration
         if (! function_exists('smc_get_profile')) {
             return [];
         }
+
         $profile = smc_get_profile($user_id);
+
         return is_array($profile) ? $profile : [];
     }
 
@@ -88,6 +95,7 @@ final class Native_Integration
         if (function_exists('smc_user_status')) {
             return sanitize_key((string) smc_user_status($user_id));
         }
+
         return sanitize_key((string) get_user_meta($user_id, '_smc_status', true));
     }
 
@@ -97,6 +105,7 @@ final class Native_Integration
         if (! $detected) {
             $detected = $this->founder_user_id() === $user_id;
         }
+
         return (bool) apply_filters('sabri_public_experience/is_founder', $detected, $user_id);
     }
 
@@ -105,6 +114,7 @@ final class Native_Integration
         $profile = $this->membership_profile($user_id);
         $age = isset($profile['calculated_age']) ? (int) $profile['calculated_age'] : 0;
         $detected = $age > 0 && $age < 18;
+
         return (bool) apply_filters('sabri_membership_core/is_minor', $detected, $user_id);
     }
 
@@ -125,7 +135,12 @@ final class Native_Integration
         }
 
         $verified = ! $membership_denied && ! $profiles_denied && ($membership_verified || $profiles_verified);
-        return (bool) apply_filters('sabri_public_experience/is_verified_doctor', $verified, $user_id);
+
+        return (bool) apply_filters(
+            'sabri_public_experience/is_verified_doctor',
+            $verified,
+            $user_id
+        );
     }
 
     public function profile_class(WP_User $user): string
@@ -146,12 +161,22 @@ final class Native_Integration
                 default => 'member',
             };
         }
+
         return (string) apply_filters('sabri_public_experience/profile_class', $class, $user);
     }
 
     public function public_visibility(int $user_id): string
     {
-        if ($this->is_founder($user_id) || $this->is_verified_doctor($user_id)) {
+        if ($this->is_founder($user_id)) {
+            return 'public';
+        }
+
+        $status = $this->membership_status($user_id);
+        if (in_array($status, ['rejected', 'suspended', 'expired_document'], true)) {
+            return 'private';
+        }
+
+        if ($this->is_verified_doctor($user_id)) {
             return 'public';
         }
         if ($this->is_minor($user_id)) {
@@ -163,6 +188,7 @@ final class Native_Integration
         if ($visibility === '') {
             $visibility = sanitize_key((string) get_user_meta($user_id, 'sabri_profile_visibility', true));
         }
+
         return (string) apply_filters('sabri_public_experience/profile_visibility', $visibility ?: 'members', $user_id);
     }
 
@@ -197,7 +223,11 @@ final class Native_Integration
             return [];
         }
 
-        $row = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$table} WHERE user_id = %d LIMIT 1", $user_id), ARRAY_A);
+        $row = $wpdb->get_row(
+            $wpdb->prepare("SELECT * FROM {$table} WHERE user_id = %d LIMIT 1", $user_id),
+            ARRAY_A
+        );
+
         return is_array($row) ? $row : [];
     }
 
@@ -215,7 +245,11 @@ final class Native_Integration
             return [];
         }
 
-        $row = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$table} WHERE owner_user_id = %d ORDER BY id DESC LIMIT 1", $user_id), ARRAY_A);
+        $row = $wpdb->get_row(
+            $wpdb->prepare("SELECT * FROM {$table} WHERE owner_user_id = %d ORDER BY id DESC LIMIT 1", $user_id),
+            ARRAY_A
+        );
+
         return is_array($row) ? $row : [];
     }
 
@@ -224,8 +258,10 @@ final class Native_Integration
     {
         if (class_exists('SPD_Helpers') && method_exists('SPD_Helpers', 'founder')) {
             $profile = \SPD_Helpers::founder();
+
             return is_array($profile) ? $profile : [];
         }
+
         return [];
     }
 }
