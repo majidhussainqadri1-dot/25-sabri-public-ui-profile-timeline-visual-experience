@@ -16,11 +16,13 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
  */
 final class Section_Service
 {
+    public const PUBLIC_CONTRACT_VERSION = '1.0.0';
+
     private const MAX_ITEMS_PER_PROVIDER = 24;
     private const MAX_ITEMS_PER_SECTION = 48;
 
     /** @var array<string,array<string,mixed>> */
-    private array $cache = [];
+    private array $public_cache = [];
 
     public function __construct(private Section_Registry $registry)
     {
@@ -31,7 +33,7 @@ final class Section_Service
     {
         $available = [];
         foreach (Section_Registry::approved_sections() as $section) {
-            $data = $this->get_section($user_id, $profile, $section);
+            $data = $this->get_public_section($user_id, $profile, $section);
             if (($data['items'] ?? []) === []) {
                 continue;
             }
@@ -42,13 +44,45 @@ final class Section_Service
     }
 
     /**
+     * HTML presentation derived from the same allow-listed public projection
+     * used by REST, preventing two divergent sanitization paths.
+     *
      * @param array<string,mixed> $profile
      * @return array{section:string,label:string,items:list<string>,provider_error_count:int,truncated:bool,is_provider_section:bool}
      */
     public function get_section(int $user_id, array $profile, string $section): array
     {
+        $public = $this->get_public_section($user_id, $profile, $section);
+        $rendered = [];
+        foreach ($public['items'] as $card) {
+            $html = Content_Cards::render($card);
+            if ($html !== '') {
+                $rendered[] = $html;
+            }
+        }
+
+        return [
+            'section' => $public['section'],
+            'label' => $public['label'],
+            'items' => $rendered,
+            'provider_error_count' => $public['provider_error_count'],
+            'truncated' => $public['truncated'],
+            'is_provider_section' => $public['is_provider_section'],
+        ];
+    }
+
+    /**
+     * Return structured, allow-listed cards without provider IDs, native IDs,
+     * projection keys, exception details, private metadata, or rendered HTML.
+     *
+     * @param array<string,mixed> $profile
+     * @return array{contract_version:string,section:string,label:string,items:list<array<string,mixed>>,provider_error_count:int,truncated:bool,is_provider_section:bool}
+     */
+    public function get_public_section(int $user_id, array $profile, string $section): array
+    {
         $section = self::key($section);
         $empty = [
+            'contract_version' => self::PUBLIC_CONTRACT_VERSION,
             'section' => $section,
             'label' => self::label($section),
             'items' => [],
@@ -61,9 +95,9 @@ final class Section_Service
         }
 
         $cache_key = $user_id . ':' . $section . ':' . self::key((string) ($profile['class'] ?? 'member'));
-        if (isset($this->cache[$cache_key])) {
-            /** @var array{section:string,label:string,items:list<string>,provider_error_count:int,truncated:bool,is_provider_section:bool} */
-            return $this->cache[$cache_key];
+        if (isset($this->public_cache[$cache_key])) {
+            /** @var array{contract_version:string,section:string,label:string,items:list<array<string,mixed>>,provider_error_count:int,truncated:bool,is_provider_section:bool} */
+            return $this->public_cache[$cache_key];
         }
 
         $items = [];
@@ -110,13 +144,13 @@ final class Section_Service
                     continue;
                 }
 
-                $rendered = Content_Cards::render($candidate);
-                if ($rendered === '') {
+                $card = Content_Cards::normalize_public($candidate);
+                if ($card === null) {
                     continue;
                 }
 
                 $seen[$key] = true;
-                $items[] = $rendered;
+                $items[] = $card;
                 if (count($items) >= self::MAX_ITEMS_PER_SECTION) {
                     $truncated = true;
                     break 2;
@@ -124,13 +158,57 @@ final class Section_Service
             }
         }
 
-        return $this->cache[$cache_key] = [
+        return $this->public_cache[$cache_key] = [
+            'contract_version' => self::PUBLIC_CONTRACT_VERSION,
             'section' => $section,
             'label' => self::label($section),
             'items' => $items,
             'provider_error_count' => $errors,
             'truncated' => $truncated,
             'is_provider_section' => true,
+        ];
+    }
+
+    /**
+     * Aggregate public health only. Provider IDs, versions, native object counts,
+     * exception messages, and implementation details remain administrator-side.
+     *
+     * @return array{contract_version:string,healthy:bool,sections:array<string,array{registered:int,consistent:int,enabled:int,error_count:int}>}
+     */
+    public function public_health(): array
+    {
+        $sections = [];
+        $healthy = true;
+        foreach (Section_Registry::approved_sections() as $section) {
+            $registered = 0;
+            $consistent = 0;
+            $enabled = 0;
+            $errors = 0;
+            foreach ($this->registry->for_section($section) as $provider) {
+                $registered++;
+                $metadata = $this->registry->validated_metadata($provider, $section);
+                if ($metadata === null) {
+                    $errors++;
+                    $healthy = false;
+                    continue;
+                }
+                $consistent++;
+                if ($metadata['maturity'] !== 'disabled') {
+                    $enabled++;
+                }
+            }
+            $sections[$section] = [
+                'registered' => $registered,
+                'consistent' => $consistent,
+                'enabled' => $enabled,
+                'error_count' => $errors,
+            ];
+        }
+
+        return [
+            'contract_version' => self::PUBLIC_CONTRACT_VERSION,
+            'healthy' => $healthy,
+            'sections' => $sections,
         ];
     }
 
@@ -165,7 +243,7 @@ final class Section_Service
         }
 
         // Native systems without item permalinks may provide a server-only opaque
-        // SHA-256 projection key. The value is never passed to the card renderer.
+        // SHA-256 projection key. The value is never passed to the public card.
         $projection_key = is_scalar($candidate['projection_key'] ?? null)
             ? strtolower(trim((string) $candidate['projection_key']))
             : '';
