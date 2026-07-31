@@ -11,7 +11,7 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
 /** Machine-readable Definition-of-Done matrix and evidence validator. */
 final class Visual_Acceptance
 {
-    public const CONTRACT_VERSION = '1.1.0';
+    public const CONTRACT_VERSION = '1.2.0';
 
     private const VIEWPORTS = [
         'mobile-small' => ['width' => 320, 'height' => 568],
@@ -34,6 +34,7 @@ final class Visual_Acceptance
         'profile-timeline',
         'knowledge-section',
         'media-section',
+        'marketplace-section',
         'loading-state',
         'empty-state',
         'error-state',
@@ -59,7 +60,8 @@ final class Visual_Acceptance
             'zoom_levels' => self::ZOOM_LEVELS,
             'input_modes' => self::INPUT_MODES,
             'required_surfaces' => self::REQUIRED_SURFACES,
-            'evidence_record_required_fields' => ['status', 'artifact_ref', 'sha256', 'recorded_at', 'reviewer'],
+            'target_commit_sha_required' => true,
+            'evidence_record_required_fields' => ['status', 'artifact_ref', 'sha256', 'commit_sha', 'recorded_at', 'reviewer'],
             'evidence_required' => true,
             'source_contract_is_acceptance' => false,
             'green_ci_is_acceptance' => false,
@@ -80,15 +82,20 @@ final class Visual_Acceptance
     public static function validate_evidence(array $evidence): array
     {
         $errors = [];
-        self::validate_group($errors, $evidence, 'surfaces', self::REQUIRED_SURFACES);
-        self::validate_group($errors, $evidence, 'viewports', array_keys(self::VIEWPORTS));
-        self::validate_group($errors, $evidence, 'directions', self::DIRECTIONS);
-        self::validate_group($errors, $evidence, 'color_modes', self::COLOR_MODES);
-        self::validate_group($errors, $evidence, 'motion_modes', self::MOTION_MODES);
-        self::validate_group($errors, $evidence, 'zoom_levels', array_map('strval', self::ZOOM_LEVELS));
-        self::validate_group($errors, $evidence, 'input_modes', self::INPUT_MODES);
-        self::validate_staging($errors, $evidence['staging_environment'] ?? null);
-        self::validate_signoff($errors, $evidence['founder_signoff'] ?? null);
+        $target_commit = self::commit_sha($evidence['target_commit_sha'] ?? null);
+        if ($target_commit === '') {
+            $errors[] = 'Missing or invalid target commit SHA.';
+        }
+
+        self::validate_group($errors, $evidence, 'surfaces', self::REQUIRED_SURFACES, $target_commit);
+        self::validate_group($errors, $evidence, 'viewports', array_keys(self::VIEWPORTS), $target_commit);
+        self::validate_group($errors, $evidence, 'directions', self::DIRECTIONS, $target_commit);
+        self::validate_group($errors, $evidence, 'color_modes', self::COLOR_MODES, $target_commit);
+        self::validate_group($errors, $evidence, 'motion_modes', self::MOTION_MODES, $target_commit);
+        self::validate_group($errors, $evidence, 'zoom_levels', array_map('strval', self::ZOOM_LEVELS), $target_commit);
+        self::validate_group($errors, $evidence, 'input_modes', self::INPUT_MODES, $target_commit);
+        self::validate_staging($errors, $evidence['staging_environment'] ?? null, $target_commit);
+        self::validate_signoff($errors, $evidence['founder_signoff'] ?? null, $target_commit);
 
         return array_values(array_unique($errors));
     }
@@ -106,7 +113,7 @@ final class Visual_Acceptance
     }
 
     /** @param list<string> $errors @param list<string> $required @param array<string,mixed> $evidence */
-    private static function validate_group(array &$errors, array $evidence, string $group, array $required): void
+    private static function validate_group(array &$errors, array $evidence, string $group, array $required, string $target_commit): void
     {
         $records = $evidence[$group] ?? null;
         if (! is_array($records)) {
@@ -114,12 +121,12 @@ final class Visual_Acceptance
             return;
         }
         foreach ($required as $key) {
-            self::validate_record($errors, $records[(string) $key] ?? null, $group . '.' . $key);
+            self::validate_record($errors, $records[(string) $key] ?? null, $group . '.' . $key, $target_commit);
         }
     }
 
     /** @param list<string> $errors */
-    private static function validate_record(array &$errors, mixed $record, string $path): void
+    private static function validate_record(array &$errors, mixed $record, string $path, string $target_commit): void
     {
         if (! is_array($record)) {
             $errors[] = 'Missing evidence record: ' . $path;
@@ -134,6 +141,10 @@ final class Visual_Acceptance
         if (! is_scalar($record['sha256'] ?? null) || preg_match('/^[a-f0-9]{64}$/i', (string) $record['sha256']) !== 1) {
             $errors[] = 'Invalid artifact SHA-256: ' . $path;
         }
+        $record_commit = self::commit_sha($record['commit_sha'] ?? null);
+        if ($record_commit === '' || $target_commit === '' || ! hash_equals($target_commit, $record_commit)) {
+            $errors[] = 'Evidence commit does not match the target commit: ' . $path;
+        }
         if (! self::iso_time($record['recorded_at'] ?? null)) {
             $errors[] = 'Invalid evidence timestamp: ' . $path;
         }
@@ -143,7 +154,7 @@ final class Visual_Acceptance
     }
 
     /** @param list<string> $errors */
-    private static function validate_staging(array &$errors, mixed $record): void
+    private static function validate_staging(array &$errors, mixed $record, string $target_commit): void
     {
         if (! is_array($record)) {
             $errors[] = 'Missing staging environment evidence.';
@@ -155,8 +166,9 @@ final class Visual_Acceptance
         if (! self::https_url($record['site_url'] ?? null)) {
             $errors[] = 'Invalid staging site URL.';
         }
-        if (! is_scalar($record['commit_sha'] ?? null) || preg_match('/^[a-f0-9]{40}$/i', (string) $record['commit_sha']) !== 1) {
-            $errors[] = 'Invalid staging commit SHA.';
+        $record_commit = self::commit_sha($record['commit_sha'] ?? null);
+        if ($record_commit === '' || $target_commit === '' || ! hash_equals($target_commit, $record_commit)) {
+            $errors[] = 'Staging commit does not match the target commit.';
         }
         if (! self::bounded_text($record['wordpress_version'] ?? null, 40) || ! self::bounded_text($record['php_version'] ?? null, 40)) {
             $errors[] = 'Missing staging runtime versions.';
@@ -167,7 +179,7 @@ final class Visual_Acceptance
     }
 
     /** @param list<string> $errors */
-    private static function validate_signoff(array &$errors, mixed $record): void
+    private static function validate_signoff(array &$errors, mixed $record, string $target_commit): void
     {
         if (! is_array($record)) {
             $errors[] = 'Missing Founder sign-off evidence.';
@@ -179,8 +191,9 @@ final class Visual_Acceptance
         if (! self::bounded_text($record['signer'] ?? null, 190)) {
             $errors[] = 'Invalid Founder signer.';
         }
-        if (! is_scalar($record['commit_sha'] ?? null) || preg_match('/^[a-f0-9]{40}$/i', (string) $record['commit_sha']) !== 1) {
-            $errors[] = 'Invalid Founder sign-off commit SHA.';
+        $record_commit = self::commit_sha($record['commit_sha'] ?? null);
+        if ($record_commit === '' || $target_commit === '' || ! hash_equals($target_commit, $record_commit)) {
+            $errors[] = 'Founder sign-off commit does not match the target commit.';
         }
         if (! self::safe_reference($record['evidence_ref'] ?? null)) {
             $errors[] = 'Invalid Founder sign-off evidence reference.';
@@ -196,8 +209,11 @@ final class Visual_Acceptance
             return false;
         }
         $value = trim((string) $value);
+        if ($value === '' || strlen($value) > 2048 || preg_match('/[\x00-\x1F\x7F]/', $value) === 1) {
+            return false;
+        }
 
-        return $value !== '' && strlen($value) <= 2048 && preg_match('/[\x00-\x1F\x7F]/', $value) !== 1;
+        return preg_match('/^(?:javascript|data|vbscript):/i', $value) !== 1;
     }
 
     private static function bounded_text(mixed $value, int $maximum): bool
@@ -205,14 +221,48 @@ final class Visual_Acceptance
         return is_scalar($value) && trim((string) $value) !== '' && strlen(trim((string) $value)) <= $maximum;
     }
 
+    private static function commit_sha(mixed $value): string
+    {
+        if (! is_scalar($value)) {
+            return '';
+        }
+        $value = strtolower(trim((string) $value));
+
+        return preg_match('/^[a-f0-9]{40}$/', $value) === 1 ? $value : '';
+    }
+
     private static function iso_time(mixed $value): bool
     {
-        if (! is_scalar($value) || preg_match('/(?:Z|[+\-]\d{2}:\d{2})$/', trim((string) $value)) !== 1) {
+        if (! is_scalar($value)) {
             return false;
         }
+        $raw = trim((string) $value);
+        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d{1,6})?(Z|[+\-](\d{2}):(\d{2}))$/', $raw, $match) !== 1) {
+            return false;
+        }
+
+        $year = (int) $match[1];
+        $month = (int) $match[2];
+        $day = (int) $match[3];
+        $hour = (int) $match[4];
+        $minute = (int) $match[5];
+        $second = (int) $match[6];
+        if (! checkdate($month, $day, $year) || $hour > 23 || $minute > 59 || $second > 59) {
+            return false;
+        }
+        if ($match[7] !== 'Z') {
+            $offset_hour = (int) $match[8];
+            $offset_minute = (int) $match[9];
+            if ($offset_hour > 14 || $offset_minute > 59 || ($offset_hour === 14 && $offset_minute !== 0)) {
+                return false;
+            }
+        }
+
         try {
-            new \DateTimeImmutable(trim((string) $value));
-            return true;
+            new \DateTimeImmutable($raw);
+            $errors = \DateTimeImmutable::getLastErrors();
+            return ! is_array($errors)
+                || ((int) ($errors['warning_count'] ?? 0) === 0 && (int) ($errors['error_count'] ?? 0) === 0);
         } catch (\Throwable) {
             return false;
         }
@@ -223,12 +273,24 @@ final class Visual_Acceptance
         if (! is_scalar($value)) {
             return false;
         }
-        $parts = parse_url(trim((string) $value));
+        $url = trim((string) $value);
+        if ($url === '' || strlen($url) > 2048 || preg_match('/[\x00-\x20\x7F]/', $url) === 1 || str_contains($url, '\\')) {
+            return false;
+        }
+        if (filter_var($url, FILTER_VALIDATE_URL) === false) {
+            return false;
+        }
+        $parts = parse_url($url);
+        if (! is_array($parts)) {
+            return false;
+        }
 
-        return is_array($parts)
-            && strtolower((string) ($parts['scheme'] ?? '')) === 'https'
+        return strtolower((string) ($parts['scheme'] ?? '')) === 'https'
             && (string) ($parts['host'] ?? '') !== ''
             && ! isset($parts['user'])
-            && ! isset($parts['pass']);
+            && ! isset($parts['pass'])
+            && ! isset($parts['query'])
+            && ! isset($parts['fragment'])
+            && (! isset($parts['port']) || ((int) $parts['port'] >= 1 && (int) $parts['port'] <= 65535));
     }
 }
