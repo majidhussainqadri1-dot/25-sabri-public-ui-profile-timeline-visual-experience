@@ -17,6 +17,7 @@
       "@php tests/section-provider-metadata.php",
       "@php tests/file06-knowledge-provider.php",
       "@php tests/file10-12-media-providers.php",
+      "@php tests/file18-marketplace-provider.php",
       "@php tests/visual-acceptance.php",
       "@php tests/safe-mode.php",
       "@php tools/verify-structure.php",
