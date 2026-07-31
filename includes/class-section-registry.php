@@ -35,7 +35,7 @@ final class Section_Registry
     /** @var array<string,Profile_Section_Provider> */
     private array $providers = [];
 
-    /** @var array<string,array{id:string,version:string,section:string,maturity:string,owns_native_content:bool}> */
+    /** @var array<string,array{id:string,version:string,section:string,maturity:string,owns_native_content:bool,object_id:int}> */
     private array $registered_metadata = [];
 
     public function register(Profile_Section_Provider $provider): void
@@ -79,6 +79,7 @@ final class Section_Registry
             'section' => $section,
             'maturity' => $maturity,
             'owns_native_content' => false,
+            'object_id' => spl_object_id($provider),
         ];
         ksort($this->providers, SORT_STRING);
         ksort($this->registered_metadata, SORT_STRING);
@@ -113,33 +114,51 @@ final class Section_Registry
         return $matches;
     }
 
-    public function provider_is_consistent(Profile_Section_Provider $provider, string $expected_section): bool
+    /**
+     * Return one atomic, registration-bound metadata snapshot after reading every
+     * mutable provider field exactly once. The concrete object identity is frozen
+     * so one provider cannot impersonate another registered provider.
+     *
+     * @return array{id:string,version:string,section:string,maturity:string,owns_native_content:bool,object_id:int}|null
+     */
+    public function validated_metadata(Profile_Section_Provider $provider, string $expected_section): ?array
     {
         try {
-            $id = self::key($provider->get_id());
-            $version = trim($provider->get_version());
-            $section = self::key($provider->get_section());
-            $maturity = self::key($provider->get_maturity_level());
-            $owns_native_content = $provider->owns_native_content();
+            $current = [
+                'id' => self::key($provider->get_id()),
+                'version' => trim($provider->get_version()),
+                'section' => self::key($provider->get_section()),
+                'maturity' => self::key($provider->get_maturity_level()),
+                'owns_native_content' => $provider->owns_native_content(),
+                'object_id' => spl_object_id($provider),
+            ];
         } catch (\Throwable) {
-            return false;
+            return null;
         }
 
-        $registered = $this->registered_metadata[$id] ?? null;
+        $registered = $this->registered_metadata[$current['id']] ?? null;
         if (! is_array($registered)) {
-            return false;
+            return null;
         }
 
-        return hash_equals($registered['id'], $id)
-            && hash_equals($registered['version'], $version)
-            && hash_equals($registered['section'], $section)
-            && hash_equals($registered['maturity'], $maturity)
-            && $registered['owns_native_content'] === $owns_native_content
-            && $owns_native_content === false
-            && $section === self::key($expected_section)
-            && self::version_is_valid($version)
-            && self::section_is_approved($section)
-            && self::maturity_is_approved($maturity);
+        $consistent = hash_equals($registered['id'], $current['id'])
+            && hash_equals($registered['version'], $current['version'])
+            && hash_equals($registered['section'], $current['section'])
+            && hash_equals($registered['maturity'], $current['maturity'])
+            && $registered['owns_native_content'] === $current['owns_native_content']
+            && $registered['object_id'] === $current['object_id']
+            && $current['owns_native_content'] === false
+            && $current['section'] === self::key($expected_section)
+            && self::version_is_valid($current['version'])
+            && self::section_is_approved($current['section'])
+            && self::maturity_is_approved($current['maturity']);
+
+        return $consistent ? $registered : null;
+    }
+
+    public function provider_is_consistent(Profile_Section_Provider $provider, string $expected_section): bool
+    {
+        return $this->validated_metadata($provider, $expected_section) !== null;
     }
 
     /** @return list<string> */
