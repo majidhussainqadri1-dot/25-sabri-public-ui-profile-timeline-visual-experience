@@ -16,7 +16,8 @@ final class Rest_Controller
 {
     public function __construct(
         private Profile_Repository $profiles,
-        private Timeline_Service $timeline
+        private Timeline_Service $timeline,
+        private Section_Service $sections
     ) {
     }
 
@@ -62,6 +63,12 @@ final class Rest_Controller
             'callback' => [$this, 'get_founder_timeline'],
             'args' => $pagination,
         ]);
+        foreach (['knowledge', 'media'] as $section) {
+            register_rest_route('sabri-public/v1', '/founder/' . $section, $public + [
+                'methods' => 'GET',
+                'callback' => static fn (WP_REST_Request $request): WP_REST_Response => $this->get_founder_section($request, $section),
+            ]);
+        }
         register_rest_route('sabri-public/v1', '/profiles/(?P<slug>[a-zA-Z0-9_-]+)', $public + [
             'methods' => 'GET',
             'callback' => [$this, 'get_profile'],
@@ -71,6 +78,17 @@ final class Rest_Controller
             'methods' => 'GET',
             'callback' => [$this, 'get_timeline'],
             'args' => ['slug' => $slug] + $pagination,
+        ]);
+        foreach (['knowledge', 'media'] as $section) {
+            register_rest_route('sabri-public/v1', '/profiles/(?P<slug>[a-zA-Z0-9_-]+)/' . $section, $public + [
+                'methods' => 'GET',
+                'callback' => static fn (WP_REST_Request $request): WP_REST_Response => $this->get_section($request, $section),
+                'args' => ['slug' => $slug],
+            ]);
+        }
+        register_rest_route('sabri-public/v1', '/providers/health', $public + [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_provider_health'],
         ]);
     }
 
@@ -84,6 +102,13 @@ final class Rest_Controller
         return $this->timeline_response($this->profiles->get_founder(), $request);
     }
 
+    public function get_founder_section(WP_REST_Request $request, string $section): WP_REST_Response
+    {
+        unset($request);
+
+        return $this->section_response($this->profiles->get_founder(), $section);
+    }
+
     public function get_profile(WP_REST_Request $request): WP_REST_Response
     {
         return $this->profile_response($this->profiles->find_by_slug((string) $request['slug']));
@@ -95,6 +120,19 @@ final class Rest_Controller
             $this->profiles->find_by_slug((string) $request['slug']),
             $request
         );
+    }
+
+    public function get_section(WP_REST_Request $request, string $section): WP_REST_Response
+    {
+        return $this->section_response(
+            $this->profiles->find_by_slug((string) $request['slug']),
+            $section
+        );
+    }
+
+    public function get_provider_health(): WP_REST_Response
+    {
+        return $this->response($this->sections->public_health(), 200);
     }
 
     private function profile_response(?WP_User $user): WP_REST_Response
@@ -132,13 +170,44 @@ final class Rest_Controller
         return $this->response($public_result, 200);
     }
 
+    private function section_response(?WP_User $user, string $section): WP_REST_Response
+    {
+        $section = sanitize_key($section);
+        if (! in_array($section, ['knowledge', 'media'], true)) {
+            return $this->response(['code' => 'section_not_found'], 404);
+        }
+
+        $profile = $user instanceof WP_User ? $this->profiles->get_public_profile($user) : null;
+        if (! $user instanceof WP_User || $profile === null) {
+            return $this->response(['code' => 'profile_not_found'], 404);
+        }
+
+        $result = $this->sections->get_public_section((int) $user->ID, $profile, $section);
+
+        return $this->response([
+            'contract_version' => $result['contract_version'],
+            'section' => $result['section'],
+            'label' => $result['label'],
+            'items' => $result['items'],
+            'truncated' => $result['truncated'],
+            'partial' => $result['provider_error_count'] > 0,
+        ], 200);
+    }
+
     /** @param array<string,mixed> $data */
     private function response(array $data, int $status): WP_REST_Response
     {
-        return new WP_REST_Response($data, $status, [
+        $encoded = function_exists('wp_json_encode') ? wp_json_encode($data) : json_encode($data);
+        $etag = is_string($encoded) ? '"' . hash('sha256', $encoded) . '"' : '';
+        $headers = [
             'Cache-Control' => 'no-store, private, max-age=0',
             'Pragma' => 'no-cache',
             'X-Content-Type-Options' => 'nosniff',
-        ]);
+        ];
+        if ($etag !== '') {
+            $headers['ETag'] = $etag;
+        }
+
+        return new WP_REST_Response($data, $status, $headers);
     }
 }
