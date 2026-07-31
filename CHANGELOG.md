@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.9.0 — Atomic Providers, File 18 Marketplace, and Commit-Bound Evidence
+
+### Added
+
+- Native read-only `file-18-marketplace` adapter for approved seller-owned public Marketplace listings from the reviewed File 18 `1.1.x` contract.
+- Bounded public projection of title, short description, application URL, first public image, category, product type, condition, effective price/currency, deal state, and publication time.
+- Server-only SHA-256 `projection_key` support for distinct native objects that share one application URL; the key is never rendered publicly.
+- Concrete provider-object identity in registration metadata through `spl_object_id()`.
+- One atomic `validated_metadata()` operation for ID, version, section, maturity, ownership, and object identity.
+- One target commit SHA for every visual evidence record, staging record, and Founder sign-off.
+- Marketplace as a required visual-acceptance surface.
+- File 18 provider, privacy, price, author, seller approval, listing status, deal-state, no-write, and package tests.
+
+### Corrected during sixth review
+
+- Prevented a mutable provider object from impersonating another registered provider ID.
+- Removed repeated provider maturity and ownership reads after consistency validation.
+- Prevented several Marketplace listings from collapsing merely because File 18 currently exposes one application URL rather than item permalinks.
+- Rejected mixed-commit visual evidence, impossible normalized timestamps, unsafe evidence schemes, and noncanonical staging URLs.
+- Made Marketplace deal-state translations statically extractable by standard WordPress tooling.
+
+### Ownership preserved
+
+- File 18 remains the canonical owner of sellers, listings, moderation, contacts, chat, offers, media/files, reports, metrics, and direct-deal workflows.
+- File 25 owns only the normalized public profile visual projection.
+
+### Still pending
+
+- Exact Files 00/03/06/10/11/12/18/20/21/25 staging acceptance.
+- File 24 runtime security/privacy/cache contract.
+- Native Reviews and Research adapters after exact source contracts become available and are reviewed.
+- Captured visual-regression, RTL, accessibility, performance, migration, rollback, deployment, and Founder-acceptance evidence.
+
 ## 0.8.0 — Native Media Adapters and Evidence Integrity
 
 ### Added
