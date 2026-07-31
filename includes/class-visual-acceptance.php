@@ -11,7 +11,7 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
 /** Machine-readable Definition-of-Done matrix and evidence validator. */
 final class Visual_Acceptance
 {
-    public const CONTRACT_VERSION = '1.2.0';
+    public const CONTRACT_VERSION = '1.3.0';
 
     private const VIEWPORTS = [
         'mobile-small' => ['width' => 320, 'height' => 568],
@@ -27,6 +27,16 @@ final class Visual_Acceptance
     private const MOTION_MODES = ['normal', 'reduced'];
     private const ZOOM_LEVELS = [100, 200, 400];
     private const INPUT_MODES = ['keyboard', 'pointer', 'touch', 'screen-reader'];
+    private const MEDIA_TYPES = [
+        'image/png',
+        'image/jpeg',
+        'image/webp',
+        'application/json',
+        'application/pdf',
+        'application/zip',
+        'text/html',
+        'text/plain',
+    ];
     private const REQUIRED_SURFACES = [
         'founder-overview',
         'doctor-overview',
@@ -61,7 +71,18 @@ final class Visual_Acceptance
             'input_modes' => self::INPUT_MODES,
             'required_surfaces' => self::REQUIRED_SURFACES,
             'target_commit_sha_required' => true,
-            'evidence_record_required_fields' => ['status', 'artifact_ref', 'sha256', 'commit_sha', 'recorded_at', 'reviewer'],
+            'artifact_root' => 'artifacts/',
+            'artifact_media_types' => self::MEDIA_TYPES,
+            'evidence_record_required_fields' => [
+                'status',
+                'artifact_ref',
+                'sha256',
+                'byte_size',
+                'media_type',
+                'commit_sha',
+                'recorded_at',
+                'reviewer',
+            ],
             'evidence_required' => true,
             'source_contract_is_acceptance' => false,
             'green_ci_is_acceptance' => false,
@@ -135,11 +156,17 @@ final class Visual_Acceptance
         if (($record['status'] ?? '') !== 'pass') {
             $errors[] = 'Evidence status is not pass: ' . $path;
         }
-        if (! self::safe_reference($record['artifact_ref'] ?? null)) {
+        if (! self::safe_artifact_reference($record['artifact_ref'] ?? null)) {
             $errors[] = 'Invalid artifact reference: ' . $path;
         }
-        if (! is_scalar($record['sha256'] ?? null) || preg_match('/^[a-f0-9]{64}$/i', (string) $record['sha256']) !== 1) {
+        if (! self::sha256($record['sha256'] ?? null)) {
             $errors[] = 'Invalid artifact SHA-256: ' . $path;
+        }
+        if (! self::byte_size($record['byte_size'] ?? null)) {
+            $errors[] = 'Invalid artifact byte size: ' . $path;
+        }
+        if (! self::media_type($record['media_type'] ?? null)) {
+            $errors[] = 'Invalid artifact media type: ' . $path;
         }
         $record_commit = self::commit_sha($record['commit_sha'] ?? null);
         if ($record_commit === '' || $target_commit === '' || ! hash_equals($target_commit, $record_commit)) {
@@ -195,25 +222,68 @@ final class Visual_Acceptance
         if ($record_commit === '' || $target_commit === '' || ! hash_equals($target_commit, $record_commit)) {
             $errors[] = 'Founder sign-off commit does not match the target commit.';
         }
-        if (! self::safe_reference($record['evidence_ref'] ?? null)) {
+        if (! self::safe_artifact_reference($record['evidence_ref'] ?? null)) {
             $errors[] = 'Invalid Founder sign-off evidence reference.';
+        }
+        if (! self::sha256($record['evidence_sha256'] ?? null)) {
+            $errors[] = 'Invalid Founder sign-off evidence SHA-256.';
+        }
+        if (! self::byte_size($record['evidence_byte_size'] ?? null)) {
+            $errors[] = 'Invalid Founder sign-off evidence byte size.';
+        }
+        if (! self::media_type($record['evidence_media_type'] ?? null)) {
+            $errors[] = 'Invalid Founder sign-off evidence media type.';
         }
         if (! self::iso_time($record['recorded_at'] ?? null)) {
             $errors[] = 'Invalid Founder sign-off timestamp.';
         }
     }
 
-    private static function safe_reference(mixed $value): bool
+    private static function safe_artifact_reference(mixed $value): bool
     {
         if (! is_scalar($value)) {
             return false;
         }
         $value = trim((string) $value);
-        if ($value === '' || strlen($value) > 2048 || preg_match('/[\x00-\x1F\x7F]/', $value) === 1) {
+        if ($value === '' || strlen($value) > 512 || preg_match('/[\x00-\x20\x7F]/', $value) === 1) {
             return false;
         }
+        if (! str_starts_with($value, 'artifacts/') || str_contains($value, '\\') || str_contains($value, ':') || str_contains($value, '?') || str_contains($value, '#')) {
+            return false;
+        }
+        if (preg_match('#^artifacts/[A-Za-z0-9][A-Za-z0-9._/-]*$#', $value) !== 1) {
+            return false;
+        }
+        foreach (explode('/', $value) as $segment) {
+            if ($segment === '' || $segment === '.' || $segment === '..') {
+                return false;
+            }
+        }
 
-        return preg_match('/^(?:javascript|data|vbscript):/i', $value) !== 1;
+        return true;
+    }
+
+    private static function sha256(mixed $value): bool
+    {
+        return is_scalar($value) && preg_match('/^[a-f0-9]{64}$/i', trim((string) $value)) === 1;
+    }
+
+    private static function byte_size(mixed $value): bool
+    {
+        if (is_int($value)) {
+            return $value >= 1 && $value <= 1073741824;
+        }
+        if (! is_string($value) || preg_match('/^[1-9]\d{0,9}$/', $value) !== 1) {
+            return false;
+        }
+        $size = (int) $value;
+
+        return $size >= 1 && $size <= 1073741824;
+    }
+
+    private static function media_type(mixed $value): bool
+    {
+        return is_scalar($value) && in_array(strtolower(trim((string) $value)), self::MEDIA_TYPES, true);
     }
 
     private static function bounded_text(mixed $value, int $maximum): bool
