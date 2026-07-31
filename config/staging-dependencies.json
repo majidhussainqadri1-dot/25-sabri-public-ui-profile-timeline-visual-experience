@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "file": 25,
-  "runtime_version": "0.11.0",
+  "runtime_version": "0.12.0",
   "purpose": "Exact multi-plugin staging candidate matrix. This file records reviewed source/package expectations and does not claim staging acceptance.",
   "environment": {
     "wordpress_minimum": "6.5",
@@ -102,16 +102,21 @@
     {
       "file": 24,
       "name": "Platform Security, Privacy, Compliance and Resilience Center",
-      "role": "production security, privacy, cache partitioning, incidents, and resilience owner",
-      "accepted_runtime_contract": "pending",
+      "role": "canonical security governance, privacy orchestration, audit evidence, incidents, controls, findings, and resilience owner",
+      "reviewed_package_version": "0.25.3",
+      "accepted_source_range": ">=0.25.3 <0.26.0",
+      "required_symbols": ["SPCRC_VERSION", "Sabri\\Platform\\Security\\Registry\\ModuleRegistry"],
+      "file_25_module_key": "file-25-public-experience",
+      "accepted_runtime_contract": "reviewed-source-contract-pending-staging",
+      "cache_partition_contract": "not-yet-versioned",
       "bundled_with_file_25": false,
-      "staging_status": "blocked-until-contract-review"
+      "staging_status": "pending"
     },
     {
       "file": 25,
       "name": "Sabri Unified Global Visual Experience and Design System",
       "role": "public visual projection, profiles, responsive refinement, accessibility, and visual acceptance",
-      "candidate_version": "0.11.0",
+      "candidate_version": "0.12.0",
       "bundled_with_file_25": true,
       "staging_status": "pending",
       "package_status": "build-input-not-acceptance",
