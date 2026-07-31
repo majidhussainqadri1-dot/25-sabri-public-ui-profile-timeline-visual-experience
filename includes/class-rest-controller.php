@@ -63,12 +63,14 @@ final class Rest_Controller
             'callback' => [$this, 'get_founder_timeline'],
             'args' => $pagination,
         ]);
-        foreach (['knowledge', 'media'] as $section) {
-            register_rest_route('sabri-public/v1', '/founder/' . $section, $public + [
-                'methods' => 'GET',
-                'callback' => static fn (WP_REST_Request $request): WP_REST_Response => $this->get_founder_section($request, $section),
-            ]);
-        }
+        register_rest_route('sabri-public/v1', '/founder/knowledge', $public + [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_founder_knowledge'],
+        ]);
+        register_rest_route('sabri-public/v1', '/founder/media', $public + [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_founder_media'],
+        ]);
         register_rest_route('sabri-public/v1', '/profiles/(?P<slug>[a-zA-Z0-9_-]+)', $public + [
             'methods' => 'GET',
             'callback' => [$this, 'get_profile'],
@@ -79,13 +81,16 @@ final class Rest_Controller
             'callback' => [$this, 'get_timeline'],
             'args' => ['slug' => $slug] + $pagination,
         ]);
-        foreach (['knowledge', 'media'] as $section) {
-            register_rest_route('sabri-public/v1', '/profiles/(?P<slug>[a-zA-Z0-9_-]+)/' . $section, $public + [
-                'methods' => 'GET',
-                'callback' => static fn (WP_REST_Request $request): WP_REST_Response => $this->get_section($request, $section),
-                'args' => ['slug' => $slug],
-            ]);
-        }
+        register_rest_route('sabri-public/v1', '/profiles/(?P<slug>[a-zA-Z0-9_-]+)/knowledge', $public + [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_knowledge'],
+            'args' => ['slug' => $slug],
+        ]);
+        register_rest_route('sabri-public/v1', '/profiles/(?P<slug>[a-zA-Z0-9_-]+)/media', $public + [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_media'],
+            'args' => ['slug' => $slug],
+        ]);
         register_rest_route('sabri-public/v1', '/providers/health', $public + [
             'methods' => 'GET',
             'callback' => [$this, 'get_provider_health'],
@@ -102,11 +107,14 @@ final class Rest_Controller
         return $this->timeline_response($this->profiles->get_founder(), $request);
     }
 
-    public function get_founder_section(WP_REST_Request $request, string $section): WP_REST_Response
+    public function get_founder_knowledge(): WP_REST_Response
     {
-        unset($request);
+        return $this->section_response($this->profiles->get_founder(), 'knowledge');
+    }
 
-        return $this->section_response($this->profiles->get_founder(), $section);
+    public function get_founder_media(): WP_REST_Response
+    {
+        return $this->section_response($this->profiles->get_founder(), 'media');
     }
 
     public function get_profile(WP_REST_Request $request): WP_REST_Response
@@ -122,11 +130,19 @@ final class Rest_Controller
         );
     }
 
-    public function get_section(WP_REST_Request $request, string $section): WP_REST_Response
+    public function get_knowledge(WP_REST_Request $request): WP_REST_Response
     {
         return $this->section_response(
             $this->profiles->find_by_slug((string) $request['slug']),
-            $section
+            'knowledge'
+        );
+    }
+
+    public function get_media(WP_REST_Request $request): WP_REST_Response
+    {
+        return $this->section_response(
+            $this->profiles->find_by_slug((string) $request['slug']),
+            'media'
         );
     }
 
