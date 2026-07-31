@@ -65,16 +65,21 @@ final class File_24_Integration
         return defined('SPCRC_VERSION') ? substr(trim((string) SPCRC_VERSION), 0, 64) : '';
     }
 
-    public static function is_compatible(): bool
+    public static function version_is_compatible(string $version): bool
     {
-        $version = self::current_version();
+        $version = trim($version);
 
         return $version !== ''
             && version_compare($version, self::REVIEWED_MINIMUM_VERSION, '>=')
             && version_compare($version, self::REVIEWED_MAXIMUM_VERSION, '<');
     }
 
-    /** @param mixed $manifests @return list<array<string,mixed>> */
+    public static function is_compatible(): bool
+    {
+        return self::version_is_compatible(self::current_version());
+    }
+
+    /** @param mixed $manifests @return list<mixed> */
     public static function filter_manifests(mixed $manifests): array
     {
         $incoming = is_array($manifests) ? array_values($manifests) : [];
