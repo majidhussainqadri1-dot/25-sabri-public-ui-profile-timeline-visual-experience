@@ -64,10 +64,14 @@ final class Timeline_Service
             }
 
             try {
-                $provider_version = trim($provider->get_provider_version());
-                if (! $provider->is_available() || $provider->get_maturity_level() === 'disabled') {
+                $metadata = $this->registry->validated_metadata($provider, (string) $provider_id);
+                if ($metadata === null) {
+                    throw new \UnexpectedValueException('Timeline provider metadata or concrete identity changed after registration.');
+                }
+                if ($metadata['maturity'] === 'disabled' || ! $provider->is_available()) {
                     continue;
                 }
+                $provider_version = $metadata['version'];
 
                 $provider_items = $provider->get_public_author_items($author_id, $provider_query);
                 if (count($provider_items) > $candidate_limit) {
