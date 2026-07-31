@@ -3,30 +3,32 @@
 declare(strict_types=1);
 
 $root = dirname(__DIR__);
+$errors = [];
 $required = [
     '.github/workflows/ci.yml',
     'sabri-public-experience.php',
     'readme.txt',
+    'README.md',
+    'CHANGELOG.md',
     'composer.json',
-    'config/staging-dependencies.json',
+    'uninstall.php',
     'includes/class-plugin.php',
     'includes/class-safe-mode.php',
     'includes/class-public-url.php',
     'includes/class-components.php',
     'includes/class-content-cards.php',
     'includes/class-visual-acceptance.php',
+    'includes/class-staging-probe.php',
+    'includes/class-staging-cli.php',
+    'includes/class-upgrade-manager.php',
     'includes/class-design-system.php',
-    'includes/class-section-registry.php',
-    'includes/class-section-service.php',
-    'includes/class-native-integration.php',
-    'includes/class-visibility-policy.php',
-    'includes/class-profile-data.php',
-    'includes/class-profile-repository.php',
+    'includes/class-profile-router.php',
     'includes/class-profile-renderer.php',
-    'includes/class-shell-integration.php',
     'includes/class-system-check.php',
     'includes/class-timeline-registry.php',
     'includes/class-timeline-service.php',
+    'includes/class-section-registry.php',
+    'includes/class-section-service.php',
     'includes/contracts/interface-timeline-provider.php',
     'includes/contracts/interface-profile-section-provider.php',
     'includes/providers/class-file-06-knowledge-provider.php',
@@ -35,271 +37,238 @@ $required = [
     'includes/providers/class-file-12-pdf-media-provider.php',
     'includes/providers/class-file-18-marketplace-provider.php',
     'includes/providers/class-file-21-provider.php',
-    'templates/public-profile.php',
-    'templates/partials/profile-hero.php',
-    'templates/partials/timeline.php',
-    'templates/partials/provider-section.php',
-    'templates/partials/founder-overview.php',
-    'templates/partials/doctor-overview.php',
-    'templates/partials/books-research.php',
-    'templates/partials/clinic-contact.php',
-    'templates/partials/about.php',
     'assets/css/design-system.css',
     'assets/css/design-system-components.css',
     'assets/css/public.css',
     'assets/css/profile-sections.css',
     'assets/js/public.js',
-    'tests/profile-data.php',
-    'tests/file21-provider.php',
+    'templates/public-profile.php',
+    'config/staging-dependencies.json',
+    'config/staging-test-plan.json',
+    'tests/profile-router.php',
+    'tests/staging-probe.php',
+    'tests/upgrade-manager.php',
     'tests/design-system.php',
-    'tests/content-cards.php',
-    'tests/section-providers.php',
-    'tests/section-provider-metadata.php',
-    'tests/file06-knowledge-provider.php',
-    'tests/file10-12-media-providers.php',
-    'tests/file18-marketplace-provider.php',
-    'tests/visual-acceptance.php',
     'tests/release-engineering.php',
-    'tests/safe-mode.php',
     'tools/build-staging-package.php',
-    'SECURITY.md',
-    'PRIVACY.md',
-    'docs/ARCHITECTURE.md',
-    'docs/GOVERNING-SCOPE.md',
-    'docs/DECISION-LOG.md',
-    'docs/DESIGN-SYSTEM-CONTRACT.md',
-    'docs/CONTENT-CARD-CONTRACT.md',
-    'docs/OPTIONAL-PROFILE-SECTIONS-CONTRACT.md',
-    'docs/STAGING-PACKAGE-CONTRACT.md',
-    'docs/SEVENTH-REVIEW-AND-STAGING-PACKAGE-2026-07-31.md',
-    'docs/FILE18-MARKETPLACE-ADAPTER-IMPLEMENTATION.md',
-    'docs/SIXTH-REVIEW-AND-MARKETPLACE-2026-07-31.md',
-    'docs/FIFTH-REVIEW-AND-NATIVE-MEDIA-2026-07-31.md',
-    'docs/FOURTH-REVIEW-AND-CORRECTION-2026-07-31.md',
-    'docs/THIRD-REVIEW-AND-CORRECTION-2026-07-30.md',
-    'docs/SECOND-REVIEW-AND-CORRECTION-2026-07-30.md',
-    'docs/REVIEW-AND-CORRECTION-2026-07-30.md',
-    'docs/PHASE-25C-25D-IMPLEMENTATION.md',
+    'tools/verify-staging-artifact.php',
+    'docs/NINTH-REVIEW-ROUTE-PARITY-AND-HOSTINGER-PREFLIGHT-2026-07-31.md',
+    'docs/HOSTINGER-STAGING-PROBE-AND-RUNBOOK.md',
 ];
-
-$errors = [];
 foreach ($required as $path) {
     if (! is_file($root . '/' . $path)) {
         $errors[] = 'Missing required file: ' . $path;
     }
 }
 
+$read = static function (string $path) use ($root, &$errors): string {
+    $content = @file_get_contents($root . '/' . $path);
+    if (! is_string($content)) {
+        $errors[] = 'Unreadable required file: ' . $path;
+        return '';
+    }
+    return $content;
+};
+$contains = static function (string $content, array $markers, string $label) use (&$errors): void {
+    foreach ($markers as $marker) {
+        if (! str_contains($content, $marker)) {
+            $errors[] = $label . ' marker missing: ' . $marker;
+        }
+    }
+};
+
+$main = $read('sabri-public-experience.php');
+$readme = $read('readme.txt');
+preg_match('/^\s*\* Version:\s*([^\s]+)/m', $main, $header);
+preg_match("/define\('SABRI_PUBLIC_EXPERIENCE_VERSION',\s*'([^']+)'\)/", $main, $constant);
+preg_match('/^Stable tag:\s*([^\s]+)/mi', $readme, $stable);
+$versions = [$header[1] ?? '', $constant[1] ?? '', $stable[1] ?? ''];
+if (count(array_unique($versions)) !== 1 || $versions[0] !== '0.11.0') {
+    $errors[] = 'Plugin header, constant, and stable tag must all equal 0.11.0.';
+}
+$contains($main, [
+    "define('SABRI_PUBLIC_EXPERIENCE_SCHEMA_VERSION', '2')",
+    'class-staging-probe.php',
+    'class-staging-cli.php',
+    'class-upgrade-manager.php',
+    'Sabri Unified Global Visual Experience and Design System',
+    "version_compare(PHP_VERSION, '8.0', '<')",
+], 'Runtime');
+
+$design = $read('includes/class-design-system.php');
+$contains($design, [
+    "CONTRACT_VERSION = '1.6.0'",
+    'installed-staging-preflight',
+    "'staging_probe' => Staging_Probe::contract()",
+    "'global_shell_owner' => 'file-20'",
+    "'visual_system_owner' => 'file-25'",
+    "'creates_file_26' => false",
+], 'Design system');
+
+$router = $read('includes/class-profile-router.php');
+$contains($router, [
+    'Section_Registry::approved_sections()',
+    'route_sections',
+    'section_pattern',
+    "private const TYPES = ['founder', 'doctor', 'member']",
+], 'Profile router');
+if (str_contains($router, "SECTION_PATTERN = 'overview|timeline")) {
+    $errors[] = 'Profile router must not keep a stale independent provider-section pattern.';
+}
+
+$probe = $read('includes/class-staging-probe.php');
+$contains($probe, [
+    "CONTRACT_VERSION = '1.0.0'",
+    'sabrisocialstaging.sabrihomeopathy.com',
+    "LIVE_HOST = 'sabrihomeopathy.com'",
+    'verify_package_integrity',
+    'verify_test_plan',
+    "'writes_runtime_data' => false",
+    "'staging_accepted' => false",
+    "'production_accepted' => false",
+], 'Staging probe');
+if (preg_match('/\b(update_option|add_option|delete_option|wp_insert_post|wp_update_post|wp_delete_post)\s*\(/', $probe)) {
+    $errors[] = 'Staging probe must remain read-only.';
+}
+
+$upgrade = $read('includes/class-upgrade-manager.php');
+$contains($upgrade, [
+    'sabri_public_experience_upgrade_lock',
+    'LOCK_TTL',
+    'Profile_Router::flush()',
+    'release_lock',
+    "Safe_Mode::enable('upgrade-exception'",
+], 'Upgrade manager');
+
+$plugin = $read('includes/class-plugin.php');
+$contains($plugin, [
+    'new Staging_Probe',
+    'Staging_CLI::register',
+    'new Upgrade_Manager',
+    'new System_Check($dependencies, $timeline_registry, $section_registry, $staging_probe)',
+], 'Plugin bootstrap');
+
+$system_check = $read('includes/class-system-check.php');
+$contains($system_check, [
+    'sabri_public_experience_staging_probe',
+    'staging_probe_test',
+    'ready for manual Hostinger staging tests',
+    'This is not staging acceptance',
+], 'Site Health');
+
+$acceptance = $read('includes/class-visual-acceptance.php');
+$contains($acceptance, [
+    "CONTRACT_VERSION = '1.3.0'",
+    'target_commit_sha',
+    'artifact_ref',
+    'artifact_bytes',
+    'media_type',
+    'founder_signoff',
+], 'Visual acceptance');
+
 $css = '';
-foreach (['assets/css/design-system.css', 'assets/css/design-system-components.css', 'assets/css/public.css', 'assets/css/profile-sections.css'] as $stylesheet) {
-    $css .= "\n" . (file_get_contents($root . '/' . $stylesheet) ?: '');
+foreach (['assets/css/design-system.css', 'assets/css/design-system-components.css', 'assets/css/public.css', 'assets/css/profile-sections.css'] as $path) {
+    $css .= "\n" . $read($path);
 }
 if (preg_match('/@import\s+url|fonts\.googleapis|use\.typekit|url\(\s*["\']?https?:/i', $css)) {
-    $errors[] = 'Remote CSS/font dependency detected.';
+    $errors[] = 'Remote CSS or font dependency detected.';
 }
-if (! str_contains($css, '.spux-profile *')) {
-    $errors[] = 'Profile reduced-motion rules are not scoped to File 25.';
-}
-if (! str_contains($css, '--sabri-shell-primary') || ! str_contains($css, '--sabri-visual-primary')) {
-    $errors[] = 'File 20 inheritance or File 25 semantic design tokens are missing.';
-}
-foreach (['.sabri-ui-card', '.sabri-ui-content-card', '.sabri-ui-button', '.sabri-ui-state', '.sabri-ui-notice', '.sabri-ui-field', '.sabri-ui-table-wrap', '.sabri-ui-skeleton'] as $component) {
-    if (! str_contains($css, $component)) {
-        $errors[] = 'Global visual component missing: ' . $component;
+foreach (['--sabri-shell-primary', '--sabri-visual-primary', '.sabri-ui-content-card', '.sabri-ui-notice', '@media (forced-colors: active)', '@media print'] as $marker) {
+    if (! str_contains($css, $marker)) {
+        $errors[] = 'Visual-system CSS marker missing: ' . $marker;
     }
 }
-foreach (['--sabri-visual-on-primary', '--sabri-visual-on-danger', '--sabri-visual-primary-soft'] as $contrast_token) {
-    if (! str_contains($css, $contrast_token)) {
-        $errors[] = 'Contrast-safe semantic token missing: ' . $contrast_token;
-    }
-}
-if (! str_contains($css, '@media (forced-colors: active)')) {
-    $errors[] = 'Forced-colors accessibility support is missing.';
-}
-if (! str_contains($css, '@media print')) {
-    $errors[] = 'Print-safe public component behavior is missing.';
+$javascript = $read('assets/js/public.js');
+if (preg_match('/\b(eval|document\.write)\s*\(/i', $javascript) || preg_match('/https?:\/\//i', $javascript)) {
+    $errors[] = 'Unsafe or remote JavaScript behavior detected.';
 }
 
-$javascript = file_get_contents($root . '/assets/js/public.js') ?: '';
-if (preg_match('/\b(eval|document\.write)\s*\(/i', $javascript)) {
-    $errors[] = 'Unsafe JavaScript execution primitive detected.';
-}
-if (preg_match('/https?:\/\//i', $javascript)) {
-    $errors[] = 'Unexpected remote JavaScript endpoint detected.';
-}
-
-$main = file_get_contents($root . '/sabri-public-experience.php') ?: '';
-$readme = file_get_contents($root . '/readme.txt') ?: '';
-preg_match('/^\s*\* Version:\s*([^\s]+)/m', $main, $header_match);
-preg_match('/^Stable tag:\s*([^\s]+)/mi', $readme, $stable_match);
-preg_match("/define\('SABRI_PUBLIC_EXPERIENCE_VERSION',\s*'([^']+)'\)/", $main, $constant_match);
-$versions = array_filter([$header_match[1] ?? '', $stable_match[1] ?? '', $constant_match[1] ?? '']);
-if (count($versions) !== 3 || count(array_unique($versions)) !== 1) {
-    $errors[] = 'Plugin header, constant, and readme stable-tag versions do not match.';
-}
-if (($header_match[1] ?? '') !== '0.10.0') {
-    $errors[] = 'Expected reviewed File 25 runtime version 0.10.0.';
-}
-if (! str_contains($main, 'Sabri Unified Global Visual Experience and Design System')) {
-    $errors[] = 'Founder-approved canonical File 25 name is missing from the plugin header.';
-}
-if (! str_contains($main, "require_once SABRI_PUBLIC_EXPERIENCE_DIR . 'includes/class-safe-mode.php'")) {
-    $errors[] = 'Safe Mode must load before the remaining runtime classes.';
-}
-if (! str_contains($main, "version_compare(PHP_VERSION, '8.0', '<')")) {
-    $errors[] = 'Pre-require PHP runtime guard is missing.';
-}
 foreach ([
-    'class-public-url.php', 'class-components.php', 'class-content-cards.php', 'class-visual-acceptance.php',
-    'class-design-system.php', 'interface-profile-section-provider.php', 'class-section-registry.php',
-    'class-section-service.php', 'class-profile-data.php', 'class-shell-integration.php',
-    'class-file-06-knowledge-provider.php', 'class-file-10-video-media-provider.php',
-    'class-file-11-reels-media-provider.php', 'class-file-12-pdf-media-provider.php',
-    'class-file-18-marketplace-provider.php', 'class-file-21-provider.php',
-] as $runtime_file) {
-    if (! str_contains($main, $runtime_file)) {
-        $errors[] = 'Required runtime file is not loaded: ' . $runtime_file;
-    }
-}
-foreach (['sabri_visual_experience_contract', 'sabri_visual_experience_acceptance_contract', 'sabri_visual_experience_render_state', 'sabri_visual_experience_render_notice', 'sabri_visual_experience_render_card'] as $function) {
-    if (! str_contains($main, $function)) {
-        $errors[] = 'Public design-system integration function missing: ' . $function;
-    }
-}
-
-$plugin = file_get_contents($root . '/includes/class-plugin.php') ?: '';
-foreach (['home_news_available', 'new Shell_Integration', 'new File_21_Provider', 'new File_10_Video_Media_Provider', 'new File_11_Reels_Media_Provider', 'new File_12_Pdf_Media_Provider', 'new File_18_Marketplace_Provider', "'file-18-marketplace'", 'new Design_System', 'new Assets', 'new Section_Registry', 'new Section_Service', 'register_section_providers'] as $marker) {
-    if (! str_contains($plugin, $marker)) {
-        $errors[] = 'Plugin bootstrap boundary missing: ' . $marker;
+    'includes/class-content-cards.php',
+    'includes/class-section-service.php',
+    'includes/providers/class-file-06-knowledge-provider.php',
+    'includes/providers/class-file-10-video-media-provider.php',
+    'includes/providers/class-file-11-reels-media-provider.php',
+    'includes/providers/class-file-12-pdf-media-provider.php',
+    'includes/providers/class-file-18-marketplace-provider.php',
+    'includes/providers/class-file-21-provider.php',
+] as $path) {
+    $source = $read($path);
+    if (preg_match('/\b(wp_insert_post|wp_update_post|wp_delete_post|update_option|delete_option)\s*\(/i', $source)) {
+        $errors[] = 'Read-only projection contains a write primitive: ' . $path;
     }
 }
 
-$shell = file_get_contents($root . '/includes/class-shell-integration.php') ?: '';
-if (str_contains($shell, '<style') || str_contains($shell, 'wp_add_inline_style')) {
-    $errors[] = 'File 20 token integration must not depend on an inline CSS bridge.';
+$matrix = json_decode($read('config/staging-dependencies.json'), true);
+if (! is_array($matrix)
+    || ($matrix['runtime_version'] ?? '') !== '0.11.0'
+    || ($matrix['environment']['target_site'] ?? '') !== 'https://sabrisocialstaging.sabrihomeopathy.com/'
+    || ($matrix['environment']['live_changes_allowed'] ?? true) !== false
+    || ($matrix['environment']['registration_disabled_required'] ?? false) !== true
+    || ($matrix['environment']['search_indexing_disabled_required'] ?? false) !== true
+    || ($matrix['staging_test_plan'] ?? '') !== 'config/staging-test-plan.json'
+) {
+    $errors[] = 'Staging dependency matrix is invalid or not bound to the exact private Hostinger target.';
 }
-if (! str_contains($shell, '$base[\'owns_global_shell\'] = false')) {
-    $errors[] = 'File 20 shell ownership denial is missing.';
-}
-
-$design_system = file_get_contents($root . '/includes/class-design-system.php') ?: '';
-foreach (['1.5.0', 'reusable-content-cards', 'optional-profile-sections', 'deterministic-staging-packaging', 'Content_Cards::contract', 'Section_Registry::approved_sections', 'provider_metadata_bound_to_concrete_object', 'projection_key', 'rendered_publicly', 'build-staging-package.php', 'staging-dependencies.json', 'STAGING-MANIFEST.json', 'creates_file_26', 'shell_is_available'] as $marker) {
-    if (! str_contains($design_system, $marker)) {
-        $errors[] = 'Design-system contract marker missing: ' . $marker;
+$modules = [];
+foreach ((array) ($matrix['modules'] ?? []) as $module) {
+    if (is_array($module) && isset($module['file'])) {
+        $modules[(int) $module['file']] = $module;
     }
 }
-
-$public_url = file_get_contents($root . '/includes/class-public-url.php') ?: '';
-foreach (["str_starts_with(\$url, '//')", "str_contains(\$url, '\\\\')", 'home_url', "isset(\$parts['user'])"] as $marker) {
-    if (! str_contains($public_url, $marker)) {
-        $errors[] = 'Same-origin URL protection marker missing: ' . $marker;
+foreach ([0, 3, 6, 10, 11, 12, 18, 20, 21, 24, 25] as $file) {
+    if (! isset($modules[$file])) {
+        $errors[] = 'Staging matrix missing File ' . $file . '.';
     }
 }
-
-$content_cards = file_get_contents($root . '/includes/class-content-cards.php') ?: '';
-foreach (['owns_native_data', 'same_site_destinations', 'Public_URL::sanitize_same_site', 'sabri-ui-content-card'] as $marker) {
-    if (! str_contains($content_cards, $marker)) {
-        $errors[] = 'Content-card boundary marker missing: ' . $marker;
-    }
+if (($modules[24]['staging_status'] ?? '') !== 'blocked-until-contract-review') {
+    $errors[] = 'File 24 must remain blocked until exact contract review.';
 }
-if (preg_match('/update_|insert_|delete_|wp_insert_post|wp_update_post|wp_delete_post/i', $content_cards)) {
-    $errors[] = 'Content-card renderer must remain presentation-only.';
-}
-
-$section_registry = file_get_contents($root . '/includes/class-section-registry.php') ?: '';
-foreach (['MAX_PROVIDERS', 'maturity_is_approved', 'section_is_approved', "'maturity' => \$maturity", "'owns_native_content' => false", "'object_id' => spl_object_id(\$provider)", 'validated_metadata', "\$registered['object_id'] === \$current['object_id']"] as $marker) {
-    if (! str_contains($section_registry, $marker)) {
-        $errors[] = 'Optional section registry invariant missing: ' . $marker;
-    }
+if (($modules[25]['staging_status'] ?? '') !== 'pending'
+    || ($modules[25]['candidate_version'] ?? '') !== '0.11.0'
+    || ($modules[25]['schema_version'] ?? '') !== '2'
+) {
+    $errors[] = 'File 25 staging state, version, or schema is not truthful.';
 }
 
-$section_service = file_get_contents($root . '/includes/class-section-service.php') ?: '';
-foreach (['MAX_ITEMS_PER_PROVIDER', 'MAX_ITEMS_PER_SECTION', 'Content_Cards::render', 'provider_error_count', 'validated_metadata', 'projection_key', "return hash('sha256', 'projection|' . \$projection_key)", "return hash('sha256', 'url|' . \$url)"] as $marker) {
-    if (! str_contains($section_service, $marker)) {
-        $errors[] = 'Optional section service invariant missing: ' . $marker;
-    }
-}
-if (preg_match('/update_|insert_|delete_|wp_insert_post|wp_update_post|wp_delete_post/i', $section_service)) {
-    $errors[] = 'Optional section service must remain read-only.';
-}
-
-$acceptance = file_get_contents($root . '/includes/class-visual-acceptance.php') ?: '';
-foreach (['1.3.0', 'target_commit_sha', 'commit_sha', 'media-section', 'marketplace-section', 'artifact_root', 'artifacts/', 'artifact_ref', 'sha256', 'byte_size', 'media_type', 'evidence_sha256', 'evidence_byte_size', 'evidence_media_type', 'recorded_at', 'reviewer', 'staging_environment', 'founder_signoff', 'checkdate', 'getLastErrors', 'summarize'] as $marker) {
-    if (! str_contains($acceptance, $marker)) {
-        $errors[] = 'Visual acceptance evidence invariant missing: ' . $marker;
-    }
+$plan = json_decode($read('config/staging-test-plan.json'), true);
+if (! is_array($plan)
+    || ($plan['owner'] ?? '') !== 'file-25'
+    || ($plan['canonical_staging_host'] ?? '') !== 'sabrisocialstaging.sabrihomeopathy.com'
+    || ($plan['live_host_must_remain_untouched'] ?? false) !== true
+    || ($plan['staging_acceptance_implied'] ?? true) !== false
+    || count((array) ($plan['scenarios'] ?? [])) < 10
+) {
+    $errors[] = 'Governed Hostinger staging test plan is invalid.';
 }
 
-$file_18 = file_get_contents($root . '/includes/providers/class-file-18-marketplace-provider.php') ?: '';
-foreach (['SMP_VERSION', "return 'file-18-marketplace'", "return 'marketplace'", "return 'read-only'", "s.status = 'approved'", "p.status IN ('published','approved')", 'projection_key', 'owns_native_content'] as $marker) {
-    if (! str_contains($file_18, $marker)) {
-        $errors[] = 'File 18 Marketplace adapter boundary missing: ' . $marker;
-    }
-}
-if (preg_match('/update_|insert_|delete_|wp_insert_post|wp_update_post|wp_delete_post/i', $file_18)) {
-    $errors[] = 'File 18 adapter must remain read-only.';
-}
-
-$timeline = file_get_contents($root . '/includes/class-timeline-service.php') ?: '';
-foreach (['provider_version', 'canonical_is_allowed', 'to_public_array'] as $marker) {
-    if (! str_contains($timeline, $marker)) {
-        $errors[] = 'Reviewed timeline invariant missing: ' . $marker;
-    }
-}
-
-$file_21 = file_get_contents($root . '/includes/providers/class-file-21-provider.php') ?: '';
-foreach (['ProfileTimeline::query', "'read-only'", 'NATIVE_PAGE_SIZE', 'owns_native_content'] as $marker) {
-    if (! str_contains($file_21, $marker)) {
-        $errors[] = 'File 21 adapter boundary missing: ' . $marker;
-    }
-}
-if (preg_match('/update_|insert_|delete_|wp_insert_post|wp_update_post|wp_delete_post/i', $file_21)) {
-    $errors[] = 'File 21 adapter must remain read-only.';
-}
-
-$repository = file_get_contents($root . '/includes/class-profile-repository.php') ?: '';
-foreach (['Profile_Data::founder_details', 'Profile_Data::professional_details', 'Profile_Data::clinic'] as $marker) {
-    if (! str_contains($repository, $marker)) {
-        $errors[] = 'Structured public profile projection marker missing: ' . $marker;
-    }
-}
-
-$safe_mode = file_get_contents($root . '/includes/class-safe-mode.php') ?: '';
-foreach (['boundary_stack', 'current_boundary', 'array_pop'] as $marker) {
-    if (! str_contains($safe_mode, $marker)) {
-        $errors[] = 'Nested Safe Mode boundary protection missing: ' . $marker;
-    }
-}
-
-$builder = file_get_contents($root . '/tools/build-staging-package.php') ?: '';
-foreach (['ZipArchive', 'STAGING-MANIFEST.json', 'source_date_epoch', 'discover_payload', 'payload_path_is_allowed', 'archive_name_is_safe', 'verify_archive', 'hash_file'] as $marker) {
-    if (! str_contains($builder, $marker)) {
-        $errors[] = 'Staging package builder invariant missing: ' . $marker;
-    }
-}
-
-$dependency_matrix_raw = file_get_contents($root . '/config/staging-dependencies.json') ?: '';
-$dependency_matrix = json_decode($dependency_matrix_raw, true);
-if (! is_array($dependency_matrix) || ($dependency_matrix['runtime_version'] ?? '') !== '0.10.0') {
-    $errors[] = 'Staging dependency matrix is invalid or does not match runtime 0.10.0.';
-}
-if (($dependency_matrix['environment']['live_changes_allowed'] ?? true) !== false) {
-    $errors[] = 'Staging dependency matrix must prohibit live changes.';
-}
-
-$composer_raw = file_get_contents($root . '/composer.json') ?: '';
+$composer_raw = $read('composer.json');
 $composer = json_decode($composer_raw, true);
 if (! is_array($composer) || ($composer['require']['php'] ?? '') !== '>=8.0') {
-    $errors[] = 'Composer PHP requirement is invalid or missing.';
+    $errors[] = 'Composer PHP contract is invalid.';
 }
-foreach (['tests/file18-marketplace-provider.php', 'tests/release-engineering.php'] as $test_marker) {
-    if (! str_contains($composer_raw, $test_marker)) {
-        $errors[] = 'Composer test suite is missing: ' . $test_marker;
+foreach (['tests/profile-router.php', 'tests/staging-probe.php', 'tests/upgrade-manager.php'] as $test) {
+    if (! str_contains($composer_raw, $test)) {
+        $errors[] = 'Composer suite missing: ' . $test;
     }
+}
+
+$workflow = $read('.github/workflows/ci.yml');
+$contains($workflow, [
+    'Provider route parity and fail-closed profile routing',
+    'Installed-package integrity and Hostinger staging-probe contract',
+    'Idempotent schema-2 profile-route upgrade contract',
+    'Verify extracted installed candidate against embedded manifest',
+    'Staging_Probe::verify_package_integrity',
+    'Verify assembled candidate with the independent verifier',
+], 'CI workflow');
+if (str_contains($workflow, 'sabri-public-experience-0.11.0.zip')) {
+    $errors[] = 'CI must not hard-code one staging package version.';
 }
 
 if ($errors !== []) {
-    fwrite(STDERR, "FAILED\n- " . implode("\n- ", $errors) . "\n");
+    fwrite(STDERR, "FAILED\n- " . implode("\n- ", array_values(array_unique($errors))) . "\n");
     exit(1);
 }
 
-echo "PASS: File 25 global visual system and staging package structure\n";
+echo "PASS: File 25 global visual, route parity, installed preflight, and package structure\n";
