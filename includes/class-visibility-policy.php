@@ -53,26 +53,25 @@ final class Visibility_Policy
     public function can_show_contact(int $user_id, string $field): bool
     {
         $field = sanitize_key($field);
-        if (! in_array($field, ['phone', 'whatsapp'], true)) {
+        if (! in_array($field, ['phone', 'whatsapp'], true) || $user_id <= 0) {
             return false;
         }
-        if ($this->is_minor($user_id)) {
+        if ($this->is_minor($user_id) || $this->native->public_visibility($user_id) !== 'public') {
             return false;
         }
 
-        if ($this->is_founder($user_id)) {
-            $authoritative = true;
-        } elseif ($this->is_verified_doctor($user_id)) {
-            $authoritative = true;
-        } else {
-            // General-member contact requires both a public approved profile and
-            // the explicit File 03 public-contact opt-in. File 03's broad helper
-            // also treats any legacy doctor as public, so the stored consent is
-            // read directly instead.
-            $authoritative = $this->native->public_visibility($user_id) === 'public';
-            if ($authoritative && class_exists('SPD_Helpers') && method_exists('SPD_Helpers', 'get')) {
-                $authoritative = (string) \SPD_Helpers::get($user_id, 'public_contact', '0') === '1';
-            } else {
+        // File 03 is the canonical public-contact consent owner. A verified Doctor
+        // does not become contact-public merely by being verified. File 25 consumes
+        // the exact File 03 helper and fails closed when that contract is absent or
+        // throws. The Founder flag is accepted only for the canonical File 00 Founder.
+        $authoritative = false;
+        if (class_exists('SPD_Helpers') && method_exists('SPD_Helpers', 'can_show_contact')) {
+            try {
+                $authoritative = (bool) \SPD_Helpers::can_show_contact(
+                    $user_id,
+                    $this->is_founder($user_id)
+                );
+            } catch (\Throwable) {
                 $authoritative = false;
             }
         }
@@ -84,7 +83,8 @@ final class Visibility_Policy
             $field
         );
 
-        // Privacy filters may revoke contact display but may not bypass a hard denial.
+        // Privacy filters may revoke contact display but may never grant it after
+        // File 03 or the minor/public-profile authority denied the projection.
         return $authoritative && $filtered;
     }
 }
