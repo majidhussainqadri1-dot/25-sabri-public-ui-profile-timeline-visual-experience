@@ -1,5 +1,25 @@
 # Decision Log
 
+## 2026-07-31 — File 18 remains the Marketplace owner
+
+File 25 may present approved public File 18 listings through a read-only `file-18-marketplace` provider. File 18 remains the sole owner of sellers, listings, moderation, contacts, chat, offers, reports, files, metrics, and direct-deal workflows.
+
+## 2026-07-31 — Provider identity includes the concrete object
+
+Provider ID, version, section, maturity, native-ownership declaration, and concrete object identity are frozen at registration. Query-time metadata is read once and atomically compared with the registration snapshot. A mutable object may not impersonate another registered provider.
+
+## 2026-07-31 — Opaque projection keys are server-only
+
+When a native module exposes one application URL rather than stable item permalinks, it may supply a SHA-256 `projection_key` for internal deduplication. The key is not a public card field, route, ID, or ownership transfer and must never appear in HTML or REST output.
+
+## 2026-07-31 — Visual evidence belongs to one exact commit
+
+Every visual evidence record, staging environment record, and Founder sign-off must match one declared target commit SHA. Evidence from different source revisions may not be combined into one accepted manifest.
+
+## 2026-07-31 — Evidence timestamps and staging URLs are strict
+
+Impossible normalized dates/times, invalid UTC offsets, parser warnings, unsafe evidence schemes, credential-bearing staging URLs, and staging URLs with queries or fragments fail closed.
+
 ## 2026-07-30 — File number and canonical name frozen
 
 The module is **File 25 — Sabri Unified Global Visual Experience and Design System**, not File 22, File 24, or a new File 26. The subtitle is **Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency**.
