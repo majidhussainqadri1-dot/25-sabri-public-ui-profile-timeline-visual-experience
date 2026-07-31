@@ -20,31 +20,36 @@ $check = static function (bool $condition, string $message) use (&$failures): vo
 $contract = Visual_Acceptance::contract();
 $check(($contract['owner'] ?? '') === 'file-25', 'File 25 must own visual acceptance.');
 $check(($contract['shell_owner'] ?? '') === 'file-20', 'File 20 must remain the shell owner.');
-$check(($contract['contract_version'] ?? '') === '1.1.0', 'Visual acceptance contract version must be current.');
+$check(($contract['contract_version'] ?? '') === '1.2.0', 'Visual acceptance contract version must be current.');
 $check(($contract['green_ci_is_acceptance'] ?? true) === false, 'Green CI must not be treated as visual acceptance.');
+$check(($contract['target_commit_sha_required'] ?? false) === true, 'All evidence must be bound to one target commit.');
 $check(($contract['staging_required'] ?? false) === true, 'Staging evidence must remain mandatory.');
 $check(($contract['founder_signoff_required'] ?? false) === true, 'Founder sign-off must remain mandatory.');
 $check(count((array) ($contract['viewports'] ?? [])) === 6, 'Six canonical viewport classes are required.');
 $check(in_array('media-section', (array) ($contract['required_surfaces'] ?? []), true), 'Media-section evidence is required.');
+$check(in_array('marketplace-section', (array) ($contract['required_surfaces'] ?? []), true), 'Marketplace-section evidence is required.');
 $check(in_array('rtl', (array) ($contract['directions'] ?? []), true), 'RTL evidence is required.');
 $check(in_array('forced-colors', (array) ($contract['color_modes'] ?? []), true), 'Forced-colors evidence is required.');
 $check(in_array(400, (array) ($contract['zoom_levels'] ?? []), true), 'Four-hundred-percent zoom evidence is required.');
 $check(in_array('screen-reader', (array) ($contract['input_modes'] ?? []), true), 'Screen-reader evidence is required.');
 
 $empty_errors = Visual_Acceptance::validate_evidence([]);
-$check(count($empty_errors) >= 9, 'Empty evidence must fail every required evidence group.');
+$check(count($empty_errors) >= 10, 'Empty evidence must fail every required evidence group and target commit.');
 
-$record = static function (string $key): array {
+$target = str_repeat('b', 40);
+$record = static function (string $key) use ($target): array {
     return [
         'status' => 'pass',
         'artifact_ref' => 'artifacts/visual/' . $key . '.png',
         'sha256' => str_repeat('a', 64),
+        'commit_sha' => $target,
         'recorded_at' => '2026-07-31T00:00:00Z',
         'reviewer' => 'QA Reviewer',
     ];
 };
 
 $complete = [
+    'target_commit_sha' => $target,
     'surfaces' => [],
     'viewports' => [],
     'directions' => [],
@@ -55,7 +60,7 @@ $complete = [
     'staging_environment' => [
         'environment' => 'staging',
         'site_url' => 'https://staging.example.test/',
-        'commit_sha' => str_repeat('b', 40),
+        'commit_sha' => $target,
         'wordpress_version' => '7.0.1',
         'php_version' => '8.3.30',
         'recorded_at' => '2026-07-31T00:00:00Z',
@@ -63,7 +68,7 @@ $complete = [
     'founder_signoff' => [
         'status' => 'accepted',
         'signer' => 'Founder',
-        'commit_sha' => str_repeat('b', 40),
+        'commit_sha' => $target,
         'evidence_ref' => 'artifacts/signoff/founder.json',
         'recorded_at' => '2026-07-31T00:00:00Z',
     ],
@@ -83,19 +88,25 @@ foreach ((array) $contract['zoom_levels'] as $zoom) {
     $complete['zoom_levels'][(string) $zoom] = $record('zoom-' . $zoom);
 }
 
-$check(Visual_Acceptance::validate_evidence($complete) === [], 'A complete cryptographically referenced evidence manifest must validate.');
+$check(Visual_Acceptance::validate_evidence($complete) === [], 'A complete commit-bound evidence manifest must validate.');
 $summary = Visual_Acceptance::summarize($complete);
 $check(($summary['accepted'] ?? false) === true && ($summary['error_count'] ?? 1) === 0, 'Complete evidence summary must be accepted.');
 
 $forged = $complete;
 $forged['viewports']['mobile-small'] = true;
-$forged['founder_signoff']['commit_sha'] = 'not-a-sha';
+$forged['founder_signoff']['commit_sha'] = str_repeat('c', 40);
+$forged['surfaces']['marketplace-section']['recorded_at'] = '2026-02-30T25:61:61Z';
+$forged['staging_environment']['site_url'] = 'https://staging.example.test/?preview=1';
 $forged_errors = Visual_Acceptance::validate_evidence($forged);
-$check($forged_errors !== [], 'Boolean placeholders and malformed sign-off evidence must be rejected.');
+$check($forged_errors !== [], 'Placeholders, commit mismatch, normalized dates, and noncanonical staging URLs must be rejected.');
+
+$mixed_commit = $complete;
+$mixed_commit['surfaces']['founder-overview']['commit_sha'] = str_repeat('d', 40);
+$check(Visual_Acceptance::validate_evidence($mixed_commit) !== [], 'Evidence from another commit may not be mixed into the target manifest.');
 
 if ($failures !== []) {
     fwrite(STDERR, "FAILED\n- " . implode("\n- ", $failures) . "\n");
     exit(1);
 }
 
-echo "PASS: File 25 strict visual acceptance evidence contract\n";
+echo "PASS: File 25 commit-bound strict visual acceptance evidence contract\n";
