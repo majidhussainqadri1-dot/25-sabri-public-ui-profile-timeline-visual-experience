@@ -10,8 +10,15 @@ if (! defined('ABSPATH')) {
 
 final class Profile_Router
 {
-    private const SECTION_PATTERN = 'overview|timeline|knowledge|books-research|media|clinic-contact|clinic|reviews|about';
-    private const SECTIONS = ['overview', 'timeline', 'knowledge', 'books-research', 'media', 'clinic-contact', 'clinic', 'reviews', 'about'];
+    private const CORE_SECTIONS = [
+        'overview',
+        'timeline',
+        'books-research',
+        'clinic-contact',
+        'clinic',
+        'about',
+    ];
+
     private const TYPES = ['founder', 'doctor', 'member'];
 
     public function register(): void
@@ -23,18 +30,19 @@ final class Profile_Router
 
     public function register_rewrite_rules(): void
     {
+        $pattern = self::section_pattern();
         add_rewrite_rule(
-            '^founder(?:/(' . self::SECTION_PATTERN . '))?/?$',
+            '^founder(?:/(' . $pattern . '))?/?$',
             'index.php?spux_profile_type=founder&spux_profile_section=$matches[1]',
             'top'
         );
         add_rewrite_rule(
-            '^doctors/([^/]+)(?:/(' . self::SECTION_PATTERN . '))?/?$',
+            '^doctors/([^/]+)(?:/(' . $pattern . '))?/?$',
             'index.php?spux_profile_type=doctor&spux_profile_slug=$matches[1]&spux_profile_section=$matches[2]',
             'top'
         );
         add_rewrite_rule(
-            '^profile/([^/]+)(?:/(' . self::SECTION_PATTERN . '))?/?$',
+            '^profile/([^/]+)(?:/(' . $pattern . '))?/?$',
             'index.php?spux_profile_type=member&spux_profile_slug=$matches[1]&spux_profile_section=$matches[2]',
             'top'
         );
@@ -53,6 +61,7 @@ final class Profile_Router
     /** @param array<string,mixed> $settings */
     public function shell_layout_mode(string $mode, array $settings = []): string
     {
+        unset($settings);
         if (! $this->is_profile_request()) {
             return $mode;
         }
@@ -66,7 +75,7 @@ final class Profile_Router
         if (! in_array($context['type'], self::TYPES, true)) {
             return false;
         }
-        if (! in_array($context['section'], self::SECTIONS, true)) {
+        if (! in_array($context['section'], self::route_sections(), true)) {
             return false;
         }
         if ($context['type'] === 'founder') {
@@ -88,9 +97,31 @@ final class Profile_Router
         ];
     }
 
+    /**
+     * Keep profile routing in exact parity with every approved optional section.
+     * A provider may still expose a tab only when it supplies accepted public
+     * cards; route capability alone never creates a dead tab.
+     *
+     * @return list<string>
+     */
+    public static function route_sections(): array
+    {
+        $sections = array_merge(self::CORE_SECTIONS, Section_Registry::approved_sections());
+
+        return array_values(array_unique($sections));
+    }
+
     public static function flush(): void
     {
         (new self())->register_rewrite_rules();
         flush_rewrite_rules(false);
+    }
+
+    private static function section_pattern(): string
+    {
+        return implode('|', array_map(
+            static fn (string $section): string => preg_quote($section, '#'),
+            self::route_sections()
+        ));
     }
 }
