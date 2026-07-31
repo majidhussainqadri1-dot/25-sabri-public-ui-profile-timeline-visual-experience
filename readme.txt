@@ -1,20 +1,20 @@
 === Sabri Unified Global Visual Experience and Design System ===
 Contributors: majidhussainqadri1-dot
-Tags: design-system, profiles, timeline, accessibility, responsive, public-ui, content-cards, profile-sections, visual-regression
+Tags: design-system, profiles, timeline, accessibility, responsive, public-ui, content-cards, profile-sections, visual-regression, staging-package
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 0.9.0
+Stable tag: 0.10.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-File 25 global public design system, reusable components, public profiles, federated timelines, governed Knowledge, Media, and Marketplace profile sections, responsive refinement, accessibility, and visual-acceptance evidence for the Sabri Social Homeopathy Platform.
+File 25 global public design system, reusable components, public profiles, federated timelines, governed Knowledge, Media, and Marketplace profile sections, artifact-integrity visual acceptance, and deterministic staging release engineering for the Sabri Social Homeopathy Platform.
 
 == Description ==
 
 This is the same existing File 25, canonically named “Sabri Unified Global Visual Experience and Design System,” with the subtitle “Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency.” No duplicate File 26 is created for this scope.
 
-The reviewed 0.9.0 source foundation includes:
+The reviewed 0.10.0 source foundation includes:
 
 * global semantic visual tokens that inherit File 20 without duplicating its application shell;
 * reusable containers, layouts, cards, buttons, badges, notices, form controls, tables, skeletons, and visual states;
@@ -30,21 +30,34 @@ The reviewed 0.9.0 source foundation includes:
 * nested non-destructive Safe Mode and truthful Site Health diagnostics;
 * canonical Founder, verified-Doctor, and permitted-Member profile routes;
 * File 00-authoritative public profile and contact projection;
-* a machine-readable visual-acceptance matrix bound to one target commit, with artifact checksums, strict timestamps, six viewports, RTL/LTR, light/dark/forced-colors, normal/reduced motion, 100/200/400 percent zoom, keyboard/pointer/touch/screen-reader input, critical surfaces, staging evidence, and Founder sign-off;
-* an explicit rule that source contracts and green CI are not visual acceptance;
+* a machine-readable visual-acceptance matrix bound to one target commit;
+* artifact references restricted to the governed `artifacts/` root, with SHA-256, byte size, media type, timestamp, reviewer, and exact commit binding;
+* a deterministic staging ZIP builder with an embedded manifest, detached manifest, detached SHA-256 checksum, path-traversal checks, and development-file exclusion;
+* a machine-readable exact staging dependency matrix that does not fabricate File 24 or staging acceptance;
+* CI that builds the staging candidate twice, compares the bytes, verifies the checksum, and publishes a temporary downloadable workflow artifact;
+* an explicit rule that source contracts, a ZIP, and green CI are not visual or production acceptance;
 * PHP 8.0/8.3 and JavaScript CI.
 
-This release is not production-complete. Exact multi-plugin staging, File 24 runtime integration, native Reviews/Research adapters, captured visual-regression evidence, migration, rollback, real-user testing, performance, packaging, and deployment remain pending.
+This release is not production-complete. Exact multi-plugin staging, File 24 runtime integration, native Reviews/Research adapters, captured visual-regression evidence, migration, rollback, real-user testing, performance, deployment, and monitoring remain pending.
 
 == Installation ==
 
-1. Install and activate approved dependencies for profile and timeline features.
-2. Upload the plugin folder to `/wp-content/plugins/`.
-3. Activate the plugin only on a backed-up staging installation.
-4. Confirm File 00 Founder identity and refresh permalinks if profile routes are unresolved.
-5. Review Site Health and the visual-acceptance contract; source contracts and green CI are not production acceptance.
+1. Install and activate the reviewed dependency packages listed in `config/staging-dependencies.json` on a backed-up staging installation.
+2. Verify the detached SHA-256 checksum before extracting the File 25 staging ZIP.
+3. Upload the `sabri-public-experience` folder to `/wp-content/plugins/`.
+4. Activate File 25 only on staging and confirm File 00 Founder identity.
+5. Refresh permalinks if profile routes are unresolved.
+6. Review Site Health and the visual-acceptance contract; source contracts, a package, and green CI are not production acceptance.
 
 == Changelog ==
+
+= 0.10.0 =
+* Hardened evidence references to repository-relative `artifacts/` paths and rejected external, traversal, query, fragment, control-character, and backslash references.
+* Required evidence byte size and allow-listed media type in addition to SHA-256, reviewer, timestamp, and exact commit binding.
+* Added cryptographic metadata requirements for Founder sign-off evidence.
+* Added a deterministic staging-package builder with embedded and detached manifests, detached checksum, safe path validation, payload hash verification, and development-file exclusion.
+* Added the machine-readable staging dependency matrix for Files 00, 03, 06, 10, 11, 12, 18, 20, 21, 24, and 25.
+* Added CI reproducibility checks and temporary downloadable staging-candidate artifacts.
 
 = 0.9.0 =
 * Bound provider metadata to the concrete registered object and made query-time validation atomic.
