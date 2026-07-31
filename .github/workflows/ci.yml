@@ -72,6 +72,9 @@ jobs:
       - name: Native File 18 Marketplace provider contract
         run: php tests/file18-marketplace-provider.php
 
+      - name: Reviewed File 24 integration contract
+        run: php tests/file24-integration.php
+
       - name: Commit-bound artifact-integrity visual acceptance contract
         run: php tests/visual-acceptance.php
 
