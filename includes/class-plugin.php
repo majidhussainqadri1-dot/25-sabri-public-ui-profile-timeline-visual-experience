@@ -8,6 +8,7 @@ use Sabri\PublicExperience\Providers\File_06_Knowledge_Provider;
 use Sabri\PublicExperience\Providers\File_10_Video_Media_Provider;
 use Sabri\PublicExperience\Providers\File_11_Reels_Media_Provider;
 use Sabri\PublicExperience\Providers\File_12_Pdf_Media_Provider;
+use Sabri\PublicExperience\Providers\File_18_Marketplace_Provider;
 use Sabri\PublicExperience\Providers\File_21_Provider;
 use Sabri\PublicExperience\Providers\WordPress_Posts_Provider;
 
@@ -123,6 +124,7 @@ final class Plugin
         self::register_section_provider($section_registry, 'file-10-video-media', new File_10_Video_Media_Provider());
         self::register_section_provider($section_registry, 'file-11-reels-media', new File_11_Reels_Media_Provider());
         self::register_section_provider($section_registry, 'file-12-pdf-media', new File_12_Pdf_Media_Provider());
+        self::register_section_provider($section_registry, 'file-18-marketplace', new File_18_Marketplace_Provider());
 
         $timeline = new Timeline_Service($timeline_registry);
         $sections = new Section_Service($section_registry);
