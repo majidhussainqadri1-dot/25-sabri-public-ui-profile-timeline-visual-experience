@@ -23,6 +23,10 @@ $provider_section = (array) ($GLOBALS['sabri_public_experience_provider_section'
 $section = sanitize_key((string) ($context['section'] ?? 'overview')) ?: 'overview';
 $sections = (array) ($profile['section_labels'] ?? []);
 $profile_class = sanitize_key((string) ($profile['class'] ?? 'member'));
+$breadcrumbs = array_values(array_filter(
+    (array) ($context['breadcrumbs'] ?? []),
+    'is_array'
+));
 ?>
 <main id="sabri-main-content" class="spux-profile" tabindex="-1" data-spux-profile-class="<?php echo esc_attr($profile_class); ?>" data-spux-section="<?php echo esc_attr($section); ?>">
     <div class="spux-container sabri-ui-container">
@@ -37,6 +41,30 @@ $profile_class = sanitize_key((string) ($profile['class'] ?? 'member'));
             ]); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- component renderer escapes all fields.
             ?>
         <?php else : ?>
+            <?php if ($breadcrumbs !== []) : ?>
+                <nav class="spux-breadcrumbs" aria-label="<?php esc_attr_e('Breadcrumb', 'sabri-public-experience'); ?>">
+                    <ol>
+                        <?php foreach ($breadcrumbs as $index => $item) : ?>
+                            <?php
+                            $label = isset($item['label']) && is_scalar($item['label']) ? (string) $item['label'] : '';
+                            $url = \Sabri\PublicExperience\Public_URL::sanitize_same_site($item['url'] ?? '', false);
+                            $current = $index === array_key_last($breadcrumbs);
+                            if ($label === '' || $url === '') {
+                                continue;
+                            }
+                            ?>
+                            <li>
+                                <?php if ($current) : ?>
+                                    <span aria-current="page"><?php echo esc_html($label); ?></span>
+                                <?php else : ?>
+                                    <a href="<?php echo esc_url($url); ?>"><?php echo esc_html($label); ?></a>
+                                <?php endif; ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ol>
+                </nav>
+            <?php endif; ?>
+
             <?php require SABRI_PUBLIC_EXPERIENCE_DIR . 'templates/partials/profile-hero.php'; ?>
 
             <?php if (count($sections) > 1) : ?>
