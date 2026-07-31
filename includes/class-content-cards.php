@@ -17,7 +17,7 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
  */
 final class Content_Cards
 {
-    public const CONTRACT_VERSION = '1.1.0';
+    public const CONTRACT_VERSION = '1.2.0';
 
     private const TYPES = [
         'article',
@@ -69,6 +69,7 @@ final class Content_Cards
                 'compact',
             ],
             'renderer' => [self::class, 'render'],
+            'public_normalizer' => [self::class, 'normalize_public'],
             'owns_native_data' => false,
             'same_site_destinations' => true,
             'date_timezone' => 'UTC',
@@ -87,7 +88,7 @@ final class Content_Cards
     /** @param array<string,mixed> $args */
     public static function render(array $args = []): string
     {
-        $card = self::normalize($args);
+        $card = self::normalize_public($args);
         if ($card === null) {
             return '';
         }
@@ -174,8 +175,15 @@ final class Content_Cards
         return $html;
     }
 
-    /** @param array<string,mixed> $args @return array<string,mixed>|null */
-    private static function normalize(array $args): ?array
+    /**
+     * Produce the exact public card projection used by both HTML and REST.
+     * Internal provider IDs, projection keys, native object IDs, metrics,
+     * moderation notes, private metadata, and unknown fields are discarded.
+     *
+     * @param array<string,mixed> $args
+     * @return array<string,mixed>|null
+     */
+    public static function normalize_public(array $args): ?array
     {
         $type = self::key((string) ($args['type'] ?? 'article'));
         if (! in_array($type, self::TYPES, true)) {
