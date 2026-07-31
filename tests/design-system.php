@@ -7,7 +7,7 @@ namespace {
         define('ABSPATH', __DIR__ . '/fixtures/');
     }
     if (! defined('SABRI_PUBLIC_EXPERIENCE_VERSION')) {
-        define('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.11.0');
+        define('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.12.0');
     }
     if (! function_exists('home_url')) {
         function home_url(string $path = ''): string
@@ -30,11 +30,13 @@ namespace {
     require_once dirname(__DIR__) . '/includes/class-section-registry.php';
     require_once dirname(__DIR__) . '/includes/class-visual-acceptance.php';
     require_once dirname(__DIR__) . '/includes/class-staging-probe.php';
+    require_once dirname(__DIR__) . '/includes/class-file-24-integration.php';
     require_once dirname(__DIR__) . '/includes/class-design-system.php';
 
     use Sabri\PublicExperience\Components;
     use Sabri\PublicExperience\Content_Cards;
     use Sabri\PublicExperience\Design_System;
+    use Sabri\PublicExperience\File_24_Integration;
     use Sabri\PublicExperience\Staging_Probe;
 
     $failures = [];
@@ -47,14 +49,22 @@ namespace {
     $contract = Design_System::contract();
     $check(($contract['file'] ?? null) === 25, 'Design system contract must remain owned by File 25.');
     $check(($contract['canonical_name'] ?? '') === 'Sabri Unified Global Visual Experience and Design System', 'Canonical File 25 name must remain exact.');
-    $check(($contract['contract_version'] ?? '') === '1.6.0', 'Design-system contract version must include installed staging preflight.');
-    $check(($contract['runtime_version'] ?? '') === '0.11.0', 'Design-system runtime version must match File 25 0.11.0.');
+    $check(($contract['contract_version'] ?? '') === '1.7.0', 'Design-system contract version must include the reviewed File 24 boundary.');
+    $check(($contract['runtime_version'] ?? '') === '0.12.0', 'Design-system runtime version must match File 25 0.12.0.');
     $check(($contract['creates_file_26'] ?? true) === false, 'Design system must reject a duplicate File 26.');
     $check(($contract['global_shell_owner'] ?? '') === 'file-20', 'File 20 must remain the global shell owner.');
     $check(($contract['visual_system_owner'] ?? '') === 'file-25', 'File 25 must remain the visual-system owner.');
-    foreach (['visual-acceptance-evidence', 'deterministic-staging-packaging', 'installed-staging-preflight'] as $scope) {
+    $check(($contract['security_governance_owner'] ?? '') === 'file-24', 'File 24 must remain the security-governance owner.');
+    foreach (['visual-acceptance-evidence', 'deterministic-staging-packaging', 'installed-staging-preflight', 'file-24-module-manifest', 'no-store-profile-boundary'] as $scope) {
         $check(in_array($scope, (array) ($contract['scope'] ?? []), true), 'Missing design-system scope: ' . $scope);
     }
+
+    $file24 = (array) ($contract['file_24_integration'] ?? []);
+    $check(($file24['contract_version'] ?? '') === File_24_Integration::CONTRACT_VERSION, 'File 24 integration contract must be exposed.');
+    $check(($file24['file_24_constant'] ?? '') === 'SPCRC_VERSION', 'The exact File 24 runtime constant must be published.');
+    $check(($file24['owns_security_governance'] ?? true) === false, 'File 25 must not claim security governance.');
+    $check(($file24['owns_privacy_orchestration'] ?? true) === false, 'File 25 must not claim privacy orchestration.');
+    $check(($file24['cache_mode'] ?? '') === 'no-store-until-versioned-partition-contract', 'Shared profile caching must remain closed.');
 
     $acceptance = (array) ($contract['visual_acceptance'] ?? []);
     $check(($acceptance['green_ci_is_acceptance'] ?? true) === false, 'Green CI must not become visual acceptance.');
@@ -106,5 +116,5 @@ namespace {
         exit(1);
     }
 
-    echo "PASS: File 25 global design system, staging package, and installed-preflight contracts\n";
+    echo "PASS: File 25 global design system, File 24 boundary, staging package, and installed-preflight contracts\n";
 }
