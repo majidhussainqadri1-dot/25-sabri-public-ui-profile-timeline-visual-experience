@@ -13,7 +13,8 @@ final class System_Check
     public function __construct(
         private Dependency_Manager $dependencies,
         private Timeline_Registry $timeline_registry,
-        private Section_Registry $section_registry
+        private Section_Registry $section_registry,
+        private Staging_Probe $staging_probe
     ) {
     }
 
@@ -40,6 +41,10 @@ final class System_Check
         $tests['direct']['sabri_public_experience_section_providers'] = [
             'label' => __('File 25 optional profile-section providers', 'sabri-public-experience'),
             'test' => [$this, 'section_provider_test'],
+        ];
+        $tests['direct']['sabri_public_experience_staging_probe'] = [
+            'label' => __('File 25 Hostinger staging preflight', 'sabri-public-experience'),
+            'test' => [$this, 'staging_probe_test'],
         ];
         $tests['direct']['sabri_public_experience_safe_mode'] = [
             'label' => __('File 25 Safe Mode', 'sabri-public-experience'),
@@ -228,6 +233,59 @@ final class System_Check
             __('Optional profile-section provider registry is healthy', 'sabri-public-experience'),
             'good',
             sprintf(__('Registered providers: %1$d; currently available: %2$d. Staging content acceptance remains required.', 'sabri-public-experience'), $registered, $active)
+        );
+    }
+
+    /** @return array<string,mixed> */
+    public function staging_probe_test(): array
+    {
+        $report = $this->staging_probe->snapshot('');
+        $gates = (array) ($report['gates'] ?? []);
+        $hard_gates = [
+            'canonical_staging_host',
+            'live_host_excluded',
+            'https',
+            'environment_type_safe',
+            'registration_disabled',
+            'search_indexing_disabled',
+            'package_integrity',
+            'test_plan_available',
+            'runtime_supported',
+            'required_dependencies_available',
+            'safe_mode_inactive',
+        ];
+        $failed = [];
+        foreach ($hard_gates as $gate) {
+            if (empty($gates[$gate])) {
+                $failed[] = $gate;
+            }
+        }
+
+        if ($failed !== []) {
+            return $this->result(
+                'staging_probe',
+                __('File 25 is not ready for manual Hostinger staging tests', 'sabri-public-experience'),
+                'critical',
+                sprintf(
+                    __('Fail-closed preflight gates: %s', 'sabri-public-experience'),
+                    implode(', ', $failed)
+                )
+            );
+        }
+        if (empty($gates['expected_commit_supplied'])) {
+            return $this->result(
+                'staging_probe',
+                __('File 25 staging environment is structurally ready for exact-commit verification', 'sabri-public-experience'),
+                'recommended',
+                __('Run the read-only WP-CLI staging probe with --expected-commit or define SABRI_PUBLIC_EXPERIENCE_EXPECTED_COMMIT. Manual staging acceptance remains pending.', 'sabri-public-experience')
+            );
+        }
+
+        return $this->result(
+            'staging_probe',
+            __('File 25 passed the exact-commit staging preflight', 'sabri-public-experience'),
+            'good',
+            __('The installed candidate is ready for manual workflows, visual evidence, rollback testing, and Founder acceptance. This is not staging acceptance.', 'sabri-public-experience')
         );
     }
 
