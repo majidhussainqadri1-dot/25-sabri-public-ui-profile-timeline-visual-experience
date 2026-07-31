@@ -22,7 +22,8 @@
       "@php tests/visual-acceptance.php",
       "@php tests/safe-mode.php",
       "@php tools/verify-structure.php",
-      "@php tools/verify-file06-and-components.php"
+      "@php tools/verify-file06-and-components.php",
+      "@php tools/verify-provider-metadata.php"
     ],
     "lint": "find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l"
   }
