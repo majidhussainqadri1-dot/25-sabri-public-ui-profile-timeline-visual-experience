@@ -121,7 +121,7 @@ namespace {
     $check(str_contains($notice, 'sabri-ui-notice--info'), 'Notice renderer must expose the requested approved type.');
     $check(! str_contains($notice, 'evil.example'), 'Notice renderer must reject cross-origin actions.');
 
-    $card = Content_Cards::render([
+    $source = [
         'type' => 'news',
         'title' => '<script>bad()</script>Public Update',
         'url' => 'https://example.test/news/public-update/',
@@ -136,7 +136,16 @@ namespace {
         'action_label' => 'Read update',
         'native_object_id' => 99,
         'patient_id' => 100,
-    ]);
+        'projection_key' => str_repeat('a', 64),
+    ];
+    $public = Content_Cards::normalize_public($source);
+    $check(is_array($public), 'Public normalizer must accept a valid public card.');
+    $check(! array_key_exists('native_object_id', (array) $public), 'Public normalizer must remove native object identifiers.');
+    $check(! array_key_exists('patient_id', (array) $public), 'Public normalizer must remove patient identifiers.');
+    $check(! array_key_exists('projection_key', (array) $public), 'Public normalizer must remove server-only projection keys.');
+    $check(($public['image_url'] ?? 'x') === '', 'Public normalizer must reject external media.');
+
+    $card = Content_Cards::render($source);
     $check(str_contains($card, 'sabri-ui-content-card--news'), 'News card variant must be rendered.');
     $check(! str_contains($card, '<script'), 'Card renderer must remove executable title markup.');
     $check(! str_contains($card, 'evil.example'), 'Card image must reject protocol-relative external media.');
@@ -154,6 +163,7 @@ namespace {
     $check(str_contains($linked_title, '<h3 class="sabri-ui-content-card__title"><a'), 'Title must be the single link when no action label is supplied.');
 
     $check(Content_Cards::render(['type' => 'post', 'title' => '']) === '', 'Untitled content card must fail closed.');
+    $check(Content_Cards::normalize_public(['type' => 'post', 'title' => '']) === null, 'Untitled structured card must fail closed.');
 
     $natural_date = Content_Cards::render([
         'type' => 'event',
@@ -181,7 +191,8 @@ namespace {
     $check(! str_contains($invalid_calendar_date, '<time'), 'Invalid calendar dates must fail closed instead of normalizing silently.');
 
     $contract = Content_Cards::contract();
-    $check(($contract['contract_version'] ?? '') === '1.1.0', 'Content-card contract must record deterministic dates.');
+    $check(($contract['contract_version'] ?? '') === '1.2.0', 'Content-card contract must record the shared public normalizer.');
+    $check(($contract['public_normalizer'] ?? null) === [Content_Cards::class, 'normalize_public'], 'Content-card contract must expose the shared public normalizer.');
     $check(($contract['owns_native_data'] ?? true) === false, 'Card contract must deny native data ownership.');
     $check(($contract['same_site_destinations'] ?? false) === true, 'Card contract must require same-site destinations.');
     $check(($contract['deterministic_dates'] ?? false) === true, 'Card contract must guarantee deterministic dates.');
@@ -194,5 +205,5 @@ namespace {
         exit(1);
     }
 
-    echo "PASS: File 25 reusable content-card and same-origin URL contracts\n";
+    echo "PASS: File 25 reusable content-card, structured projection, and same-origin URL contracts\n";
 }
