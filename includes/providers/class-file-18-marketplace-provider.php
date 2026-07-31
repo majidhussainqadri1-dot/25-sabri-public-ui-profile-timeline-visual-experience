@@ -229,14 +229,12 @@ final class File_18_Marketplace_Provider implements Profile_Section_Provider
 
     private static function status_label(string $status): string
     {
-        $label = match ($status) {
-            'available' => 'Available',
-            'reserved' => 'Reserved',
-            'sold' => 'Sold',
+        return match ($status) {
+            'available' => function_exists('__') ? __('Available', 'sabri-public-experience') : 'Available',
+            'reserved' => function_exists('__') ? __('Reserved', 'sabri-public-experience') : 'Reserved',
+            'sold' => function_exists('__') ? __('Sold', 'sabri-public-experience') : 'Sold',
             default => '',
         };
-
-        return function_exists('__') && $label !== '' ? __($label, 'sabri-public-experience') : $label;
     }
 
     private static function marketplace_label(): string
