@@ -45,7 +45,10 @@ final class Plugin
         update_option('sabri_public_experience_schema_version', SABRI_PUBLIC_EXPERIENCE_SCHEMA_VERSION, false);
         update_option('sabri_public_experience_runtime_version', SABRI_PUBLIC_EXPERIENCE_VERSION, false);
         add_option('sabri_public_experience_safe_mode', '0', '', false);
-        add_option('sabri_public_experience_founder_display_name', 'Dr. Allamah Majid Hussain Sabri Muhaddith Mursheed', '', false);
+        // Retained only as a backward-compatible historical option. Runtime
+        // Founder identity is frozen by Profile_Repository and cannot be changed
+        // through this presentation option.
+        add_option('sabri_public_experience_founder_display_name', Profile_Repository::FOUNDER_DISPLAY_NAME, '', false);
         Profile_Router::flush();
     }
 
@@ -140,7 +143,7 @@ final class Plugin
         $router->register();
         (new Shell_Integration($router, $profiles, $native))->register();
         $renderer->register();
-        (new Rest_Controller($profiles, $timeline))->register();
+        (new Rest_Controller($profiles, $timeline, $sections))->register();
 
         do_action('sabri_public_experience/booted', $this, $timeline_registry, $section_registry);
         Safe_Mode::end();
