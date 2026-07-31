@@ -14,7 +14,8 @@ final class System_Check
         private Dependency_Manager $dependencies,
         private Timeline_Registry $timeline_registry,
         private Section_Registry $section_registry,
-        private Staging_Probe $staging_probe
+        private Staging_Probe $staging_probe,
+        private File_24_Integration $file_24
     ) {
     }
 
@@ -33,6 +34,10 @@ final class System_Check
         $tests['direct']['sabri_public_experience_dependencies'] = [
             'label' => __('File 25 profile dependencies', 'sabri-public-experience'),
             'test' => [$this, 'dependency_test'],
+        ];
+        $tests['direct']['sabri_public_experience_file24'] = [
+            'label' => __('File 25 and File 24 security integration', 'sabri-public-experience'),
+            'test' => [$this, 'file_24_test'],
         ];
         $tests['direct']['sabri_public_experience_providers'] = [
             'label' => __('File 25 timeline providers', 'sabri-public-experience'),
@@ -62,6 +67,7 @@ final class System_Check
         $components = (array) ($contract['components'] ?? []);
         $acceptance = (array) ($contract['visual_acceptance'] ?? []);
         $sections = (array) ($contract['optional_sections'] ?? []);
+        $file_24 = (array) ($contract['file_24_integration'] ?? []);
         $stylesheet = SABRI_PUBLIC_EXPERIENCE_DIR . 'assets/css/design-system.css';
         $component_stylesheet = SABRI_PUBLIC_EXPERIENCE_DIR . 'assets/css/design-system-components.css';
         $valid = ($contract['file'] ?? null) === 25
@@ -76,6 +82,8 @@ final class System_Check
             && ($acceptance['green_ci_is_acceptance'] ?? true) === false
             && ($sections['provider_metadata_bound_to_concrete_object'] ?? false) === true
             && (($sections['internal_projection_key']['rendered_publicly'] ?? true) === false)
+            && ($file_24['contract_version'] ?? '') === File_24_Integration::CONTRACT_VERSION
+            && ($file_24['owns_security_governance'] ?? true) === false
             && is_callable('sabri_visual_experience_contract')
             && is_callable('sabri_visual_experience_acceptance_contract')
             && is_callable('sabri_visual_experience_render_state')
@@ -89,7 +97,7 @@ final class System_Check
                 'design_system',
                 __('The File 25 global design-system contract is incomplete', 'sabri-public-experience'),
                 'critical',
-                __('The canonical contract, reusable renderer API, provider identity boundary, evidence contract, or local stylesheet is missing or inconsistent.', 'sabri-public-experience')
+                __('The canonical contract, reusable renderer API, File 24 boundary, provider identity boundary, evidence contract, or local stylesheet is missing or inconsistent.', 'sabri-public-experience')
             );
         }
 
@@ -97,7 +105,7 @@ final class System_Check
             'design_system',
             __('The File 25 global design-system contract is available', 'sabri-public-experience'),
             'good',
-            __('File 25 owns the visual system while File 20 remains the shell owner. Exact-commit visual staging evidence is still required.', 'sabri-public-experience')
+            __('File 25 owns the visual system, File 20 remains the shell owner, and File 24 remains the security-governance owner. Exact-commit staging evidence is still required.', 'sabri-public-experience')
         );
     }
 
@@ -127,6 +135,57 @@ final class System_Check
         }
 
         return $this->result('dependencies', $label, $status, $description);
+    }
+
+    /** @return array<string,mixed> */
+    public function file_24_test(): array
+    {
+        $version = File_24_Integration::current_version();
+        $manifest = File_24_Integration::manifest();
+        $contract = File_24_Integration::contract();
+
+        if ($version === '') {
+            return $this->result(
+                'file24',
+                __('The reviewed File 24 runtime is not active', 'sabri-public-experience'),
+                'recommended',
+                __('File 25 remains operational with no-store profile responses, but production security, privacy, audit, incident, and resilience integration is incomplete.', 'sabri-public-experience')
+            );
+        }
+        if (! File_24_Integration::is_compatible()) {
+            return $this->result(
+                'file24',
+                __('The active File 24 version is outside the reviewed range', 'sabri-public-experience'),
+                'critical',
+                sprintf(
+                    __('Active version: %1$s; reviewed range: %2$s', 'sabri-public-experience'),
+                    $version,
+                    (string) ($contract['reviewed_version_range'] ?? '')
+                )
+            );
+        }
+        if (($manifest['module_key'] ?? '') !== File_24_Integration::MODULE_KEY
+            || ($manifest['owner'] ?? '') !== 'File 25'
+            || ($manifest['privacy_operations'] ?? null) !== []
+            || ($contract['owns_security_governance'] ?? true) !== false
+        ) {
+            return $this->result(
+                'file24',
+                __('The File 24 module boundary is inconsistent', 'sabri-public-experience'),
+                'critical',
+                __('File 25 must publish only its bounded manifest and must not claim security, privacy, incident, or native-content ownership.', 'sabri-public-experience')
+            );
+        }
+
+        return $this->result(
+            'file24',
+            __('The reviewed File 24 integration contract is active', 'sabri-public-experience'),
+            'good',
+            sprintf(
+                __('File 24 version %s is compatible. File 25 publishes a bounded module manifest and keeps profile responses no-store pending a later accepted cache-partition contract.', 'sabri-public-experience'),
+                $version
+            )
+        );
     }
 
     /** @return array<string,mixed> */
