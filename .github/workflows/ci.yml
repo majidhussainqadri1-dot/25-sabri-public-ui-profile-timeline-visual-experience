@@ -45,6 +45,9 @@ jobs:
       - name: Structured public profile contracts
         run: php tests/profile-data.php
 
+      - name: Provider route parity and fail-closed profile routing
+        run: php tests/profile-router.php
+
       - name: File 21 timeline adapter contract
         run: php tests/file21-provider.php
 
@@ -74,6 +77,12 @@ jobs:
 
       - name: Deterministic builder and independent artifact-verifier contract
         run: php tests/release-engineering.php
+
+      - name: Installed-package integrity and Hostinger staging-probe contract
+        run: php tests/staging-probe.php
+
+      - name: Idempotent schema-2 profile-route upgrade contract
+        run: php tests/upgrade-manager.php
 
       - name: Nested Safe Mode contract
         run: php tests/safe-mode.php
@@ -145,6 +154,26 @@ jobs:
           cmp "build/package-a/${BASE}.sha256" "build/package-b/${BASE}.sha256"
           cd build/package-a
           sha256sum --check "${BASE}.sha256"
+
+      - name: Verify extracted installed candidate against embedded manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="sabri-public-experience-${{ steps.source.outputs.version }}"
+          rm -rf build/installed-probe
+          mkdir -p build/installed-probe
+          unzip -q "build/package-a/${BASE}.zip" -d build/installed-probe
+          php -r '
+            define("ABSPATH", __DIR__ . "/");
+            require "build/installed-probe/sabri-public-experience/includes/class-staging-probe.php";
+            $report = \Sabri\PublicExperience\Staging_Probe::verify_package_integrity(
+              "build/installed-probe/sabri-public-experience",
+              "${{ steps.source.outputs.version }}",
+              "${{ steps.source.outputs.commit_sha }}"
+            );
+            echo json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), PHP_EOL;
+            exit(!empty($report["valid"]) ? 0 : 1);
+          '
 
       - name: Assemble downloadable candidate artifact
         shell: bash
