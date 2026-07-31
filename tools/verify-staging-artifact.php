@@ -2,15 +2,7 @@
 
 declare(strict_types=1);
 
-/**
- * Independent verifier for a downloaded File 25 GitHub Actions artifact or
- * an assembled artifact directory before upload.
- *
- * Usage:
- * php tools/verify-staging-artifact.php \
- *   --artifact=/path/to/artifact.zip \
- *   [--artifact-sha256=<expected-outer-sha256>]
- */
+/** Independent verifier for File 25 workflow artifacts and assembled directories. */
 final class File25_Staging_Artifact_Verifier
 {
     private const PACKAGE_ROOT = 'sabri-public-experience';
@@ -35,7 +27,7 @@ final class File25_Staging_Artifact_Verifier
         $outer_sha256 = '';
         if (is_dir($artifact)) {
             $files = self::read_artifact_directory($artifact);
-            $artifact_mode = 'directory';
+            $mode = 'directory';
         } elseif (is_file($artifact)) {
             $real = realpath($artifact);
             if (! is_string($real)) {
@@ -55,14 +47,13 @@ final class File25_Staging_Artifact_Verifier
                 }
             }
             $files = self::read_outer_zip($real);
-            $artifact_mode = 'zip';
+            $mode = 'zip';
         } else {
             throw new InvalidArgumentException('Artifact path does not exist.');
         }
 
-        $bundle = self::identify_bundle($files);
-        $result = self::verify_bundle($bundle);
-        $result['artifact_mode'] = $artifact_mode;
+        $result = self::verify_bundle(self::identify_bundle($files));
+        $result['artifact_mode'] = $mode;
         $result['outer_artifact_sha256'] = $outer_sha256;
 
         return $result;
@@ -102,7 +93,7 @@ final class File25_Staging_Artifact_Verifier
             }
             $files[$entry] = $contents;
         }
-        if (count($files) === 0 || count($files) > self::MAX_OUTER_FILES) {
+        if ($files === [] || count($files) > self::MAX_OUTER_FILES) {
             throw new RuntimeException('Artifact directory contains an invalid number of files.');
         }
 
@@ -116,59 +107,54 @@ final class File25_Staging_Artifact_Verifier
         if ($zip->open($zip_path, ZipArchive::RDONLY) !== true) {
             throw new RuntimeException('Unable to open the downloaded workflow artifact.');
         }
-        if ($zip->numFiles < 1 || $zip->numFiles > self::MAX_OUTER_FILES) {
+        try {
+            if ($zip->numFiles < 1 || $zip->numFiles > self::MAX_OUTER_FILES) {
+                throw new RuntimeException('Workflow artifact contains an invalid number of entries.');
+            }
+            $files = [];
+            for ($index = 0; $index < $zip->numFiles; $index++) {
+                $name = $zip->getNameIndex($index);
+                $stat = $zip->statIndex($index);
+                if (! is_string($name) || ! is_array($stat) || ! self::outer_name_is_safe($name)) {
+                    throw new RuntimeException('Unsafe entry detected in the downloaded workflow artifact.');
+                }
+                if (isset($files[$name])) {
+                    throw new RuntimeException('Duplicate entry detected in the downloaded workflow artifact: ' . $name);
+                }
+                if (self::zip_entry_is_symlink($stat)) {
+                    throw new RuntimeException('Symbolic link detected in the downloaded workflow artifact.');
+                }
+                $bytes = (int) ($stat['size'] ?? -1);
+                if ($bytes < 0 || $bytes > self::MAX_OUTER_FILE_BYTES) {
+                    throw new RuntimeException('Workflow artifact entry exceeds the permitted size: ' . $name);
+                }
+                $contents = $zip->getFromIndex($index);
+                if (! is_string($contents) || strlen($contents) !== $bytes) {
+                    throw new RuntimeException('Unable to read workflow artifact entry: ' . $name);
+                }
+                $files[$name] = $contents;
+            }
+
+            return $files;
+        } finally {
             $zip->close();
-            throw new RuntimeException('Workflow artifact contains an invalid number of entries.');
         }
-
-        $files = [];
-        for ($index = 0; $index < $zip->numFiles; $index++) {
-            $name = $zip->getNameIndex($index);
-            $stat = $zip->statIndex($index);
-            if (! is_string($name) || ! is_array($stat) || ! self::outer_name_is_safe($name)) {
-                $zip->close();
-                throw new RuntimeException('Unsafe entry detected in the downloaded workflow artifact.');
-            }
-            if (isset($files[$name])) {
-                $zip->close();
-                throw new RuntimeException('Duplicate entry detected in the downloaded workflow artifact: ' . $name);
-            }
-            if (self::zip_entry_is_symlink($stat)) {
-                $zip->close();
-                throw new RuntimeException('Symbolic link detected in the downloaded workflow artifact.');
-            }
-            $bytes = (int) ($stat['size'] ?? -1);
-            if ($bytes < 0 || $bytes > self::MAX_OUTER_FILE_BYTES) {
-                $zip->close();
-                throw new RuntimeException('Workflow artifact entry exceeds the permitted size: ' . $name);
-            }
-            $contents = $zip->getFromIndex($index);
-            if (! is_string($contents) || strlen($contents) !== $bytes) {
-                $zip->close();
-                throw new RuntimeException('Unable to read workflow artifact entry: ' . $name);
-            }
-            $files[$name] = $contents;
-        }
-        $zip->close();
-
-        return $files;
     }
 
     /** @param array<string,string> $files @return array<string,string> */
     private static function identify_bundle(array $files): array
     {
-        $plugin_zip = [];
+        $plugin_zips = [];
         foreach (array_keys($files) as $name) {
             if (preg_match('/^sabri-public-experience-(\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?)\.zip$/', $name, $match) === 1) {
-                $plugin_zip[$name] = $match[1];
+                $plugin_zips[$name] = $match[1];
             }
         }
-        if (count($plugin_zip) !== 1) {
+        if (count($plugin_zips) !== 1) {
             throw new RuntimeException('Artifact must contain exactly one versioned File 25 plugin ZIP.');
         }
-
-        $zip_name = array_key_first($plugin_zip);
-        $version = $plugin_zip[$zip_name];
+        $zip_name = (string) array_key_first($plugin_zips);
+        $version = $plugin_zips[$zip_name];
         $expected = [
             $zip_name,
             'sabri-public-experience-' . $version . '.sha256',
@@ -216,8 +202,7 @@ final class File25_Staging_Artifact_Verifier
         $manifest = self::decode_json_object($manifest_bytes, 'detached manifest');
         self::validate_manifest($manifest, $version);
         $matrix = self::decode_json_object($matrix_bytes, 'dependency matrix');
-        self::validate_matrix($matrix, $version);
-
+        $file24_status = self::validate_matrix($matrix, $version);
         $inner = self::verify_inner_zip($zip_bytes, $manifest_bytes, $manifest, $matrix_bytes);
 
         return [
@@ -227,7 +212,7 @@ final class File25_Staging_Artifact_Verifier
             'package_sha256' => $package_sha256,
             'payload_file_count' => $inner['payload_file_count'],
             'payload_bytes' => $inner['payload_bytes'],
-            'file24_status' => 'pending-contract-review',
+            'file24_status' => $file24_status,
             'staging_accepted' => false,
             'production_accepted' => false,
         ];
@@ -272,7 +257,7 @@ final class File25_Staging_Artifact_Verifier
     }
 
     /** @param array<string,mixed> $matrix */
-    private static function validate_matrix(array $matrix, string $version): void
+    private static function validate_matrix(array $matrix, string $version): string
     {
         if (($matrix['schema_version'] ?? null) !== 1
             || ($matrix['file'] ?? null) !== 25
@@ -296,10 +281,15 @@ final class File25_Staging_Artifact_Verifier
                 throw new RuntimeException('Staging dependency matrix is missing File ' . $required . '.');
             }
         }
-        if (($modules[24]['accepted_runtime_contract'] ?? '') !== 'pending'
-            || ($modules[24]['staging_status'] ?? '') !== 'blocked-until-contract-review'
+
+        $file24 = $modules[24];
+        if (($file24['reviewed_package_version'] ?? '') !== '0.25.3'
+            || ($file24['accepted_source_range'] ?? '') !== '>=0.25.3 <0.26.0'
+            || ($file24['accepted_runtime_contract'] ?? '') !== 'reviewed-source-contract-pending-staging'
+            || ($file24['cache_partition_contract'] ?? '') !== 'not-yet-versioned'
+            || ($file24['staging_status'] ?? '') !== 'pending'
         ) {
-            throw new RuntimeException('File 24 must remain blocked until its runtime contract is reviewed.');
+            throw new RuntimeException('File 24 reviewed contract or pending staging state is inaccurate.');
         }
         if (($modules[25]['candidate_version'] ?? '') !== $version
             || ($modules[25]['staging_status'] ?? '') !== 'pending'
@@ -307,6 +297,8 @@ final class File25_Staging_Artifact_Verifier
         ) {
             throw new RuntimeException('File 25 dependency-matrix candidate status is inaccurate.');
         }
+
+        return 'reviewed-source-contract-pending-staging';
     }
 
     /** @param array<string,mixed> $manifest @return array{payload_file_count:int,payload_bytes:int} */
@@ -324,93 +316,79 @@ final class File25_Staging_Artifact_Verifier
             if ($zip->open($temporary, ZipArchive::RDONLY) !== true) {
                 throw new RuntimeException('Unable to open the inner File 25 plugin ZIP.');
             }
+            try {
+                $expected = [];
+                foreach (array_keys((array) $manifest['files']) as $relative) {
+                    $expected[] = self::PACKAGE_ROOT . '/' . $relative;
+                }
+                $expected[] = self::PACKAGE_ROOT . '/' . self::INNER_MANIFEST;
+                sort($expected, SORT_STRING);
+                if ($zip->numFiles !== count($expected) || $zip->numFiles > self::MAX_INNER_FILES + 1) {
+                    throw new RuntimeException('Inner plugin ZIP contains an invalid number of entries.');
+                }
 
-            $expected = [];
-            foreach (array_keys((array) $manifest['files']) as $relative) {
-                $expected[] = self::PACKAGE_ROOT . '/' . $relative;
-            }
-            $expected[] = self::PACKAGE_ROOT . '/' . self::INNER_MANIFEST;
-            sort($expected, SORT_STRING);
+                $actual = [];
+                $seen = [];
+                $total_bytes = 0;
+                for ($index = 0; $index < $zip->numFiles; $index++) {
+                    $name = $zip->getNameIndex($index);
+                    $stat = $zip->statIndex($index);
+                    if (! is_string($name) || ! is_array($stat) || ! self::inner_name_is_safe($name)) {
+                        throw new RuntimeException('Unsafe entry detected in the inner plugin ZIP.');
+                    }
+                    if (isset($seen[$name])) {
+                        throw new RuntimeException('Duplicate entry detected in the inner plugin ZIP: ' . $name);
+                    }
+                    $seen[$name] = true;
+                    if (self::zip_entry_is_symlink($stat)) {
+                        throw new RuntimeException('Symbolic link detected in the inner plugin ZIP.');
+                    }
+                    $bytes = (int) ($stat['size'] ?? -1);
+                    if ($bytes < 0 || $bytes > self::MAX_INNER_FILE_BYTES) {
+                        throw new RuntimeException('Inner plugin ZIP entry exceeds the permitted size.');
+                    }
+                    $total_bytes += $bytes;
+                    if ($total_bytes > self::MAX_INNER_TOTAL_BYTES + self::MAX_INNER_FILE_BYTES) {
+                        throw new RuntimeException('Inner plugin ZIP expands beyond the permitted size.');
+                    }
+                    $actual[] = $name;
+                }
+                sort($actual, SORT_STRING);
+                if ($actual !== $expected) {
+                    throw new RuntimeException('Inner plugin ZIP entries do not match the detached manifest.');
+                }
 
-            if ($zip->numFiles !== count($expected) || $zip->numFiles > self::MAX_INNER_FILES + 1) {
+                $payload_bytes = 0;
+                foreach ((array) $manifest['files'] as $relative => $metadata) {
+                    $contents = $zip->getFromName(self::PACKAGE_ROOT . '/' . $relative);
+                    if (! is_string($contents)) {
+                        throw new RuntimeException('Unable to read inner payload entry: ' . $relative);
+                    }
+                    if (! hash_equals((string) $metadata['sha256'], hash('sha256', $contents))) {
+                        throw new RuntimeException('Inner payload SHA-256 mismatch: ' . $relative);
+                    }
+                    if ((int) $metadata['bytes'] !== strlen($contents)) {
+                        throw new RuntimeException('Inner payload byte-size mismatch: ' . $relative);
+                    }
+                    $payload_bytes += strlen($contents);
+                }
+
+                $embedded_manifest = $zip->getFromName(self::PACKAGE_ROOT . '/' . self::INNER_MANIFEST);
+                $embedded_matrix = $zip->getFromName(self::PACKAGE_ROOT . '/config/staging-dependencies.json');
+                $main = $zip->getFromName(self::PACKAGE_ROOT . '/sabri-public-experience.php');
+                $readme = $zip->getFromName(self::PACKAGE_ROOT . '/readme.txt');
+                if (! is_string($embedded_manifest) || ! hash_equals($manifest_bytes, $embedded_manifest)) {
+                    throw new RuntimeException('Embedded and detached staging manifests differ.');
+                }
+                if (! is_string($embedded_matrix) || ! hash_equals($matrix_bytes, $embedded_matrix)) {
+                    throw new RuntimeException('Outer and embedded dependency matrices differ.');
+                }
+                self::verify_runtime_versions($main, $readme, (string) $manifest['version']);
+
+                return ['payload_file_count' => count((array) $manifest['files']), 'payload_bytes' => $payload_bytes];
+            } finally {
                 $zip->close();
-                throw new RuntimeException('Inner plugin ZIP contains an invalid number of entries.');
             }
-
-            $actual = [];
-            $seen = [];
-            $total_bytes = 0;
-            for ($index = 0; $index < $zip->numFiles; $index++) {
-                $name = $zip->getNameIndex($index);
-                $stat = $zip->statIndex($index);
-                if (! is_string($name) || ! is_array($stat) || ! self::inner_name_is_safe($name)) {
-                    $zip->close();
-                    throw new RuntimeException('Unsafe entry detected in the inner plugin ZIP.');
-                }
-                if (isset($seen[$name])) {
-                    $zip->close();
-                    throw new RuntimeException('Duplicate entry detected in the inner plugin ZIP: ' . $name);
-                }
-                $seen[$name] = true;
-                if (self::zip_entry_is_symlink($stat)) {
-                    $zip->close();
-                    throw new RuntimeException('Symbolic link detected in the inner plugin ZIP.');
-                }
-                $bytes = (int) ($stat['size'] ?? -1);
-                if ($bytes < 0 || $bytes > self::MAX_INNER_FILE_BYTES) {
-                    $zip->close();
-                    throw new RuntimeException('Inner plugin ZIP entry exceeds the permitted size.');
-                }
-                $total_bytes += $bytes;
-                if ($total_bytes > self::MAX_INNER_TOTAL_BYTES + self::MAX_INNER_FILE_BYTES) {
-                    $zip->close();
-                    throw new RuntimeException('Inner plugin ZIP expands beyond the permitted size.');
-                }
-                $actual[] = $name;
-            }
-            sort($actual, SORT_STRING);
-            if ($actual !== $expected) {
-                $zip->close();
-                throw new RuntimeException('Inner plugin ZIP entries do not match the detached manifest.');
-            }
-
-            $payload_bytes = 0;
-            foreach ((array) $manifest['files'] as $relative => $metadata) {
-                $name = self::PACKAGE_ROOT . '/' . $relative;
-                $contents = $zip->getFromName($name);
-                if (! is_string($contents)) {
-                    $zip->close();
-                    throw new RuntimeException('Unable to read inner payload entry: ' . $relative);
-                }
-                if (! hash_equals((string) $metadata['sha256'], hash('sha256', $contents))) {
-                    $zip->close();
-                    throw new RuntimeException('Inner payload SHA-256 mismatch: ' . $relative);
-                }
-                if ((int) $metadata['bytes'] !== strlen($contents)) {
-                    $zip->close();
-                    throw new RuntimeException('Inner payload byte-size mismatch: ' . $relative);
-                }
-                $payload_bytes += strlen($contents);
-            }
-
-            $embedded_manifest = $zip->getFromName(self::PACKAGE_ROOT . '/' . self::INNER_MANIFEST);
-            $embedded_matrix = $zip->getFromName(self::PACKAGE_ROOT . '/config/staging-dependencies.json');
-            $main = $zip->getFromName(self::PACKAGE_ROOT . '/sabri-public-experience.php');
-            $readme = $zip->getFromName(self::PACKAGE_ROOT . '/readme.txt');
-            $zip->close();
-
-            if (! is_string($embedded_manifest) || ! hash_equals($manifest_bytes, $embedded_manifest)) {
-                throw new RuntimeException('Embedded and detached staging manifests differ.');
-            }
-            if (! is_string($embedded_matrix) || ! hash_equals($matrix_bytes, $embedded_matrix)) {
-                throw new RuntimeException('Outer and embedded dependency matrices differ.');
-            }
-            self::verify_runtime_versions($main, $readme, (string) $manifest['version']);
-
-            return [
-                'payload_file_count' => count((array) $manifest['files']),
-                'payload_bytes' => $payload_bytes,
-            ];
         } finally {
             if (is_file($temporary)) {
                 unlink($temporary);
@@ -450,11 +428,8 @@ final class File25_Staging_Artifact_Verifier
 
     private static function outer_name_is_safe(string $name): bool
     {
-        return $name !== ''
-            && strlen($name) <= 190
-            && basename($name) === $name
-            && ! str_contains($name, "\0")
-            && preg_match('/^[A-Za-z0-9][A-Za-z0-9._+-]*$/', $name) === 1;
+        return $name !== '' && strlen($name) <= 190 && basename($name) === $name
+            && ! str_contains($name, "\0") && preg_match('/^[A-Za-z0-9][A-Za-z0-9._+-]*$/', $name) === 1;
     }
 
     private static function relative_payload_name_is_safe(string $name): bool
@@ -487,9 +462,7 @@ final class File25_Staging_Artifact_Verifier
         if (! isset($stat['external_attributes'])) {
             return false;
         }
-        $mode = ((int) $stat['external_attributes'] >> 16) & 0170000;
-
-        return $mode === 0120000;
+        return ((((int) $stat['external_attributes'] >> 16) & 0170000) === 0120000);
     }
 }
 
@@ -501,8 +474,10 @@ if (PHP_SAPI === 'cli' && isset($_SERVER['SCRIPT_FILENAME']) && realpath((string
         if ($artifact === '') {
             throw new InvalidArgumentException('Required option: --artifact.');
         }
-        $result = File25_Staging_Artifact_Verifier::verify($artifact, $outer_sha);
-        echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n";
+        echo json_encode(
+            File25_Staging_Artifact_Verifier::verify($artifact, $outer_sha),
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
+        ) . "\n";
     } catch (Throwable $exception) {
         fwrite(STDERR, 'FAILED: ' . $exception->getMessage() . "\n");
         exit(1);
