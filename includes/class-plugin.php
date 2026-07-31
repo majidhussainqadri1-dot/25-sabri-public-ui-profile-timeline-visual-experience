@@ -42,7 +42,8 @@ final class Plugin
             wp_die(esc_html__('Sabri Unified Global Visual Experience requires WordPress 6.5 or newer.', 'sabri-public-experience'));
         }
 
-        add_option('sabri_public_experience_schema_version', SABRI_PUBLIC_EXPERIENCE_SCHEMA_VERSION, '', false);
+        update_option('sabri_public_experience_schema_version', SABRI_PUBLIC_EXPERIENCE_SCHEMA_VERSION, false);
+        update_option('sabri_public_experience_runtime_version', SABRI_PUBLIC_EXPERIENCE_VERSION, false);
         add_option('sabri_public_experience_safe_mode', '0', '', false);
         add_option('sabri_public_experience_founder_display_name', 'Dr. Allamah Majid Hussain Sabri Muhaddith Mursheed', '', false);
         Profile_Router::flush();
@@ -70,13 +71,16 @@ final class Plugin
         $dependencies = new Dependency_Manager($native);
         $timeline_registry = new Timeline_Registry();
         $section_registry = new Section_Registry();
-        (new System_Check($dependencies, $timeline_registry, $section_registry))->register();
+        $staging_probe = new Staging_Probe($dependencies, $timeline_registry, $section_registry);
+        (new System_Check($dependencies, $timeline_registry, $section_registry, $staging_probe))->register();
+        Staging_CLI::register($staging_probe);
 
         if (Safe_Mode::is_active()) {
             Safe_Mode::end();
             return;
         }
 
+        (new Upgrade_Manager())->register();
         $router = new Profile_Router();
         (new Design_System())->register();
         (new Assets($router))->register();
