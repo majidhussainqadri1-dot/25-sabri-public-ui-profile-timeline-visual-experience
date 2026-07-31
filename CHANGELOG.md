@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.13.0 — Master-Plan and File 25 Final-Specification Reconciliation
+
+### Corrected during eleventh review
+
+- Removed the verified-Doctor contact privacy bypass. File 25 now consumes File 03's canonical `SPD_Helpers::can_show_contact()` decision for Founder, Doctor, and permitted Member contact rendering; filters may only revoke.
+- Froze the approved Founder public spelling as `Dr. Allamah Majid Hussain Sabri Muhaddith Mursheed` instead of trusting a mutable presentation option or extension filter.
+- Removed silent external avatar-service fallback and restricted profile, cover, and OpenGraph media to same-origin URLs.
+- Stopped every Doctor profile from forcing an empty third File 20 shell column; three-column mode now requires declared real right-sidebar content.
+- Added an explicit default 404 and opt-in 410 tombstone policy for unavailable/deleted public profiles.
+
+### Added
+
+- Visible accessible profile breadcrumbs and `BreadcrumbList` structured data.
+- Safe `og:image:alt` output.
+- One public card allow-list shared by HTML and REST.
+- Structured Founder/profile Knowledge and Media endpoints.
+- Aggregate provider-health endpoint without provider IDs, versions, native IDs, object counts, or exception details.
+- Deterministic REST ETags while retaining `no-store, private` cache policy.
+- Master-plan reconciliation regression test and CI gate.
+- Updated staging expectations for File 00 `1.1.13`, File 03 `0.2.0`, and File 25 `0.13.0`.
+
+### Ownership and acceptance boundary
+
+- File 20 remains the only shell/sidebar owner.
+- File 03 remains profile/contact-consent owner.
+- File 21 and native modules remain canonical content owners.
+- File 24 remains security/privacy/compliance/resilience owner.
+- Hostinger staging, runtime privacy tests, visual/accessibility evidence, rollback, deployment, monitoring, and Founder acceptance remain pending.
+
 ## 0.12.0 — Exact File 24 Integration and No-Store Security Boundary
 
 ### Added
