@@ -54,7 +54,7 @@ jobs:
       - name: Optional profile section provider contract
         run: php tests/section-providers.php
 
-      - name: Provider metadata immutability contract
+      - name: Provider object identity and atomic metadata contract
         run: php tests/section-provider-metadata.php
 
       - name: Native File 06 knowledge provider contract
@@ -63,7 +63,10 @@ jobs:
       - name: Native File 10 11 12 media provider contracts
         run: php tests/file10-12-media-providers.php
 
-      - name: Strict visual acceptance evidence contract
+      - name: Native File 18 Marketplace provider contract
+        run: php tests/file18-marketplace-provider.php
+
+      - name: Commit-bound strict visual acceptance evidence contract
         run: php tests/visual-acceptance.php
 
       - name: Nested Safe Mode contract
