@@ -67,12 +67,16 @@ final class Plugin
 
         load_plugin_textdomain('sabri-public-experience', false, dirname(plugin_basename(SABRI_PUBLIC_EXPERIENCE_FILE)) . '/languages');
 
+        $router = new Profile_Router();
+        $file_24 = new File_24_Integration($router);
+        $file_24->register();
+
         $native = new Native_Integration();
         $dependencies = new Dependency_Manager($native);
         $timeline_registry = new Timeline_Registry();
         $section_registry = new Section_Registry();
         $staging_probe = new Staging_Probe($dependencies, $timeline_registry, $section_registry);
-        (new System_Check($dependencies, $timeline_registry, $section_registry, $staging_probe))->register();
+        (new System_Check($dependencies, $timeline_registry, $section_registry, $staging_probe, $file_24))->register();
         Staging_CLI::register($staging_probe);
 
         if (Safe_Mode::is_active()) {
@@ -81,7 +85,6 @@ final class Plugin
         }
 
         (new Upgrade_Manager())->register();
-        $router = new Profile_Router();
         (new Design_System())->register();
         (new Assets($router))->register();
         do_action('sabri_visual_experience/design_system_booted', Design_System::contract());
