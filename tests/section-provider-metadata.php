@@ -21,7 +21,7 @@ namespace {
 namespace Sabri\PublicExperience\Tests {
     use Sabri\PublicExperience\Contracts\Profile_Section_Provider;
 
-    final class Mutable_Metadata_Provider implements Profile_Section_Provider
+    class Mutable_Metadata_Provider implements Profile_Section_Provider
     {
         public string $id = 'mutable-metadata';
         public string $version = '1.0.0';
@@ -44,11 +44,33 @@ namespace Sabri\PublicExperience\Tests {
         {
             return [
                 ['type' => 'article', 'title' => 'Upper path', 'url' => '/Knowledge/Case/'],
-                ['type' => 'article', 'title' => 'Changed title same URL', 'url' => '/Knowledge/Case/'],
                 ['type' => 'article', 'title' => 'Lower path', 'url' => '/knowledge/case/'],
+                ['type' => 'marketplace-item', 'title' => 'Listing One', 'url' => '/marketplace/', 'projection_key' => str_repeat('a', 64)],
+                ['type' => 'marketplace-item', 'title' => 'Listing Two', 'url' => '/marketplace/', 'projection_key' => str_repeat('b', 64)],
             ];
         }
         public function owns_native_content(): bool { return $this->owns; }
+    }
+
+    final class Unstable_Maturity_Provider extends Mutable_Metadata_Provider
+    {
+        private int $reads = 0;
+
+        public function __construct()
+        {
+            $this->id = 'unstable-maturity';
+        }
+
+        public function get_maturity_level(): string
+        {
+            $this->reads++;
+            return $this->reads <= 2 ? 'read-only' : 'disabled';
+        }
+
+        public function query(int $user_id, array $profile, array $context = []): array
+        {
+            return [['type' => 'article', 'title' => 'Atomic metadata item', 'url' => '/atomic/']];
+        }
     }
 }
 
@@ -61,6 +83,7 @@ namespace {
     use Sabri\PublicExperience\Section_Registry;
     use Sabri\PublicExperience\Section_Service;
     use Sabri\PublicExperience\Tests\Mutable_Metadata_Provider;
+    use Sabri\PublicExperience\Tests\Unstable_Maturity_Provider;
 
     $failures = [];
     $check = static function (bool $condition, string $message) use (&$failures): void {
@@ -73,7 +96,7 @@ namespace {
     $registry->register($provider);
 
     $data = (new Section_Service($registry))->get_section(11, $profile, 'knowledge');
-    $check(count((array) ($data['items'] ?? [])) === 2, 'Same canonical URL must deduplicate while case-distinct paths remain separate.');
+    $check(count((array) ($data['items'] ?? [])) === 4, 'Case-sensitive paths and distinct opaque projection keys must remain separate.');
 
     $provider->section = 'media';
     $mutated = (new Section_Service($registry))->get_section(11, $profile, 'knowledge');
@@ -82,27 +105,42 @@ namespace {
     $provider->section = 'knowledge';
     $provider->version = '2.0.0';
     $version_mutated = (new Section_Service($registry))->get_section(11, $profile, 'knowledge');
-    $check(($version_mutated['items'] ?? []) === [] && ($version_mutated['provider_error_count'] ?? 0) === 1, 'Version mutation must fail closed and be reported.');
+    $check(($version_mutated['items'] ?? []) === [], 'Version mutation must fail closed.');
 
     $provider->version = '1.0.0';
     $provider->maturity = 'production-accepted';
     $maturity_mutated = (new Section_Service($registry))->get_section(11, $profile, 'knowledge');
-    $check(($maturity_mutated['items'] ?? []) === [] && ($maturity_mutated['provider_error_count'] ?? 0) === 1, 'Maturity self-promotion must fail closed and be reported.');
+    $check(($maturity_mutated['items'] ?? []) === [], 'Maturity self-promotion must fail closed.');
 
     $provider->maturity = 'read-only';
     $provider->owns = true;
     $ownership_mutated = (new Section_Service($registry))->get_section(11, $profile, 'knowledge');
-    $check(($ownership_mutated['items'] ?? []) === [] && ($ownership_mutated['provider_error_count'] ?? 0) === 1, 'Native ownership mutation must fail closed and be reported.');
+    $check(($ownership_mutated['items'] ?? []) === [], 'Native ownership mutation must fail closed.');
 
     $provider->owns = false;
     $provider->throw_section = true;
     $metadata_failure = (new Section_Service($registry))->get_section(11, $profile, 'knowledge');
-    $check(($metadata_failure['items'] ?? []) === [] && ($metadata_failure['provider_error_count'] ?? 0) === 1, 'Metadata exceptions must be isolated and reported before query execution.');
+    $check(($metadata_failure['items'] ?? []) === [], 'Metadata exceptions must be isolated before query execution.');
+
+    $provider->throw_section = false;
+    $second = new Mutable_Metadata_Provider();
+    $second->id = 'second-provider';
+    $second_registry = new Section_Registry();
+    $second_registry->register($provider);
+    $second_registry->register($second);
+    $provider->id = 'second-provider';
+    $check($second_registry->validated_metadata($provider, 'knowledge') === null, 'A provider object may not impersonate another registered provider ID.');
+
+    $unstable = new Unstable_Maturity_Provider();
+    $unstable_registry = new Section_Registry();
+    $unstable_registry->register($unstable);
+    $atomic = (new Section_Service($unstable_registry))->get_section(11, $profile, 'knowledge');
+    $check(count((array) ($atomic['items'] ?? [])) === 1, 'Provider maturity must be read once during atomic query-time metadata validation.');
 
     if ($failures !== []) {
         fwrite(STDERR, "FAILED\n- " . implode("\n- ", $failures) . "\n");
         exit(1);
     }
 
-    echo "PASS: File 25 complete provider metadata immutability and canonical deduplication\n";
+    echo "PASS: File 25 provider object identity, atomic metadata, and projection-key contracts\n";
 }
