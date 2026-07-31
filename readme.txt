@@ -4,7 +4,7 @@ Tags: design-system, profiles, timeline, accessibility, responsive, public-ui, c
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 0.10.0
+Stable tag: 0.11.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,7 +14,7 @@ File 25 global public design system, reusable components, public profiles, feder
 
 This is the same existing File 25, canonically named “Sabri Unified Global Visual Experience and Design System,” with the subtitle “Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency.” No duplicate File 26 is created for this scope.
 
-The reviewed 0.10.0 source foundation includes:
+The reviewed 0.11.0 source foundation includes:
 
 * global semantic visual tokens that inherit File 20 without duplicating its application shell;
 * reusable containers, layouts, cards, buttons, badges, notices, form controls, tables, skeletons, and visual states;
@@ -22,23 +22,21 @@ The reviewed 0.10.0 source foundation includes:
 * a bounded optional profile-section provider contract for Knowledge, Media, Reviews, Research, and Marketplace;
 * immutable provider ID, version, section, maturity, ownership, and concrete-object identity;
 * atomic provider metadata validation and truthful bounded failure reporting;
-* exact canonical-URL deduplication plus private SHA-256 projection keys for native systems sharing one application URL;
 * native read-only File 06 Knowledge, File 10 Video Wall, File 11 Reels, File 12 PDF Library, File 18 Marketplace, and File 21 timeline adapters;
-* strict File 11 duration enforcement from 60 to 600 seconds;
-* strict public-status, author/owner, password, native type/table, version-range, and no-write boundaries;
-* File 18 seller approval, public listing status, allowed deal-state, price, privacy, and native-ownership checks;
-* nested non-destructive Safe Mode and truthful Site Health diagnostics;
+* strict public-status, author/owner, password, version-range, and no-write boundaries;
 * canonical Founder, verified-Doctor, and permitted-Member profile routes;
-* File 00-authoritative public profile and contact projection;
+* exact route parity for every approved Knowledge, Media, Reviews, Research, and Marketplace provider section;
+* a schema-2, lock-guarded, idempotent rewrite migration for newly routable provider sections;
 * a machine-readable visual-acceptance matrix bound to one target commit;
-* artifact references restricted to the governed `artifacts/` root, with SHA-256, byte size, media type, timestamp, reviewer, and exact commit binding;
-* a deterministic staging ZIP builder with an embedded manifest, detached manifest, detached SHA-256 checksum, path-traversal checks, and development-file exclusion;
-* a machine-readable exact staging dependency matrix that does not fabricate File 24 or staging acceptance;
-* CI that builds the staging candidate twice, compares the bytes, verifies the checksum, and publishes a temporary downloadable workflow artifact;
-* an explicit rule that source contracts, a ZIP, and green CI are not visual or production acceptance;
+* artifact references restricted to the governed `artifacts/` root with SHA-256, byte size, media type, timestamp, reviewer, and exact commit binding;
+* a deterministic staging ZIP builder with embedded/detached manifests, checksum, safe paths, and development-file exclusion;
+* an embedded-manifest installed-candidate verifier that rejects tampering, missing/extra files, symlinks, unsafe paths, wrong commit, and version mismatch;
+* an exact Hostinger staging preflight for the canonical staging host, HTTPS, disabled registration, noindex, Safe Mode, dependencies, and expected commit;
+* a privacy-safe WP-CLI staging command and machine-readable staging scenario plan;
+* an explicit rule that source contracts, a ZIP, preflight, and green CI are not visual or production acceptance;
 * PHP 8.0/8.3 and JavaScript CI.
 
-This release is not production-complete. Exact multi-plugin staging, File 24 runtime integration, native Reviews/Research adapters, captured visual-regression evidence, migration, rollback, real-user testing, performance, deployment, and monitoring remain pending.
+This release is not production-complete. Exact multi-plugin staging, File 24 runtime integration, native Reviews/Research adapters, captured visual-regression evidence, rollback, real-user testing, performance, deployment, and monitoring remain pending.
 
 == Installation ==
 
@@ -46,50 +44,46 @@ This release is not production-complete. Exact multi-plugin staging, File 24 run
 2. Verify the detached SHA-256 checksum before extracting the File 25 staging ZIP.
 3. Upload the `sabri-public-experience` folder to `/wp-content/plugins/`.
 4. Activate File 25 only on staging and confirm File 00 Founder identity.
-5. Refresh permalinks if profile routes are unresolved.
-6. Review Site Health and the visual-acceptance contract; source contracts, a package, and green CI are not production acceptance.
+5. Run `wp sabri file25 staging-probe --expected-commit=<sha>` and correct every fail-closed gate.
+6. Schema 2 refreshes expanded provider routes once; confirm Marketplace and Research route parity.
+7. Review Site Health and visual acceptance; a package and green CI are not production acceptance.
 
 == Changelog ==
 
+= 0.11.0 =
+* Fixed unreachable Research and Marketplace profile sections by deriving rewrite routes from the approved provider-section registry.
+* Added an idempotent schema-2 rewrite migration with bounded lock and stale-lock recovery.
+* Added read-only installed-candidate verification against `STAGING-MANIFEST.json`.
+* Added the exact Hostinger staging preflight, privacy-safe WP-CLI command, and machine-readable staging test plan.
+* Preserved live, File 20 shell ownership, native module ownership, Draft PR status, and the rule that preflight does not imply acceptance.
+
 = 0.10.0 =
-* Hardened evidence references to repository-relative `artifacts/` paths and rejected external, traversal, query, fragment, control-character, and backslash references.
-* Required evidence byte size and allow-listed media type in addition to SHA-256, reviewer, timestamp, and exact commit binding.
-* Added cryptographic metadata requirements for Founder sign-off evidence.
-* Added a deterministic staging-package builder with embedded and detached manifests, detached checksum, safe path validation, payload hash verification, and development-file exclusion.
-* Added the machine-readable staging dependency matrix for Files 00, 03, 06, 10, 11, 12, 18, 20, 21, 24, and 25.
-* Added CI reproducibility checks and temporary downloadable staging-candidate artifacts.
+* Added artifact-integrity evidence and deterministic staging packaging.
+* Added independent downloaded-artifact verification and exact dependency matrix.
 
 = 0.9.0 =
-* Bound provider metadata to the concrete registered object and made query-time validation atomic.
-* Added private SHA-256 projection keys for distinct native objects that share one application URL.
-* Bound every visual evidence record, staging record, and Founder sign-off to one exact target commit and rejected normalized invalid timestamps.
-* Added the native read-only File 18 Marketplace profile adapter for approved seller-owned public listings.
-* Preserved File 18 ownership of sellers, listings, moderation, contacts, chat, offers, metrics, files, and direct-deal workflows.
+* Added immutable provider identity, File 18 Marketplace adapter, and exact-commit visual evidence.
 
 = 0.8.0 =
-* Added native read-only File 10 Video Wall, File 11 Reels, and File 12 PDF Library Media adapters after exact package review.
-* Froze provider maturity and ownership metadata and reported consistency failures truthfully.
-* Deduplicated cards by exact canonical destination before fallback metadata.
-* Replaced boolean visual evidence placeholders with bounded artifact references, SHA-256 hashes, timestamps, reviewers, staging runtime evidence, and commit-bound Founder sign-off.
+* Added native File 10/11/12 Media adapters and evidence integrity.
 
 = 0.7.0 =
-* Froze registered optional-provider ID, version, and section metadata and added query-time consistency checks.
-* Added the governed visual-acceptance Definition-of-Done contract.
+* Added immutable optional-provider metadata and visual-acceptance Definition of Done.
 
 = 0.6.0 =
-* Added bounded optional profile sections and the native read-only File 06 Knowledge adapter.
+* Added governed optional profile sections and File 06 Knowledge adapter.
 
 = 0.5.0 =
 * Added same-origin URL security and reusable content cards.
 
 = 0.4.0 =
-* Added the canonical global visual-system contract and nested Safe Mode boundaries.
+* Added the canonical global visual-system contract and nested Safe Mode.
 
 = 0.3.0 =
-* Added a native read-only File 21 timeline adapter.
+* Added native read-only File 21 timeline adapter.
 
 = 0.2.0 =
-* Added File 20 shell integration and Founder/Doctor public profile foundations.
+* Added File 20 shell integration and Founder/Doctor profile foundations.
 
 = 0.1.0 =
-* Initial foundation followed by source review and defect correction.
+* Initial reviewed foundation.
