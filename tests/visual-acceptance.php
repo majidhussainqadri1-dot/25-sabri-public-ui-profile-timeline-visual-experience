@@ -20,9 +20,12 @@ $check = static function (bool $condition, string $message) use (&$failures): vo
 $contract = Visual_Acceptance::contract();
 $check(($contract['owner'] ?? '') === 'file-25', 'File 25 must own visual acceptance.');
 $check(($contract['shell_owner'] ?? '') === 'file-20', 'File 20 must remain the shell owner.');
-$check(($contract['contract_version'] ?? '') === '1.2.0', 'Visual acceptance contract version must be current.');
+$check(($contract['contract_version'] ?? '') === '1.3.0', 'Visual acceptance contract version must be current.');
 $check(($contract['green_ci_is_acceptance'] ?? true) === false, 'Green CI must not be treated as visual acceptance.');
 $check(($contract['target_commit_sha_required'] ?? false) === true, 'All evidence must be bound to one target commit.');
+$check(($contract['artifact_root'] ?? '') === 'artifacts/', 'Evidence references must use the governed artifacts root.');
+$check(in_array('byte_size', (array) ($contract['evidence_record_required_fields'] ?? []), true), 'Artifact byte size must be mandatory.');
+$check(in_array('media_type', (array) ($contract['evidence_record_required_fields'] ?? []), true), 'Artifact media type must be mandatory.');
 $check(($contract['staging_required'] ?? false) === true, 'Staging evidence must remain mandatory.');
 $check(($contract['founder_signoff_required'] ?? false) === true, 'Founder sign-off must remain mandatory.');
 $check(count((array) ($contract['viewports'] ?? [])) === 6, 'Six canonical viewport classes are required.');
@@ -42,6 +45,8 @@ $record = static function (string $key) use ($target): array {
         'status' => 'pass',
         'artifact_ref' => 'artifacts/visual/' . $key . '.png',
         'sha256' => str_repeat('a', 64),
+        'byte_size' => 4096,
+        'media_type' => 'image/png',
         'commit_sha' => $target,
         'recorded_at' => '2026-07-31T00:00:00Z',
         'reviewer' => 'QA Reviewer',
@@ -70,6 +75,9 @@ $complete = [
         'signer' => 'Founder',
         'commit_sha' => $target,
         'evidence_ref' => 'artifacts/signoff/founder.json',
+        'evidence_sha256' => str_repeat('c', 64),
+        'evidence_byte_size' => 2048,
+        'evidence_media_type' => 'application/json',
         'recorded_at' => '2026-07-31T00:00:00Z',
     ],
 ];
@@ -94,19 +102,31 @@ $check(($summary['accepted'] ?? false) === true && ($summary['error_count'] ?? 1
 
 $forged = $complete;
 $forged['viewports']['mobile-small'] = true;
-$forged['founder_signoff']['commit_sha'] = str_repeat('c', 40);
+$forged['founder_signoff']['commit_sha'] = str_repeat('d', 40);
 $forged['surfaces']['marketplace-section']['recorded_at'] = '2026-02-30T25:61:61Z';
 $forged['staging_environment']['site_url'] = 'https://staging.example.test/?preview=1';
 $forged_errors = Visual_Acceptance::validate_evidence($forged);
 $check($forged_errors !== [], 'Placeholders, commit mismatch, normalized dates, and noncanonical staging URLs must be rejected.');
 
 $mixed_commit = $complete;
-$mixed_commit['surfaces']['founder-overview']['commit_sha'] = str_repeat('d', 40);
+$mixed_commit['surfaces']['founder-overview']['commit_sha'] = str_repeat('e', 40);
 $check(Visual_Acceptance::validate_evidence($mixed_commit) !== [], 'Evidence from another commit may not be mixed into the target manifest.');
+
+$external_ref = $complete;
+$external_ref['surfaces']['founder-overview']['artifact_ref'] = 'https://evil.example/evidence.png';
+$check(Visual_Acceptance::validate_evidence($external_ref) !== [], 'External artifact references must be rejected.');
+
+$traversal_ref = $complete;
+$traversal_ref['surfaces']['founder-overview']['artifact_ref'] = 'artifacts/../private/evidence.png';
+$check(Visual_Acceptance::validate_evidence($traversal_ref) !== [], 'Artifact path traversal must be rejected.');
+
+$missing_metadata = $complete;
+unset($missing_metadata['surfaces']['founder-overview']['byte_size'], $missing_metadata['surfaces']['founder-overview']['media_type']);
+$check(Visual_Acceptance::validate_evidence($missing_metadata) !== [], 'Evidence without byte size and media type must be rejected.');
 
 if ($failures !== []) {
     fwrite(STDERR, "FAILED\n- " . implode("\n- ", $failures) . "\n");
     exit(1);
 }
 
-echo "PASS: File 25 commit-bound strict visual acceptance evidence contract\n";
+echo "PASS: File 25 commit-bound artifact-integrity visual acceptance contract\n";
