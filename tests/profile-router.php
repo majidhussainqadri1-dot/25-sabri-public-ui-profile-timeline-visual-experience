@@ -8,6 +8,7 @@ if (! defined('ABSPATH')) {
 
 $GLOBALS['spux_test_query_vars'] = [];
 $GLOBALS['spux_test_rewrite_rules'] = [];
+$GLOBALS['spux_test_right_sidebar'] = false;
 
 if (! function_exists('sanitize_key')) {
     function sanitize_key(string $value): string
@@ -43,6 +44,17 @@ if (! function_exists('add_filter')) {
     function add_filter(string $hook, callable $callback, int $priority = 10, int $accepted_args = 1): void
     {
         unset($hook, $callback, $priority, $accepted_args);
+    }
+}
+if (! function_exists('apply_filters')) {
+    function apply_filters(string $hook, mixed $value, mixed ...$args): mixed
+    {
+        unset($args);
+        if ($hook === 'sabri_public_experience/profile_right_sidebar_available') {
+            return $GLOBALS['spux_test_right_sidebar'];
+        }
+
+        return $value;
     }
 }
 if (! function_exists('flush_rewrite_rules')) {
@@ -87,6 +99,10 @@ $GLOBALS['spux_test_query_vars'] = [
     'spux_profile_section' => 'marketplace',
 ];
 $check($router->is_profile_request(), 'Marketplace Doctor profile route must be recognized.');
+$check($router->shell_layout_mode('three') === 'two', 'Doctor profiles must not force an empty right sidebar.');
+$GLOBALS['spux_test_right_sidebar'] = true;
+$check($router->shell_layout_mode('two') === 'three', 'Three-column mode is allowed only after real sidebar content is confirmed.');
+$GLOBALS['spux_test_right_sidebar'] = false;
 
 $GLOBALS['spux_test_query_vars']['spux_profile_section'] = 'research';
 $check($router->is_profile_request(), 'Research Doctor profile route must be recognized.');
@@ -100,10 +116,11 @@ $GLOBALS['spux_test_query_vars'] = [
     'spux_profile_section' => 'overview',
 ];
 $check(! $router->is_profile_request(), 'Numeric member slugs must remain rejected.');
+$check($router->shell_layout_mode('three') === 'three', 'Non-profile requests must preserve File 20 layout decisions.');
 
 if ($failures !== []) {
     fwrite(STDERR, "FAILED\n- " . implode("\n- ", $failures) . "\n");
     exit(1);
 }
 
-echo "PASS: File 25 provider-route parity and fail-closed profile routing\n";
+echo "PASS: File 25 provider-route parity and conditional profile layout\n";
