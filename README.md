@@ -14,8 +14,8 @@ Implemented in `0.9.0`:
 - reusable `sabri-ui-*` components, states, notices, forms, tables, and content cards;
 - strict same-origin links and deterministic UTC dates;
 - bounded optional sections limited to Knowledge, Media, Reviews, Research, and Marketplace;
-- immutable provider ID, version, section, maturity, native ownership, and concrete object identity;
-- atomic one-read metadata validation and bounded provider-error reporting;
+- immutable timeline/section provider ID, version, maturity, section where applicable, native ownership, and concrete object identity;
+- atomic one-read provider metadata validation and bounded provider-error reporting;
 - canonical-destination deduplication plus server-only SHA-256 projection keys for native systems sharing one application URL;
 - native read-only File 06 Homeopathy Encyclopedia adapter;
 - native read-only File 10 Video Wall adapter excluding Reels;
@@ -78,6 +78,7 @@ The Founder-approved Microsoft Word specification remains the full governance so
 composer validate --strict --no-check-publish
 find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
 php tests/run.php
+php tests/timeline-provider-metadata.php
 php tests/profile-data.php
 php tests/file21-provider.php
 php tests/design-system.php
@@ -91,6 +92,7 @@ php tests/visual-acceptance.php
 php tests/safe-mode.php
 php tools/verify-structure.php
 php tools/verify-file06-and-components.php
+php tools/verify-provider-metadata.php
 node --check assets/js/public.js
 ```
 
