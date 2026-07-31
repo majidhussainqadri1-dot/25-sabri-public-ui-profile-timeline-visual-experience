@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.10.0 — Artifact Integrity and Deterministic Staging Candidate
+
+### Added
+
+- Deterministic `tools/build-staging-package.php` builder using a bounded payload allow list and `SOURCE_DATE_EPOCH`.
+- Embedded `STAGING-MANIFEST.json`, detached manifest, and detached SHA-256 checksum.
+- Archive reopening and verification of entry names, payload hashes, byte sizes, root prefix, and embedded-manifest equality.
+- Development-file exclusion for `.github`, tests, tools, docs, build output, dependencies, and coverage artifacts.
+- Machine-readable `config/staging-dependencies.json` for Files 00, 03, 06, 10, 11, 12, 18, 20, 21, 24, and 25.
+- CI staging-package job that builds the candidate twice, requires byte-for-byte reproducibility, verifies the detached checksum, and uploads a temporary workflow artifact.
+- Release-engineering contract tests on PHP 8.0 and PHP 8.3.
+
+### Corrected during seventh review
+
+- Rejected arbitrary external evidence references that could point outside controlled acceptance artifacts.
+- Rejected path traversal, absolute paths, backslashes, queries, fragments, whitespace/control characters, and colon-bearing artifact references.
+- Required artifact byte size and allow-listed media type in addition to SHA-256, timestamp, reviewer, and target commit.
+- Added SHA-256, byte size, and media type requirements for Founder sign-off evidence.
+- Prevented staging packages from silently including development-only or dependency directories.
+- Prevented package versions from diverging across the plugin header, runtime constant, and WordPress stable tag.
+
+### Acceptance boundary
+
+- A deterministic package and green CI produce a staging candidate only.
+- Exact multi-plugin staging, File 24 runtime integration, real visual/accessibility evidence, rollback, performance, deployment, monitoring, and Founder acceptance remain mandatory.
+
 ## 0.9.0 — Atomic Providers, File 18 Marketplace, and Commit-Bound Evidence
 
 ### Added
