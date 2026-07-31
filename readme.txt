@@ -4,35 +4,37 @@ Tags: design-system, profiles, timeline, accessibility, responsive, public-ui, c
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 0.8.0
+Stable tag: 0.9.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-File 25 global public design system, reusable components, public profiles, federated timelines, governed Knowledge and Media profile sections, responsive refinement, accessibility, and visual-acceptance evidence for the Sabri Social Homeopathy Platform.
+File 25 global public design system, reusable components, public profiles, federated timelines, governed Knowledge, Media, and Marketplace profile sections, responsive refinement, accessibility, and visual-acceptance evidence for the Sabri Social Homeopathy Platform.
 
 == Description ==
 
 This is the same existing File 25, canonically named “Sabri Unified Global Visual Experience and Design System,” with the subtitle “Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency.” No duplicate File 26 is created for this scope.
 
-The reviewed 0.8.0 source foundation includes:
+The reviewed 0.9.0 source foundation includes:
 
 * global semantic visual tokens that inherit File 20 without duplicating its application shell;
 * reusable containers, layouts, cards, buttons, badges, notices, form controls, tables, skeletons, and visual states;
 * exact same-origin URL enforcement for reusable actions, cards, and media;
 * a bounded optional profile-section provider contract for Knowledge, Media, Reviews, Research, and Marketplace;
-* immutable provider ID, version, section, maturity, and ownership snapshots with query-time consistency validation;
-* truthful provider metadata-failure counting and canonical-URL deduplication;
-* native read-only File 06 Knowledge, File 10 Video Wall, File 11 Reels, File 12 PDF Library, and File 21 timeline adapters;
+* immutable provider ID, version, section, maturity, ownership, and concrete-object identity;
+* atomic provider metadata validation and truthful bounded failure reporting;
+* exact canonical-URL deduplication plus private SHA-256 projection keys for native systems sharing one application URL;
+* native read-only File 06 Knowledge, File 10 Video Wall, File 11 Reels, File 12 PDF Library, File 18 Marketplace, and File 21 timeline adapters;
 * strict File 11 duration enforcement from 60 to 600 seconds;
-* strict public-status, author, password, post-type, version-range, and no-write boundaries for native adapters;
+* strict public-status, author/owner, password, native type/table, version-range, and no-write boundaries;
+* File 18 seller approval, public listing status, allowed deal-state, price, privacy, and native-ownership checks;
 * nested non-destructive Safe Mode and truthful Site Health diagnostics;
 * canonical Founder, verified-Doctor, and permitted-Member profile routes;
 * File 00-authoritative public profile and contact projection;
-* a machine-readable visual-acceptance Definition-of-Done matrix with cryptographically referenced evidence records, six viewports, RTL/LTR, light/dark/forced-colors, normal/reduced motion, 100/200/400 percent zoom, keyboard/pointer/touch/screen-reader input, critical surfaces, staging evidence, and Founder sign-off;
+* a machine-readable visual-acceptance matrix bound to one target commit, with artifact checksums, strict timestamps, six viewports, RTL/LTR, light/dark/forced-colors, normal/reduced motion, 100/200/400 percent zoom, keyboard/pointer/touch/screen-reader input, critical surfaces, staging evidence, and Founder sign-off;
 * an explicit rule that source contracts and green CI are not visual acceptance;
 * PHP 8.0/8.3 and JavaScript CI.
 
-This release is not production-complete. Exact multi-plugin staging, File 24 runtime integration, native Reviews/Research/Marketplace adapters, captured visual-regression evidence, migration, rollback, real-user testing, performance, packaging, and deployment remain pending.
+This release is not production-complete. Exact multi-plugin staging, File 24 runtime integration, native Reviews/Research adapters, captured visual-regression evidence, migration, rollback, real-user testing, performance, packaging, and deployment remain pending.
 
 == Installation ==
 
@@ -43,6 +45,13 @@ This release is not production-complete. Exact multi-plugin staging, File 24 run
 5. Review Site Health and the visual-acceptance contract; source contracts and green CI are not production acceptance.
 
 == Changelog ==
+
+= 0.9.0 =
+* Bound provider metadata to the concrete registered object and made query-time validation atomic.
+* Added private SHA-256 projection keys for distinct native objects that share one application URL.
+* Bound every visual evidence record, staging record, and Founder sign-off to one exact target commit and rejected normalized invalid timestamps.
+* Added the native read-only File 18 Marketplace profile adapter for approved seller-owned public listings.
+* Preserved File 18 ownership of sellers, listings, moderation, contacts, chat, offers, metrics, files, and direct-deal workflows.
 
 = 0.8.0 =
 * Added native read-only File 10 Video Wall, File 11 Reels, and File 12 PDF Library Media adapters after exact package review.
