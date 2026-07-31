@@ -65,11 +65,11 @@ final class Dependency_Manager
             'security_center' => [
                 'required' => false,
                 'production_required' => true,
-                'available' => $this->native->security_center_available(),
-                'version' => defined('SABRI_SECURITY_CENTER_VERSION')
-                    ? (string) SABRI_SECURITY_CENTER_VERSION
-                    : (defined('SABRI_SPRC_VERSION') ? (string) SABRI_SPRC_VERSION : ''),
-                'contract' => 'File 24 security, privacy, compliance, and resilience API',
+                'available' => File_24_Integration::is_compatible(),
+                'version' => File_24_Integration::current_version(),
+                'minimum' => File_24_Integration::REVIEWED_MINIMUM_VERSION,
+                'maximum_exclusive' => File_24_Integration::REVIEWED_MAXIMUM_VERSION,
+                'contract' => 'File 24 SPCRC module-manifest, advisory security-state, privacy, audit, incident, and resilience contract',
             ],
         ];
 
