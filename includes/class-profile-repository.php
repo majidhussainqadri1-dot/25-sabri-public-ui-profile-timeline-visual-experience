@@ -12,6 +12,8 @@ if (! defined('ABSPATH')) {
 
 final class Profile_Repository
 {
+    public const FOUNDER_DISPLAY_NAME = 'Dr. Allamah Majid Hussain Sabri Muhaddith Mursheed';
+
     public function __construct(
         private Visibility_Policy $visibility,
         private Native_Integration $native
@@ -69,9 +71,10 @@ final class Profile_Repository
             $cover_id = (int) ($founder_source['cover_id'] ?? $cover_id);
         }
 
-        $avatar = $photo_id > 0
-            ? wp_get_attachment_image_url($photo_id, 'medium')
-            : get_avatar_url($user_id, ['size' => 256]);
+        // File 25 does not silently call an external avatar service. Only local,
+        // same-origin approved media is projected; otherwise the template renders
+        // privacy-safe initials.
+        $avatar = $photo_id > 0 ? wp_get_attachment_image_url($photo_id, 'medium') : '';
         $cover = $cover_id > 0 ? wp_get_attachment_image_url($cover_id, 'large') : '';
         $headline = $profile_class === 'founder'
             ? (string) ($founder_source['title'] ?? '')
@@ -102,7 +105,7 @@ final class Profile_Repository
         $all_labels = $this->section_labels($profile_class);
         $section_labels = array_intersect_key($all_labels, array_flip($available_sections));
         $default_name = $profile_class === 'founder'
-            ? (string) get_option('sabri_public_experience_founder_display_name', 'Dr. Allamah Majid Hussain Sabri Muhaddith Mursheed')
+            ? self::FOUNDER_DISPLAY_NAME
             : (string) $user->display_name;
 
         $profile = [
@@ -111,8 +114,8 @@ final class Profile_Repository
             'class' => $profile_class,
             'role_label' => $this->role_label($profile_class),
             'verified' => in_array($profile_class, ['founder', 'doctor'], true),
-            'avatar_url' => is_string($avatar) ? $avatar : '',
-            'cover_url' => is_string($cover) ? $cover : '',
+            'avatar_url' => Public_URL::sanitize_same_site(is_string($avatar) ? $avatar : '', false),
+            'cover_url' => Public_URL::sanitize_same_site(is_string($cover) ? $cover : '', false),
             'headline' => $headline,
             'bio' => $bio,
             'country' => $country,
@@ -131,17 +134,27 @@ final class Profile_Repository
         $filtered = (array) apply_filters('sabri_public_experience/public_profile_data', $profile, $user);
 
         // Public identity and policy fields remain authoritative. Extensions may
-        // modify bounded presentation text and media only.
-        $filtered_name = $this->plain_text((string) ($filtered['display_name'] ?? $profile['display_name']), 190);
-        $profile['display_name'] = $filtered_name !== '' ? $filtered_name : $this->plain_text($default_name, 190);
+        // modify bounded presentation text and local presentation media only.
+        if ($profile_class === 'founder') {
+            $profile['display_name'] = self::FOUNDER_DISPLAY_NAME;
+        } else {
+            $filtered_name = $this->plain_text((string) ($filtered['display_name'] ?? $profile['display_name']), 190);
+            $profile['display_name'] = $filtered_name !== '' ? $filtered_name : $this->plain_text($default_name, 190);
+        }
         $profile['headline'] = $this->plain_text((string) ($filtered['headline'] ?? $profile['headline']), 300);
         $profile['bio'] = $this->plain_text((string) ($filtered['bio'] ?? $profile['bio']), 12000);
-        $profile['avatar_url'] = esc_url_raw((string) ($filtered['avatar_url'] ?? $profile['avatar_url']));
-        $profile['cover_url'] = esc_url_raw((string) ($filtered['cover_url'] ?? $profile['cover_url']));
+        $profile['avatar_url'] = Public_URL::sanitize_same_site(
+            $filtered['avatar_url'] ?? $profile['avatar_url'],
+            false
+        );
+        $profile['cover_url'] = Public_URL::sanitize_same_site(
+            $filtered['cover_url'] ?? $profile['cover_url'],
+            false
+        );
         $profile['country'] = $this->plain_text((string) $profile['country'], 100);
         $profile['city'] = $this->plain_text((string) $profile['city'], 100);
         $profile['location_text'] = $this->plain_text((string) $profile['location_text'], 240);
-        $profile['canonical_url'] = esc_url_raw((string) $profile['canonical_url']);
+        $profile['canonical_url'] = Public_URL::sanitize_same_site($profile['canonical_url'], false);
 
         return $profile;
     }
