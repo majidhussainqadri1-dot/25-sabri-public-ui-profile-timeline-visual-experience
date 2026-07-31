@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.12.0 — Exact File 24 Integration and No-Store Security Boundary
+
+### Added
+
+- Reviewed File 24 integration for the exact `SPCRC_VERSION` runtime contract.
+- Fail-closed compatibility range `>=0.25.3 <0.26.0`.
+- Bounded `file-25-public-experience` manifest through `spcrc/module_manifests`.
+- Site Health diagnostics for absent, incompatible, and compatible File 24 states.
+- Advisory `elevated-monitoring` request when File 25 enters Safe Mode.
+- File 24 integration contract, staging-matrix records, regression tests, CI gate, and review documentation.
+
+### Corrected during tenth review
+
+- Removed File 25's ineffective File 24 detection through nonexistent `SABRI_SECURITY_CENTER_VERSION` and `SABRI_SPRC_VERSION` constants.
+- Replaced it with the exact reviewed File 24 constant `SPCRC_VERSION`.
+- Kept HTML profile responses explicitly `no-store, private` in addition to the existing no-store REST responses.
+- Prevented duplicate or forged File 25 manifests from overriding the canonical bounded manifest.
+- Preserved File 24 ownership of security governance, privacy orchestration, audit evidence, incidents, controls, findings, and resilience.
+
+### Acceptance boundary
+
+- File 24 source compatibility is reviewed, but File 24 and File 25 remain pending exact Hostinger staging.
+- No versioned shared-cache partition contract has been accepted.
+- File 25 claims no File 24 operational capabilities or privacy operations.
+- PR merge, deployment, visual/accessibility evidence, rollback proof, and Founder acceptance remain pending.
+
 ## 0.11.0 — Provider Route Parity and Hostinger Installed-Candidate Preflight
 
 ### Added
@@ -22,7 +48,7 @@
 
 - The staging probe is read-only and contains no user or patient data.
 - A passing preflight permits manual Hostinger staging tests only.
-- Live remains untouched; PR merge, deployment, File 24 acceptance, visual evidence, rollback evidence, and Founder sign-off remain pending.
+- Live remains untouched; PR merge, deployment, visual evidence, rollback evidence, and Founder sign-off remain pending.
 
 ## 0.10.0 — Artifact Integrity and Deterministic Staging Candidate
 
