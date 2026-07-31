@@ -8,6 +8,7 @@ $required = [
     'sabri-public-experience.php',
     'readme.txt',
     'composer.json',
+    'config/staging-dependencies.json',
     'includes/class-plugin.php',
     'includes/class-safe-mode.php',
     'includes/class-public-url.php',
@@ -58,7 +59,9 @@ $required = [
     'tests/file10-12-media-providers.php',
     'tests/file18-marketplace-provider.php',
     'tests/visual-acceptance.php',
+    'tests/release-engineering.php',
     'tests/safe-mode.php',
+    'tools/build-staging-package.php',
     'SECURITY.md',
     'PRIVACY.md',
     'docs/ARCHITECTURE.md',
@@ -67,6 +70,8 @@ $required = [
     'docs/DESIGN-SYSTEM-CONTRACT.md',
     'docs/CONTENT-CARD-CONTRACT.md',
     'docs/OPTIONAL-PROFILE-SECTIONS-CONTRACT.md',
+    'docs/STAGING-PACKAGE-CONTRACT.md',
+    'docs/SEVENTH-REVIEW-AND-STAGING-PACKAGE-2026-07-31.md',
     'docs/FILE18-MARKETPLACE-ADAPTER-IMPLEMENTATION.md',
     'docs/SIXTH-REVIEW-AND-MARKETPLACE-2026-07-31.md',
     'docs/FIFTH-REVIEW-AND-NATIVE-MEDIA-2026-07-31.md',
@@ -131,8 +136,8 @@ $versions = array_filter([$header_match[1] ?? '', $stable_match[1] ?? '', $const
 if (count($versions) !== 3 || count(array_unique($versions)) !== 1) {
     $errors[] = 'Plugin header, constant, and readme stable-tag versions do not match.';
 }
-if (($header_match[1] ?? '') !== '0.9.0') {
-    $errors[] = 'Expected reviewed File 25 runtime version 0.9.0.';
+if (($header_match[1] ?? '') !== '0.10.0') {
+    $errors[] = 'Expected reviewed File 25 runtime version 0.10.0.';
 }
 if (! str_contains($main, 'Sabri Unified Global Visual Experience and Design System')) {
     $errors[] = 'Founder-approved canonical File 25 name is missing from the plugin header.';
@@ -177,7 +182,7 @@ if (! str_contains($shell, '$base[\'owns_global_shell\'] = false')) {
 }
 
 $design_system = file_get_contents($root . '/includes/class-design-system.php') ?: '';
-foreach (['1.4.0', 'reusable-content-cards', 'optional-profile-sections', 'Content_Cards::contract', 'Section_Registry::approved_sections', 'provider_metadata_bound_to_concrete_object', 'projection_key', 'rendered_publicly', 'creates_file_26', 'shell_is_available'] as $marker) {
+foreach (['1.5.0', 'reusable-content-cards', 'optional-profile-sections', 'deterministic-staging-packaging', 'Content_Cards::contract', 'Section_Registry::approved_sections', 'provider_metadata_bound_to_concrete_object', 'projection_key', 'rendered_publicly', 'build-staging-package.php', 'staging-dependencies.json', 'STAGING-MANIFEST.json', 'creates_file_26', 'shell_is_available'] as $marker) {
     if (! str_contains($design_system, $marker)) {
         $errors[] = 'Design-system contract marker missing: ' . $marker;
     }
@@ -218,7 +223,7 @@ if (preg_match('/update_|insert_|delete_|wp_insert_post|wp_update_post|wp_delete
 }
 
 $acceptance = file_get_contents($root . '/includes/class-visual-acceptance.php') ?: '';
-foreach (['1.2.0', 'target_commit_sha', 'commit_sha', 'media-section', 'marketplace-section', 'artifact_ref', 'sha256', 'recorded_at', 'reviewer', 'staging_environment', 'founder_signoff', 'checkdate', 'getLastErrors', 'summarize'] as $marker) {
+foreach (['1.3.0', 'target_commit_sha', 'commit_sha', 'media-section', 'marketplace-section', 'artifact_root', 'artifacts/', 'artifact_ref', 'sha256', 'byte_size', 'media_type', 'evidence_sha256', 'evidence_byte_size', 'evidence_media_type', 'recorded_at', 'reviewer', 'staging_environment', 'founder_signoff', 'checkdate', 'getLastErrors', 'summarize'] as $marker) {
     if (! str_contains($acceptance, $marker)) {
         $errors[] = 'Visual acceptance evidence invariant missing: ' . $marker;
     }
@@ -265,13 +270,31 @@ foreach (['boundary_stack', 'current_boundary', 'array_pop'] as $marker) {
     }
 }
 
+$builder = file_get_contents($root . '/tools/build-staging-package.php') ?: '';
+foreach (['ZipArchive', 'STAGING-MANIFEST.json', 'source_date_epoch', 'discover_payload', 'payload_path_is_allowed', 'archive_name_is_safe', 'verify_archive', 'hash_file'] as $marker) {
+    if (! str_contains($builder, $marker)) {
+        $errors[] = 'Staging package builder invariant missing: ' . $marker;
+    }
+}
+
+$dependency_matrix_raw = file_get_contents($root . '/config/staging-dependencies.json') ?: '';
+$dependency_matrix = json_decode($dependency_matrix_raw, true);
+if (! is_array($dependency_matrix) || ($dependency_matrix['runtime_version'] ?? '') !== '0.10.0') {
+    $errors[] = 'Staging dependency matrix is invalid or does not match runtime 0.10.0.';
+}
+if (($dependency_matrix['environment']['live_changes_allowed'] ?? true) !== false) {
+    $errors[] = 'Staging dependency matrix must prohibit live changes.';
+}
+
 $composer_raw = file_get_contents($root . '/composer.json') ?: '';
 $composer = json_decode($composer_raw, true);
 if (! is_array($composer) || ($composer['require']['php'] ?? '') !== '>=8.0') {
     $errors[] = 'Composer PHP requirement is invalid or missing.';
 }
-if (! str_contains($composer_raw, 'tests/file18-marketplace-provider.php')) {
-    $errors[] = 'Composer test suite does not include File 18 Marketplace coverage.';
+foreach (['tests/file18-marketplace-provider.php', 'tests/release-engineering.php'] as $test_marker) {
+    if (! str_contains($composer_raw, $test_marker)) {
+        $errors[] = 'Composer test suite is missing: ' . $test_marker;
+    }
 }
 
 if ($errors !== []) {
@@ -279,4 +302,4 @@ if ($errors !== []) {
     exit(1);
 }
 
-echo "PASS: File 25 global visual system package structure\n";
+echo "PASS: File 25 global visual system and staging package structure\n";
