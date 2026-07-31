@@ -11,7 +11,7 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
 /** Canonical design-system contract for File 25. */
 final class Design_System
 {
-    public const CONTRACT_VERSION = '1.5.0';
+    public const CONTRACT_VERSION = '1.6.0';
     public const CANONICAL_NAME = 'Sabri Unified Global Visual Experience and Design System';
     public const SUBTITLE = 'Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency';
 
@@ -98,6 +98,7 @@ final class Design_System
                 'optional-profile-sections',
                 'visual-acceptance-evidence',
                 'deterministic-staging-packaging',
+                'installed-staging-preflight',
             ],
             'tokens' => self::tokens(),
             'components' => Components::contract(),
@@ -118,6 +119,7 @@ final class Design_System
                     'purpose' => 'deduplicate native objects that share one application URL',
                 ],
             ],
+            'staging_probe' => Staging_Probe::contract(),
             'staging_package' => [
                 'contract_version' => '1.0.0',
                 'builder' => 'tools/build-staging-package.php',
