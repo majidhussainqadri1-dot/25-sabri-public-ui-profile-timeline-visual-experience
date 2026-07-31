@@ -39,6 +39,9 @@ jobs:
       - name: Reviewed timeline foundation contracts
         run: php tests/run.php
 
+      - name: Immutable timeline provider object metadata contract
+        run: php tests/timeline-provider-metadata.php
+
       - name: Structured public profile contracts
         run: php tests/profile-data.php
 
