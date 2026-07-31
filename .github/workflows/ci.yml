@@ -48,6 +48,9 @@ jobs:
       - name: Provider route parity and fail-closed profile routing
         run: php tests/profile-router.php
 
+      - name: Master-plan and File 25 final-specification reconciliation
+        run: php tests/master-plan-reconciliation.php
+
       - name: File 21 timeline adapter contract
         run: php tests/file21-provider.php
 
