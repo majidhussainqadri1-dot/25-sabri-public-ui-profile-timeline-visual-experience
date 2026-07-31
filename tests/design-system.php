@@ -7,7 +7,7 @@ namespace {
         define('ABSPATH', __DIR__ . '/fixtures/');
     }
     if (! defined('SABRI_PUBLIC_EXPERIENCE_VERSION')) {
-        define('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.9.0');
+        define('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.10.0');
     }
     if (! function_exists('home_url')) {
         function home_url(string $path = ''): string
@@ -64,14 +64,16 @@ namespace {
     $contract = Design_System::contract();
     $check(($contract['file'] ?? null) === 25, 'Design system contract must remain owned by File 25.');
     $check(($contract['canonical_name'] ?? '') === 'Sabri Unified Global Visual Experience and Design System', 'Canonical File 25 name must match the Founder-approved decision.');
-    $check(($contract['contract_version'] ?? '') === '1.4.0', 'Design-system contract version must record atomic providers and commit-bound evidence.');
-    $check(($contract['runtime_version'] ?? '') === '0.9.0', 'Design-system runtime version must match File 25 0.9.0.');
+    $check(($contract['contract_version'] ?? '') === '1.5.0', 'Design-system contract version must record deterministic staging packaging.');
+    $check(($contract['runtime_version'] ?? '') === '0.10.0', 'Design-system runtime version must match File 25 0.10.0.');
     $check(($contract['creates_file_26'] ?? true) === false, 'Design system contract must explicitly reject a duplicate File 26.');
     $check(($contract['global_shell_owner'] ?? '') === 'file-20', 'File 20 must remain the global shell owner.');
     $check(($contract['visual_system_owner'] ?? '') === 'file-25', 'File 25 must remain the visual-system owner.');
     $check(in_array('visual-acceptance-evidence', (array) ($contract['scope'] ?? []), true), 'Visual acceptance evidence scope must be present.');
+    $check(in_array('deterministic-staging-packaging', (array) ($contract['scope'] ?? []), true), 'Deterministic staging packaging scope must be present.');
     $check(($contract['visual_acceptance']['green_ci_is_acceptance'] ?? true) === false, 'Green CI must not become visual acceptance.');
     $check(($contract['visual_acceptance']['target_commit_sha_required'] ?? false) === true, 'Visual evidence must be bound to one target commit.');
+    $check(($contract['visual_acceptance']['artifact_root'] ?? '') === 'artifacts/', 'Visual evidence must use the governed artifacts root.');
     $check(($contract['content_cards']['owns_native_data'] ?? true) === false, 'Global contract must preserve native card-data ownership.');
     $check(($contract['optional_sections']['contract_version'] ?? '') === '1.1.0', 'Optional-section contract must record atomic provider identity.');
     $check(($contract['optional_sections']['owns_native_content'] ?? true) === false, 'Optional sections must deny native content ownership.');
@@ -83,6 +85,15 @@ namespace {
     foreach (['knowledge', 'media', 'reviews', 'research', 'marketplace'] as $section) {
         $check(in_array($section, (array) ($contract['optional_sections']['allowed_sections'] ?? []), true), 'Missing optional section: ' . $section);
     }
+
+    $package = (array) ($contract['staging_package'] ?? []);
+    $check(($package['contract_version'] ?? '') === '1.0.0', 'Staging package contract version must be present.');
+    $check(($package['builder'] ?? '') === 'tools/build-staging-package.php', 'Canonical staging package builder must be declared.');
+    $check(($package['dependency_matrix'] ?? '') === 'config/staging-dependencies.json', 'Canonical dependency matrix must be declared.');
+    $check(($package['deterministic_source_date_epoch'] ?? false) === true, 'Staging packages must use deterministic source timestamps.');
+    $check(($package['development_files_excluded'] ?? false) === true, 'Development files must be excluded from staging packages.');
+    $check(($package['staging_acceptance_implied'] ?? true) === false, 'A staging ZIP must not imply staging acceptance.');
+    $check(($package['production_acceptance_implied'] ?? true) === false, 'A staging ZIP must not imply production acceptance.');
 
     $components = Components::contract();
     foreach (['content_card', 'notice', 'field', 'label', 'input', 'select', 'textarea', 'help', 'field_error', 'table_wrap', 'table'] as $class) {
@@ -117,5 +128,5 @@ namespace {
         exit(1);
     }
 
-    echo "PASS: File 25 global design system contract\n";
+    echo "PASS: File 25 global design system and staging package contract\n";
 }
