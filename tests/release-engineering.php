@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/tools/build-staging-package.php';
+require_once dirname(__DIR__) . '/tools/verify-staging-artifact.php';
 
 $root = dirname(__DIR__);
 $failures = [];
@@ -42,6 +43,8 @@ $check(is_array($matrix), 'Staging dependency matrix must be valid JSON.');
 $check(($matrix['file'] ?? null) === 25, 'Staging dependency matrix must belong to File 25.');
 $check(($matrix['runtime_version'] ?? '') === '0.10.0', 'Staging dependency matrix must match runtime 0.10.0.');
 $check(($matrix['environment']['live_changes_allowed'] ?? true) === false, 'Staging matrix must prohibit live changes.');
+$check(($matrix['artifact_verification']['verifier'] ?? '') === 'tools/verify-staging-artifact.php', 'Independent artifact verifier must be declared.');
+$check(($matrix['artifact_verification']['staging_acceptance_implied'] ?? true) === false, 'Artifact verification must not imply staging acceptance.');
 
 $modules = [];
 foreach ((array) ($matrix['modules'] ?? []) as $module) {
@@ -53,7 +56,9 @@ foreach ([0, 3, 6, 10, 11, 12, 18, 20, 21, 24, 25] as $file_number) {
     $check(isset($modules[$file_number]), 'Staging dependency matrix is missing File ' . $file_number . '.');
 }
 $check(($modules[24]['accepted_runtime_contract'] ?? '') === 'pending', 'File 24 must not be fabricated as accepted.');
-$check(($modules[25]['staging_status'] ?? '') === 'candidate-package-pending-ci', 'File 25 must remain a staging candidate before evidence.');
+$check(($modules[24]['staging_status'] ?? '') === 'blocked-until-contract-review', 'File 24 must remain blocked until contract review.');
+$check(($modules[25]['staging_status'] ?? '') === 'pending', 'File 25 staging must remain pending before real Hostinger evidence.');
+$check(($modules[25]['package_status'] ?? '') === 'build-input-not-acceptance', 'File 25 package status must not claim CI or staging acceptance.');
 
 $builder = file_get_contents($root . '/tools/build-staging-package.php') ?: '';
 foreach ([
@@ -64,13 +69,45 @@ foreach ([
     'verify_archive',
     'payload_path_is_allowed',
     'archive_name_is_safe',
+    'validated_output_dir',
+    'Output path ancestor may not be a symbolic link',
+    'Refusing to remove a path outside build/',
+    'zip_entry_is_symlink',
+    'MAX_PAYLOAD_BYTES',
 ] as $marker) {
     $check(str_contains($builder, $marker), 'Deterministic package builder marker missing: ' . $marker);
 }
+
+$verifier = file_get_contents($root . '/tools/verify-staging-artifact.php') ?: '';
+foreach ([
+    'File25_Staging_Artifact_Verifier',
+    'outer_artifact_sha256',
+    'verify_inner_zip',
+    'Embedded and detached staging manifests differ',
+    'Outer and embedded dependency matrices differ',
+    'Duplicate entry detected',
+    'Symbolic link detected',
+    'MAX_INNER_TOTAL_BYTES',
+    'staging_accepted',
+    'production_accepted',
+] as $marker) {
+    $check(str_contains($verifier, $marker), 'Independent staging artifact verifier marker missing: ' . $marker);
+}
+
+$workflow = file_get_contents($root . '/.github/workflows/ci.yml') ?: '';
+foreach ([
+    'version=$(php -r',
+    'steps.source.outputs.version',
+    'tools/verify-staging-artifact.php',
+    'Verify assembled candidate with the independent verifier',
+] as $marker) {
+    $check(str_contains($workflow, $marker), 'Dynamic staging workflow marker missing: ' . $marker);
+}
+$check(! str_contains($workflow, 'sabri-public-experience-0.10.0.zip'), 'Staging workflow must not hard-code one release filename.');
 
 if ($failures !== []) {
     fwrite(STDERR, "FAILED\n- " . implode("\n- ", $failures) . "\n");
     exit(1);
 }
 
-echo "PASS: File 25 deterministic staging package and dependency matrix contracts\n";
+echo "PASS: File 25 deterministic builder, independent artifact verifier, and dependency matrix contracts\n";
