@@ -6,22 +6,25 @@ Production-grade WordPress module for the **Sabri Social Homeopathy Platform**. 
 
 ## Current source scope
 
-The Draft PR contains governance and safety, File 20 shell-token integration, Founder/Doctor profile foundations, the federated File 21 timeline, the reusable global visual system, governed optional profile sections, native File 06 Knowledge projection, native File 10/11/12 Media projections, and the visual-acceptance evidence contract.
+The Draft PR contains governance and safety, File 20 shell-token integration, Founder/Doctor profile foundations, the federated File 21 timeline, the reusable global visual system, governed optional profile sections, native File 06 Knowledge, File 10/11/12 Media, and File 18 Marketplace projections, plus the commit-bound visual-acceptance evidence contract.
 
-Implemented in `0.8.0`:
+Implemented in `0.9.0`:
 
 - canonical File 25 visual ownership while File 20 remains the only application-shell owner;
 - reusable `sabri-ui-*` components, states, notices, forms, tables, and content cards;
 - strict same-origin links and deterministic UTC dates;
 - bounded optional sections limited to Knowledge, Media, Reviews, Research, and Marketplace;
-- immutable registered provider ID, version, section, maturity, and ownership metadata;
-- truthful provider consistency-error reporting and canonical-destination deduplication;
+- immutable provider ID, version, section, maturity, native ownership, and concrete object identity;
+- atomic one-read metadata validation and bounded provider-error reporting;
+- canonical-destination deduplication plus server-only SHA-256 projection keys for native systems sharing one application URL;
 - native read-only File 06 Homeopathy Encyclopedia adapter;
 - native read-only File 10 Video Wall adapter excluding Reels;
-- native read-only File 11 Reels adapter enforcing the approved 60–600 second duration;
+- native read-only File 11 Reels adapter enforcing 60–600 seconds;
 - native read-only File 12 PDF Library adapter;
-- public-status, author, password, post-type, version-range, and no-write revalidation;
-- strict visual-evidence records with artifact references, SHA-256 hashes, timestamps, reviewers, staging runtime data, commit binding, and Founder sign-off;
+- native read-only File 18 Marketplace adapter for approved seller-owned public listings;
+- public-status, author/owner, password, native type/table, version-range, and no-write revalidation;
+- strict evidence records bound to one target commit with artifact references, SHA-256 hashes, timestamps, reviewers, staging runtime data, and Founder sign-off;
+- explicit rejection of impossible timestamps, mixed-commit evidence, and noncanonical staging URLs;
 - PHP 8.0/8.3 and JavaScript CI.
 
 ## Architecture boundary
@@ -32,10 +35,10 @@ Implemented in `0.8.0`:
 - **File 21:** Home, News, posts, comments, interactions, moderation, social behavior.
 - **Files 22/23:** creation and private publishing operations.
 - **File 24:** security, privacy, compliance, cache, incidents, resilience.
-- **Files 06/10/11/12 and later native modules:** canonical content, permissions, moderation, metrics, and workflows.
+- **Files 06/10/11/12/18 and later native modules:** canonical content, permissions, moderation, metrics, files, transactions, and workflows.
 - **File 25:** public visual projection, profile navigation, reusable components, responsive refinement, accessibility, and visual acceptance.
 
-File 25 stores no duplicate publication bodies, reactions, comments, patient information, identity evidence, native metrics, or transactions.
+File 25 stores no duplicate publication bodies, reactions, comments, patient information, identity evidence, native metrics, seller contacts, offers, or transactions.
 
 ## Public integration API
 
@@ -57,7 +60,9 @@ Canonical stylesheet handle: `sabri-visual-design-system`.
 
 ## Review and contract records
 
-- `docs/FIFTH-REVIEW-AND-MEDIA-ADAPTERS-2026-07-31.md`
+- `docs/SIXTH-REVIEW-AND-MARKETPLACE-2026-07-31.md`
+- `docs/FILE18-MARKETPLACE-ADAPTER-IMPLEMENTATION.md`
+- `docs/FIFTH-REVIEW-AND-NATIVE-MEDIA-2026-07-31.md`
 - `docs/OPTIONAL-PROFILE-SECTIONS-CONTRACT.md`
 - `docs/CONTENT-CARD-CONTRACT.md`
 - `docs/DESIGN-SYSTEM-CONTRACT.md`
@@ -81,6 +86,7 @@ php tests/section-providers.php
 php tests/section-provider-metadata.php
 php tests/file06-knowledge-provider.php
 php tests/file10-12-media-providers.php
+php tests/file18-marketplace-provider.php
 php tests/visual-acceptance.php
 php tests/safe-mode.php
 php tools/verify-structure.php
@@ -90,9 +96,9 @@ node --check assets/js/public.js
 
 ## Remaining acceptance gates
 
-- Exact Files 00/03/06/10/11/12/20/21/25 staging.
+- Exact Files 00/03/06/10/11/12/18/20/21/25 staging.
 - Accepted File 24 runtime security/privacy/cache contract.
-- Native Reviews, Research, and Marketplace adapters after exact source review.
+- Native Reviews and Research adapters after their exact source contracts become available and are reviewed.
 - Actual viewport screenshots and visual-regression baselines.
 - Urdu RTL, keyboard, screen-reader, zoom, forced-colors, reduced-motion, and performance evidence.
 - Fresh install, upgrade, migration, rollback, backup restoration, real-user workflows, release packaging, deployment, monitoring, and Founder acceptance.
