@@ -81,6 +81,9 @@ jobs:
       - name: Native adapters and component completion package policy
         run: php tools/verify-file06-and-components.php
 
+      - name: Concrete provider identity package policy
+        run: php tools/verify-provider-metadata.php
+
   javascript:
     runs-on: ubuntu-latest
     steps:
