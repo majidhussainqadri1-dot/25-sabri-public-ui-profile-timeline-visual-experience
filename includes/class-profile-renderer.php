@@ -53,7 +53,7 @@ final class Profile_Renderer
         $user = $this->resolve_user();
         $profile = $user instanceof WP_User ? $this->profiles->get_public_profile($user) : null;
         if (! $user instanceof WP_User || $profile === null) {
-            $this->set_not_found();
+            $this->set_unavailable($context);
             return;
         }
 
@@ -89,7 +89,7 @@ final class Profile_Renderer
         }
 
         if (! in_array($requested_section, $available_sections, true)) {
-            $this->set_not_found();
+            $this->set_unavailable($context);
             return;
         }
 
@@ -100,9 +100,10 @@ final class Profile_Renderer
         $wp_query->is_singular = true;
         status_header(200);
 
-        $profile['canonical_url'] = $canonical;
+        $profile['canonical_url'] = Public_URL::sanitize_same_site($canonical, false);
         $context['section'] = $requested_section;
         $context['available_sections'] = $available_sections;
+        $context['breadcrumbs'] = $this->breadcrumbs($profile, $context);
 
         $timeline = [
             'items' => [],
@@ -196,7 +197,8 @@ final class Profile_Renderer
         }
 
         $profile = (array) $GLOBALS['sabri_public_experience_profile'];
-        $canonical = esc_url((string) ($profile['canonical_url'] ?? ''));
+        $context = (array) ($GLOBALS['sabri_public_experience_context'] ?? []);
+        $canonical = Public_URL::sanitize_same_site($profile['canonical_url'] ?? '', false);
         if ($canonical === '') {
             return;
         }
@@ -207,16 +209,21 @@ final class Profile_Renderer
         }
         $description = wp_trim_words($description_source, 30);
 
-        echo '<link rel="canonical" href="' . $canonical . '">' . "\n";
+        echo '<link rel="canonical" href="' . esc_url($canonical) . '">' . "\n";
         if ($description !== '') {
             echo '<meta name="description" content="' . esc_attr($description) . '">' . "\n";
             echo '<meta property="og:description" content="' . esc_attr($description) . '">' . "\n";
         }
         echo '<meta property="og:type" content="profile">' . "\n";
         echo '<meta property="og:title" content="' . esc_attr((string) ($profile['display_name'] ?? '')) . '">' . "\n";
-        echo '<meta property="og:url" content="' . $canonical . '">' . "\n";
-        if (! empty($profile['avatar_url'])) {
-            echo '<meta property="og:image" content="' . esc_url((string) $profile['avatar_url']) . '">' . "\n";
+        echo '<meta property="og:url" content="' . esc_url($canonical) . '">' . "\n";
+        $avatar = Public_URL::sanitize_same_site($profile['avatar_url'] ?? '', false);
+        if ($avatar !== '') {
+            echo '<meta property="og:image" content="' . esc_url($avatar) . '">' . "\n";
+            echo '<meta property="og:image:alt" content="' . esc_attr(sprintf(
+                __('%s profile photograph', 'sabri-public-experience'),
+                (string) ($profile['display_name'] ?? '')
+            )) . '">' . "\n";
         }
 
         $profile_class = sanitize_key((string) ($profile['class'] ?? 'member'));
@@ -226,13 +233,13 @@ final class Profile_Renderer
         $entity = [
             '@type' => $entity_type,
             'name' => (string) ($profile['display_name'] ?? ''),
-            'url' => (string) ($profile['canonical_url'] ?? ''),
+            'url' => $canonical,
         ];
         if ($description !== '') {
             $entity['description'] = $description;
         }
-        if (! empty($profile['avatar_url'])) {
-            $entity['image'] = (string) $profile['avatar_url'];
+        if ($avatar !== '') {
+            $entity['image'] = $avatar;
         }
         if (! empty($profile['headline'])) {
             $entity['jobTitle'] = (string) $profile['headline'];
@@ -252,12 +259,25 @@ final class Profile_Renderer
         $schema = [
             '@context' => 'https://schema.org',
             '@type' => 'ProfilePage',
-            'url' => (string) ($profile['canonical_url'] ?? ''),
+            'url' => $canonical,
             'mainEntity' => $entity,
             'isPartOf' => [
                 '@type' => 'WebSite',
                 'name' => 'Sabri Social Homeopathy Platform',
                 'url' => home_url('/'),
+            ],
+            'breadcrumb' => [
+                '@type' => 'BreadcrumbList',
+                'itemListElement' => array_map(
+                    static fn (array $item, int $index): array => [
+                        '@type' => 'ListItem',
+                        'position' => $index + 1,
+                        'name' => (string) $item['label'],
+                        'item' => (string) $item['url'],
+                    ],
+                    $this->breadcrumbs($profile, $context),
+                    array_keys($this->breadcrumbs($profile, $context))
+                ),
             ],
         ];
         echo '<script type="application/ld+json">'
@@ -275,11 +295,49 @@ final class Profile_Renderer
         return $this->profiles->find_by_slug($context['slug']);
     }
 
-    private function set_not_found(): void
+    /** @param array<string,mixed> $profile @param array<string,mixed> $context @return list<array{label:string,url:string}> */
+    private function breadcrumbs(array $profile, array $context): array
     {
+        $canonical = Public_URL::sanitize_same_site($profile['canonical_url'] ?? '', false);
+        $section = sanitize_key((string) ($context['section'] ?? 'overview')) ?: 'overview';
+        $labels = (array) ($profile['section_labels'] ?? []);
+        $profile_base = $canonical;
+        if ($section !== 'overview') {
+            $suffix = '/' . $section . '/';
+            if (str_ends_with($profile_base, $suffix)) {
+                $profile_base = substr($profile_base, 0, -strlen($suffix) + 1);
+            }
+        }
+        $profile_base = Public_URL::sanitize_same_site($profile_base, false);
+
+        $items = [
+            ['label' => __('Home', 'sabri-public-experience'), 'url' => home_url('/')],
+            ['label' => (string) ($profile['display_name'] ?? ''), 'url' => $profile_base !== '' ? $profile_base : $canonical],
+        ];
+        if ($section !== 'overview' && isset($labels[$section])) {
+            $items[] = ['label' => (string) $labels[$section], 'url' => $canonical];
+        }
+
+        return array_values(array_filter($items, static function (array $item): bool {
+            return $item['label'] !== '' && Public_URL::sanitize_same_site($item['url'], false) !== '';
+        }));
+    }
+
+    /** @param array<string,mixed> $context */
+    private function set_unavailable(array $context): void
+    {
+        $status = (int) apply_filters(
+            'sabri_public_experience/missing_profile_status',
+            404,
+            $context
+        );
+        if ($status !== 410) {
+            $status = 404;
+        }
+
         global $wp_query;
         $wp_query->set_404();
-        status_header(404);
+        status_header($status);
         nocache_headers();
     }
 }
