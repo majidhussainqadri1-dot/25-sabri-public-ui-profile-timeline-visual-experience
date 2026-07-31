@@ -32,6 +32,7 @@ $required = [
     'includes/providers/class-file-10-video-media-provider.php',
     'includes/providers/class-file-11-reels-media-provider.php',
     'includes/providers/class-file-12-pdf-media-provider.php',
+    'includes/providers/class-file-18-marketplace-provider.php',
     'includes/providers/class-file-21-provider.php',
     'templates/public-profile.php',
     'templates/partials/profile-hero.php',
@@ -55,6 +56,7 @@ $required = [
     'tests/section-provider-metadata.php',
     'tests/file06-knowledge-provider.php',
     'tests/file10-12-media-providers.php',
+    'tests/file18-marketplace-provider.php',
     'tests/visual-acceptance.php',
     'tests/safe-mode.php',
     'SECURITY.md',
@@ -65,6 +67,9 @@ $required = [
     'docs/DESIGN-SYSTEM-CONTRACT.md',
     'docs/CONTENT-CARD-CONTRACT.md',
     'docs/OPTIONAL-PROFILE-SECTIONS-CONTRACT.md',
+    'docs/FILE18-MARKETPLACE-ADAPTER-IMPLEMENTATION.md',
+    'docs/SIXTH-REVIEW-AND-MARKETPLACE-2026-07-31.md',
+    'docs/FIFTH-REVIEW-AND-NATIVE-MEDIA-2026-07-31.md',
     'docs/FOURTH-REVIEW-AND-CORRECTION-2026-07-31.md',
     'docs/THIRD-REVIEW-AND-CORRECTION-2026-07-30.md',
     'docs/SECOND-REVIEW-AND-CORRECTION-2026-07-30.md',
@@ -126,6 +131,9 @@ $versions = array_filter([$header_match[1] ?? '', $stable_match[1] ?? '', $const
 if (count($versions) !== 3 || count(array_unique($versions)) !== 1) {
     $errors[] = 'Plugin header, constant, and readme stable-tag versions do not match.';
 }
+if (($header_match[1] ?? '') !== '0.9.0') {
+    $errors[] = 'Expected reviewed File 25 runtime version 0.9.0.';
+}
 if (! str_contains($main, 'Sabri Unified Global Visual Experience and Design System')) {
     $errors[] = 'Founder-approved canonical File 25 name is missing from the plugin header.';
 }
@@ -140,7 +148,8 @@ foreach ([
     'class-design-system.php', 'interface-profile-section-provider.php', 'class-section-registry.php',
     'class-section-service.php', 'class-profile-data.php', 'class-shell-integration.php',
     'class-file-06-knowledge-provider.php', 'class-file-10-video-media-provider.php',
-    'class-file-11-reels-media-provider.php', 'class-file-12-pdf-media-provider.php', 'class-file-21-provider.php',
+    'class-file-11-reels-media-provider.php', 'class-file-12-pdf-media-provider.php',
+    'class-file-18-marketplace-provider.php', 'class-file-21-provider.php',
 ] as $runtime_file) {
     if (! str_contains($main, $runtime_file)) {
         $errors[] = 'Required runtime file is not loaded: ' . $runtime_file;
@@ -153,7 +162,7 @@ foreach (['sabri_visual_experience_contract', 'sabri_visual_experience_acceptanc
 }
 
 $plugin = file_get_contents($root . '/includes/class-plugin.php') ?: '';
-foreach (['home_news_available', 'new Shell_Integration', 'new File_21_Provider', 'new File_10_Video_Media_Provider', 'new File_11_Reels_Media_Provider', 'new File_12_Pdf_Media_Provider', 'new Design_System', 'new Assets', 'new Section_Registry', 'new Section_Service', 'register_section_providers'] as $marker) {
+foreach (['home_news_available', 'new Shell_Integration', 'new File_21_Provider', 'new File_10_Video_Media_Provider', 'new File_11_Reels_Media_Provider', 'new File_12_Pdf_Media_Provider', 'new File_18_Marketplace_Provider', "'file-18-marketplace'", 'new Design_System', 'new Assets', 'new Section_Registry', 'new Section_Service', 'register_section_providers'] as $marker) {
     if (! str_contains($plugin, $marker)) {
         $errors[] = 'Plugin bootstrap boundary missing: ' . $marker;
     }
@@ -168,7 +177,7 @@ if (! str_contains($shell, '$base[\'owns_global_shell\'] = false')) {
 }
 
 $design_system = file_get_contents($root . '/includes/class-design-system.php') ?: '';
-foreach (['reusable-content-cards', 'optional-profile-sections', 'Content_Cards::contract', 'Section_Registry::approved_sections', 'creates_file_26', 'shell_is_available'] as $marker) {
+foreach (['1.4.0', 'reusable-content-cards', 'optional-profile-sections', 'Content_Cards::contract', 'Section_Registry::approved_sections', 'provider_metadata_bound_to_concrete_object', 'projection_key', 'rendered_publicly', 'creates_file_26', 'shell_is_available'] as $marker) {
     if (! str_contains($design_system, $marker)) {
         $errors[] = 'Design-system contract marker missing: ' . $marker;
     }
@@ -192,14 +201,14 @@ if (preg_match('/update_|insert_|delete_|wp_insert_post|wp_update_post|wp_delete
 }
 
 $section_registry = file_get_contents($root . '/includes/class-section-registry.php') ?: '';
-foreach (['MAX_PROVIDERS', 'maturity_is_approved', 'section_is_approved', "'maturity' => \$maturity", "'owns_native_content' => false", 'provider_is_consistent'] as $marker) {
+foreach (['MAX_PROVIDERS', 'maturity_is_approved', 'section_is_approved', "'maturity' => \$maturity", "'owns_native_content' => false", "'object_id' => spl_object_id(\$provider)", 'validated_metadata', "\$registered['object_id'] === \$current['object_id']"] as $marker) {
     if (! str_contains($section_registry, $marker)) {
         $errors[] = 'Optional section registry invariant missing: ' . $marker;
     }
 }
 
 $section_service = file_get_contents($root . '/includes/class-section-service.php') ?: '';
-foreach (['MAX_ITEMS_PER_PROVIDER', 'MAX_ITEMS_PER_SECTION', 'Content_Cards::render', 'provider_error_count', "return hash('sha256', 'url|' . \$url)"] as $marker) {
+foreach (['MAX_ITEMS_PER_PROVIDER', 'MAX_ITEMS_PER_SECTION', 'Content_Cards::render', 'provider_error_count', 'validated_metadata', 'projection_key', "return hash('sha256', 'projection|' . \$projection_key)", "return hash('sha256', 'url|' . \$url)"] as $marker) {
     if (! str_contains($section_service, $marker)) {
         $errors[] = 'Optional section service invariant missing: ' . $marker;
     }
@@ -209,10 +218,20 @@ if (preg_match('/update_|insert_|delete_|wp_insert_post|wp_update_post|wp_delete
 }
 
 $acceptance = file_get_contents($root . '/includes/class-visual-acceptance.php') ?: '';
-foreach (['media-section', 'artifact_ref', 'sha256', 'recorded_at', 'reviewer', 'staging_environment', 'founder_signoff', 'summarize'] as $marker) {
+foreach (['1.2.0', 'target_commit_sha', 'commit_sha', 'media-section', 'marketplace-section', 'artifact_ref', 'sha256', 'recorded_at', 'reviewer', 'staging_environment', 'founder_signoff', 'checkdate', 'getLastErrors', 'summarize'] as $marker) {
     if (! str_contains($acceptance, $marker)) {
         $errors[] = 'Visual acceptance evidence invariant missing: ' . $marker;
     }
+}
+
+$file_18 = file_get_contents($root . '/includes/providers/class-file-18-marketplace-provider.php') ?: '';
+foreach (['SMP_VERSION', "return 'file-18-marketplace'", "return 'marketplace'", "return 'read-only'", "s.status = 'approved'", "p.status IN ('published','approved')", 'projection_key', 'owns_native_content'] as $marker) {
+    if (! str_contains($file_18, $marker)) {
+        $errors[] = 'File 18 Marketplace adapter boundary missing: ' . $marker;
+    }
+}
+if (preg_match('/update_|insert_|delete_|wp_insert_post|wp_update_post|wp_delete_post/i', $file_18)) {
+    $errors[] = 'File 18 adapter must remain read-only.';
 }
 
 $timeline = file_get_contents($root . '/includes/class-timeline-service.php') ?: '';
@@ -250,6 +269,9 @@ $composer_raw = file_get_contents($root . '/composer.json') ?: '';
 $composer = json_decode($composer_raw, true);
 if (! is_array($composer) || ($composer['require']['php'] ?? '') !== '>=8.0') {
     $errors[] = 'Composer PHP requirement is invalid or missing.';
+}
+if (! str_contains($composer_raw, 'tests/file18-marketplace-provider.php')) {
+    $errors[] = 'Composer test suite does not include File 18 Marketplace coverage.';
 }
 
 if ($errors !== []) {
