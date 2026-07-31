@@ -138,22 +138,13 @@ final class Section_Service
     private function provider_status(Profile_Section_Provider $provider, array $profile, string $section): string
     {
         try {
-            if (! $this->registry->provider_is_consistent($provider, $section)) {
-                self::emit_error(new \RuntimeException('Profile-section provider metadata changed after registration.'), $section);
+            $metadata = $this->registry->validated_metadata($provider, $section);
+            if ($metadata === null) {
+                self::emit_error(new \RuntimeException('Profile-section provider metadata or concrete identity changed after registration.'), $section);
                 return 'error';
             }
-
-            $maturity = self::key($provider->get_maturity_level());
-            if (! Section_Registry::maturity_is_approved($maturity)) {
-                self::emit_error(new \RuntimeException('Profile-section provider maturity is invalid.'), $section);
-                return 'error';
-            }
-            if ($maturity === 'disabled') {
+            if ($metadata['maturity'] === 'disabled') {
                 return 'skip';
-            }
-            if ($provider->owns_native_content()) {
-                self::emit_error(new \RuntimeException('Profile-section provider attempted to claim native ownership.'), $section);
-                return 'error';
             }
 
             return $provider->is_available() && $provider->supports_profile($profile)
@@ -171,6 +162,15 @@ final class Section_Service
         $title = self::text($candidate['title'] ?? '', 240);
         if ($title === '') {
             return '';
+        }
+
+        // Native systems without item permalinks may provide a server-only opaque
+        // SHA-256 projection key. The value is never passed to the card renderer.
+        $projection_key = is_scalar($candidate['projection_key'] ?? null)
+            ? strtolower(trim((string) $candidate['projection_key']))
+            : '';
+        if (preg_match('/^[a-f0-9]{64}$/', $projection_key) === 1) {
+            return hash('sha256', 'projection|' . $projection_key);
         }
 
         $url = Public_URL::sanitize_same_site($candidate['url'] ?? '', false);
