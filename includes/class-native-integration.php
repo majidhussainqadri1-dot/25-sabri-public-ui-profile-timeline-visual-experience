@@ -64,9 +64,16 @@ final class Native_Integration
 
     public function security_center_available(): bool
     {
-        $detected = defined('SABRI_SECURITY_CENTER_VERSION') || defined('SABRI_SPRC_VERSION');
+        $detected = File_24_Integration::is_compatible();
+        $filtered = (bool) apply_filters(
+            'sabri_public_experience/dependency/security_center',
+            $detected,
+            File_24_Integration::current_version()
+        );
 
-        return $detected && (bool) apply_filters('sabri_public_experience/dependency/security_center', true);
+        // Extensions may make the dependency more restrictive, never promote an
+        // absent, malformed, old, or unreviewed File 24 runtime to compatible.
+        return $detected && $filtered;
     }
 
     public function founder_user_id(): int
