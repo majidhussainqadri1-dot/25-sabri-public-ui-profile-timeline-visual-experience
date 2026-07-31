@@ -9,11 +9,16 @@ $required = [
     'includes/providers/class-file-10-video-media-provider.php',
     'includes/providers/class-file-11-reels-media-provider.php',
     'includes/providers/class-file-12-pdf-media-provider.php',
+    'includes/providers/class-file-18-marketplace-provider.php',
     'tests/file06-knowledge-provider.php',
     'tests/file10-12-media-providers.php',
+    'tests/file18-marketplace-provider.php',
     'assets/css/design-system-components.css',
     'docs/OPTIONAL-PROFILE-SECTIONS-CONTRACT.md',
     'docs/FOURTH-REVIEW-AND-CORRECTION-2026-07-31.md',
+    'docs/FIFTH-REVIEW-AND-NATIVE-MEDIA-2026-07-31.md',
+    'docs/SIXTH-REVIEW-AND-MARKETPLACE-2026-07-31.md',
+    'docs/FILE18-MARKETPLACE-ADAPTER-IMPLEMENTATION.md',
 ];
 foreach ($required as $path) {
     if (! is_file($root . '/' . $path)) {
@@ -27,6 +32,7 @@ foreach ([
     'class-file-10-video-media-provider.php',
     'class-file-11-reels-media-provider.php',
     'class-file-12-pdf-media-provider.php',
+    'class-file-18-marketplace-provider.php',
 ] as $marker) {
     if (! str_contains($main, $marker)) {
         $errors[] = 'Native adapter is not loaded by the plugin bootstrap: ' . $marker;
@@ -42,6 +48,8 @@ foreach ([
     'File_10_Video_Media_Provider',
     'File_11_Reels_Media_Provider',
     'File_12_Pdf_Media_Provider',
+    'File_18_Marketplace_Provider',
+    "'file-18-marketplace'",
     'register_section_providers',
 ] as $marker) {
     if (! str_contains($plugin, $marker)) {
@@ -54,6 +62,7 @@ $provider_requirements = [
     'class-file-10-video-media-provider.php' => ['SVW_VERSION', 'SVW_Helpers::TYPE', "'svw_video'", "'publish'", "'author' => \$user_id", "'has_password' => false", "return 'read-only'", "'is_reel'"],
     'class-file-11-reels-media-provider.php' => ['SRL_VERSION', 'SVW_VERSION', 'SVW_Helpers::TYPE', "'svw_video'", "'meta_key' => '_svw_is_reel'", "'meta_value' => '1'", '60', '600', "return 'read-only'"],
     'class-file-12-pdf-media-provider.php' => ['SPL_VERSION', 'SPL_Helpers::TYPE', "'spl_document'", "'publish'", "'author' => \$user_id", "'has_password' => false", "return 'read-only'", 'owns_native_content'],
+    'class-file-18-marketplace-provider.php' => ['SMP_VERSION', "SMP_DB::table('products')", "SMP_DB::table('sellers')", "s.status = 'approved'", "p.status IN ('published','approved')", "return 'read-only'", 'projection_key', 'owns_native_content'],
 ];
 foreach ($provider_requirements as $file => $markers) {
     $provider = file_get_contents($root . '/includes/providers/' . $file) ?: '';
@@ -84,16 +93,30 @@ foreach ($provider_requirements as $file => $markers) {
 }
 
 $registry = file_get_contents($root . '/includes/class-section-registry.php') ?: '';
-foreach (["'maturity' => \$maturity", "'owns_native_content' => false", "hash_equals(\$registered['maturity'], \$maturity)"] as $marker) {
+foreach ([
+    "'maturity' => \$maturity",
+    "'owns_native_content' => false",
+    "'object_id' => spl_object_id(\$provider)",
+    'validated_metadata',
+    "hash_equals(\$registered['maturity'], \$current['maturity'])",
+    "\$registered['object_id'] === \$current['object_id']",
+] as $marker) {
     if (! str_contains($registry, $marker)) {
-        $errors[] = 'Complete provider metadata immutability marker missing: ' . $marker;
+        $errors[] = 'Complete provider identity/metadata immutability marker missing: ' . $marker;
+    }
+}
+
+$section_service = file_get_contents($root . '/includes/class-section-service.php') ?: '';
+foreach (['validated_metadata', 'projection_key', "preg_match('/^[a-f0-9]{64}$/', \$projection_key)", "hash('sha256', 'projection|' . \$projection_key)"] as $marker) {
+    if (! str_contains($section_service, $marker)) {
+        $errors[] = 'Atomic provider or opaque projection-key marker missing: ' . $marker;
     }
 }
 
 $acceptance = file_get_contents($root . '/includes/class-visual-acceptance.php') ?: '';
-foreach (['artifact_ref', 'sha256', 'recorded_at', 'reviewer', 'staging_environment', 'founder_signoff', 'media-section'] as $marker) {
+foreach (['target_commit_sha', 'commit_sha', 'artifact_ref', 'sha256', 'recorded_at', 'reviewer', 'staging_environment', 'founder_signoff', 'media-section', 'marketplace-section', 'checkdate', 'getLastErrors'] as $marker) {
     if (! str_contains($acceptance, $marker)) {
-        $errors[] = 'Strict visual evidence marker missing: ' . $marker;
+        $errors[] = 'Commit-bound strict visual evidence marker missing: ' . $marker;
     }
 }
 
@@ -126,4 +149,4 @@ if ($errors !== []) {
     exit(1);
 }
 
-echo "PASS: native knowledge/media adapters and component package boundaries\n";
+echo "PASS: native knowledge/media/Marketplace adapters, atomic providers, and component package boundaries\n";
