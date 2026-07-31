@@ -8,7 +8,7 @@ The File 18 integration is a read-only visual projection. File 18 remains the ca
 
 ## Confirmed defects and corrections
 
-### Provider metadata was not bound to the concrete object instance
+### Section-provider metadata was not bound to the concrete object instance
 
 A provider registration snapshot froze ID, version, section, maturity, and native-ownership state, but did not freeze the concrete provider object identity. A mutable provider could attempt to change its ID to another registered provider ID.
 
@@ -19,7 +19,7 @@ Correction:
 - a provider object cannot impersonate another registered provider;
 - all mutable metadata is read once through one atomic validation operation.
 
-### Metadata was read again after consistency validation
+### Section metadata was read again after consistency validation
 
 The section service validated provider metadata and then separately read maturity and native-ownership state again. An unstable provider could return different values across those reads.
 
@@ -28,6 +28,17 @@ Correction:
 - `Section_Registry::validated_metadata()` returns one registration-bound snapshot;
 - the section service consumes that snapshot rather than re-reading mutable metadata;
 - mutation, exceptions, self-promotion, and native-ownership claims fail closed and increment only a bounded public error count.
+
+### Timeline providers had the same mutable-identity weakness
+
+The timeline registry validated provider ID, version, and maturity only at registration. The timeline service later trusted the registry key but re-read mutable version and maturity values. A provider could change metadata after registration and attempt to return items under the modified version.
+
+Correction:
+
+- timeline provider ID, version, maturity, and concrete object identity are now frozen;
+- `Timeline_Registry::validated_metadata()` performs one atomic query-time comparison;
+- the timeline service and Site Health consume the immutable snapshot rather than re-reading version or maturity;
+- provider impersonation, version mutation, and maturity self-promotion fail closed and are reported against the registered provider key.
 
 ### Native objects sharing one application URL could collapse
 
@@ -104,28 +115,9 @@ Admission requires:
 - a non-empty title;
 - a bounded query limit.
 
-The public card may contain:
+The public card may contain title, short description, Marketplace application URL, first public image URL, category, product type, condition, effective public price/currency, public deal-state label, and publication date.
 
-- title;
-- short description;
-- Marketplace application URL;
-- first public image URL;
-- category;
-- product type;
-- condition;
-- effective public price and currency;
-- public deal-state label;
-- publication date.
-
-The projection excludes:
-
-- product, seller, user, attachment, and report IDs;
-- identity/contact evidence;
-- moderation notes;
-- chat and offer records;
-- views, ratings, review counts, sales metrics, and analytics;
-- file-storage details;
-- transaction or direct-deal authority.
+The projection excludes product/seller/user/attachment/report IDs, identity/contact evidence, moderation notes, chats/offers, metrics, storage details, and transaction authority.
 
 ## Visual acceptance extension
 
@@ -135,9 +127,9 @@ The Marketplace section is now a mandatory visual-acceptance surface. Its real s
 
 The PHP 8.0/8.3 suite now covers:
 
-- provider concrete-object identity;
+- section and timeline provider concrete-object identity;
 - one-read atomic metadata validation;
-- maturity and ownership mutation rejection;
+- version, maturity, ownership, and impersonation rejection;
 - server-only projection-key behavior;
 - File 18 version, seller, author, listing, deal-state, price, privacy, and no-ownership boundaries;
 - commit-bound visual evidence;
