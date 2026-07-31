@@ -29,6 +29,8 @@ Implemented in `0.10.0`:
 - payload path-traversal protection, symlink rejection, development-file exclusion, and post-build archive verification;
 - a machine-readable staging dependency matrix for Files 00, 03, 06, 10, 11, 12, 18, 20, 21, 24, and 25;
 - CI that builds the staging candidate twice and requires byte-for-byte reproducibility before publishing a temporary workflow artifact;
+- an independent downloaded-artifact verifier with exact bundle, checksum, manifest, matrix, runtime-version, duplicate-entry, symlink, and expanded-size validation;
+- version-dynamic staging CI without hard-coded release filenames;
 - PHP 8.0/8.3 and JavaScript CI.
 
 ## Architecture boundary
@@ -73,6 +75,14 @@ php tools/build-staging-package.php \
   --source-date-epoch=<commit-unix-timestamp>
 ```
 
+The independent verifier is:
+
+```bash
+php tools/verify-staging-artifact.php \
+  --artifact=/path/to/downloaded-workflow-artifact.zip \
+  --artifact-sha256=<expected-outer-sha256>
+```
+
 Outputs:
 
 - `sabri-public-experience-0.10.0.zip`
@@ -80,10 +90,11 @@ Outputs:
 - `sabri-public-experience-0.10.0-manifest.json`
 - embedded `STAGING-MANIFEST.json`
 
-The exact integration matrix is `config/staging-dependencies.json`. A generated package is a staging candidate only; it is not staging or production acceptance.
+The exact integration matrix is `config/staging-dependencies.json`. A generated or independently verified package is a staging candidate only; it is not staging or production acceptance.
 
 ## Review and contract records
 
+- `docs/EIGHTH-REVIEW-AND-INDEPENDENT-ARTIFACT-VERIFICATION-2026-07-31.md`
 - `docs/SEVENTH-REVIEW-AND-STAGING-PACKAGE-2026-07-31.md`
 - `docs/STAGING-PACKAGE-CONTRACT.md`
 - `docs/SIXTH-REVIEW-AND-MARKETPLACE-2026-07-31.md`
@@ -120,6 +131,7 @@ php tests/safe-mode.php
 php tools/verify-structure.php
 php tools/verify-file06-and-components.php
 php tools/verify-provider-metadata.php
+php tools/verify-staging-artifact.php --artifact=/path/to/downloaded-workflow-artifact.zip --artifact-sha256=<expected-outer-sha256>
 node --check assets/js/public.js
 ```
 
@@ -132,4 +144,4 @@ node --check assets/js/public.js
 - Urdu RTL, keyboard, screen-reader, zoom, forced-colors, reduced-motion, and performance evidence.
 - Fresh install, upgrade, migration, rollback, backup restoration, real-user workflows, deployment, monitoring, and Founder acceptance.
 
-Code presence, a ZIP, or green CI is not production completion.
+Code presence, a ZIP, artifact verification, or green CI is not production completion.
