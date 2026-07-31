@@ -1,3 +1,47 @@
+.spux-breadcrumbs {
+    color: var(--spux-muted);
+    font-size: 0.9rem;
+    margin-block: 0 0.85rem;
+}
+
+.spux-breadcrumbs ol {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.spux-breadcrumbs li {
+    align-items: center;
+    display: inline-flex;
+    min-width: 0;
+}
+
+.spux-breadcrumbs li:not(:last-child)::after {
+    content: "/";
+    margin-inline-start: 0.35rem;
+}
+
+.spux-breadcrumbs a {
+    color: var(--spux-primary-strong);
+    overflow-wrap: anywhere;
+    text-underline-offset: 0.15em;
+}
+
+.spux-breadcrumbs a:focus-visible {
+    outline: 3px solid var(--spux-focus);
+    outline-offset: 2px;
+}
+
+.spux-breadcrumbs [aria-current="page"] {
+    color: var(--spux-text);
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
 .spux-section-stack {
     display: grid;
     gap: var(--spux-layout-gap, 1rem);
@@ -155,5 +199,11 @@ body.spux-shell-connected .spux-profile {
 
     .spux-eyebrow {
         letter-spacing: 0.02em;
+    }
+}
+
+@media (forced-colors: active) {
+    .spux-breadcrumbs a:focus-visible {
+        outline-color: CanvasText;
     }
 }
