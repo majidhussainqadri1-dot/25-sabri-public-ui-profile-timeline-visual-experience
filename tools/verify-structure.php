@@ -21,6 +21,7 @@ $required = [
     'includes/class-staging-probe.php',
     'includes/class-staging-cli.php',
     'includes/class-upgrade-manager.php',
+    'includes/class-file-24-integration.php',
     'includes/class-design-system.php',
     'includes/class-profile-router.php',
     'includes/class-profile-renderer.php',
@@ -46,6 +47,7 @@ $required = [
     'config/staging-dependencies.json',
     'config/staging-test-plan.json',
     'tests/profile-router.php',
+    'tests/file24-integration.php',
     'tests/staging-probe.php',
     'tests/upgrade-manager.php',
     'tests/design-system.php',
@@ -54,6 +56,7 @@ $required = [
     'tools/verify-staging-artifact.php',
     'docs/NINTH-REVIEW-ROUTE-PARITY-AND-HOSTINGER-PREFLIGHT-2026-07-31.md',
     'docs/HOSTINGER-STAGING-PROBE-AND-RUNBOOK.md',
+    'docs/TENTH-REVIEW-FILE24-INTEGRATION-2026-07-31.md',
 ];
 foreach ($required as $path) {
     if (! is_file($root . '/' . $path)) {
@@ -83,27 +86,47 @@ preg_match('/^\s*\* Version:\s*([^\s]+)/m', $main, $header);
 preg_match("/define\('SABRI_PUBLIC_EXPERIENCE_VERSION',\s*'([^']+)'\)/", $main, $constant);
 preg_match('/^Stable tag:\s*([^\s]+)/mi', $readme, $stable);
 $versions = [$header[1] ?? '', $constant[1] ?? '', $stable[1] ?? ''];
-if (count(array_unique($versions)) !== 1 || $versions[0] !== '0.11.0') {
-    $errors[] = 'Plugin header, constant, and stable tag must all equal 0.11.0.';
+if (count(array_unique($versions)) !== 1 || $versions[0] !== '0.12.0') {
+    $errors[] = 'Plugin header, constant, and stable tag must all equal 0.12.0.';
 }
 $contains($main, [
     "define('SABRI_PUBLIC_EXPERIENCE_SCHEMA_VERSION', '2')",
     'class-staging-probe.php',
     'class-staging-cli.php',
     'class-upgrade-manager.php',
+    'class-file-24-integration.php',
     'Sabri Unified Global Visual Experience and Design System',
     "version_compare(PHP_VERSION, '8.0', '<')",
 ], 'Runtime');
 
 $design = $read('includes/class-design-system.php');
 $contains($design, [
-    "CONTRACT_VERSION = '1.6.0'",
+    "CONTRACT_VERSION = '1.7.0'",
     'installed-staging-preflight',
-    "'staging_probe' => Staging_Probe::contract()",
+    'file-24-module-manifest',
+    "'file_24_integration' => File_24_Integration::contract()",
+    "'security_governance_owner' => 'file-24'",
     "'global_shell_owner' => 'file-20'",
     "'visual_system_owner' => 'file-25'",
     "'creates_file_26' => false",
 ], 'Design system');
+
+$file24 = $read('includes/class-file-24-integration.php');
+$contains($file24, [
+    "CONTRACT_VERSION = '1.0.0'",
+    "MODULE_KEY = 'file-25-public-experience'",
+    "REVIEWED_MINIMUM_VERSION = '0.25.3'",
+    "REVIEWED_MAXIMUM_VERSION = '0.26.0'",
+    "defined('SPCRC_VERSION')",
+    "add_filter('spcrc/module_manifests'",
+    "do_action('spcrc/request_security_state'",
+    'no-store, private, max-age=0, must-revalidate',
+    "'owns_security_governance' => false",
+    "'owns_privacy_orchestration' => false",
+], 'File 24 integration');
+if (str_contains($file24, 'SABRI_SECURITY_CENTER_VERSION') || str_contains($file24, 'SABRI_SPRC_VERSION')) {
+    $errors[] = 'File 24 integration must use the exact reviewed SPCRC_VERSION contract.';
+}
 
 $router = $read('includes/class-profile-router.php');
 $contains($router, [
@@ -142,17 +165,28 @@ $contains($upgrade, [
 
 $plugin = $read('includes/class-plugin.php');
 $contains($plugin, [
+    'new File_24_Integration',
+    '$file_24->register()',
     'new Staging_Probe',
     'Staging_CLI::register',
     'new Upgrade_Manager',
-    'new System_Check($dependencies, $timeline_registry, $section_registry, $staging_probe)',
+    'new System_Check($dependencies, $timeline_registry, $section_registry, $staging_probe, $file_24)',
 ], 'Plugin bootstrap');
+
+$dependencies = $read('includes/class-dependency-manager.php');
+$contains($dependencies, [
+    'File_24_Integration::is_compatible()',
+    'File_24_Integration::current_version()',
+    'File_24_Integration::REVIEWED_MINIMUM_VERSION',
+    'File_24_Integration::REVIEWED_MAXIMUM_VERSION',
+], 'Dependency manager');
 
 $system_check = $read('includes/class-system-check.php');
 $contains($system_check, [
+    'sabri_public_experience_file24',
+    'file_24_test',
     'sabri_public_experience_staging_probe',
     'staging_probe_test',
-    'ready for manual Hostinger staging tests',
     'This is not staging acceptance',
 ], 'Site Health');
 
@@ -201,7 +235,7 @@ foreach ([
 
 $matrix = json_decode($read('config/staging-dependencies.json'), true);
 if (! is_array($matrix)
-    || ($matrix['runtime_version'] ?? '') !== '0.11.0'
+    || ($matrix['runtime_version'] ?? '') !== '0.12.0'
     || ($matrix['environment']['target_site'] ?? '') !== 'https://sabrisocialstaging.sabrihomeopathy.com/'
     || ($matrix['environment']['live_changes_allowed'] ?? true) !== false
     || ($matrix['environment']['registration_disabled_required'] ?? false) !== true
@@ -221,11 +255,16 @@ foreach ([0, 3, 6, 10, 11, 12, 18, 20, 21, 24, 25] as $file) {
         $errors[] = 'Staging matrix missing File ' . $file . '.';
     }
 }
-if (($modules[24]['staging_status'] ?? '') !== 'blocked-until-contract-review') {
-    $errors[] = 'File 24 must remain blocked until exact contract review.';
+if (($modules[24]['staging_status'] ?? '') !== 'pending'
+    || ($modules[24]['reviewed_package_version'] ?? '') !== '0.25.3'
+    || ($modules[24]['accepted_source_range'] ?? '') !== '>=0.25.3 <0.26.0'
+    || ($modules[24]['accepted_runtime_contract'] ?? '') !== 'reviewed-source-contract-pending-staging'
+    || ($modules[24]['cache_partition_contract'] ?? '') !== 'not-yet-versioned'
+) {
+    $errors[] = 'File 24 reviewed contract or pending staging state is not truthful.';
 }
 if (($modules[25]['staging_status'] ?? '') !== 'pending'
-    || ($modules[25]['candidate_version'] ?? '') !== '0.11.0'
+    || ($modules[25]['candidate_version'] ?? '') !== '0.12.0'
     || ($modules[25]['schema_version'] ?? '') !== '2'
 ) {
     $errors[] = 'File 25 staging state, version, or schema is not truthful.';
@@ -247,7 +286,7 @@ $composer = json_decode($composer_raw, true);
 if (! is_array($composer) || ($composer['require']['php'] ?? '') !== '>=8.0') {
     $errors[] = 'Composer PHP contract is invalid.';
 }
-foreach (['tests/profile-router.php', 'tests/staging-probe.php', 'tests/upgrade-manager.php'] as $test) {
+foreach (['tests/profile-router.php', 'tests/file24-integration.php', 'tests/staging-probe.php', 'tests/upgrade-manager.php'] as $test) {
     if (! str_contains($composer_raw, $test)) {
         $errors[] = 'Composer suite missing: ' . $test;
     }
@@ -256,13 +295,14 @@ foreach (['tests/profile-router.php', 'tests/staging-probe.php', 'tests/upgrade-
 $workflow = $read('.github/workflows/ci.yml');
 $contains($workflow, [
     'Provider route parity and fail-closed profile routing',
+    'Reviewed File 24 integration contract',
     'Installed-package integrity and Hostinger staging-probe contract',
     'Idempotent schema-2 profile-route upgrade contract',
     'Verify extracted installed candidate against embedded manifest',
     'Staging_Probe::verify_package_integrity',
     'Verify assembled candidate with the independent verifier',
 ], 'CI workflow');
-if (str_contains($workflow, 'sabri-public-experience-0.11.0.zip')) {
+if (str_contains($workflow, 'sabri-public-experience-0.12.0.zip')) {
     $errors[] = 'CI must not hard-code one staging package version.';
 }
 
@@ -271,4 +311,4 @@ if ($errors !== []) {
     exit(1);
 }
 
-echo "PASS: File 25 global visual, route parity, installed preflight, and package structure\n";
+echo "PASS: File 25 global visual, File 24 integration, route parity, installed preflight, and package structure\n";
