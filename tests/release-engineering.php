@@ -26,6 +26,7 @@ foreach ([
     'readme.txt',
     'assets/css/design-system.css',
     'includes/class-plugin.php',
+    'includes/class-file-24-integration.php',
     'includes/class-staging-probe.php',
     'includes/class-staging-cli.php',
     'includes/class-upgrade-manager.php',
@@ -45,7 +46,7 @@ $matrix_raw = file_get_contents($root . '/config/staging-dependencies.json');
 $matrix = is_string($matrix_raw) ? json_decode($matrix_raw, true) : null;
 $check(is_array($matrix), 'Staging dependency matrix must be valid JSON.');
 $check(($matrix['file'] ?? null) === 25, 'Staging dependency matrix must belong to File 25.');
-$check(($matrix['runtime_version'] ?? '') === '0.11.0', 'Staging dependency matrix must match runtime 0.11.0.');
+$check(($matrix['runtime_version'] ?? '') === '0.12.0', 'Staging dependency matrix must match runtime 0.12.0.');
 $check(($matrix['environment']['target_site'] ?? '') === 'https://sabrisocialstaging.sabrihomeopathy.com/', 'Exact canonical Hostinger staging site must be declared.');
 $check(($matrix['environment']['live_changes_allowed'] ?? true) === false, 'Staging matrix must prohibit live changes.');
 $check(($matrix['environment']['registration_disabled_required'] ?? false) === true, 'Staging matrix must require disabled registration.');
@@ -63,9 +64,12 @@ foreach ((array) ($matrix['modules'] ?? []) as $module) {
 foreach ([0, 3, 6, 10, 11, 12, 18, 20, 21, 24, 25] as $file_number) {
     $check(isset($modules[$file_number]), 'Staging dependency matrix is missing File ' . $file_number . '.');
 }
-$check(($modules[24]['accepted_runtime_contract'] ?? '') === 'pending', 'File 24 must not be fabricated as accepted.');
-$check(($modules[24]['staging_status'] ?? '') === 'blocked-until-contract-review', 'File 24 must remain blocked until contract review.');
-$check(($modules[25]['candidate_version'] ?? '') === '0.11.0', 'File 25 candidate version must match runtime.');
+$check(($modules[24]['reviewed_package_version'] ?? '') === '0.25.3', 'File 24 exact reviewed package must be declared.');
+$check(($modules[24]['accepted_source_range'] ?? '') === '>=0.25.3 <0.26.0', 'File 24 reviewed source range must be exact.');
+$check(($modules[24]['accepted_runtime_contract'] ?? '') === 'reviewed-source-contract-pending-staging', 'File 24 source review must remain distinct from staging acceptance.');
+$check(($modules[24]['cache_partition_contract'] ?? '') === 'not-yet-versioned', 'File 24 cache partitioning must not be fabricated.');
+$check(($modules[24]['staging_status'] ?? '') === 'pending', 'File 24 staging must remain pending.');
+$check(($modules[25]['candidate_version'] ?? '') === '0.12.0', 'File 25 candidate version must match runtime.');
 $check(($modules[25]['schema_version'] ?? '') === '2', 'File 25 schema version 2 must be declared.');
 $check(($modules[25]['staging_status'] ?? '') === 'pending', 'File 25 staging must remain pending before real Hostinger evidence.');
 $check(($modules[25]['package_status'] ?? '') === 'build-input-not-acceptance', 'File 25 package status must not claim acceptance.');
@@ -109,17 +113,18 @@ foreach ([
     'version=$(php -r',
     'steps.source.outputs.version',
     'tools/verify-staging-artifact.php',
+    'Reviewed File 24 integration contract',
     'Verify extracted installed candidate against embedded manifest',
     'Staging_Probe::verify_package_integrity',
     'Verify assembled candidate with the independent verifier',
 ] as $marker) {
     $check(str_contains($workflow, $marker), 'Dynamic staging workflow marker missing: ' . $marker);
 }
-$check(! str_contains($workflow, 'sabri-public-experience-0.11.0.zip'), 'Staging workflow must not hard-code one release filename.');
+$check(! str_contains($workflow, 'sabri-public-experience-0.12.0.zip'), 'Staging workflow must not hard-code one release filename.');
 
 if ($failures !== []) {
     fwrite(STDERR, "FAILED\n- " . implode("\n- ", $failures) . "\n");
     exit(1);
 }
 
-echo "PASS: File 25 deterministic builder, independent artifact verifier, installed probe, and Hostinger dependency matrix contracts\n";
+echo "PASS: File 25 deterministic builder, File 24 matrix, independent artifact verifier, installed probe, and Hostinger dependency contracts\n";
