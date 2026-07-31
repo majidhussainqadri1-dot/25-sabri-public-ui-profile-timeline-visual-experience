@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Sabri Unified Global Visual Experience and Design System
  * Plugin URI:  https://sabrihomeopathy.com/
- * Description: File 25 global design system, public UI, profile timeline, responsive refinement, accessibility, visual consistency, reusable visual components, governed native media adapters, and visual-acceptance evidence for the Sabri Social Homeopathy Platform.
- * Version:     0.8.0
+ * Description: File 25 global design system, public UI, profile timeline, responsive refinement, accessibility, visual consistency, reusable visual components, governed native content adapters, and visual-acceptance evidence for the Sabri Social Homeopathy Platform.
+ * Version:     0.9.0
  * Author:      Dr. Allamah Majid Hussain Sabri Muhaddith Mursheed
  * Text Domain: sabri-public-experience
  * Requires at least: 6.5
@@ -61,7 +61,7 @@ if (function_exists('sabri_public_experience_bootstrap')) {
     return;
 }
 
-define('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.8.0');
+define('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.9.0');
 define('SABRI_PUBLIC_EXPERIENCE_SCHEMA_VERSION', '1');
 define('SABRI_PUBLIC_EXPERIENCE_FILE', __FILE__);
 define('SABRI_PUBLIC_EXPERIENCE_DIR', plugin_dir_path(__FILE__));
@@ -90,6 +90,7 @@ $spux_files = [
     'includes/providers/class-file-10-video-media-provider.php',
     'includes/providers/class-file-11-reels-media-provider.php',
     'includes/providers/class-file-12-pdf-media-provider.php',
+    'includes/providers/class-file-18-marketplace-provider.php',
     'includes/providers/class-file-21-provider.php',
     'includes/providers/class-wordpress-posts-provider.php',
     'includes/class-profile-repository.php',
