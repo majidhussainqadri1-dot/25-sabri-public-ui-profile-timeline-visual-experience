@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "file": 25,
-  "runtime_version": "0.12.0",
+  "runtime_version": "0.13.0",
   "purpose": "Exact multi-plugin staging candidate matrix. This file records reviewed source/package expectations and does not claim staging acceptance.",
   "environment": {
     "wordpress_minimum": "6.5",
@@ -16,7 +16,8 @@
       "file": 0,
       "name": "Sabri Membership Core",
       "role": "hard runtime authority for identity, approval, age, visibility, and professional eligibility",
-      "reviewed_package_version": "1.0.1",
+      "reviewed_package_version": "1.1.13",
+      "accepted_source_range": ">=1.1.13 <1.2.0",
       "required_symbols": ["SMC_VERSION", "smc_get_profile", "smc_user_status", "smc_is_founder"],
       "bundled_with_file_25": false,
       "staging_status": "pending"
@@ -24,9 +25,10 @@
     {
       "file": 3,
       "name": "Sabri Profiles and Doctors",
-      "role": "profile master data, photographs, professional data, and public-contact consent",
-      "reviewed_package_version": "0.1.0",
-      "required_symbols": ["SPD_VERSION", "SPD_Helpers"],
+      "role": "profile master data, photographs, professional data, and explicit public-contact consent",
+      "reviewed_package_version": "0.2.0",
+      "accepted_source_range": ">=0.2.0 <0.3.0",
+      "required_symbols": ["SPD_VERSION", "SPD_Helpers", "SPD_Helpers::can_show_contact"],
       "bundled_with_file_25": false,
       "staging_status": "pending"
     },
@@ -116,7 +118,7 @@
       "file": 25,
       "name": "Sabri Unified Global Visual Experience and Design System",
       "role": "public visual projection, profiles, responsive refinement, accessibility, and visual acceptance",
-      "candidate_version": "0.12.0",
+      "candidate_version": "0.13.0",
       "bundled_with_file_25": true,
       "staging_status": "pending",
       "package_status": "build-input-not-acceptance",
