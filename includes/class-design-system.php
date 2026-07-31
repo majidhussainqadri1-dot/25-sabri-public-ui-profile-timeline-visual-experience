@@ -11,7 +11,7 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
 /** Canonical design-system contract for File 25. */
 final class Design_System
 {
-    public const CONTRACT_VERSION = '1.7.0';
+    public const CONTRACT_VERSION = '1.8.0';
     public const CANONICAL_NAME = 'Sabri Unified Global Visual Experience and Design System';
     public const SUBTITLE = 'Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency';
 
@@ -86,6 +86,8 @@ final class Design_System
             'global_shell_owner' => 'file-20',
             'visual_system_owner' => 'file-25',
             'security_governance_owner' => 'file-24',
+            'profile_master_owner' => 'file-00-file-03',
+            'public_contact_consent_owner' => 'file-03',
             'shell_detected' => self::shell_is_available(),
             'scope' => [
                 'global-design-system',
@@ -102,25 +104,55 @@ final class Design_System
                 'installed-staging-preflight',
                 'file-24-module-manifest',
                 'no-store-profile-boundary',
+                'native-contact-consent',
+                'same-origin-profile-media',
+                'conditional-profile-layout',
+                'profile-breadcrumbs',
+                'structured-profile-section-rest',
             ],
             'tokens' => self::tokens(),
             'components' => Components::contract(),
             'content_cards' => Content_Cards::contract(),
             'visual_acceptance' => Visual_Acceptance::contract(),
             'optional_sections' => [
-                'contract_version' => '1.1.0',
+                'contract_version' => '1.2.0',
                 'allowed_sections' => Section_Registry::approved_sections(),
                 'registration_hook' => 'sabri_public_experience/register_section_providers',
                 'provider_interface' => 'Sabri\\PublicExperience\\Contracts\\Profile_Section_Provider',
                 'owns_native_content' => false,
                 'requires_content_before_tab' => true,
                 'provider_metadata_bound_to_concrete_object' => true,
+                'public_projection_contract' => Section_Service::PUBLIC_CONTRACT_VERSION,
                 'internal_projection_key' => [
                     'field' => 'projection_key',
                     'format' => 'sha256',
                     'rendered_publicly' => false,
                     'purpose' => 'deduplicate native objects that share one application URL',
                 ],
+            ],
+            'public_rest' => [
+                'namespace' => 'sabri-public/v1',
+                'profile' => '/profiles/{public-slug}',
+                'timeline' => '/profiles/{public-slug}/timeline',
+                'knowledge' => '/profiles/{public-slug}/knowledge',
+                'media' => '/profiles/{public-slug}/media',
+                'provider_health' => '/providers/health',
+                'structured_cards' => true,
+                'provider_ids_public' => false,
+                'native_ids_public' => false,
+                'no_store' => true,
+                'etag' => true,
+            ],
+            'profile_presentation' => [
+                'founder_display_name' => Profile_Repository::FOUNDER_DISPLAY_NAME,
+                'external_avatar_fallback' => false,
+                'same_origin_media_only' => true,
+                'doctor_contact_requires_file_03_consent' => true,
+                'right_sidebar_requires_real_content' => true,
+                'breadcrumb_html' => true,
+                'breadcrumb_schema' => true,
+                'missing_profile_default_status' => 404,
+                'explicit_tombstone_status' => 410,
             ],
             'file_24_integration' => File_24_Integration::contract(),
             'staging_probe' => Staging_Probe::contract(),
