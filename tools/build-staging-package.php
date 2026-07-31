@@ -15,6 +15,10 @@ final class File25_Staging_Package_Builder
 {
     private const PACKAGE_ROOT = 'sabri-public-experience';
     private const MANIFEST_NAME = 'STAGING-MANIFEST.json';
+    private const MAX_PAYLOAD_FILES = 256;
+    private const MAX_PAYLOAD_BYTES = 25_000_000;
+    private const MAX_SINGLE_FILE_BYTES = 5_000_000;
+
     private const TOP_LEVEL_FILES = [
         'sabri-public-experience.php',
         'uninstall.php',
@@ -24,6 +28,7 @@ final class File25_Staging_Package_Builder
         'SECURITY.md',
         'PRIVACY.md',
     ];
+
     private const RUNTIME_DIRECTORIES = [
         'assets',
         'config',
@@ -31,6 +36,7 @@ final class File25_Staging_Package_Builder
         'languages',
         'templates',
     ];
+
     private const FORBIDDEN_SEGMENTS = [
         '.git',
         '.github',
@@ -46,18 +52,19 @@ final class File25_Staging_Package_Builder
     /** @return list<string> */
     public static function discover_payload(string $root): array
     {
-        $root = rtrim(str_replace('\\', '/', $root), '/');
+        $root = self::validated_root($root);
         $payload = [];
 
         foreach (self::TOP_LEVEL_FILES as $relative) {
-            if (is_file($root . '/' . $relative)) {
+            $absolute = $root . '/' . $relative;
+            if (is_file($absolute) && ! is_link($absolute)) {
                 $payload[] = $relative;
             }
         }
 
         foreach (self::RUNTIME_DIRECTORIES as $directory) {
             $absolute = $root . '/' . $directory;
-            if (! is_dir($absolute)) {
+            if (! is_dir($absolute) || is_link($absolute)) {
                 continue;
             }
 
@@ -69,7 +76,11 @@ final class File25_Staging_Package_Builder
                 if (! $file instanceof SplFileInfo || ! $file->isFile() || $file->isLink()) {
                     continue;
                 }
-                $relative = ltrim(str_replace('\\', '/', substr($file->getPathname(), strlen($root))), '/');
+                $real = $file->getRealPath();
+                if (! is_string($real) || ! self::path_is_within($real, $root)) {
+                    throw new RuntimeException('Payload file resolved outside the repository root.');
+                }
+                $relative = ltrim(str_replace('\\', '/', substr($real, strlen($root))), '/');
                 if (self::payload_path_is_allowed($relative)) {
                     $payload[] = $relative;
                 }
@@ -84,6 +95,9 @@ final class File25_Staging_Package_Builder
                 throw new RuntimeException('Required staging payload file is missing: ' . $required);
             }
         }
+        if (count($payload) > self::MAX_PAYLOAD_FILES) {
+            throw new RuntimeException('Staging payload contains too many files.');
+        }
 
         return $payload;
     }
@@ -94,16 +108,17 @@ final class File25_Staging_Package_Builder
         if (! class_exists('ZipArchive')) {
             throw new RuntimeException('The PHP Zip extension is required to build the staging package.');
         }
-        if (preg_match('/^[a-f0-9]{40}$/', strtolower($commit_sha)) !== 1) {
+        $commit_sha = strtolower(trim($commit_sha));
+        if (preg_match('/^[a-f0-9]{40}$/', $commit_sha) !== 1) {
             throw new InvalidArgumentException('A full 40-character commit SHA is required.');
         }
         if ($source_date_epoch < 315532800 || $source_date_epoch > 4102444800) {
             throw new InvalidArgumentException('SOURCE_DATE_EPOCH is outside the supported deterministic range.');
         }
 
-        $root = rtrim(str_replace('\\', '/', $root), '/');
+        $root = self::validated_root($root);
         $output_dir = self::validated_output_dir($root, $output_dir);
-        self::remove_tree($output_dir);
+        self::remove_tree($output_dir, $root . '/build');
         if (! mkdir($output_dir, 0775, true) && ! is_dir($output_dir)) {
             throw new RuntimeException('Unable to create staging output directory.');
         }
@@ -116,21 +131,38 @@ final class File25_Staging_Package_Builder
         }
 
         $manifest_files = [];
+        $payload_bytes = 0;
         foreach ($payload as $relative) {
             $source = $root . '/' . $relative;
+            if (! is_file($source) || is_link($source)) {
+                throw new RuntimeException('Payload source is missing or is a symbolic link: ' . $relative);
+            }
+            $source_real = realpath($source);
+            if (! is_string($source_real) || ! self::path_is_within($source_real, $root)) {
+                throw new RuntimeException('Payload source resolved outside the repository root: ' . $relative);
+            }
+            $bytes = filesize($source_real);
+            if (! is_int($bytes) || $bytes < 0 || $bytes > self::MAX_SINGLE_FILE_BYTES) {
+                throw new RuntimeException('Payload file exceeds the permitted size: ' . $relative);
+            }
+            $payload_bytes += $bytes;
+            if ($payload_bytes > self::MAX_PAYLOAD_BYTES) {
+                throw new RuntimeException('Total staging payload exceeds the permitted size.');
+            }
+
             $destination = $stage_root . '/' . $relative;
             $destination_dir = dirname($destination);
             if (! is_dir($destination_dir) && ! mkdir($destination_dir, 0775, true) && ! is_dir($destination_dir)) {
                 throw new RuntimeException('Unable to create payload directory: ' . $relative);
             }
-            if (! copy($source, $destination)) {
+            if (! copy($source_real, $destination)) {
                 throw new RuntimeException('Unable to copy payload file: ' . $relative);
             }
             chmod($destination, 0644);
             touch($destination, $source_date_epoch);
             $manifest_files[$relative] = [
                 'sha256' => hash_file('sha256', $destination),
-                'bytes' => filesize($destination),
+                'bytes' => $bytes,
             ];
         }
 
@@ -140,7 +172,7 @@ final class File25_Staging_Package_Builder
             'file_number' => 25,
             'canonical_name' => 'Sabri Unified Global Visual Experience and Design System',
             'version' => $version,
-            'commit_sha' => strtolower($commit_sha),
+            'commit_sha' => $commit_sha,
             'source_date_epoch' => $source_date_epoch,
             'generated_at_utc' => gmdate('Y-m-d\TH:i:s\Z', $source_date_epoch),
             'manifest_scope' => 'Payload files only; the manifest and detached package checksum are excluded from the payload hash list.',
@@ -148,16 +180,13 @@ final class File25_Staging_Package_Builder
         ];
         $manifest_json = json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n";
         $internal_manifest = $stage_root . '/' . self::MANIFEST_NAME;
-        file_put_contents($internal_manifest, $manifest_json, LOCK_EX);
-        chmod($internal_manifest, 0644);
-        touch($internal_manifest, $source_date_epoch);
+        self::write_file($internal_manifest, $manifest_json, $source_date_epoch);
 
         $base_name = self::PACKAGE_ROOT . '-' . $version;
         $zip_path = $output_dir . '/' . $base_name . '.zip';
         $manifest_path = $output_dir . '/' . $base_name . '-manifest.json';
         $checksum_path = $output_dir . '/' . $base_name . '.sha256';
-        file_put_contents($manifest_path, $manifest_json, LOCK_EX);
-        touch($manifest_path, $source_date_epoch);
+        self::write_file($manifest_path, $manifest_json, $source_date_epoch);
 
         $zip = new ZipArchive();
         if ($zip->open($zip_path, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
@@ -180,28 +209,30 @@ final class File25_Staging_Package_Builder
                 $zip->setExternalAttributesName($archive_name, ZipArchive::OPSYS_UNIX, 0100644 << 16);
             }
         }
-        $zip->setArchiveComment('File 25 staging candidate ' . $version . ' @ ' . strtolower($commit_sha));
+        $zip->setArchiveComment('File 25 staging candidate ' . $version . ' @ ' . $commit_sha);
         if (! $zip->close()) {
             throw new RuntimeException('Unable to finalize staging ZIP archive.');
         }
         touch($zip_path, $source_date_epoch);
 
         $zip_sha256 = hash_file('sha256', $zip_path);
-        $checksum_line = $zip_sha256 . '  ' . basename($zip_path) . "\n";
-        file_put_contents($checksum_path, $checksum_line, LOCK_EX);
-        touch($checksum_path, $source_date_epoch);
+        if (! is_string($zip_sha256) || preg_match('/^[a-f0-9]{64}$/', $zip_sha256) !== 1) {
+            throw new RuntimeException('Unable to calculate the staging ZIP checksum.');
+        }
+        self::write_file($checksum_path, $zip_sha256 . '  ' . basename($zip_path) . "\n", $source_date_epoch);
 
         self::verify_archive($zip_path, $manifest, $manifest_json);
 
         return [
             'version' => $version,
-            'commit_sha' => strtolower($commit_sha),
+            'commit_sha' => $commit_sha,
             'source_date_epoch' => $source_date_epoch,
             'zip' => $zip_path,
             'zip_sha256' => $zip_sha256,
             'checksum' => $checksum_path,
             'manifest' => $manifest_path,
             'payload_file_count' => count($payload),
+            'payload_bytes' => $payload_bytes,
         ];
     }
 
@@ -221,11 +252,33 @@ final class File25_Staging_Package_Builder
         sort($expected, SORT_STRING);
 
         $actual = [];
+        $seen = [];
+        $total_bytes = 0;
         for ($index = 0; $index < $zip->numFiles; $index++) {
             $name = $zip->getNameIndex($index);
-            if (! is_string($name) || ! self::archive_name_is_safe($name)) {
+            $stat = $zip->statIndex($index);
+            if (! is_string($name) || ! is_array($stat) || ! self::archive_name_is_safe($name)) {
                 $zip->close();
                 throw new RuntimeException('Unsafe entry detected in staging ZIP.');
+            }
+            if (isset($seen[$name])) {
+                $zip->close();
+                throw new RuntimeException('Duplicate entry detected in staging ZIP: ' . $name);
+            }
+            $seen[$name] = true;
+            $entry_bytes = (int) ($stat['size'] ?? -1);
+            if ($entry_bytes < 0 || $entry_bytes > self::MAX_SINGLE_FILE_BYTES) {
+                $zip->close();
+                throw new RuntimeException('Staging ZIP entry exceeds the permitted size: ' . $name);
+            }
+            $total_bytes += $entry_bytes;
+            if ($total_bytes > self::MAX_PAYLOAD_BYTES + self::MAX_SINGLE_FILE_BYTES) {
+                $zip->close();
+                throw new RuntimeException('Staging ZIP expands beyond the permitted size.');
+            }
+            if (self::zip_entry_is_symlink($stat)) {
+                $zip->close();
+                throw new RuntimeException('Symbolic link detected in staging ZIP: ' . $name);
             }
             $actual[] = $name;
         }
@@ -280,6 +333,61 @@ final class File25_Staging_Package_Builder
         return $versions[0];
     }
 
+    private static function validated_root(string $root): string
+    {
+        if ($root === '' || str_contains($root, "\0") || is_link($root)) {
+            throw new InvalidArgumentException('Repository root is invalid or symbolic.');
+        }
+        $real = realpath($root);
+        if (! is_string($real) || ! is_dir($real)) {
+            throw new InvalidArgumentException('Repository root does not exist.');
+        }
+
+        return rtrim(str_replace('\\', '/', $real), '/');
+    }
+
+    private static function validated_output_dir(string $root, string $output_dir): string
+    {
+        $output_dir = trim(str_replace('\\', '/', $output_dir));
+        if (preg_match('#^build/[A-Za-z0-9][A-Za-z0-9._-]*(?:/[A-Za-z0-9][A-Za-z0-9._-]*)*$#', $output_dir) !== 1) {
+            throw new InvalidArgumentException('Output directory must be a safe non-root path below build/.');
+        }
+
+        $build_root = $root . '/build';
+        if (is_link($build_root)) {
+            throw new RuntimeException('The build directory may not be a symbolic link.');
+        }
+        if (! is_dir($build_root) && ! mkdir($build_root, 0775, true) && ! is_dir($build_root)) {
+            throw new RuntimeException('Unable to create the build directory.');
+        }
+        $build_real = realpath($build_root);
+        if (! is_string($build_real)) {
+            throw new RuntimeException('Unable to resolve the build directory.');
+        }
+        $build_real = rtrim(str_replace('\\', '/', $build_real), '/');
+        if (! hash_equals($root . '/build', $build_real)) {
+            throw new RuntimeException('The build directory resolved outside the repository root.');
+        }
+
+        $segments = explode('/', substr($output_dir, strlen('build/')));
+        $candidate = $build_real;
+        foreach ($segments as $segment) {
+            $candidate .= '/' . $segment;
+            if (is_link($candidate)) {
+                throw new RuntimeException('Output path ancestor may not be a symbolic link.');
+            }
+            if (file_exists($candidate) && ! is_dir($candidate)) {
+                throw new RuntimeException('Output path ancestor must be a directory.');
+            }
+        }
+
+        if (! self::path_is_within($candidate, $build_real)) {
+            throw new RuntimeException('Output directory resolved outside build/.');
+        }
+
+        return $candidate;
+    }
+
     private static function payload_path_is_allowed(string $relative): bool
     {
         if ($relative === '' || str_starts_with($relative, '/') || str_contains($relative, '\\') || str_contains($relative, "\0")) {
@@ -311,37 +419,68 @@ final class File25_Staging_Package_Builder
         return true;
     }
 
-    private static function validated_output_dir(string $root, string $output_dir): string
+    /** @param array<string,mixed> $stat */
+    private static function zip_entry_is_symlink(array $stat): bool
     {
-        $output_dir = trim(str_replace('\\', '/', $output_dir));
-        if (preg_match('#^build/[A-Za-z0-9._/-]+$#', $output_dir) !== 1 || str_contains($output_dir, '..')) {
-            throw new InvalidArgumentException('Output directory must be a safe relative path below build/.');
+        if (! isset($stat['external_attributes'])) {
+            return false;
         }
+        $mode = ((int) $stat['external_attributes'] >> 16) & 0170000;
 
-        return $root . '/' . rtrim($output_dir, '/');
+        return $mode === 0120000;
     }
 
-    private static function remove_tree(string $path): void
+    private static function path_is_within(string $path, string $parent): bool
     {
-        if (! file_exists($path)) {
+        $path = rtrim(str_replace('\\', '/', $path), '/');
+        $parent = rtrim(str_replace('\\', '/', $parent), '/');
+
+        return $path !== $parent && str_starts_with($path, $parent . '/');
+    }
+
+    private static function write_file(string $path, string $contents, int $timestamp): void
+    {
+        if (file_put_contents($path, $contents, LOCK_EX) === false) {
+            throw new RuntimeException('Unable to write staging evidence file: ' . basename($path));
+        }
+        chmod($path, 0644);
+        touch($path, $timestamp);
+    }
+
+    private static function remove_tree(string $path, string $build_root): void
+    {
+        $path = rtrim(str_replace('\\', '/', $path), '/');
+        $build_root = rtrim(str_replace('\\', '/', $build_root), '/');
+        if (! self::path_is_within($path, $build_root)) {
+            throw new RuntimeException('Refusing to remove a path outside build/.');
+        }
+        if (! file_exists($path) && ! is_link($path)) {
             return;
         }
         if (is_link($path) || is_file($path)) {
-            unlink($path);
-            return;
+            throw new RuntimeException('Refusing to remove a symbolic link or file as the output directory.');
         }
+
         $iterator = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS),
             RecursiveIteratorIterator::CHILD_FIRST
         );
         foreach ($iterator as $item) {
+            $item_path = str_replace('\\', '/', $item->getPathname());
+            if (! self::path_is_within($item_path, $path)) {
+                throw new RuntimeException('Refusing to remove an item outside the output directory.');
+            }
             if ($item->isDir() && ! $item->isLink()) {
-                rmdir($item->getPathname());
-            } else {
-                unlink($item->getPathname());
+                if (! rmdir($item_path)) {
+                    throw new RuntimeException('Unable to remove an output directory.');
+                }
+            } elseif (! unlink($item_path)) {
+                throw new RuntimeException('Unable to remove an output file.');
             }
         }
-        rmdir($path);
+        if (! rmdir($path)) {
+            throw new RuntimeException('Unable to remove the previous output directory.');
+        }
     }
 }
 
