@@ -161,7 +161,7 @@ $contains($acceptance, [
     "CONTRACT_VERSION = '1.3.0'",
     'target_commit_sha',
     'artifact_ref',
-    'artifact_bytes',
+    'byte_size',
     'media_type',
     'founder_signoff',
 ], 'Visual acceptance');
