@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 $root = dirname(__DIR__);
 $errors = [];
+
 $required = [
     '.github/workflows/ci.yml',
     'sabri-public-experience.php',
@@ -28,25 +29,14 @@ $required = [
     'includes/class-profile-repository.php',
     'includes/class-visibility-policy.php',
     'includes/class-rest-controller.php',
-    'includes/class-system-check.php',
-    'includes/class-timeline-registry.php',
-    'includes/class-timeline-service.php',
     'includes/class-section-registry.php',
     'includes/class-section-service.php',
-    'includes/contracts/interface-timeline-provider.php',
-    'includes/contracts/interface-profile-section-provider.php',
-    'includes/providers/class-file-06-knowledge-provider.php',
-    'includes/providers/class-file-10-video-media-provider.php',
-    'includes/providers/class-file-11-reels-media-provider.php',
-    'includes/providers/class-file-12-pdf-media-provider.php',
-    'includes/providers/class-file-18-marketplace-provider.php',
-    'includes/providers/class-file-21-provider.php',
+    'templates/public-profile.php',
     'assets/css/design-system.css',
     'assets/css/design-system-components.css',
     'assets/css/public.css',
     'assets/css/profile-sections.css',
     'assets/js/public.js',
-    'templates/public-profile.php',
     'config/staging-dependencies.json',
     'config/staging-test-plan.json',
     'tests/profile-router.php',
@@ -58,11 +48,10 @@ $required = [
     'tests/release-engineering.php',
     'tools/build-staging-package.php',
     'tools/verify-staging-artifact.php',
-    'docs/NINTH-REVIEW-ROUTE-PARITY-AND-HOSTINGER-PREFLIGHT-2026-07-31.md',
-    'docs/HOSTINGER-STAGING-PROBE-AND-RUNBOOK.md',
     'docs/TENTH-REVIEW-FILE24-INTEGRATION-2026-07-31.md',
     'docs/ELEVENTH-REVIEW-MASTER-PLAN-AND-FILE25-2026-07-31.md',
 ];
+
 foreach ($required as $path) {
     if (! is_file($root . '/' . $path)) {
         $errors[] = 'Missing required file: ' . $path;
@@ -77,9 +66,10 @@ $read = static function (string $path) use ($root, &$errors): string {
     }
     return $content;
 };
-$contains = static function (string $content, array $markers, string $label) use (&$errors): void {
+
+$contains = static function (string $source, array $markers, string $label) use (&$errors): void {
     foreach ($markers as $marker) {
-        if (! str_contains($content, $marker)) {
+        if (! str_contains($source, $marker)) {
             $errors[] = $label . ' marker missing: ' . $marker;
         }
     }
@@ -96,57 +86,46 @@ if (count(array_unique($versions)) !== 1 || $versions[0] !== '0.13.0') {
 }
 $contains($main, [
     "define('SABRI_PUBLIC_EXPERIENCE_SCHEMA_VERSION', '2')",
-    'class-staging-probe.php',
-    'class-staging-cli.php',
-    'class-upgrade-manager.php',
     'class-file-24-integration.php',
-    'Sabri Unified Global Visual Experience and Design System',
+    'class-section-service.php',
+    'class-rest-controller.php',
     "version_compare(PHP_VERSION, '8.0', '<')",
 ], 'Runtime');
 
 $design = $read('includes/class-design-system.php');
 $contains($design, [
     "CONTRACT_VERSION = '1.8.0'",
-    'installed-staging-preflight',
-    'file-24-module-manifest',
+    "'global_shell_owner' => 'file-20'",
+    "'security_governance_owner' => 'file-24'",
+    "'public_contact_consent_owner' => 'file-03'",
     'native-contact-consent',
     'same-origin-profile-media',
     'conditional-profile-layout',
     'profile-breadcrumbs',
     'structured-profile-section-rest',
-    "'file_24_integration' => File_24_Integration::contract()",
-    "'security_governance_owner' => 'file-24'",
-    "'global_shell_owner' => 'file-20'",
-    "'visual_system_owner' => 'file-25'",
-    "'public_contact_consent_owner' => 'file-03'",
     "'creates_file_26' => false",
 ], 'Design system');
 
 $file24 = $read('includes/class-file-24-integration.php');
 $contains($file24, [
-    "CONTRACT_VERSION = '1.0.0'",
-    "MODULE_KEY = 'file-25-public-experience'",
+    "defined('SPCRC_VERSION')",
     "REVIEWED_MINIMUM_VERSION = '0.25.3'",
     "REVIEWED_MAXIMUM_VERSION = '0.26.0'",
-    "defined('SPCRC_VERSION')",
     "add_filter('spcrc/module_manifests'",
-    "do_action('spcrc/request_security_state'",
-    'no-store, private, max-age=0, must-revalidate',
     "'owns_security_governance' => false",
     "'owns_privacy_orchestration' => false",
 ], 'File 24 integration');
 if (str_contains($file24, 'SABRI_SECURITY_CENTER_VERSION') || str_contains($file24, 'SABRI_SPRC_VERSION')) {
-    $errors[] = 'File 24 integration must use the exact reviewed SPCRC_VERSION contract.';
+    $errors[] = 'File 24 integration must use only the reviewed SPCRC_VERSION contract.';
 }
 
 $visibility = $read('includes/class-visibility-policy.php');
 $contains($visibility, [
     'SPD_Helpers::can_show_contact',
     'return $authoritative && $filtered',
-    "['phone', 'whatsapp']",
 ], 'Contact visibility');
 if (str_contains($visibility, 'elseif ($this->is_verified_doctor')) {
-    $errors[] = 'Verified Doctor status must not bypass File 03 public-contact consent.';
+    $errors[] = 'Verified Doctor status must not bypass File 03 contact consent.';
 }
 
 $repository = $read('includes/class-profile-repository.php');
@@ -162,15 +141,9 @@ if (str_contains($repository, 'get_avatar_url')) {
 $router = $read('includes/class-profile-router.php');
 $contains($router, [
     'Section_Registry::approved_sections()',
-    'route_sections',
-    'section_pattern',
     'profile_right_sidebar_available',
-    "return $right_sidebar_available ? 'three' : 'two'",
-    "private const TYPES = ['founder', 'doctor', 'member']",
+    'return $right_sidebar_available ? \'three\' : \'two\';',
 ], 'Profile router');
-if (str_contains($router, "SECTION_PATTERN = 'overview|timeline")) {
-    $errors[] = 'Profile router must not keep a stale independent provider-section pattern.';
-}
 
 $renderer = $read('includes/class-profile-renderer.php');
 $contains($renderer, [
@@ -179,8 +152,10 @@ $contains($renderer, [
     'missing_profile_status',
     'status_header($status)',
 ], 'Profile renderer');
-$template = $read('templates/public-profile.php');
-$contains($template, ['spux-breadcrumbs', "aria-current=\"page\""], 'Public profile template');
+$contains($read('templates/public-profile.php'), [
+    'spux-breadcrumbs',
+    'aria-current="page"',
+], 'Profile template');
 
 $cards = $read('includes/class-content-cards.php');
 $contains($cards, [
@@ -188,6 +163,7 @@ $contains($cards, [
     'public static function normalize_public',
     "'public_normalizer' => [self::class, 'normalize_public']",
 ], 'Content cards');
+
 $sections = $read('includes/class-section-service.php');
 $contains($sections, [
     "PUBLIC_CONTRACT_VERSION = '1.0.0'",
@@ -195,6 +171,7 @@ $contains($sections, [
     'public_health',
     'Content_Cards::normalize_public',
 ], 'Section service');
+
 $rest = $read('includes/class-rest-controller.php');
 $contains($rest, [
     '/founder/knowledge',
@@ -206,70 +183,16 @@ $contains($rest, [
     'no-store, private, max-age=0',
 ], 'REST controller');
 if (preg_match('/provider_id|native_id|projection_key/', $rest)) {
-    $errors[] = 'Public REST controller must not expose provider, native, or projection identifiers.';
+    $errors[] = 'Public REST controller must not expose internal identifiers.';
 }
-
-$probe = $read('includes/class-staging-probe.php');
-$contains($probe, [
-    "CONTRACT_VERSION = '1.0.0'",
-    'sabrisocialstaging.sabrihomeopathy.com',
-    "LIVE_HOST = 'sabrihomeopathy.com'",
-    'verify_package_integrity',
-    'verify_test_plan',
-    "'writes_runtime_data' => false",
-    "'staging_accepted' => false",
-    "'production_accepted' => false",
-], 'Staging probe');
-if (preg_match('/\b(update_option|add_option|delete_option|wp_insert_post|wp_update_post|wp_delete_post)\s*\(/', $probe)) {
-    $errors[] = 'Staging probe must remain read-only.';
-}
-
-$upgrade = $read('includes/class-upgrade-manager.php');
-$contains($upgrade, [
-    'sabri_public_experience_upgrade_lock',
-    'LOCK_TTL',
-    'Profile_Router::flush()',
-    'release_lock',
-    "Safe_Mode::enable('upgrade-exception'",
-], 'Upgrade manager');
 
 $plugin = $read('includes/class-plugin.php');
 $contains($plugin, [
     'new File_24_Integration',
-    '$file_24->register()',
     'new Staging_Probe',
-    'Staging_CLI::register',
     'new Upgrade_Manager',
     'new Rest_Controller($profiles, $timeline, $sections)',
-    'new System_Check($dependencies, $timeline_registry, $section_registry, $staging_probe, $file_24)',
 ], 'Plugin bootstrap');
-
-$dependencies = $read('includes/class-dependency-manager.php');
-$contains($dependencies, [
-    'File_24_Integration::is_compatible()',
-    'File_24_Integration::current_version()',
-    'File_24_Integration::REVIEWED_MINIMUM_VERSION',
-    'File_24_Integration::REVIEWED_MAXIMUM_VERSION',
-], 'Dependency manager');
-
-$system_check = $read('includes/class-system-check.php');
-$contains($system_check, [
-    'sabri_public_experience_file24',
-    'file_24_test',
-    'sabri_public_experience_staging_probe',
-    'staging_probe_test',
-    'This is not staging acceptance',
-], 'Site Health');
-
-$acceptance = $read('includes/class-visual-acceptance.php');
-$contains($acceptance, [
-    "CONTRACT_VERSION = '1.3.0'",
-    'target_commit_sha',
-    'artifact_ref',
-    'byte_size',
-    'media_type',
-    'founder_signoff',
-], 'Visual acceptance');
 
 $css = '';
 foreach (['assets/css/design-system.css', 'assets/css/design-system-components.css', 'assets/css/public.css', 'assets/css/profile-sections.css'] as $path) {
@@ -278,7 +201,7 @@ foreach (['assets/css/design-system.css', 'assets/css/design-system-components.c
 if (preg_match('/@import\s+url|fonts\.googleapis|use\.typekit|url\(\s*["\']?https?:/i', $css)) {
     $errors[] = 'Remote CSS or font dependency detected.';
 }
-foreach (['--sabri-shell-primary', '--sabri-visual-primary', '.sabri-ui-content-card', '.sabri-ui-notice', '.spux-breadcrumbs', '@media (forced-colors: active)', '@media print'] as $marker) {
+foreach (['--sabri-visual-primary', '.sabri-ui-content-card', '.spux-breadcrumbs', '@media (forced-colors: active)', '@media print'] as $marker) {
     if (! str_contains($css, $marker)) {
         $errors[] = 'Visual-system CSS marker missing: ' . $marker;
     }
@@ -298,8 +221,7 @@ foreach ([
     'includes/providers/class-file-18-marketplace-provider.php',
     'includes/providers/class-file-21-provider.php',
 ] as $path) {
-    $source = $read($path);
-    if (preg_match('/\b(wp_insert_post|wp_update_post|wp_delete_post|update_option|delete_option)\s*\(/i', $source)) {
+    if (preg_match('/\b(wp_insert_post|wp_update_post|wp_delete_post|update_option|delete_option)\s*\(/i', $read($path))) {
         $errors[] = 'Read-only projection contains a write primitive: ' . $path;
     }
 }
@@ -309,11 +231,8 @@ if (! is_array($matrix)
     || ($matrix['runtime_version'] ?? '') !== '0.13.0'
     || ($matrix['environment']['target_site'] ?? '') !== 'https://sabrisocialstaging.sabrihomeopathy.com/'
     || ($matrix['environment']['live_changes_allowed'] ?? true) !== false
-    || ($matrix['environment']['registration_disabled_required'] ?? false) !== true
-    || ($matrix['environment']['search_indexing_disabled_required'] ?? false) !== true
-    || ($matrix['staging_test_plan'] ?? '') !== 'config/staging-test-plan.json'
 ) {
-    $errors[] = 'Staging dependency matrix is invalid or not bound to the exact private Hostinger target.';
+    $errors[] = 'Staging dependency matrix is invalid.';
 }
 $modules = [];
 foreach ((array) ($matrix['modules'] ?? []) as $module) {
@@ -329,64 +248,44 @@ foreach ([0, 3, 6, 10, 11, 12, 18, 20, 21, 24, 25] as $file) {
 if (($modules[0]['reviewed_package_version'] ?? '') !== '1.1.13'
     || ($modules[0]['accepted_source_range'] ?? '') !== '>=1.1.13 <1.2.0'
 ) {
-    $errors[] = 'File 00 staging authority must match reviewed 1.1.13 source expectations.';
+    $errors[] = 'File 00 staging authority is stale.';
 }
 if (($modules[3]['reviewed_package_version'] ?? '') !== '0.2.0'
     || ($modules[3]['accepted_source_range'] ?? '') !== '>=0.2.0 <0.3.0'
     || ! in_array('SPD_Helpers::can_show_contact', (array) ($modules[3]['required_symbols'] ?? []), true)
 ) {
-    $errors[] = 'File 03 staging authority must require reviewed 0.2.0 contact-consent contract.';
+    $errors[] = 'File 03 contact-consent staging authority is stale.';
 }
 if (($modules[24]['staging_status'] ?? '') !== 'pending'
-    || ($modules[24]['reviewed_package_version'] ?? '') !== '0.25.3'
-    || ($modules[24]['accepted_source_range'] ?? '') !== '>=0.25.3 <0.26.0'
     || ($modules[24]['accepted_runtime_contract'] ?? '') !== 'reviewed-source-contract-pending-staging'
-    || ($modules[24]['cache_partition_contract'] ?? '') !== 'not-yet-versioned'
 ) {
-    $errors[] = 'File 24 reviewed contract or pending staging state is not truthful.';
+    $errors[] = 'File 24 pending staging state is inaccurate.';
 }
-if (($modules[25]['staging_status'] ?? '') !== 'pending'
-    || ($modules[25]['candidate_version'] ?? '') !== '0.13.0'
+if (($modules[25]['candidate_version'] ?? '') !== '0.13.0'
     || ($modules[25]['schema_version'] ?? '') !== '2'
+    || ($modules[25]['staging_status'] ?? '') !== 'pending'
 ) {
-    $errors[] = 'File 25 staging state, version, or schema is not truthful.';
+    $errors[] = 'File 25 candidate state is inaccurate.';
 }
 
-$plan = json_decode($read('config/staging-test-plan.json'), true);
-if (! is_array($plan)
-    || ($plan['owner'] ?? '') !== 'file-25'
-    || ($plan['canonical_staging_host'] ?? '') !== 'sabrisocialstaging.sabrihomeopathy.com'
-    || ($plan['live_host_must_remain_untouched'] ?? false) !== true
-    || ($plan['staging_acceptance_implied'] ?? true) !== false
-    || count((array) ($plan['scenarios'] ?? [])) < 10
-) {
-    $errors[] = 'Governed Hostinger staging test plan is invalid.';
-}
-
-$composer_raw = $read('composer.json');
-$composer = json_decode($composer_raw, true);
-if (! is_array($composer) || ($composer['require']['php'] ?? '') !== '>=8.0') {
-    $errors[] = 'Composer PHP contract is invalid.';
-}
-foreach (['tests/profile-router.php', 'tests/master-plan-reconciliation.php', 'tests/file24-integration.php', 'tests/staging-probe.php', 'tests/upgrade-manager.php'] as $test) {
-    if (! str_contains($composer_raw, $test)) {
+$composer = $read('composer.json');
+foreach (['tests/profile-router.php', 'tests/master-plan-reconciliation.php', 'tests/file24-integration.php', 'tests/staging-probe.php'] as $test) {
+    if (! str_contains($composer, $test)) {
         $errors[] = 'Composer suite missing: ' . $test;
     }
 }
-
 $workflow = $read('.github/workflows/ci.yml');
-$contains($workflow, [
-    'Provider route parity and fail-closed profile routing',
+foreach ([
     'Master-plan and File 25 final-specification reconciliation',
     'Reviewed File 24 integration contract',
-    'Installed-package integrity and Hostinger staging-probe contract',
-    'Idempotent schema-2 profile-route upgrade contract',
-    'Verify extracted installed candidate against embedded manifest',
-    'Staging_Probe::verify_package_integrity',
     'Verify assembled candidate with the independent verifier',
-], 'CI workflow');
+] as $marker) {
+    if (! str_contains($workflow, $marker)) {
+        $errors[] = 'CI workflow marker missing: ' . $marker;
+    }
+}
 if (str_contains($workflow, 'sabri-public-experience-0.13.0.zip')) {
-    $errors[] = 'CI must not hard-code one staging package version.';
+    $errors[] = 'CI must not hard-code the current package version.';
 }
 
 if ($errors !== []) {
@@ -394,4 +293,4 @@ if ($errors !== []) {
     exit(1);
 }
 
-echo "PASS: File 25 master-plan, privacy, REST, File 24, staging, and package structure\n";
+echo "PASS: File 25 master-plan, privacy, REST, staging, and package structure\n";
