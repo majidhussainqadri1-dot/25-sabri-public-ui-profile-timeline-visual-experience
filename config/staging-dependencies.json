@@ -1,13 +1,15 @@
 {
   "schema_version": 1,
   "file": 25,
-  "runtime_version": "0.10.0",
+  "runtime_version": "0.11.0",
   "purpose": "Exact multi-plugin staging candidate matrix. This file records reviewed source/package expectations and does not claim staging acceptance.",
   "environment": {
     "wordpress_minimum": "6.5",
     "php_minimum": "8.0",
-    "target_site": "Hostinger native staging only",
-    "live_changes_allowed": false
+    "target_site": "https://sabrisocialstaging.sabrihomeopathy.com/",
+    "live_changes_allowed": false,
+    "registration_disabled_required": true,
+    "search_indexing_disabled_required": true
   },
   "modules": [
     {
@@ -15,12 +17,7 @@
       "name": "Sabri Membership Core",
       "role": "hard runtime authority for identity, approval, age, visibility, and professional eligibility",
       "reviewed_package_version": "1.0.1",
-      "required_symbols": [
-        "SMC_VERSION",
-        "smc_get_profile",
-        "smc_user_status",
-        "smc_is_founder"
-      ],
+      "required_symbols": ["SMC_VERSION", "smc_get_profile", "smc_user_status", "smc_is_founder"],
       "bundled_with_file_25": false,
       "staging_status": "pending"
     },
@@ -29,10 +26,7 @@
       "name": "Sabri Profiles and Doctors",
       "role": "profile master data, photographs, professional data, and public-contact consent",
       "reviewed_package_version": "0.1.0",
-      "required_symbols": [
-        "SPD_VERSION",
-        "SPD_Helpers"
-      ],
+      "required_symbols": ["SPD_VERSION", "SPD_Helpers"],
       "bundled_with_file_25": false,
       "staging_status": "pending"
     },
@@ -42,10 +36,7 @@
       "role": "canonical Knowledge content owner",
       "reviewed_package_version": "0.1.0",
       "accepted_source_range": ">=0.1.0 <0.2.0",
-      "required_symbols": [
-        "HE_VERSION",
-        "HE_Content"
-      ],
+      "required_symbols": ["HE_VERSION", "HE_Content"],
       "bundled_with_file_25": false,
       "staging_status": "pending"
     },
@@ -55,10 +46,7 @@
       "role": "canonical video and live-broadcasting owner",
       "reviewed_package_version": "0.1.0",
       "accepted_source_range": ">=0.1.0 <0.2.0",
-      "required_symbols": [
-        "SVW_VERSION",
-        "SVW_Helpers"
-      ],
+      "required_symbols": ["SVW_VERSION", "SVW_Helpers"],
       "bundled_with_file_25": false,
       "staging_status": "pending"
     },
@@ -68,11 +56,7 @@
       "role": "canonical Reel policy and discovery owner over File 10 video objects",
       "reviewed_package_version": "0.1.0",
       "accepted_source_range": ">=0.1.0 <0.2.0",
-      "required_symbols": [
-        "SRL_VERSION",
-        "SVW_VERSION",
-        "SVW_Helpers"
-      ],
+      "required_symbols": ["SRL_VERSION", "SVW_VERSION", "SVW_Helpers"],
       "bundled_with_file_25": false,
       "staging_status": "pending"
     },
@@ -82,10 +66,7 @@
       "role": "canonical documents, encryption, reading, and download owner",
       "reviewed_package_version": "0.1.0",
       "accepted_source_range": ">=0.1.0 <0.2.0",
-      "required_symbols": [
-        "SPL_VERSION",
-        "SPL_Helpers"
-      ],
+      "required_symbols": ["SPL_VERSION", "SPL_Helpers"],
       "bundled_with_file_25": false,
       "staging_status": "pending"
     },
@@ -95,12 +76,7 @@
       "role": "canonical seller, listing, moderation, contact, offer, and direct-deal owner",
       "reviewed_package_version": "1.1.0",
       "accepted_source_range": ">=1.1.0 <1.2.0",
-      "required_symbols": [
-        "SMP_VERSION",
-        "SMP_DB",
-        "SMP_Activator",
-        "SMP_Utils"
-      ],
+      "required_symbols": ["SMP_VERSION", "SMP_DB", "SMP_Activator", "SMP_Utils"],
       "bundled_with_file_25": false,
       "staging_status": "pending"
     },
@@ -109,9 +85,7 @@
       "name": "Sabri Unified Application Shell",
       "role": "sole global shell, navigation, sidebar, drawer, and layout owner",
       "reviewed_package_version": "1.0.0",
-      "required_symbols": [
-        "SABRI_SHELL_VERSION"
-      ],
+      "required_symbols": ["SABRI_SHELL_VERSION"],
       "bundled_with_file_25": false,
       "staging_status": "pending"
     },
@@ -120,11 +94,7 @@
       "name": "Home and News Feed",
       "role": "canonical Home, News, publication, interaction, moderation, and timeline owner",
       "reviewed_source_range": ">=1.0.3 <2.0.0",
-      "required_symbols": [
-        "SABRI_HNF_VERSION",
-        "sabri_hnf_bootstrap",
-        "Sabri\\HomeNewsFeed\\ProfileTimeline"
-      ],
+      "required_symbols": ["SABRI_HNF_VERSION", "sabri_hnf_bootstrap", "Sabri\\HomeNewsFeed\\ProfileTimeline"],
       "exact_staging_package": "pending",
       "bundled_with_file_25": false,
       "staging_status": "pending"
@@ -141,10 +111,12 @@
       "file": 25,
       "name": "Sabri Unified Global Visual Experience and Design System",
       "role": "public visual projection, profiles, responsive refinement, accessibility, and visual acceptance",
-      "candidate_version": "0.10.0",
+      "candidate_version": "0.11.0",
       "bundled_with_file_25": true,
       "staging_status": "pending",
-      "package_status": "build-input-not-acceptance"
+      "package_status": "build-input-not-acceptance",
+      "schema_version": "2",
+      "installed_preflight": "wp sabri file25 staging-probe --expected-commit=<sha>"
     }
   ],
   "acceptance_rule": "No module is staging-accepted or production-accepted merely because this matrix, source code, a ZIP, or green CI exists.",
@@ -155,5 +127,6 @@
     "embedded_manifest_match_required": true,
     "embedded_dependency_matrix_match_required": true,
     "staging_acceptance_implied": false
-  }
+  },
+  "staging_test_plan": "config/staging-test-plan.json"
 }
