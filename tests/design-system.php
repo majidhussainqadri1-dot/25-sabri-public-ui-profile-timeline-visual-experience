@@ -7,7 +7,7 @@ namespace {
         define('ABSPATH', __DIR__ . '/fixtures/');
     }
     if (! defined('SABRI_PUBLIC_EXPERIENCE_VERSION')) {
-        define('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.12.0');
+        define('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.13.0');
     }
     if (! function_exists('home_url')) {
         function home_url(string $path = ''): string
@@ -28,6 +28,8 @@ namespace {
     require_once dirname(__DIR__) . '/includes/class-content-cards.php';
     require_once dirname(__DIR__) . '/includes/contracts/interface-profile-section-provider.php';
     require_once dirname(__DIR__) . '/includes/class-section-registry.php';
+    require_once dirname(__DIR__) . '/includes/class-section-service.php';
+    require_once dirname(__DIR__) . '/includes/class-profile-repository.php';
     require_once dirname(__DIR__) . '/includes/class-visual-acceptance.php';
     require_once dirname(__DIR__) . '/includes/class-staging-probe.php';
     require_once dirname(__DIR__) . '/includes/class-file-24-integration.php';
@@ -37,6 +39,8 @@ namespace {
     use Sabri\PublicExperience\Content_Cards;
     use Sabri\PublicExperience\Design_System;
     use Sabri\PublicExperience\File_24_Integration;
+    use Sabri\PublicExperience\Profile_Repository;
+    use Sabri\PublicExperience\Section_Service;
     use Sabri\PublicExperience\Staging_Probe;
 
     $failures = [];
@@ -49,13 +53,25 @@ namespace {
     $contract = Design_System::contract();
     $check(($contract['file'] ?? null) === 25, 'Design system contract must remain owned by File 25.');
     $check(($contract['canonical_name'] ?? '') === 'Sabri Unified Global Visual Experience and Design System', 'Canonical File 25 name must remain exact.');
-    $check(($contract['contract_version'] ?? '') === '1.7.0', 'Design-system contract version must include the reviewed File 24 boundary.');
-    $check(($contract['runtime_version'] ?? '') === '0.12.0', 'Design-system runtime version must match File 25 0.12.0.');
+    $check(($contract['contract_version'] ?? '') === '1.8.0', 'Design-system contract version must include the master-plan profile reconciliation.');
+    $check(($contract['runtime_version'] ?? '') === '0.13.0', 'Design-system runtime version must match File 25 0.13.0.');
     $check(($contract['creates_file_26'] ?? true) === false, 'Design system must reject a duplicate File 26.');
     $check(($contract['global_shell_owner'] ?? '') === 'file-20', 'File 20 must remain the global shell owner.');
     $check(($contract['visual_system_owner'] ?? '') === 'file-25', 'File 25 must remain the visual-system owner.');
     $check(($contract['security_governance_owner'] ?? '') === 'file-24', 'File 24 must remain the security-governance owner.');
-    foreach (['visual-acceptance-evidence', 'deterministic-staging-packaging', 'installed-staging-preflight', 'file-24-module-manifest', 'no-store-profile-boundary'] as $scope) {
+    $check(($contract['public_contact_consent_owner'] ?? '') === 'file-03', 'File 03 must remain the public-contact consent owner.');
+    foreach ([
+        'visual-acceptance-evidence',
+        'deterministic-staging-packaging',
+        'installed-staging-preflight',
+        'file-24-module-manifest',
+        'no-store-profile-boundary',
+        'native-contact-consent',
+        'same-origin-profile-media',
+        'conditional-profile-layout',
+        'profile-breadcrumbs',
+        'structured-profile-section-rest',
+    ] as $scope) {
         $check(in_array($scope, (array) ($contract['scope'] ?? []), true), 'Missing design-system scope: ' . $scope);
     }
 
@@ -72,14 +88,32 @@ namespace {
     $check(($acceptance['artifact_root'] ?? '') === 'artifacts/', 'Visual evidence must use the governed artifact root.');
 
     $cards = (array) ($contract['content_cards'] ?? []);
+    $check(($cards['contract_version'] ?? '') === '1.2.0', 'Content-card contract must expose the shared public normalizer.');
+    $check(($cards['public_normalizer'] ?? null) === [Content_Cards::class, 'normalize_public'], 'Public card normalizer must remain exposed.');
     $check(($cards['owns_native_data'] ?? true) === false, 'Global cards must preserve native-data ownership.');
 
     $sections = (array) ($contract['optional_sections'] ?? []);
     $check(($sections['provider_metadata_bound_to_concrete_object'] ?? false) === true, 'Provider metadata must remain object-bound.');
     $check(($sections['owns_native_content'] ?? true) === false, 'Optional sections must deny native-content ownership.');
+    $check(($sections['public_projection_contract'] ?? '') === Section_Service::PUBLIC_CONTRACT_VERSION, 'Structured section projection contract must remain exposed.');
     foreach (['knowledge', 'media', 'reviews', 'research', 'marketplace'] as $section) {
         $check(in_array($section, (array) ($sections['allowed_sections'] ?? []), true), 'Missing optional section: ' . $section);
     }
+
+    $rest = (array) ($contract['public_rest'] ?? []);
+    $check(($rest['knowledge'] ?? '') === '/profiles/{public-slug}/knowledge', 'Knowledge REST route must remain canonical.');
+    $check(($rest['media'] ?? '') === '/profiles/{public-slug}/media', 'Media REST route must remain canonical.');
+    $check(($rest['provider_health'] ?? '') === '/providers/health', 'Provider-health REST route must remain canonical.');
+    $check(($rest['provider_ids_public'] ?? true) === false, 'Provider identifiers must remain private.');
+    $check(($rest['native_ids_public'] ?? true) === false, 'Native identifiers must remain private.');
+    $check(($rest['etag'] ?? false) === true, 'Public REST contract must declare deterministic ETags.');
+
+    $presentation = (array) ($contract['profile_presentation'] ?? []);
+    $check(($presentation['founder_display_name'] ?? '') === Profile_Repository::FOUNDER_DISPLAY_NAME, 'Founder public spelling must remain immutable.');
+    $check(($presentation['external_avatar_fallback'] ?? true) === false, 'External avatar fallback must remain disabled.');
+    $check(($presentation['doctor_contact_requires_file_03_consent'] ?? false) === true, 'Doctor contact must require File 03 consent.');
+    $check(($presentation['right_sidebar_requires_real_content'] ?? false) === true, 'Profile right sidebar must require real content.');
+    $check(($presentation['explicit_tombstone_status'] ?? 0) === 410, 'Explicit deleted-profile tombstones must use 410.');
 
     $package = (array) ($contract['staging_package'] ?? []);
     $check(($package['contract_version'] ?? '') === '1.0.0', 'Staging package contract must remain declared.');
@@ -116,5 +150,5 @@ namespace {
         exit(1);
     }
 
-    echo "PASS: File 25 global design system, File 24 boundary, staging package, and installed-preflight contracts\n";
+    echo "PASS: File 25 global design system and master-plan profile contracts\n";
 }
