@@ -20,7 +20,7 @@ $sections = file_get_contents($root . '/includes/class-section-service.php') ?: 
 $rest = file_get_contents($root . '/includes/class-rest-controller.php') ?: '';
 $design = file_get_contents($root . '/includes/class-design-system.php') ?: '';
 
-$check(str_contains($visibility, "SPD_Helpers::can_show_contact"), 'File 25 must consume File 03 public-contact consent.');
+$check(str_contains($visibility, 'SPD_Helpers::can_show_contact'), 'File 25 must consume File 03 public-contact consent.');
 $check(! str_contains($visibility, 'elseif ($this->is_verified_doctor'), 'Verified Doctor status must not bypass public-contact consent.');
 $check(str_contains($visibility, 'return $authoritative && $filtered'), 'Contact filters may revoke but never grant a denied contact projection.');
 
@@ -28,8 +28,8 @@ $check(str_contains($repository, "FOUNDER_DISPLAY_NAME = 'Dr. Allamah Majid Huss
 $check(! str_contains($repository, 'get_avatar_url'), 'File 25 must not silently use external avatar services.');
 $check(str_contains($repository, 'Public_URL::sanitize_same_site'), 'Profile media must use same-origin URL enforcement.');
 
-$check(str_contains($router, "profile_right_sidebar_available"), 'Three-column profile layout must require real right-sidebar content.');
-$check(str_contains($router, "return $right_sidebar_available ? 'three' : 'two'"), 'Profile layout must default to two columns.');
+$check(str_contains($router, 'profile_right_sidebar_available'), 'Three-column profile layout must require real right-sidebar content.');
+$check(str_contains($router, 'return $right_sidebar_available ? \'three\' : \'two\';'), 'Profile layout must default to two columns.');
 
 $check(str_contains($renderer, "'@type' => 'BreadcrumbList'"), 'Profile SEO must include BreadcrumbList structured data.');
 $check(str_contains($renderer, 'og:image:alt'), 'Profile OpenGraph media must include safe alternative text.');
