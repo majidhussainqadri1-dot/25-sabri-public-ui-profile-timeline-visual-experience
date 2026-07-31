@@ -10,23 +10,26 @@ This is the same existing File 25. It is not a new file and does not create File
 
 - File 20 owns the application shell: header, navigation, sidebars, mobile drawers, bottom navigation, widths, and layout resolver.
 - File 21 owns Home, News Feed, posts, comments, reactions, moderation, and social behavior.
+- Native modules own canonical Knowledge, Media, Marketplace, Reviews, Research, files, metrics, moderation, and workflows.
 - File 25 owns the global public design system, visual consistency, profile presentation, profile timeline, responsive refinement, accessibility, reusable public components, visual states, content-card presentation, and visual-regression acceptance.
 
 File 25 must not render a second shell, create a second publication backend, or take ownership of native card objects.
 
 ## Runtime contract
 
-Design-system contract version: `1.1.0`
+Design-system contract version: `1.4.0`
 
-Component contract version: `1.1.0`
+Optional-section contract version: `1.1.0`
 
-Content-card contract version: `1.0.0`
+Visual-acceptance contract version: `1.2.0`
 
 Public integration functions:
 
 ```php
 sabri_visual_experience_contract(): array
+sabri_visual_experience_acceptance_contract(): array
 sabri_visual_experience_render_state(array $args = []): string
+sabri_visual_experience_render_notice(array $args = []): string
 sabri_visual_experience_render_card(array $args = []): string
 ```
 
@@ -37,20 +40,13 @@ sabri_visual_experience/contract
 sabri_visual_experience/tokens
 sabri_visual_experience/components
 sabri_visual_experience/content_cards
+sabri_visual_experience/acceptance
 sabri_public_experience/design_system_contract
 ```
 
-The canonical stylesheet handle is:
+Canonical stylesheet handle: `sabri-visual-design-system`.
 
-```text
-sabri-visual-design-system
-```
-
-The reusable component prefix is:
-
-```text
-sabri-ui-
-```
+Reusable component prefix: `sabri-ui-`.
 
 ## Semantic tokens
 
@@ -58,73 +54,54 @@ File 25 exposes globally unique `--sabri-visual-*` semantic tokens. Where File 2
 
 The contract includes primary, strong-primary, soft-primary, on-primary, text, muted, surface, page, border, focus, success, warning, danger, on-danger, radii, spacing, font scale, and content-width tokens.
 
-Contrast-specific foreground tokens prevent one color from being incorrectly reused for both text and filled-control backgrounds.
-
 ## Reusable components
 
-Current component primitives:
+Current primitives include container, reading width, stack, cluster, responsive grid, generic and content cards, buttons, badges, loading/empty/error/success/warning/unavailable states, notices, form controls, responsive tables, skeletons, and visually hidden utilities.
 
-- container and reading width;
-- stack, cluster, and responsive grid;
-- generic card and governed content card;
-- primary, secondary, and danger buttons;
-- neutral, primary, verified, info, success, warning, and danger badges;
-- loading, empty, error, success, warning, and unavailable states;
-- notice variants;
-- field, label, input, select, textarea, help, and field-error styles;
-- responsive table wrapper and table;
-- skeleton;
-- visually hidden utility.
-
-All classes are prefixed. The stylesheet does not globally restyle arbitrary module buttons, cards, headings, forms, tables, or markup.
+All classes are prefixed. File 25 does not globally restyle arbitrary native module markup.
 
 ## Content-card catalog
 
-The visual contract provides presentation variants for:
+Presentation variants include article, post, news, video, reel, book, PDF, Doctor, clinic, event, and Marketplace item.
 
-- article;
-- post;
-- news;
-- video;
-- reel;
-- book;
-- PDF;
-- Doctor;
-- clinic;
-- event;
-- Marketplace item.
+These are presentation types only. Native modules retain content, publication state, permissions, interactions, transactions, metrics, files, and canonical records.
 
-These are visual variants only. Native modules continue to own content, publication state, permissions, interactions, transactions, metrics, and canonical records.
+## Provider identity and projection rules
+
+The optional-section registry freezes provider ID, version, section, maturity, native-ownership declaration, and concrete object identity. Query-time validation reads mutable metadata once and compares the complete registration-bound snapshot.
+
+A valid canonical same-site item URL is the preferred duplicate identity. A native module that exposes only one application URL may supply an internal `projection_key` with these rules:
+
+- SHA-256 hexadecimal format;
+- used only before rendering;
+- excluded from the content-card allow list;
+- never exposed in HTML or REST;
+- does not create a public ID or transfer native ownership.
 
 ## URL and media policy
 
 Reusable state and card destinations are exact same-origin by default. The policy rejects protocol-relative, external, credential-bearing, scheme-downgrade, port-mismatch, control-character, backslash, malformed, and fragment-bearing canonical card/media URLs.
 
-External destinations require a future separately governed integration contract rather than a permissive presentation-layer exception.
+External destinations require a separately governed contract.
 
 ## Accessibility and responsive rules
 
-The contract includes:
+The contract includes minimum 44px-compatible targets, visible focus, one keyboard destination per card, semantic markup, RTL/LTR logical properties, reduced motion, forced colors, responsive tables and compact cards, print behavior, and local/system fonts only.
 
-- minimum 44px-compatible interactive targets;
-- visible keyboard focus;
-- one keyboard link per card destination by default;
-- semantic article, heading, list, and time markup;
-- logical properties for RTL/LTR compatibility;
-- reduced-motion handling;
-- forced-colors support;
-- mobile container and compact-card refinement;
-- responsive table overflow;
-- print-safe shadows and breaks;
-- local/system fonts only;
-- no remote CSS or font dependency.
+## Visual acceptance evidence
+
+Every accepted evidence manifest declares one exact `target_commit_sha`. Every surface, viewport, direction, color mode, motion mode, zoom level, input mode, staging record, and Founder sign-off must match that commit.
+
+Each matrix record requires pass status, artifact reference, SHA-256 checksum, commit SHA, strict timestamp, and reviewer. Impossible normalized timestamps, mixed-commit records, unsafe evidence schemes, and noncanonical staging URLs fail closed.
+
+Required surfaces include Founder, Doctor, Member, timeline, Knowledge, Media, Marketplace, all visual states, content-card grid, forms, and responsive tables.
 
 ## Failure behavior
 
-The global design-system layer does not require File 00 identity services. Profile and timeline features remain fail-closed when File 00 is unavailable. File 25 Safe Mode disables File 25 visual overrides without changing native data.
+The global design-system layer does not require File 00 identity services. Profile, timeline, and optional-section features remain fail-closed when their authoritative dependencies are unavailable. Safe Mode disables File 25 visual overrides without changing native data.
 
-An untitled content card returns no markup. Unsafe actions or images are omitted. Unknown input fields are ignored rather than serialized.
+An untitled content card returns no markup. Unsafe actions or images are omitted. Unknown fields are ignored rather than serialized.
 
 ## Acceptance boundary
 
-Source contracts and green CI do not prove visual acceptance. Real module pages, viewport and visual-regression evidence, Urdu RTL, keyboard, screen-reader, forced-colors, reduced-motion, performance, staging, rollback, and Founder acceptance remain mandatory.
+Source contracts and green CI do not prove visual acceptance. Real module pages, exact-commit viewport artifacts, Urdu RTL, keyboard, screen-reader, forced-colors, reduced-motion, performance, staging, rollback, and Founder acceptance remain mandatory.
