@@ -1,129 +1,81 @@
 # Changelog
 
+## 0.11.0 — Provider Route Parity and Hostinger Installed-Candidate Preflight
+
+### Added
+
+- Read-only `Staging_Probe` contract for the exact canonical Hostinger staging host.
+- Installed extracted-package verification against `STAGING-MANIFEST.json`, including exact file-set, SHA-256, byte-size, path, symlink, version, and expected-commit checks.
+- Privacy-safe WP-CLI command: `wp sabri file25 staging-probe --expected-commit=<sha>`.
+- Site Health staging-preflight test that reports fail-closed gates without granting acceptance.
+- Machine-readable `config/staging-test-plan.json` with environment, route, privacy, content, RTL, accessibility, resilience, rollback, performance, and Founder-acceptance scenarios.
+- Schema version 2 and a bounded upgrade coordinator with lock ownership, stale-lock recovery, one-time rewrite refresh, and idempotence.
+
+### Corrected during ninth review
+
+- Fixed a canonical routing contradiction: `research` and `marketplace` were approved optional sections but absent from the profile rewrite pattern and request whitelist.
+- Replaced the duplicated hard-coded provider route list with `Section_Registry::approved_sections()` parity.
+- Prevented upgraded sites from retaining stale rewrite rules after provider destinations became routable.
+- Added exact installed-candidate verification so a downloaded ZIP cannot be silently altered, partially extracted, or mixed with stale files before manual staging tests.
+
+### Acceptance boundary
+
+- The staging probe is read-only and contains no user or patient data.
+- A passing preflight permits manual Hostinger staging tests only.
+- Live remains untouched; PR merge, deployment, File 24 acceptance, visual evidence, rollback evidence, and Founder sign-off remain pending.
+
 ## 0.10.0 — Artifact Integrity and Deterministic Staging Candidate
 
 ### Added
 
-- Deterministic `tools/build-staging-package.php` builder using a bounded payload allow list and `SOURCE_DATE_EPOCH`.
+- Deterministic staging-package builder using a bounded payload allow list and `SOURCE_DATE_EPOCH`.
 - Embedded `STAGING-MANIFEST.json`, detached manifest, and detached SHA-256 checksum.
-- Archive reopening and verification of entry names, payload hashes, byte sizes, root prefix, and embedded-manifest equality.
-- Development-file exclusion for `.github`, tests, tools, docs, build output, dependencies, and coverage artifacts.
-- Machine-readable `config/staging-dependencies.json` for Files 00, 03, 06, 10, 11, 12, 18, 20, 21, 24, and 25.
-- CI staging-package job that builds the candidate twice, requires byte-for-byte reproducibility, verifies the detached checksum, and uploads a temporary workflow artifact.
-- Release-engineering contract tests on PHP 8.0 and PHP 8.3.
+- Archive reopening and verification of entries, hashes, sizes, root prefix, and manifest equality.
+- Development-file exclusion and exact staging dependency matrix.
+- CI byte-for-byte reproducibility, independent artifact verification, and temporary workflow artifact.
 
-### Corrected during seventh review
+### Corrected during seventh and eighth reviews
 
-- Rejected arbitrary external evidence references that could point outside controlled acceptance artifacts.
-- Rejected path traversal, absolute paths, backslashes, queries, fragments, whitespace/control characters, and colon-bearing artifact references.
-- Required artifact byte size and allow-listed media type in addition to SHA-256, timestamp, reviewer, and target commit.
-- Added SHA-256, byte size, and media type requirements for Founder sign-off evidence.
-- Prevented staging packages from silently including development-only or dependency directories.
-- Prevented package versions from diverging across the plugin header, runtime constant, and WordPress stable tag.
-
-### Acceptance boundary
-
-- A deterministic package and green CI produce a staging candidate only.
-- Exact multi-plugin staging, File 24 runtime integration, real visual/accessibility evidence, rollback, performance, deployment, monitoring, and Founder acceptance remain mandatory.
+- Rejected arbitrary external, traversal, absolute, query, fragment, control-character, and backslash evidence references.
+- Required evidence byte size and allow-listed media type in addition to SHA-256, timestamp, reviewer, and target commit.
+- Hardened build-path and symlink boundaries and removed hard-coded workflow filenames.
 
 ## 0.9.0 — Atomic Providers, File 18 Marketplace, and Commit-Bound Evidence
 
-### Added
-
-- Native read-only `file-18-marketplace` adapter for approved seller-owned public Marketplace listings from the reviewed File 18 `1.1.x` contract.
-- Bounded public projection of title, short description, application URL, first public image, category, product type, condition, effective price/currency, deal state, and publication time.
-- Server-only SHA-256 `projection_key` support for distinct native objects that share one application URL; the key is never rendered publicly.
-- Concrete provider-object identity in registration metadata through `spl_object_id()`.
-- One atomic `validated_metadata()` operation for ID, version, section, maturity, ownership, and object identity.
-- One target commit SHA for every visual evidence record, staging record, and Founder sign-off.
-- Marketplace as a required visual-acceptance surface.
-- File 18 provider, privacy, price, author, seller approval, listing status, deal-state, no-write, and package tests.
-
-### Corrected during sixth review
-
-- Prevented a mutable provider object from impersonating another registered provider ID.
-- Removed repeated provider maturity and ownership reads after consistency validation.
-- Prevented several Marketplace listings from collapsing merely because File 18 currently exposes one application URL rather than item permalinks.
-- Rejected mixed-commit visual evidence, impossible normalized timestamps, unsafe evidence schemes, and noncanonical staging URLs.
-- Made Marketplace deal-state translations statically extractable by standard WordPress tooling.
-
-### Ownership preserved
-
-- File 18 remains the canonical owner of sellers, listings, moderation, contacts, chat, offers, media/files, reports, metrics, and direct-deal workflows.
-- File 25 owns only the normalized public profile visual projection.
-
-### Still pending
-
-- Exact Files 00/03/06/10/11/12/18/20/21/25 staging acceptance.
-- File 24 runtime security/privacy/cache contract.
-- Native Reviews and Research adapters after exact source contracts become available and are reviewed.
-- Captured visual-regression, RTL, accessibility, performance, migration, rollback, deployment, and Founder-acceptance evidence.
+- Added native read-only File 18 Marketplace profile adapter.
+- Bound provider metadata to concrete registered objects and made validation atomic.
+- Added server-only SHA-256 projection keys for native objects sharing an application URL.
+- Bound all visual evidence and Founder sign-off to one exact commit.
 
 ## 0.8.0 — Native Media Adapters and Evidence Integrity
 
-### Added
-
-- Native read-only `file-10-video-media` adapter for published non-Reel Video Wall items.
-- Native read-only `file-11-reels-media` adapter over File 10 objects, enforcing the approved 60–600 second Reel duration.
-- Native read-only `file-12-pdf-media` adapter for published PDF Library documents.
-- Exact 0.1.x compatibility gates for Files 10, 11, and 12 and File 11's dependency on the reviewed File 10 contract.
-- Strict public card projection for canonical title, permalink, excerpt, thumbnail, category/type, duration/pages/language, and publication time only.
-- PHP 8.0/8.3 adapter tests and package rules that forbid write, upload, moderation, interaction, metric, and transaction ownership.
-- Visual-acceptance evidence records requiring artifact reference, SHA-256, timestamp, reviewer, staging runtime data, commit binding, and Founder sign-off.
-
-### Corrected during fifth review
-
-- Froze provider maturity and native-ownership metadata in addition to ID, version, and section.
-- Counted provider metadata and consistency failures truthfully instead of silently presenting a clean partial result.
-- Deduplicated valid cards by exact canonical destination, while preserving case-sensitive paths.
-- Rejected boolean placeholders as visual-acceptance evidence and required bounded cryptographically referenced records.
-- Added the Media section to the required visual-acceptance surfaces.
-
-### Still pending
-
-- Exact Files 00/03/06/10/11/12/20/21/25 staging acceptance.
-- File 24 runtime security/privacy/cache contract.
-- Native Reviews, Research, and Marketplace adapters after source review.
-- Captured visual-regression, RTL, accessibility, performance, migration, rollback, deployment, and Founder-acceptance evidence.
+- Added File 10 Video Wall, File 11 Reels, and File 12 PDF Library read-only adapters.
+- Froze provider maturity/ownership metadata and strengthened evidence records.
 
 ## 0.7.0 — Immutable Providers and Visual Acceptance Contract
 
-- Froze registered provider ID, version, and section and revalidated them at query time.
-- Isolated provider metadata failures and preserved case-sensitive canonical URL paths.
-- Added the machine-readable visual-acceptance Definition-of-Done contract.
+- Froze provider identity/version/section metadata and added the machine-readable Definition of Done.
 
 ## 0.6.0 — Governed Optional Profile Sections
 
-### Added
-
-- A read-only `Profile_Section_Provider` contract for native Knowledge, Media, Reviews, Research, and Marketplace modules.
-- A bounded registry and service with approved sections, maturity levels, native-ownership denial, failure isolation, deduplication, and content-backed tabs.
-- A native read-only File 06 Knowledge adapter.
-- A canonical optional-section template, notice renderer, completed reusable components, diagnostics, and tests.
-
-### Corrected
-
-- Prevented dead tabs and arbitrary provider HTML.
-- Revalidated mutable provider state.
-- Made card timestamps deterministic in UTC and rejected invalid dates.
+- Added bounded Knowledge, Media, Reviews, Research, and Marketplace provider sections and File 06 adapter.
 
 ## 0.5.0 — Reusable Content Cards and URL Security
 
-- Added strict same-origin URL policy, presentation-only content cards, reusable forms/tables/notices, and contrast-safe visual tokens.
-- Corrected protocol-relative URLs, cross-origin actions, dark-mode ownership, translation extraction, contrast, and compact-card layout.
+- Added same-origin URL policy, content cards, forms, tables, notices, and contrast-safe tokens.
 
 ## 0.4.0 — Unified Global Visual System Foundation
 
-- Added canonical File 25 identity, global semantic tokens, reusable prefixed components, visual states, independent public assets, nested Safe Mode, and diagnostics.
+- Added canonical global semantic tokens, components, nested Safe Mode, and diagnostics.
 
 ## 0.3.0 — Native File 21 Timeline Adapter
 
-- Added native read-only File 21 provider, bounded paging, normalization, identifier redaction, and no-write tests.
+- Added native read-only File 21 provider and bounded timeline normalization.
 
 ## 0.2.0 — File 20 Integration and Founder/Doctor Profiles
 
-- Added File 20 integration, canonical author links, structured Founder and verified-Doctor profiles, strict public allow lists, and responsive sections.
+- Added File 20 integration, Founder/Doctor profiles, public allow lists, and responsive sections.
 
 ## 0.1.0 — Reviewed Foundation
 
-- Added bootstrap, Safe Mode, dependency diagnostics, privacy-first profiles, canonical routes, federated timeline contracts, REST foundations, responsive profile presentation, and CI.
+- Added bootstrap, dependency diagnostics, privacy-first profiles, routes, timeline contracts, REST foundations, and CI.
