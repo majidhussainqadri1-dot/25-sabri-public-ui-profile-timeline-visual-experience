@@ -9,7 +9,7 @@ if (! defined('SABRI_PUBLIC_EXPERIENCE_SCHEMA_VERSION')) {
     define('SABRI_PUBLIC_EXPERIENCE_SCHEMA_VERSION', '2');
 }
 if (! defined('SABRI_PUBLIC_EXPERIENCE_VERSION')) {
-    define('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.11.0');
+    define('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.12.0');
 }
 
 $GLOBALS['spux_upgrade_options'] = [
@@ -93,7 +93,7 @@ $check = static function (bool $condition, string $message) use (&$failures): vo
 
 Upgrade_Manager::maybe_upgrade();
 $check(($GLOBALS['spux_upgrade_options']['sabri_public_experience_schema_version'] ?? '') === '2', 'Schema upgrade must reach version 2.');
-$check(($GLOBALS['spux_upgrade_options']['sabri_public_experience_runtime_version'] ?? '') === '0.11.0', 'Runtime version must be recorded after upgrade.');
+$check(($GLOBALS['spux_upgrade_options']['sabri_public_experience_runtime_version'] ?? '') === '0.12.0', 'Runtime version must be recorded after upgrade.');
 $check($GLOBALS['spux_upgrade_flushes'] === 1, 'Rewrite rules must flush exactly once during the schema upgrade.');
 $check(count($GLOBALS['spux_upgrade_rules']) === 3, 'Upgrade rewrite refresh must register all three profile route families.');
 $check(! isset($GLOBALS['spux_upgrade_options']['sabri_public_experience_upgrade_lock']), 'Upgrade lock must be released after success.');
