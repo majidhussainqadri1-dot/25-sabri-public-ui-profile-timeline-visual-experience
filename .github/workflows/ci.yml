@@ -72,7 +72,7 @@ jobs:
       - name: Commit-bound artifact-integrity visual acceptance contract
         run: php tests/visual-acceptance.php
 
-      - name: Deterministic staging package and dependency matrix contract
+      - name: Deterministic builder and independent artifact-verifier contract
         run: php tests/release-engineering.php
 
       - name: Nested Safe Mode contract
@@ -117,8 +117,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          version=$(php -r '$source = file_get_contents("sabri-public-experience.php"); if (!is_string($source) || preg_match("/^\\s*\\* Version:\\s*([^\\s]+)/m", $source, $match) !== 1) { exit(1); } echo $match[1];')
           echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           echo "source_date_epoch=$(git show -s --format=%ct HEAD)" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Build staging candidate twice
         shell: bash
@@ -137,21 +139,26 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cmp build/package-a/sabri-public-experience-0.10.0.zip build/package-b/sabri-public-experience-0.10.0.zip
-          cmp build/package-a/sabri-public-experience-0.10.0-manifest.json build/package-b/sabri-public-experience-0.10.0-manifest.json
-          cmp build/package-a/sabri-public-experience-0.10.0.sha256 build/package-b/sabri-public-experience-0.10.0.sha256
+          BASE="sabri-public-experience-${{ steps.source.outputs.version }}"
+          cmp "build/package-a/${BASE}.zip" "build/package-b/${BASE}.zip"
+          cmp "build/package-a/${BASE}-manifest.json" "build/package-b/${BASE}-manifest.json"
+          cmp "build/package-a/${BASE}.sha256" "build/package-b/${BASE}.sha256"
           cd build/package-a
-          sha256sum --check sabri-public-experience-0.10.0.sha256
+          sha256sum --check "${BASE}.sha256"
 
       - name: Assemble downloadable candidate artifact
         shell: bash
         run: |
           set -euo pipefail
+          BASE="sabri-public-experience-${{ steps.source.outputs.version }}"
           mkdir -p build/artifact
-          cp build/package-a/sabri-public-experience-0.10.0.zip build/artifact/
-          cp build/package-a/sabri-public-experience-0.10.0.sha256 build/artifact/
-          cp build/package-a/sabri-public-experience-0.10.0-manifest.json build/artifact/
+          cp "build/package-a/${BASE}.zip" build/artifact/
+          cp "build/package-a/${BASE}.sha256" build/artifact/
+          cp "build/package-a/${BASE}-manifest.json" build/artifact/
           cp config/staging-dependencies.json build/artifact/
+
+      - name: Verify assembled candidate with the independent verifier
+        run: php tools/verify-staging-artifact.php --artifact=build/artifact
 
       - name: Upload staging candidate
         uses: actions/upload-artifact@v4
