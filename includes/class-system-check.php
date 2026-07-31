@@ -55,7 +55,10 @@ final class System_Check
         $contract = Design_System::contract();
         $cards = (array) ($contract['content_cards'] ?? []);
         $components = (array) ($contract['components'] ?? []);
+        $acceptance = (array) ($contract['visual_acceptance'] ?? []);
+        $sections = (array) ($contract['optional_sections'] ?? []);
         $stylesheet = SABRI_PUBLIC_EXPERIENCE_DIR . 'assets/css/design-system.css';
+        $component_stylesheet = SABRI_PUBLIC_EXPERIENCE_DIR . 'assets/css/design-system-components.css';
         $valid = ($contract['file'] ?? null) === 25
             && ($contract['contract_version'] ?? '') === Design_System::CONTRACT_VERSION
             && ($contract['visual_system_owner'] ?? '') === 'file-25'
@@ -63,18 +66,25 @@ final class System_Check
             && ($components['contract_version'] ?? '') === Components::CONTRACT_VERSION
             && ($cards['contract_version'] ?? '') === Content_Cards::CONTRACT_VERSION
             && ($cards['owns_native_data'] ?? true) === false
+            && ($acceptance['contract_version'] ?? '') === Visual_Acceptance::CONTRACT_VERSION
+            && ($acceptance['target_commit_sha_required'] ?? false) === true
+            && ($acceptance['green_ci_is_acceptance'] ?? true) === false
+            && ($sections['provider_metadata_bound_to_concrete_object'] ?? false) === true
+            && (($sections['internal_projection_key']['rendered_publicly'] ?? true) === false)
             && is_callable('sabri_visual_experience_contract')
+            && is_callable('sabri_visual_experience_acceptance_contract')
             && is_callable('sabri_visual_experience_render_state')
             && is_callable('sabri_visual_experience_render_notice')
             && is_callable('sabri_visual_experience_render_card')
-            && is_readable($stylesheet);
+            && is_readable($stylesheet)
+            && is_readable($component_stylesheet);
 
         if (! $valid) {
             return $this->result(
                 'design_system',
                 __('The File 25 global design-system contract is incomplete', 'sabri-public-experience'),
                 'critical',
-                __('The canonical contract, reusable renderer API, ownership boundary, or local stylesheet is missing or inconsistent.', 'sabri-public-experience')
+                __('The canonical contract, reusable renderer API, provider identity boundary, evidence contract, or local stylesheet is missing or inconsistent.', 'sabri-public-experience')
             );
         }
 
@@ -82,7 +92,7 @@ final class System_Check
             'design_system',
             __('The File 25 global design-system contract is available', 'sabri-public-experience'),
             'good',
-            __('File 25 owns the visual system and reusable components while File 20 remains the sole application-shell owner. Visual staging acceptance is still required.', 'sabri-public-experience')
+            __('File 25 owns the visual system while File 20 remains the shell owner. Exact-commit visual staging evidence is still required.', 'sabri-public-experience')
         );
     }
 
@@ -122,11 +132,16 @@ final class System_Check
         $errors = [];
         foreach ($this->timeline_registry->all() as $id => $provider) {
             try {
-                if (! $provider->is_available() || $provider->get_maturity_level() === 'disabled') {
+                $metadata = $this->timeline_registry->validated_metadata($provider, (string) $id);
+                if ($metadata === null) {
+                    $errors[] = (string) $id;
+                    continue;
+                }
+                if ($metadata['maturity'] === 'disabled' || ! $provider->is_available()) {
                     continue;
                 }
                 $available[] = (string) $id;
-                if ($provider->get_maturity_level() === 'production-accepted') {
+                if ($metadata['maturity'] === 'production-accepted') {
                     $production[] = (string) $id;
                 }
             } catch (\Throwable) {
@@ -137,9 +152,9 @@ final class System_Check
         if ($errors !== []) {
             return $this->result(
                 'providers',
-                __('One or more timeline providers failed health inspection', 'sabri-public-experience'),
+                __('One or more timeline providers failed immutable health inspection', 'sabri-public-experience'),
                 'critical',
-                sprintf(__('Failed provider count: %d', 'sabri-public-experience'), count($errors))
+                sprintf(__('Failed provider count: %d', 'sabri-public-experience'), count(array_unique($errors)))
             );
         }
         if (! in_array('file-21', $production, true)) {
@@ -158,35 +173,43 @@ final class System_Check
             'providers',
             __('The production File 21 timeline provider is registered', 'sabri-public-experience'),
             'good',
-            __('Provider registration is healthy; real-content staging tests remain mandatory.', 'sabri-public-experience')
+            __('Immutable provider registration is healthy; real-content staging tests remain mandatory.', 'sabri-public-experience')
         );
     }
 
     /** @return array<string,mixed> */
     public function section_provider_test(): array
     {
-        $registered = 0;
+        $registered = count($this->section_registry->all());
         $active = 0;
         $errors = 0;
-        foreach ($this->section_registry->all() as $provider) {
-            $registered++;
-            try {
-                if ($provider->owns_native_content()) {
-                    $errors++;
+        $seen = [];
+
+        foreach (Section_Registry::approved_sections() as $section) {
+            foreach ($this->section_registry->for_section($section) as $id => $provider) {
+                if (isset($seen[$id])) {
                     continue;
                 }
-                if ($provider->get_maturity_level() !== 'disabled' && $provider->is_available()) {
-                    $active++;
+                $seen[$id] = true;
+                try {
+                    $metadata = $this->section_registry->validated_metadata($provider, $section);
+                    if ($metadata === null) {
+                        $errors++;
+                        continue;
+                    }
+                    if ($metadata['maturity'] !== 'disabled' && $provider->is_available()) {
+                        $active++;
+                    }
+                } catch (\Throwable) {
+                    $errors++;
                 }
-            } catch (\Throwable) {
-                $errors++;
             }
         }
 
         if ($errors > 0) {
             return $this->result(
                 'section_providers',
-                __('One or more optional section providers failed health inspection', 'sabri-public-experience'),
+                __('One or more optional section providers failed immutable health inspection', 'sabri-public-experience'),
                 'critical',
                 sprintf(__('Failed provider count: %d', 'sabri-public-experience'), $errors)
             );
