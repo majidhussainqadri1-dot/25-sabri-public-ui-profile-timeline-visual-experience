@@ -27,8 +27,8 @@ $check(($contract['staging_acceptance_implied'] ?? true) === false, 'Preflight m
 $root = sys_get_temp_dir() . '/file25-staging-probe-' . bin2hex(random_bytes(6));
 mkdir($root . '/config', 0777, true);
 $files = [
-    'sabri-public-experience.php' => "<?php\n/* Version: 0.11.0 */\ndefine('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.11.0');\n",
-    'readme.txt' => "Stable tag: 0.11.0\n",
+    'sabri-public-experience.php' => "<?php\n/* Version: 0.12.0 */\ndefine('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.12.0');\n",
+    'readme.txt' => "Stable tag: 0.12.0\n",
     'uninstall.php' => "<?php\n",
 ];
 $scenarios = [];
@@ -65,7 +65,7 @@ $manifest = [
     'package' => 'sabri-public-experience',
     'file_number' => 25,
     'canonical_name' => 'Sabri Unified Global Visual Experience and Design System',
-    'version' => '0.11.0',
+    'version' => '0.12.0',
     'commit_sha' => $commit,
     'source_date_epoch' => 1785456000,
     'generated_at_utc' => '2026-07-31T00:00:00Z',
@@ -73,28 +73,28 @@ $manifest = [
 ];
 file_put_contents($root . '/STAGING-MANIFEST.json', json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
 
-$valid = Staging_Probe::verify_package_integrity($root, '0.11.0', $commit);
+$valid = Staging_Probe::verify_package_integrity($root, '0.12.0', $commit);
 $check(($valid['valid'] ?? false) === true, 'Exact installed package must pass manifest verification.');
 $check(($valid['verified_file_count'] ?? 0) === count($files), 'Every governed payload file must be verified.');
 $check(Staging_Probe::verify_test_plan($root)['valid'] === true, 'Governed staging test plan must validate.');
 
 file_put_contents($root . '/extra.php', "<?php\n");
-$extra = Staging_Probe::verify_package_integrity($root, '0.11.0', $commit);
+$extra = Staging_Probe::verify_package_integrity($root, '0.12.0', $commit);
 $check(($extra['valid'] ?? true) === false, 'Ungoverned extra installed files must fail integrity.');
 unlink($root . '/extra.php');
 
 file_put_contents($root . '/readme.txt', "tampered\n");
-$tampered = Staging_Probe::verify_package_integrity($root, '0.11.0', $commit);
+$tampered = Staging_Probe::verify_package_integrity($root, '0.12.0', $commit);
 $check(($tampered['valid'] ?? true) === false, 'Tampered payload must fail SHA-256 or byte-size verification.');
 file_put_contents($root . '/readme.txt', $files['readme.txt']);
 
-$wrong_commit = Staging_Probe::verify_package_integrity($root, '0.11.0', str_repeat('b', 40));
+$wrong_commit = Staging_Probe::verify_package_integrity($root, '0.12.0', str_repeat('b', 40));
 $check(($wrong_commit['valid'] ?? true) === false, 'Wrong expected commit must fail closed.');
 
 $unsafe_manifest = $manifest;
 $unsafe_manifest['files']['../escape.php'] = ['sha256' => str_repeat('c', 64), 'bytes' => 1];
 file_put_contents($root . '/STAGING-MANIFEST.json', json_encode($unsafe_manifest, JSON_PRETTY_PRINT) . "\n");
-$unsafe = Staging_Probe::verify_package_integrity($root, '0.11.0', $commit);
+$unsafe = Staging_Probe::verify_package_integrity($root, '0.12.0', $commit);
 $check(($unsafe['valid'] ?? true) === false, 'Unsafe manifest paths must fail closed.');
 
 $remove = static function (string $path) use (&$remove): void {
