@@ -66,7 +66,17 @@ final class Profile_Router
             return $mode;
         }
 
-        return $this->context()['type'] === 'doctor' ? 'three' : 'two';
+        // File 20 remains the sole shell/sidebar owner. File 25 requests the
+        // two-column public profile layout by default and may use a third column
+        // only when an integration explicitly confirms that real sidebar content
+        // exists. This prevents an empty right rail on every Doctor profile.
+        $right_sidebar_available = (bool) apply_filters(
+            'sabri_public_experience/profile_right_sidebar_available',
+            false,
+            $this->context()
+        );
+
+        return $right_sidebar_available ? 'three' : 'two';
     }
 
     public function is_profile_request(): bool
