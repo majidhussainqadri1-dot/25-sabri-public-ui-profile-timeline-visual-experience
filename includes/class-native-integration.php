@@ -299,10 +299,20 @@ final class Native_Integration
     /** @return array<string,mixed> */
     public function doctor_approved_snapshot(int $user_id): array
     {
+        if (! $this->is_verified_doctor($user_id)) {
+            return [];
+        }
+
+        return $this->raw_doctor_approved_snapshot($user_id);
+    }
+
+    /** @return array<string,mixed> */
+    private function raw_doctor_approved_snapshot(int $user_id): array
+    {
         if (array_key_exists($user_id, $this->doctor_snapshot_cache)) {
             return $this->doctor_snapshot_cache[$user_id];
         }
-        if (! $this->is_verified_doctor($user_id)) {
+        if ($user_id <= 0 || ! $this->doctor_verification_available()) {
             return $this->doctor_snapshot_cache[$user_id] = [];
         }
 
@@ -322,8 +332,14 @@ final class Native_Integration
             'consultation_modes', 'bio',
         ] as $field) {
             if (isset($source['profile'][$field]) && is_scalar($source['profile'][$field])) {
-                $profile[$field] = $this->plain_text((string) $source['profile'][$field], $field === 'bio' ? 4000 : 300);
+                $value = $this->plain_text((string) $source['profile'][$field], $field === 'bio' ? 4000 : 300);
+                if ($value !== '') {
+                    $profile[$field] = $value;
+                }
             }
+        }
+        if ($profile === []) {
+            return $this->doctor_snapshot_cache[$user_id] = [];
         }
 
         return $this->doctor_snapshot_cache[$user_id] = [
@@ -341,6 +357,7 @@ final class Native_Integration
         } catch (\Throwable) {
             $owner_verified = false;
         }
+        $snapshot = $this->raw_doctor_approved_snapshot($user_id);
         $eligible = $assertions !== []
             && ($assertions['membership_type'] ?? '') === 'doctor'
             && ! empty($assertions['approved'])
@@ -349,8 +366,8 @@ final class Native_Integration
             && ! empty($assertions['professional_verified'])
             && ! empty($assertions['can_practice'])
             && $owner_verified
-            && ! empty($decision['verified'])
-            && in_array((string) ($decision['state'] ?? ''), ['verified', 'approved'], true);
+            && $this->doctor_decision_is_current($decision)
+            && ! empty($snapshot['profile']);
 
         if ($eligible && class_exists('SPD_Helpers') && method_exists('SPD_Helpers', 'verification_status')) {
             try {
@@ -366,6 +383,33 @@ final class Native_Integration
         $filtered = (bool) apply_filters('sabri_public_experience/is_verified_doctor', $eligible, $user_id);
 
         return $eligible && $filtered;
+    }
+
+
+    /** @param array<string,mixed> $decision */
+    private function doctor_decision_is_current(array $decision): bool
+    {
+        if (empty($decision['verified'])
+            || ! in_array((string) ($decision['state'] ?? ''), ['verified', 'approved'], true)
+            || preg_match('/^[a-f0-9]{64}$/', (string) ($decision['fingerprint'] ?? '')) !== 1
+        ) {
+            return false;
+        }
+
+        $until = trim((string) ($decision['verified_until'] ?? ''));
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $until) !== 1) {
+            return false;
+        }
+        $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $until, new \DateTimeZone('UTC'));
+        $errors = \DateTimeImmutable::getLastErrors();
+        if (! $date instanceof \DateTimeImmutable
+            || (is_array($errors) && ((int) ($errors['warning_count'] ?? 0) > 0 || (int) ($errors['error_count'] ?? 0) > 0))
+            || $date->format('Y-m-d') !== $until
+        ) {
+            return false;
+        }
+
+        return $until >= gmdate('Y-m-d');
     }
 
     public function profile_class(WP_User $user): string

@@ -326,13 +326,57 @@ final class Staging_Probe
             $plan = null;
         }
         $scenarios = is_array($plan) && is_array($plan['scenarios'] ?? null) ? $plan['scenarios'] : [];
+        $scenario_ids = [];
+        $scenario_shapes_valid = true;
+        foreach ($scenarios as $scenario) {
+            if (! is_array($scenario)) {
+                $scenario_shapes_valid = false;
+                continue;
+            }
+            $id = sanitize_key((string) ($scenario['id'] ?? ''));
+            $category = sanitize_key((string) ($scenario['category'] ?? ''));
+            $requirement = self::bounded($scenario['requirement'] ?? '', 1000);
+            if ($id === '' || $category === '' || $requirement === '' || isset($scenario_ids[$id])) {
+                $scenario_shapes_valid = false;
+                continue;
+            }
+            $scenario_ids[$id] = true;
+        }
+        $required_scenarios = [
+            'environment-host',
+            'environment-privacy',
+            'package-integrity',
+            'activation-order',
+            'file00-assertions',
+            'file08-clinic-projection',
+            'file09-doctor-decision',
+            'file18-owner-dto',
+            'minor-private',
+            'wrong-author',
+            'responsive-viewports',
+            'urdu-rtl',
+            'accessibility-input',
+            'accessibility-display',
+            'safe-mode',
+            'upgrade-rollback',
+            'performance-errors',
+            'founder-acceptance',
+        ];
+        $required_scenarios_present = array_diff_key(array_flip($required_scenarios), $scenario_ids) === [];
         $valid = is_array($plan)
-            && ($plan['schema_version'] ?? null) === 1
+            && ($plan['schema_version'] ?? null) === 2
             && ($plan['owner'] ?? '') === 'file-25'
             && ($plan['canonical_staging_host'] ?? '') === self::CANONICAL_STAGING_HOST
             && ($plan['live_host_must_remain_untouched'] ?? null) === true
+            && ($plan['registration_must_remain_disabled'] ?? null) === true
+            && ($plan['search_indexing_must_remain_disabled'] ?? null) === true
+            && ($plan['source_contract_is_acceptance'] ?? null) === false
+            && ($plan['green_ci_is_acceptance'] ?? null) === false
             && ($plan['staging_acceptance_implied'] ?? null) === false
-            && count($scenarios) >= 10
+            && ($plan['production_acceptance_implied'] ?? null) === false
+            && $scenario_shapes_valid
+            && $required_scenarios_present
+            && count($scenarios) >= count($required_scenarios)
             && count($scenarios) <= 100;
 
         return [
