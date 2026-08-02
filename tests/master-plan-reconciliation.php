@@ -29,9 +29,7 @@ $check(str_contains($main, "SABRI_PUBLIC_EXPERIENCE_VERSION', '0.14.0'"), 'Autho
 foreach ([
     "FILE_00_MINIMUM_VERSION = '1.2.4'",
     "FILE_00_CONTRACT_VERSION = '1.1.2'",
-    'SMC_Contracts::assertions',
-    'SMC_CONTRACT_VERSION',
-    'smc_founder_user_id',
+    'SMC_Contracts::assertions', 'SMC_CONTRACT_VERSION', 'smc_founder_user_id',
 ] as $marker) {
     $check(str_contains($native, $marker), 'File 00 authoritative contract marker is missing: ' . $marker);
 }
@@ -106,7 +104,14 @@ foreach ([0, 3, 6, 8, 9, 10, 11, 12, 18, 20, 21, 24, 25] as $file_number) {
 $check(($modules[0]['reviewed_package_version'] ?? '') === '1.2.4', 'File 00 reviewed package must be 1.2.4.');
 $check(($modules[0]['required_contract_version'] ?? '') === '1.1.2', 'File 00 public contract must be 1.1.2.');
 $check(($modules[0]['foreign_table_reads_allowed'] ?? true) === false, 'File 00 foreign table reads must be prohibited.');
+$check(($modules[8]['reviewed_package_version'] ?? '') === '0.2.1', 'File 08 reviewed package must be 0.2.1.');
+$check(($modules[8]['reviewed_source_version'] ?? '') === '0.2.1', 'File 08 reviewed source must be 0.2.1.');
+$check(($modules[8]['accepted_source_range'] ?? '') === '>=0.2.1 <0.3.0', 'File 08 accepted source range must begin at 0.2.1.');
 $check(($modules[8]['required_public_contract_version'] ?? '') === '1.0.0', 'File 08 public clinic contract must be explicit.');
+$check(($modules[8]['reviewed_source_commit'] ?? '') === 'bd6a10b693991fc518788ef8e3cba49531454821', 'File 08 reviewed source commit must be exact.');
+$check(($modules[8]['reviewed_candidate_sha256'] ?? '') === '36ce0c78aa51396b02bd0705021e66782bfc45b74636ac65b0826bd372103578', 'File 08 reviewed candidate digest must be exact.');
+$check(($modules[8]['contract_status'] ?? '') === 'implemented-and-ci-verified-pending-hostinger-staging', 'File 08 source completion must not be confused with staging acceptance.');
+$check(($modules[8]['staging_status'] ?? '') === 'pending', 'File 08 staging must remain pending.');
 $check(($modules[9]['reviewed_source_version'] ?? '') === '1.1.0', 'File 09 reviewed source must be 1.1.0.');
 $check(($modules[18]['reviewed_source_version'] ?? '') === '1.2.0-RC1', 'File 18 reviewed source must be 1.2.0-RC1.');
 $check(($modules[20]['reviewed_source_version'] ?? '') === '1.2.0', 'File 20 central-plan corrective source must be 1.2.0.');
