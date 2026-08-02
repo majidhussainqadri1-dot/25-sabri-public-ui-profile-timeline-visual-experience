@@ -6,57 +6,32 @@ $root = dirname(__DIR__);
 $errors = [];
 
 $required = [
-    '.github/workflows/ci.yml',
-    'sabri-public-experience.php',
-    'readme.txt',
-    'README.md',
-    'CHANGELOG.md',
-    'composer.json',
-    'uninstall.php',
-    'includes/class-plugin.php',
-    'includes/class-safe-mode.php',
-    'includes/class-public-url.php',
-    'includes/class-components.php',
-    'includes/class-content-cards.php',
-    'includes/class-visual-acceptance.php',
-    'includes/class-staging-probe.php',
-    'includes/class-staging-cli.php',
-    'includes/class-upgrade-manager.php',
-    'includes/class-file-24-integration.php',
-    'includes/class-native-integration.php',
-    'includes/class-dependency-manager.php',
-    'includes/class-design-system.php',
-    'includes/class-profile-router.php',
-    'includes/class-profile-renderer.php',
-    'includes/class-profile-repository.php',
-    'includes/class-visibility-policy.php',
-    'includes/class-rest-controller.php',
-    'includes/class-section-registry.php',
-    'includes/class-section-service.php',
+    '.github/workflows/ci.yml', 'sabri-public-experience.php', 'readme.txt',
+    'README.md', 'CHANGELOG.md', 'composer.json', 'uninstall.php',
+    'includes/class-plugin.php', 'includes/class-safe-mode.php',
+    'includes/class-public-url.php', 'includes/class-components.php',
+    'includes/class-content-cards.php', 'includes/class-visual-acceptance.php',
+    'includes/class-staging-probe.php', 'includes/class-staging-cli.php',
+    'includes/class-upgrade-manager.php', 'includes/class-file-24-integration.php',
+    'includes/class-native-integration.php', 'includes/class-dependency-manager.php',
+    'includes/class-design-system.php', 'includes/class-profile-router.php',
+    'includes/class-profile-renderer.php', 'includes/class-profile-repository.php',
+    'includes/class-visibility-policy.php', 'includes/class-rest-controller.php',
+    'includes/class-section-registry.php', 'includes/class-section-service.php',
     'includes/providers/class-file-18-marketplace-provider.php',
-    'templates/public-profile.php',
-    'assets/css/design-system.css',
-    'assets/css/design-system-components.css',
-    'assets/css/public.css',
-    'assets/css/profile-sections.css',
-    'assets/js/public.js',
-    'config/staging-dependencies.json',
-    'config/staging-test-plan.json',
-    'tests/profile-router.php',
-    'tests/authoritative-native-contracts.php',
-    'tests/master-plan-reconciliation.php',
-    'tests/file18-marketplace-provider.php',
-    'tests/file24-integration.php',
-    'tests/staging-probe.php',
-    'tests/upgrade-manager.php',
-    'tests/design-system.php',
-    'tests/release-engineering.php',
-    'tools/build-staging-package.php',
+    'templates/public-profile.php', 'assets/css/design-system.css',
+    'assets/css/design-system-components.css', 'assets/css/public.css',
+    'assets/css/profile-sections.css', 'assets/js/public.js',
+    'config/staging-dependencies.json', 'config/staging-test-plan.json',
+    'tests/profile-router.php', 'tests/authoritative-native-contracts.php',
+    'tests/master-plan-reconciliation.php', 'tests/file18-marketplace-provider.php',
+    'tests/file24-integration.php', 'tests/staging-probe.php',
+    'tests/upgrade-manager.php', 'tests/design-system.php',
+    'tests/release-engineering.php', 'tools/build-staging-package.php',
     'tools/verify-staging-artifact.php',
     'docs/TENTH-REVIEW-FILE24-INTEGRATION-2026-07-31.md',
     'docs/ELEVENTH-REVIEW-MASTER-PLAN-AND-FILE25-2026-07-31.md',
 ];
-
 foreach ($required as $path) {
     if (! is_file($root . '/' . $path)) {
         $errors[] = 'Missing required file: ' . $path;
@@ -71,7 +46,6 @@ $read = static function (string $path) use ($root, &$errors): string {
     }
     return $content;
 };
-
 $contains = static function (string $source, array $markers, string $label) use (&$errors): void {
     foreach ($markers as $marker) {
         if (! str_contains($source, $marker)) {
@@ -79,7 +53,6 @@ $contains = static function (string $source, array $markers, string $label) use 
         }
     }
 };
-
 $forbids = static function (string $source, array $markers, string $label) use (&$errors): void {
     foreach ($markers as $marker) {
         if (str_contains($source, $marker)) {
@@ -100,126 +73,87 @@ if (count(array_unique($versions)) !== 1 || $versions[0] !== '0.14.0') {
 $runtimeVersion = (string) ($constant[1] ?? '');
 $contains($main, [
     "define('SABRI_PUBLIC_EXPERIENCE_SCHEMA_VERSION', '2')",
-    'class-native-integration.php',
-    'class-dependency-manager.php',
-    'class-file-24-integration.php',
-    'class-section-service.php',
-    'class-rest-controller.php',
-    "version_compare(PHP_VERSION, '8.0', '<')",
+    'class-native-integration.php', 'class-dependency-manager.php',
+    'class-file-24-integration.php', 'class-section-service.php',
+    'class-rest-controller.php', "version_compare(PHP_VERSION, '8.0', '<')",
 ], 'Runtime');
 
 $design = $read('includes/class-design-system.php');
 $contains($design, [
-    "CONTRACT_VERSION = '1.8.0'",
-    "'global_shell_owner' => 'file-20'",
+    "CONTRACT_VERSION = '1.8.0'", "'global_shell_owner' => 'file-20'",
     "'security_governance_owner' => 'file-24'",
-    "'public_contact_consent_owner' => 'file-03'",
-    'native-contact-consent',
-    'same-origin-profile-media',
-    'conditional-profile-layout',
-    'profile-breadcrumbs',
-    'structured-profile-section-rest',
+    "'public_contact_consent_owner' => 'file-03'", 'native-contact-consent',
+    'same-origin-profile-media', 'conditional-profile-layout',
+    'profile-breadcrumbs', 'structured-profile-section-rest',
     "'creates_file_26' => false",
 ], 'Design system');
 
 $file24 = $read('includes/class-file-24-integration.php');
 $contains($file24, [
-    "defined('SPCRC_VERSION')",
-    "REVIEWED_MINIMUM_VERSION = '0.25.3'",
-    "REVIEWED_MAXIMUM_VERSION = '0.26.0'",
-    "add_filter('spcrc/module_manifests'",
-    "'owns_security_governance' => false",
-    "'owns_privacy_orchestration' => false",
+    "defined('SPCRC_VERSION')", "REVIEWED_MINIMUM_VERSION = '0.25.3'",
+    "REVIEWED_MAXIMUM_VERSION = '0.26.0'", "add_filter('spcrc/module_manifests'",
+    "'owns_security_governance' => false", "'owns_privacy_orchestration' => false",
 ], 'File 24 integration');
 $forbids($file24, ['SABRI_SECURITY_CENTER_VERSION', 'SABRI_SPRC_VERSION'], 'File 24 integration');
 
 $native = $read('includes/class-native-integration.php');
 $contains($native, [
-    "FILE_00_MINIMUM_VERSION = '1.2.4'",
-    "FILE_00_MAXIMUM_VERSION = '1.3.0'",
-    "FILE_00_CONTRACT_VERSION = '1.1.2'",
-    'SMC_Contracts::assertions',
-    'SMC_CONTRACT_VERSION',
-    'smc_founder_user_id',
-    'gdo_get_verification_decision',
-    'gdo_get_approved_snapshot',
-    "FILE_08_PUBLIC_PROJECTION_CONTRACT = '1.0.0'",
-    'swc_get_public_clinic_projection',
-    "FILE_18_MINIMUM_VERSION = '1.2.0-RC1'",
+    "FILE_00_MINIMUM_VERSION = '1.2.4'", "FILE_00_MAXIMUM_VERSION = '1.3.0'",
+    "FILE_00_CONTRACT_VERSION = '1.1.2'", 'SMC_Contracts::assertions',
+    'SMC_CONTRACT_VERSION', 'smc_founder_user_id', 'gdo_get_verification_decision',
+    'gdo_get_approved_snapshot', "FILE_08_PUBLIC_PROJECTION_CONTRACT = '1.0.0'",
+    'swc_get_public_clinic_projection', "FILE_18_MINIMUM_VERSION = '1.2.0-RC1'",
     'File 25 must not calculate age',
 ], 'Native authority adapter');
 $forbids($native, [
-    '$wpdb',
-    'SHOW TABLES',
-    'smc_get_profile',
-    'smc_professional_credentials',
-    'smc_clinics',
-    'calculated_age',
-    'license_expiry',
+    '$wpdb', 'SHOW TABLES', 'smc_get_profile', 'smc_professional_credentials',
+    'smc_clinics', 'calculated_age', 'license_expiry',
 ], 'Native authority adapter');
 
 $marketplace = $read('includes/providers/class-file-18-marketplace-provider.php');
 $contains($marketplace, [
-    "MINIMUM_VERSION = '1.2.0-RC1'",
-    'smp_get_public_profile_listings',
-    'SMP_Utils::current_seller',
-    'SMP_REST::products',
-    'SMP_Activator::marketplace_url',
-    'TRANSITIONAL_FETCH_LIMIT',
+    "MINIMUM_VERSION = '1.2.0-RC1'", 'smp_get_public_profile_listings',
+    'SMP_Utils::current_seller', 'SMP_REST::products',
+    'SMP_Activator::marketplace_url', 'TRANSITIONAL_FETCH_LIMIT',
 ], 'File 18 adapter');
 $forbids($marketplace, ['$wpdb', 'SMP_DB::table', 'SELECT p.*'], 'File 18 adapter');
 
 $dependencies = $read('includes/class-dependency-manager.php');
 $contains($dependencies, [
-    'FILE_00_CONTRACT_VERSION',
-    'doctor_verification_available',
-    'clinic_available',
-    'marketplace_available',
-    'File 25 retains visual-token ownership',
+    'FILE_00_CONTRACT_VERSION', 'doctor_verification_available', 'clinic_available',
+    'marketplace_available', 'File 25 retains visual-token ownership',
 ], 'Dependency manager');
 
 $visibility = $read('includes/class-visibility-policy.php');
 $contains($visibility, ['SPD_Helpers::can_show_contact', 'return $authoritative && $filtered'], 'Contact visibility');
-if (str_contains($visibility, 'elseif ($this->is_verified_doctor')) {
-    $errors[] = 'Verified Doctor status must not bypass File 03 contact consent.';
-}
+$forbids($visibility, ['elseif ($this->is_verified_doctor'], 'Contact visibility');
 
 $repository = $read('includes/class-profile-repository.php');
 $contains($repository, [
     "FOUNDER_DISPLAY_NAME = 'Dr. Allamah Majid Hussain Sabri Muhaddith Mursheed'",
-    'Public_URL::sanitize_same_site',
-    'privacy-safe initials',
+    'Public_URL::sanitize_same_site', 'privacy-safe initials',
 ], 'Profile repository');
-if (str_contains($repository, 'get_avatar_url')) {
-    $errors[] = 'External avatar-service fallback must remain disabled.';
-}
+$forbids($repository, ['get_avatar_url'], 'Profile repository');
 
 $router = $read('includes/class-profile-router.php');
 $contains($router, [
-    'Section_Registry::approved_sections()',
-    'profile_right_sidebar_available',
+    'Section_Registry::approved_sections()', 'profile_right_sidebar_available',
     'return $right_sidebar_available ? \'three\' : \'two\';',
 ], 'Profile router');
-
 $renderer = $read('includes/class-profile-renderer.php');
 $contains($renderer, ["'@type' => 'BreadcrumbList'", 'og:image:alt', 'missing_profile_status', 'status_header($status)'], 'Profile renderer');
 $contains($read('templates/public-profile.php'), ['spux-breadcrumbs', 'aria-current="page"'], 'Profile template');
 
 $cards = $read('includes/class-content-cards.php');
 $contains($cards, ["CONTRACT_VERSION = '1.2.0'", 'public static function normalize_public', "'public_normalizer' => [self::class, 'normalize_public']"], 'Content cards');
-
 $sections = $read('includes/class-section-service.php');
 $contains($sections, ["PUBLIC_CONTRACT_VERSION = '1.0.0'", 'get_public_section', 'public_health', 'Content_Cards::normalize_public'], 'Section service');
-
 $rest = $read('includes/class-rest-controller.php');
 $contains($rest, [
-    '/founder/knowledge',
-    '/founder/media',
+    '/founder/knowledge', '/founder/media',
     '/profiles/(?P<slug>[a-zA-Z0-9_-]+)/knowledge',
-    '/profiles/(?P<slug>[a-zA-Z0-9_-]+)/media',
-    '/providers/health',
-    "'ETag'",
-    'no-store, private, max-age=0',
+    '/profiles/(?P<slug>[a-zA-Z0-9_-]+)/media', '/providers/health',
+    "'ETag'", 'no-store, private, max-age=0',
 ], 'REST controller');
 if (preg_match('/provider_id|native_id|projection_key/', $rest)) {
     $errors[] = 'Public REST controller must not expose internal identifiers.';
@@ -246,8 +180,7 @@ if (preg_match('/\b(eval|document\.write)\s*\(/i', $javascript) || preg_match('/
 }
 
 foreach ([
-    'includes/class-content-cards.php',
-    'includes/class-section-service.php',
+    'includes/class-content-cards.php', 'includes/class-section-service.php',
     'includes/providers/class-file-06-knowledge-provider.php',
     'includes/providers/class-file-10-video-media-provider.php',
     'includes/providers/class-file-11-reels-media-provider.php',
@@ -295,11 +228,22 @@ if (($modules[3]['reviewed_package_version'] ?? '') !== '0.2.0'
 ) {
     $errors[] = 'File 03 contact-consent staging authority is stale.';
 }
-if (($modules[8]['reviewed_source_version'] ?? '') !== '0.2.0'
+if (($modules[8]['reviewed_package_version'] ?? '') !== '0.2.1'
+    || ($modules[8]['reviewed_source_version'] ?? '') !== '0.2.1'
+    || ($modules[8]['accepted_source_range'] ?? '') !== '>=0.2.1 <0.3.0'
     || ($modules[8]['required_public_contract_version'] ?? '') !== '1.0.0'
+    || ($modules[8]['reviewed_source_commit'] ?? '') !== 'bd6a10b693991fc518788ef8e3cba49531454821'
+    || ($modules[8]['reviewed_candidate_sha256'] ?? '') !== '36ce0c78aa51396b02bd0705021e66782bfc45b74636ac65b0826bd372103578'
+    || ($modules[8]['contract_status'] ?? '') !== 'implemented-and-ci-verified-pending-hostinger-staging'
     || ($modules[8]['foreign_table_reads_allowed'] ?? true) !== false
+    || ($modules[8]['staging_status'] ?? '') !== 'pending'
 ) {
-    $errors[] = 'File 08 public clinic projection authority is stale or unsafe.';
+    $errors[] = 'File 08 public clinic projection authority is stale, incomplete, or unsafe.';
+}
+foreach (['SWC_VERSION', 'SWC_PUBLIC_CLINIC_CONTRACT_VERSION', 'swc_get_public_clinic_projection', 'swc_public_clinic_projection_contract'] as $symbol) {
+    if (! in_array($symbol, (array) ($modules[8]['required_symbols'] ?? []), true)) {
+        $errors[] = 'File 08 matrix symbol missing: ' . $symbol;
+    }
 }
 if (($modules[9]['reviewed_source_version'] ?? '') !== '1.1.0'
     || ($modules[9]['foreign_table_reads_allowed'] ?? true) !== false
@@ -346,12 +290,9 @@ foreach (['file00-assertions', 'file08-clinic-projection', 'file09-doctor-decisi
 
 $composer = $read('composer.json');
 foreach ([
-    'tests/profile-router.php',
-    'tests/authoritative-native-contracts.php',
-    'tests/master-plan-reconciliation.php',
-    'tests/file18-marketplace-provider.php',
-    'tests/file24-integration.php',
-    'tests/staging-probe.php',
+    'tests/profile-router.php', 'tests/authoritative-native-contracts.php',
+    'tests/master-plan-reconciliation.php', 'tests/file18-marketplace-provider.php',
+    'tests/file24-integration.php', 'tests/staging-probe.php',
 ] as $test) {
     if (! str_contains($composer, $test)) {
         $errors[] = 'Composer suite missing: ' . $test;
