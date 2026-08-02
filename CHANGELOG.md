@@ -11,20 +11,27 @@
 - Removed locally derived Doctor verification based on role, qualification fields, or license-expiry queries.
 - Required a current File 09 `1.1.0` verification decision and immutable approved snapshot in addition to File 00 Doctor eligibility.
 - Removed File 25 age calculation. Explicit File 00 minor/guardian assertions govern; unknown ordinary contact state fails closed.
-- Added a fail-closed File 08 public-clinic projection contract `1.0.0`; clinic output remains unavailable until File 08 implements the owner API.
+- Replaced the earlier File 08 placeholder with the exact reviewed File 08 `0.2.1` public clinic projection contract `1.0.0`, bound to source commit `bd6a10b693991fc518788ef8e3cba49531454821` and candidate SHA-256 `36ce0c78aa51396b02bd0705021e66782bfc45b74636ac65b0826bd372103578`.
+- Required File 08 owner APIs `swc_get_public_clinic_projection()` and `swc_public_clinic_projection_contract()` while retaining File 25's bounded allow-list and zero foreign-table reads.
 - Replaced File 18 direct SQL with owner-executed public DTO APIs. The reviewed `1.2.0-RC1` transitional adapter is bounded and read-only.
 - Updated the File 00/03/08/09/18/20/21/24/25 dependency matrix and Hostinger staging scenarios.
 
 ### Added
 
-- `tests/authoritative-native-contracts.php` for File 00/08/09 fail-closed ownership behavior.
+- `tests/authoritative-native-contracts.php` for File 00/08/09 fail-closed ownership behavior, now exercised against File 08 `0.2.1` and contract introspection `1.0.0`.
 - File 18 owner-API regression coverage prohibiting `$wpdb`, `SMP_DB::table`, and native table queries in File 25.
-- Master Plan v3.0, File 20 v4.1, File 00 `1.2.4`, File 09 `1.1.0`, File 18 `1.2.0-RC1`, and File 25 `0.14.0` reconciliation gates.
-- CI, Composer, deterministic release-engineering, staging-test, and structural verification updates.
+- Master Plan v3.0, File 20 v4.1, File 00 `1.2.4`, File 08 `0.2.1`, File 09 `1.1.0`, File 18 `1.2.0-RC1`, and File 25 `0.14.0` reconciliation gates.
+- Exact File 08 commit, candidate digest, required symbols, source CI evidence, and pending-Hostinger state in deterministic release-engineering and structural verification.
+
+### File 08 integration review rounds
+
+- **Round 1:** synchronized the dependency matrix and tests to File 08 `0.2.1`; corrected stale structural and Master Plan assertions that still expected `0.2.0`.
+- **Round 2:** strengthened exact package, commit, digest, owner-symbol, contract-state, and real-staging scenario checks so source/CI verification cannot be mislabeled as Hostinger acceptance.
 
 ### Acceptance boundary
 
-- File 08 public clinic contract, exact multi-plugin Hostinger staging, browsers, Urdu RTL, accessibility, performance, upgrade, rollback, restore, monitoring, Founder acceptance, PR merge, release, and live deployment remain pending.
+- File 08 contract implementation and source/package verification are complete, but exact multi-plugin Hostinger runtime acceptance remains pending.
+- Browsers, Urdu RTL, accessibility, performance, upgrade, rollback, restore, monitoring, Founder acceptance, PR merge, release, and live deployment remain pending.
 - Green CI or a deterministic package is not staging or production acceptance.
 
 ## 0.13.0 — Master-Plan and File 25 Final-Specification Reconciliation
