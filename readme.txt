@@ -21,7 +21,7 @@ The reviewed 0.14.0 source correction includes:
 * File 09 `1.1.0` verification decisions and immutable approved professional snapshots as the Doctor-verification authority;
 * removal of File 25 Doctor verification derived from local qualification, role or license-expiry fields;
 * removal of all File 25 reads from `smc_professional_credentials`, `smc_clinics`, or other foreign File 00 tables;
-* a fail-closed File 08 `1.0.0` public-clinic projection boundary; clinic output remains unavailable until the owner module supplies that contract;
+* exact reviewed File 08 `0.2.1` and public clinic contract `1.0.0`, with owner-executed projection APIs, dedicated clinic-address handling, authoritative practitioner gating, and explicit pending Hostinger acceptance;
 * File 18 `1.2.0-RC1` owner-executed public DTO consumption with bounded transitional API access and no File 25 Marketplace SQL;
 * no File 25 age calculation; explicit File 00 minor/guardian assertions govern, and unknown ordinary contact state fails closed;
 * global semantic visual tokens without duplicating File 20's application shell;
@@ -35,17 +35,19 @@ The reviewed 0.14.0 source correction includes:
 * exact File 24 `>=0.25.3 <0.26.0` reviewed-source integration;
 * PHP 8.0/8.3 and JavaScript CI, including authoritative native-contract and foreign-table regression gates.
 
-This candidate is not production-complete. File 08's versioned public clinic projection, exact multi-plugin Hostinger staging, visual/accessibility evidence, upgrade, rollback, performance, deployment, monitoring, and Founder acceptance remain pending. Source compatibility, a ZIP, or green automated tests do not constitute staging or production acceptance.
+The exact File 08 staging input is runtime `0.2.1`, source commit `bd6a10b693991fc518788ef8e3cba49531454821`, and candidate SHA-256 `36ce0c78aa51396b02bd0705021e66782bfc45b74636ac65b0826bd372103578`. Source and package verification are complete, but File 08 and File 25 Hostinger runtime acceptance remains pending.
+
+This candidate is not production-complete. Exact multi-plugin Hostinger staging, visual/accessibility evidence, upgrade, rollback, performance, deployment, monitoring, and Founder acceptance remain pending. Source compatibility, a ZIP, or green automated tests do not constitute staging or production acceptance.
 
 == Installation ==
 
 1. Use only the exact dependency candidates listed in `config/staging-dependencies.json` on a backed-up, noindex Hostinger staging installation.
 2. Verify the detached SHA-256 checksum and embedded manifest before extracting the File 25 package.
 3. Upload the `sabri-public-experience` folder to `/wp-content/plugins/`.
-4. Confirm File 00 `1.2.4` / contract `1.1.2`, File 03 contact consent, File 09 `1.1.0`, File 18 `1.2.0-RC1`, File 20 `1.2.0`, and File 24 `0.25.x` exact boundaries.
-5. Do not expect clinic projection until File 08 supplies the required public contract `1.0.0`.
+4. Confirm File 00 `1.2.4` / contract `1.1.2`, File 03 contact consent, File 08 `0.2.1` / contract `1.0.0`, File 09 `1.1.0`, File 18 `1.2.0-RC1`, File 20 `1.2.0`, and File 24 `0.25.x` exact boundaries.
+5. Verify File 08 owner APIs `swc_get_public_clinic_projection()` and `swc_public_clinic_projection_contract()` before testing clinic sections.
 6. Run `wp sabri file25 staging-probe --expected-commit=<sha>` and correct every fail-closed gate.
-7. Complete real roles, routes, RTL, accessibility, browsers, performance, upgrade, rollback, restore, logs, and Founder acceptance before release.
+7. Complete real roles, routes, clinic projections, RTL, accessibility, browsers, performance, upgrade, rollback, restore, logs, and Founder acceptance before release.
 
 == Changelog ==
 
@@ -54,10 +56,10 @@ This candidate is not production-complete. File 08's versioned public clinic pro
 * Replaced stale File 00 assumptions with exact runtime `1.2.4` and assertion contract `1.1.2`.
 * Made File 09 verification decisions and immutable approved snapshots authoritative for Doctor status and professional fields.
 * Removed foreign File 00 professional-credential and clinic table reads.
-* Added a fail-closed File 08 public-clinic projection contract and explicit staging blocker.
+* Bound File 25 to exact reviewed File 08 `0.2.1`, contract `1.0.0`, owner symbols, source commit, candidate digest, and pending Hostinger state.
 * Replaced File 18 direct table queries with owner-executed public DTO APIs and a bounded transitional adapter.
 * Removed local age derivation; unknown ordinary minor/contact state now fails closed.
-* Updated dependency, staging, Composer, CI, release-engineering, and structural regression gates.
+* Updated dependency, staging, Composer, CI, release-engineering, structural, and Master Plan regression gates.
 
 = 0.13.0 =
 * Reconciled implementation with the central Master Plan, Files 22–25 numbering amendment, and final File 25 specification.
