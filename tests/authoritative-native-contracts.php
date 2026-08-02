@@ -51,6 +51,8 @@ namespace {
     $gdo_decisions = [];
     /** @var array<int,array<string,mixed>> */
     $gdo_snapshots = [];
+    /** @var array<int,bool> */
+    $gdo_helper_verified_overrides = [];
     $force_grant_doctor_filter = false;
 
     function sanitize_key(string $value): string
@@ -83,6 +85,10 @@ namespace {
     }
     function gdo_user_is_verified(int $user_id): bool
     {
+        global $gdo_helper_verified_overrides;
+        if (array_key_exists($user_id, $gdo_helper_verified_overrides)) {
+            return $gdo_helper_verified_overrides[$user_id];
+        }
         return ! empty(gdo_get_verification_decision($user_id)['verified']);
     }
     function swc_get_public_clinic_projection(int $user_id): array
@@ -132,6 +138,7 @@ namespace {
     ]);
     SMC_Contracts::$assertions[7] = $base(7, 'doctor');
     SMC_Contracts::$assertions[8] = $base(8, 'doctor');
+    SMC_Contracts::$assertions[9] = $base(9, 'doctor');
     SMC_Contracts::$assertions[10] = $base(10, 'member');
     SMC_Contracts::$assertions[12] = array_merge($base(12), ['contract_version' => '1.1.1']);
 
@@ -150,11 +157,19 @@ namespace {
             'languages' => 'Urdu, English',
             'consultation_modes' => 'Online, In person',
             'phone' => '+923001234567',
+            'whatsapp' => '+923001234567',
             'bio' => 'Approved public professional biography.',
         ],
         'evidence' => ['qualification' => ['decision' => 'approved']],
     ];
     $gdo_decisions[8] = ['state' => 'rejected', 'verified' => false];
+    $gdo_decisions[9] = [
+        'state' => 'verified',
+        'verified' => true,
+        'verified_until' => '2027-08-02',
+        'fingerprint' => str_repeat('b', 64),
+    ];
+    $gdo_helper_verified_overrides[9] = false;
 
     $failures = [];
     $check = static function (bool $condition, string $message) use (&$failures): void {
@@ -166,12 +181,15 @@ namespace {
     $check($native->founder_user_id() === 1, 'Founder identity must come only from File 00.');
     $check($native->is_verified_doctor(7), 'Doctor requires both File 00 eligibility and File 09 verification.');
     $check(! $native->is_verified_doctor(8), 'Rejected File 09 decision must fail closed.');
+    $check(! $native->is_verified_doctor(9), 'File 09 helper/decision disagreement must fail closed.');
     $check($native->membership_assertions(12) === [], 'Mismatched File 00 assertion contract must fail closed.');
 
     $credentials = $native->professional_credentials(7);
     $check(($credentials['qualification'] ?? '') === 'DHMS', 'Qualification must come from the File 09 approved snapshot.');
     $check(($credentials['council'] ?? '') === 'National Council', 'Licensing authority must be normalized from File 09.');
     $check(! array_key_exists('license_number', $credentials), 'Sensitive license number must not enter File 25 public credentials.');
+    $check($native->profile_value(7, 'phone', '') === '', 'File 09 contact values must not bypass File 03 profile/contact ownership.');
+    $check($native->profile_value(7, 'whatsapp', '') === '', 'File 09 WhatsApp values must not bypass File 03 profile/contact ownership.');
 
     $clinic = $native->clinic(7);
     $check(($clinic['name'] ?? '') === 'Global Clinic', 'Clinic must come from the File 08 public projection.');
