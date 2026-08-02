@@ -1,0 +1,19 @@
+--- a/includes/class-native-integration.php
++++ b/includes/class-native-integration.php
+@@ -327,7 +327,7 @@
+ 
+         $profile = [];
+         foreach ([
+-            'display_name', 'country', 'city', 'clinic', 'qualification',
++            'display_name', 'country', 'city', 'qualification',
+             'licensing_authority', 'experience_years', 'specialty', 'languages',
+             'consultation_modes', 'bio',
+         ] as $field) {
+@@ -491,7 +491,6 @@
+             'specialty' => ['specialty'],
+             'specialization' => ['specialty'],
+             'consultation_mode' => ['consultation_modes'],
+-            'clinic_name' => ['clinic'],
+         ];
+         $candidates = $aliases[$key] ?? [$key];
+         foreach ($candidates as $candidate) {
