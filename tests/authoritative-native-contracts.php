@@ -8,7 +8,8 @@ namespace {
     define('SMC_CONTRACT_VERSION', '1.1.2');
     define('SPD_VERSION', '0.2.0');
     define('GDO_VERSION', '1.1.0');
-    define('SWC_VERSION', '0.2.0');
+    define('SWC_VERSION', '0.2.1');
+    define('SWC_PUBLIC_CLINIC_CONTRACT_VERSION', '1.0.0');
 
     final class WP_User
     {
@@ -107,6 +108,15 @@ namespace {
             ],
         ];
     }
+    function swc_public_clinic_projection_contract(): array
+    {
+        return [
+            'contract_version' => '1.0.0',
+            'owner' => 'file-08',
+            'fields' => ['name', 'address', 'country', 'city', 'hours', 'timezone'],
+            'writes_data' => false,
+        ];
+    }
 
     require_once dirname(__DIR__) . '/includes/class-native-integration.php';
 
@@ -183,6 +193,8 @@ namespace {
     $check(! $native->is_verified_doctor(8), 'Rejected File 09 decision must fail closed.');
     $check(! $native->is_verified_doctor(9), 'File 09 helper/decision disagreement must fail closed.');
     $check($native->membership_assertions(12) === [], 'Mismatched File 00 assertion contract must fail closed.');
+    $check($native->clinic_available(), 'Exact File 08 0.2.1 owner projection must be available.');
+    $check((swc_public_clinic_projection_contract()['contract_version'] ?? '') === '1.0.0', 'File 08 contract introspection must report 1.0.0.');
 
     $credentials = $native->professional_credentials(7);
     $check(($credentials['qualification'] ?? '') === 'DHMS', 'Qualification must come from the File 09 approved snapshot.');
