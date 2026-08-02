@@ -6,18 +6,50 @@
 
 ## Current source phase
 
-This branch implements and reviews phases 25A–25H, continues 25I with governed Knowledge, Media, and Marketplace adapters, and continues 25J with a commit-bound visual-acceptance evidence contract. It does not represent staging or production completion.
+Candidate `0.14.0` corrects the authoritative read boundaries of the existing File 25 implementation. It remains a Draft PR source candidate and does not represent Hostinger staging, merge, production, deployment, or Founder acceptance.
 
 ## Ownership
 
-- File 00: identity, roles, approval, age/guardian authority, public visibility, and professional eligibility.
-- File 03: profile master data, photographs, and public-contact consent.
-- Files 06/10/11/12/18: canonical Knowledge, Video, Reels, PDF, Marketplace content and native workflows.
-- File 20: global shell, navigation, widths, layout resolver, and base shell tokens.
-- File 21: Home/News publications, comments, interactions, moderation, and the production timeline provider.
+- File 00: identity, membership, Founder identity, approval, suspension, age/guardian policy, eligibility, professional eligibility, and public-profile authorization.
+- File 03: profile master data, local photographs/media, and public-contact consent.
+- File 08: clinic, availability, appointment, and scheduling truth.
+- File 09: Doctor application, credential evidence, independent review, verification lifecycle, and immutable approved professional snapshot.
+- Files 06/10/11/12/18: canonical Knowledge, Video, Reels, PDF, and Marketplace content/workflows.
+- File 20: global shell, routes, header/navigation, sidebars, drawers, widths, structural layout, recovery, and rollback.
+- File 21: Home/News publications, interactions, moderation, and production timeline provider.
 - Files 22/23: content creation and private publishing operations.
-- File 24: security, privacy, compliance, incidents, cache partitioning, and resilience.
-- File 25: global public visual language, public profile templates, rebuildable timeline/section projections, reusable components/cards/states, responsive refinement, accessibility, and visual acceptance.
+- File 24: security, privacy, compliance, incidents, audit evidence, cache governance, and resilience.
+- File 25: global visual language, public profiles, rebuildable timeline/section projections, reusable components/cards/states, responsive refinement, accessibility, SEO presentation, and visual acceptance.
+
+## Authoritative native adapters
+
+### File 00
+
+`Native_Integration` accepts only File 00 `>=1.2.4 <1.3.0`, exact contract `1.1.2`, `SMC_Contracts::assertions()`, `smc_founder_user_id()`, and `smc_is_founder()`.
+
+The returned assertion is rejected unless its contract version and user ID match exactly. File 25 performs no direct File 00 table read and does not calculate membership, age, guardian, suspension, professional eligibility, or public-profile state.
+
+### File 09
+
+Doctor presentation requires:
+
+1. File 00 membership type `doctor`;
+2. approved, eligible, non-suspended File 00 state;
+3. File 00 professional verification and `can_practice`;
+4. File 09 current verified/approved decision;
+5. no revoking File 03 professional status.
+
+Professional fields come from `gdo_get_approved_snapshot()`. File 25 allow-lists public qualification, licensing authority label, experience, specialty, languages, consultation modes, and biography. Private evidence and license numbers do not enter public projection.
+
+### File 08
+
+Clinic projection is accepted only from `swc_get_public_clinic_projection()` or `SWC_Helpers::public_clinic_projection()` with exact contract `1.0.0`. File 25 allow-lists name, address, country, city, hours, and timezone. Contact data continues through File 03 consent. Until File 08 implements the versioned owner contract, clinic projection remains unavailable.
+
+### File 18
+
+File 25 does not use `$wpdb`, `SMP_DB::table()`, or Marketplace SQL. It prefers `smp_get_public_profile_listings()` contract `1.0.0`. For reviewed File 18 `1.2.0-RC1`, a transitional read-only path calls `SMP_Utils::current_seller()`, `SMP_REST::products()`, and `SMP_Activator::marketplace_url()`.
+
+The transitional owner fetch is bounded to the first 50 public DTOs; File 25 projects at most 24 cards. File 18 remains owner of listing eligibility, seller state, moderation, contact, offers, metrics, transactions, and direct-deal history.
 
 ## Global visual contract
 
@@ -31,49 +63,25 @@ sabri_visual_experience_render_notice(array $args = []): string
 sabri_visual_experience_render_card(array $args = []): string
 ```
 
-The canonical stylesheet handle is `sabri-visual-design-system`, and reusable classes use the `sabri-ui-` prefix.
+The canonical stylesheet handle is `sabri-visual-design-system`; reusable classes use the `sabri-ui-` prefix. File 20 supplies structural shell geometry. File 25 owns visual tokens, component appearance, public profiles/timelines, responsive visual consistency, and visual regression.
 
-File 25 inherits File 20-owned shell tokens. It may define derivative semantic tokens, but it does not replace File 20's connected text, surface, page, border, focus, width, radius, gap, or font-scale decisions.
+## Content cards and optional sections
 
-## Reusable content cards
+`Content_Cards` accepts a bounded public display allow list, requires a title, ignores unknown/internal fields, performs no native writes, emits no native IDs, and uses strict same-origin URLs.
 
-`Content_Cards` supplies visual variants for article, post, news, video, reel, book, PDF, Doctor, clinic, event, and Marketplace item data.
+Approved optional sections are Knowledge, Media, Reviews, Research, and Marketplace. A tab appears only when an accepted provider produces at least one valid public card.
 
-The renderer accepts only a bounded display allow list, requires a title, ignores unknown/internal fields, performs no native writes, emits no native IDs or diagnostics, uses one keyboard destination per card, applies exact same-origin URL policy, and preserves native ownership.
-
-## Optional profile-section architecture
-
-Approved sections are Knowledge, Media, Reviews, Research, and Marketplace. A tab appears only when an accepted provider produces at least one valid public card.
-
-`Section_Registry` freezes provider ID, version, section, maturity, native-ownership declaration, and concrete object identity. `validated_metadata()` reads every mutable field once and compares the complete registration-bound snapshot before a query. Provider impersonation, self-promotion, ownership drift, metadata exceptions, and section/version mutation fail closed.
-
-`Section_Service` bounds provider candidates and final cards, isolates errors, suppresses duplicates, renders descriptors only through `Content_Cards`, and returns only bounded public status.
-
-A valid canonical item URL is the preferred identity. Native systems with one application URL may provide a private SHA-256 `projection_key`; it is consumed before rendering and never exposed publicly.
-
-Current native read-only adapters:
-
-- File 06 Homeopathy Encyclopedia → Knowledge;
-- File 10 Video Wall non-Reels → Media;
-- File 11 Reels with 60–600 second validation → Media;
-- File 12 PDF Library → Media;
-- File 18 approved public seller listings → Marketplace.
-
-Files 06/10/11/12/18 retain canonical content, permissions, moderation, metrics, files, contacts, and workflow ownership.
-
-## URL boundary
-
-`Public_URL::sanitize_same_site()` rejects protocol-relative, cross-origin, credential-bearing, downgrade, port-mismatch, control-character, backslash, malformed, and forbidden-fragment URLs. External navigation requires a separate reviewed contract.
+`Section_Registry` freezes provider ID, version, section, maturity, ownership declaration, and object identity. `Section_Service` bounds candidates and final cards, isolates errors, suppresses duplicates, and returns only public-safe data.
 
 ## Public profile projection
 
-File 25 creates no second profile authority. It reads the minimum presentation fields from File 00 and File 03 and applies monotonic visibility:
+File 25 creates no second profile authority. Public projection obeys monotonic restriction:
 
-- filters may narrow but not elevate identity or widen visibility;
-- public Doctor presentation requires approved adult identity and current evidence;
-- ordinary member contact requires explicit public-contact consent;
-- minors, unknown-age, private/member-only, rejected, and suspended profiles fail closed;
-- public output excludes identity documents, registration numbers, patient data, user IDs, and native private identifiers.
+- filters may revoke but cannot grant denied identity, Doctor state, public visibility, or contact exposure;
+- File 25 performs no age calculation;
+- unknown ordinary minor/contact state fails closed;
+- File 03 consent controls phone, WhatsApp, and email exposure;
+- public output excludes user IDs, identity documents, professional evidence, license numbers, patient data, provider IDs, native IDs, and private diagnostics.
 
 ## Routing and cache behavior
 
@@ -83,26 +91,20 @@ Canonical routes:
 - `/doctors/{slug}/`
 - `/profile/{slug}/`
 
-Only truthfully renderable sections are exposed. Role/slug mismatches redirect canonically; unknown or unavailable sections return non-cacheable 404 responses. Until File 24 provides an audited cache partition, profile HTML and REST remain `no-store`.
+Only truthfully renderable sections are exposed. Role/slug mismatches redirect canonically; unavailable sections return non-cacheable errors. Until File 24 supplies an accepted versioned cache partition, profile HTML and REST remain `no-store`.
 
-## Timeline design
+## Timeline and provider safety
 
-Timeline providers remain read-only. File 25 bounds provider results, validates identity/version/maturity, public/review state, author binding, dates, media and canonical URLs, then performs final merge, sort, deduplication, and pagination. Public output excludes provider/native/user IDs, metrics pointers, and diagnostics.
+Timeline providers remain read-only. File 25 validates provider identity/version/maturity, public and review state, author binding, dates, media, and canonical URLs before final merge, sort, deduplication, and pagination. Public output excludes provider/native/user IDs and diagnostics.
 
-The WordPress posts provider is registered only while File 21 is absent. Active incompatible File 21 is not bypassed. The File 21 adapter remains `read-only` until exact staging acceptance.
+## Visual acceptance
 
-## Visual acceptance architecture
+One evidence manifest declares one `target_commit_sha`. Every surface, viewport, direction, color/motion mode, zoom level, input mode, staging record, and Founder sign-off must match that commit.
 
-One evidence manifest declares a single `target_commit_sha`. Every required surface, viewport, direction, color mode, motion mode, zoom level, input mode, staging record, and Founder sign-off must match that commit.
+Required evidence includes Founder, Doctor, Member, timeline, Knowledge, Media, Marketplace, all visual states, forms, responsive tables, Urdu RTL, keyboard, screen reader, forced colors, reduced motion, zoom, target viewports, and performance.
 
-Every matrix cell requires pass status, bounded artifact reference, SHA-256, commit SHA, strict ISO timestamp, and reviewer. Impossible timestamps, parser warnings, mixed commits, unsafe references, and noncanonical staging URLs fail closed.
+## Safe failure and acceptance
 
-Required surfaces include Founder, Doctor, Member, timeline, Knowledge, Media, Marketplace, all visual states, card grids, forms, and responsive tables.
+Missing or incompatible authoritative dependencies prevent the related public projection from booting. File 25 Safe Mode disables its own overrides, records bounded incidents, permits authenticated retry, and leaves native data untouched.
 
-## Safe failure
-
-A missing identity dependency prevents profile/timeline/section overrides from booting, while the identity-independent design system may continue. File 25 Safe Mode disables File 25 overrides, records bounded incidents, preserves nested boundaries, allows authenticated retry, and leaves native data untouched. File 24 remains the incident owner.
-
-## Acceptance boundary
-
-Source lint and green CI do not prove integration or visual completion. Exact plugin packages, real native pages/content, visual-regression baselines, Urdu RTL, keyboard, screen reader, zoom, forced colors, reduced motion, performance, migration, rollback, staging, deployment, monitoring, and Founder acceptance remain mandatory.
+Source lint and green CI do not prove integration or visual completion. Exact packages, real owner contracts, Hostinger staging, migration, rollback, restore, deployment, monitoring, and Founder acceptance remain mandatory.
