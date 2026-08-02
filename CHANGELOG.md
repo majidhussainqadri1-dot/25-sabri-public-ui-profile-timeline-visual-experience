@@ -1,135 +1,83 @@
 # Changelog
 
-## 0.13.0 — Master-Plan and File 25 Final-Specification Reconciliation
+## 0.14.0 — Authoritative Contracts and Foreign-Table Decoupling
 
-### Corrected during eleventh review
+### Corrected
 
-- Removed the verified-Doctor contact privacy bypass. File 25 now consumes File 03's canonical `SPD_Helpers::can_show_contact()` decision for Founder, Doctor, and permitted Member contact rendering; filters may only revoke.
-- Froze the approved Founder public spelling as `Dr. Allamah Majid Hussain Sabri Muhaddith Mursheed` instead of trusting a mutable presentation option or extension filter.
-- Removed silent external avatar-service fallback and restricted profile, cover, and OpenGraph media to same-origin URLs.
-- Stopped every Doctor profile from forcing an empty third File 20 shell column; three-column mode now requires declared real right-sidebar content.
-- Added an explicit default 404 and opt-in 410 tombstone policy for unavailable/deleted public profiles.
+- Reconciled File 25 with the Sabri Platform Master Plan `v3.0` and File 20 harmonized plan `v4.1`.
+- Replaced stale File 00 assumptions with exact runtime `1.2.4` and public assertion contract `1.1.2`.
+- Made `SMC_Contracts::assertions()` the authoritative membership, eligibility, suspension, guardian-policy, can-practice, and public-profile source.
+- Removed File 25 direct access to File 00 professional-credential and clinic tables.
+- Removed locally derived Doctor verification based on role, qualification fields, or license-expiry queries.
+- Required a current File 09 `1.1.0` verification decision and immutable approved snapshot in addition to File 00 Doctor eligibility.
+- Removed File 25 age calculation. Explicit File 00 minor/guardian assertions govern; unknown ordinary contact state fails closed.
+- Added a fail-closed File 08 public-clinic projection contract `1.0.0`; clinic output remains unavailable until File 08 implements the owner API.
+- Replaced File 18 direct SQL with owner-executed public DTO APIs. The reviewed `1.2.0-RC1` transitional adapter is bounded and read-only.
+- Updated the File 00/03/08/09/18/20/21/24/25 dependency matrix and Hostinger staging scenarios.
 
 ### Added
 
-- Visible accessible profile breadcrumbs and `BreadcrumbList` structured data.
-- Safe `og:image:alt` output.
-- One public card allow-list shared by HTML and REST.
-- Structured Founder/profile Knowledge and Media endpoints.
-- Aggregate provider-health endpoint without provider IDs, versions, native IDs, object counts, or exception details.
-- Deterministic REST ETags while retaining `no-store, private` cache policy.
-- Master-plan reconciliation regression test and CI gate.
-- Updated staging expectations for File 00 `1.1.13`, File 03 `0.2.0`, and File 25 `0.13.0`.
+- `tests/authoritative-native-contracts.php` for File 00/08/09 fail-closed ownership behavior.
+- File 18 owner-API regression coverage prohibiting `$wpdb`, `SMP_DB::table`, and native table queries in File 25.
+- Master Plan v3.0, File 20 v4.1, File 00 `1.2.4`, File 09 `1.1.0`, File 18 `1.2.0-RC1`, and File 25 `0.14.0` reconciliation gates.
+- CI, Composer, deterministic release-engineering, staging-test, and structural verification updates.
 
-### Ownership and acceptance boundary
+### Acceptance boundary
 
-- File 20 remains the only shell/sidebar owner.
-- File 03 remains profile/contact-consent owner.
-- File 21 and native modules remain canonical content owners.
-- File 24 remains security/privacy/compliance/resilience owner.
-- Hostinger staging, runtime privacy tests, visual/accessibility evidence, rollback, deployment, monitoring, and Founder acceptance remain pending.
+- File 08 public clinic contract, exact multi-plugin Hostinger staging, browsers, Urdu RTL, accessibility, performance, upgrade, rollback, restore, monitoring, Founder acceptance, PR merge, release, and live deployment remain pending.
+- Green CI or a deterministic package is not staging or production acceptance.
+
+## 0.13.0 — Master-Plan and File 25 Final-Specification Reconciliation
+
+- Removed the verified-Doctor contact privacy bypass and made File 03 consent authoritative.
+- Froze the Founder public spelling, removed external avatar fallback, and enforced same-origin media.
+- Prevented empty forced third-column Doctor layouts.
+- Added accessible breadcrumbs, structured metadata, 404/410 handling, structured Knowledge/Media APIs, provider health, shared public card normalization, and deterministic ETags.
 
 ## 0.12.0 — Exact File 24 Integration and No-Store Security Boundary
 
-### Added
+- Added exact `SPCRC_VERSION` compatibility, bounded File 25 manifest, advisory monitoring, and no-store profile policy.
+- Preserved File 24 ownership of security, privacy, compliance, incident, audit, and resilience governance.
 
-- Reviewed File 24 integration for the exact `SPCRC_VERSION` runtime contract.
-- Fail-closed compatibility range `>=0.25.3 <0.26.0`.
-- Bounded `file-25-public-experience` manifest through `spcrc/module_manifests`.
-- Site Health diagnostics for absent, incompatible, and compatible File 24 states.
-- Advisory `elevated-monitoring` request when File 25 enters Safe Mode.
-- File 24 integration contract, staging-matrix records, regression tests, CI gate, and review documentation.
+## 0.11.0 — Provider Route Parity and Hostinger Preflight
 
-### Corrected during tenth review
-
-- Removed File 25's ineffective File 24 detection through nonexistent `SABRI_SECURITY_CENTER_VERSION` and `SABRI_SPRC_VERSION` constants.
-- Replaced it with the exact reviewed File 24 constant `SPCRC_VERSION`.
-- Kept HTML profile responses explicitly `no-store, private` in addition to the existing no-store REST responses.
-- Prevented duplicate or forged File 25 manifests from overriding the canonical bounded manifest.
-- Preserved File 24 ownership of security governance, privacy orchestration, audit evidence, incidents, controls, findings, and resilience.
-
-### Acceptance boundary
-
-- File 24 source compatibility is reviewed, but File 24 and File 25 remain pending exact Hostinger staging.
-- No versioned shared-cache partition contract has been accepted.
-- File 25 claims no File 24 operational capabilities or privacy operations.
-- PR merge, deployment, visual/accessibility evidence, rollback proof, and Founder acceptance remain pending.
-
-## 0.11.0 — Provider Route Parity and Hostinger Installed-Candidate Preflight
-
-### Added
-
-- Read-only `Staging_Probe` contract for the exact canonical Hostinger staging host.
-- Installed extracted-package verification against `STAGING-MANIFEST.json`, including exact file-set, SHA-256, byte-size, path, symlink, version, and expected-commit checks.
-- Privacy-safe WP-CLI command: `wp sabri file25 staging-probe --expected-commit=<sha>`.
-- Site Health staging-preflight test that reports fail-closed gates without granting acceptance.
-- Machine-readable `config/staging-test-plan.json` with environment, route, privacy, content, RTL, accessibility, resilience, rollback, performance, and Founder-acceptance scenarios.
-- Schema version 2 and a bounded upgrade coordinator with lock ownership, stale-lock recovery, one-time rewrite refresh, and idempotence.
-
-### Corrected during ninth review
-
-- Fixed a canonical routing contradiction: `research` and `marketplace` were approved optional sections but absent from the profile rewrite pattern and request whitelist.
-- Replaced the duplicated hard-coded provider route list with `Section_Registry::approved_sections()` parity.
-- Prevented upgraded sites from retaining stale rewrite rules after provider destinations became routable.
-- Added exact installed-candidate verification so a downloaded ZIP cannot be silently altered, partially extracted, or mixed with stale files before manual staging tests.
-
-### Acceptance boundary
-
-- The staging probe is read-only and contains no user or patient data.
-- A passing preflight permits manual Hostinger staging tests only.
-- Live remains untouched; PR merge, deployment, visual evidence, rollback evidence, and Founder sign-off remain pending.
+- Added installed-package verification, Hostinger preflight, schema-2 upgrade coordination, and optional-section route parity.
 
 ## 0.10.0 — Artifact Integrity and Deterministic Staging Candidate
 
-### Added
+- Added deterministic package building, embedded/detached manifests, checksums, and independent artifact verification.
 
-- Deterministic staging-package builder using a bounded payload allow list and `SOURCE_DATE_EPOCH`.
-- Embedded `STAGING-MANIFEST.json`, detached manifest, and detached SHA-256 checksum.
-- Archive reopening and verification of entries, hashes, sizes, root prefix, and manifest equality.
-- Development-file exclusion and exact staging dependency matrix.
-- CI byte-for-byte reproducibility, independent artifact verification, and temporary workflow artifact.
+## 0.9.0 — Atomic Providers and Commit-Bound Evidence
 
-### Corrected during seventh and eighth reviews
+- Added immutable provider metadata, initial File 18 projection, server-only projection keys, and exact-commit visual evidence.
 
-- Rejected arbitrary external, traversal, absolute, query, fragment, control-character, and backslash evidence references.
-- Required evidence byte size and allow-listed media type in addition to SHA-256, timestamp, reviewer, and target commit.
-- Hardened build-path and symlink boundaries and removed hard-coded workflow filenames.
+## 0.8.0 — Native Media Adapters
 
-## 0.9.0 — Atomic Providers, File 18 Marketplace, and Commit-Bound Evidence
+- Added File 10 Video, File 11 Reels, and File 12 PDF read-only adapters.
 
-- Added native read-only File 18 Marketplace profile adapter.
-- Bound provider metadata to concrete registered objects and made validation atomic.
-- Added server-only SHA-256 projection keys for native objects sharing an application URL.
-- Bound all visual evidence and Founder sign-off to one exact commit.
+## 0.7.0 — Visual Acceptance Contract
 
-## 0.8.0 — Native Media Adapters and Evidence Integrity
+- Added immutable provider identity and machine-readable visual Definition of Done.
 
-- Added File 10 Video Wall, File 11 Reels, and File 12 PDF Library read-only adapters.
-- Froze provider maturity/ownership metadata and strengthened evidence records.
+## 0.6.0 — Optional Profile Sections
 
-## 0.7.0 — Immutable Providers and Visual Acceptance Contract
+- Added bounded Knowledge, Media, Reviews, Research, and Marketplace sections and File 06 adapter.
 
-- Froze provider identity/version/section metadata and added the machine-readable Definition of Done.
+## 0.5.0 — Content Cards and URL Security
 
-## 0.6.0 — Governed Optional Profile Sections
+- Added same-origin URL policy, reusable cards, forms, tables, notices, and contrast-safe tokens.
 
-- Added bounded Knowledge, Media, Reviews, Research, and Marketplace provider sections and File 06 adapter.
+## 0.4.0 — Global Visual System Foundation
 
-## 0.5.0 — Reusable Content Cards and URL Security
+- Added semantic tokens, reusable components, nested Safe Mode, and diagnostics.
 
-- Added same-origin URL policy, content cards, forms, tables, notices, and contrast-safe tokens.
+## 0.3.0 — File 21 Timeline Adapter
 
-## 0.4.0 — Unified Global Visual System Foundation
+- Added native read-only File 21 timeline normalization.
 
-- Added canonical global semantic tokens, components, nested Safe Mode, and diagnostics.
+## 0.2.0 — File 20 Integration and Profiles
 
-## 0.3.0 — Native File 21 Timeline Adapter
-
-- Added native read-only File 21 provider and bounded timeline normalization.
-
-## 0.2.0 — File 20 Integration and Founder/Doctor Profiles
-
-- Added File 20 integration, Founder/Doctor profiles, public allow lists, and responsive sections.
+- Added File 20 shell integration and Founder/Doctor profile foundations.
 
 ## 0.1.0 — Reviewed Foundation
 
