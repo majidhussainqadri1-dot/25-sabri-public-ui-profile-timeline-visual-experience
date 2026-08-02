@@ -14,8 +14,10 @@ namespace {
     if (! function_exists('apply_filters')) { function apply_filters(string $hook, mixed $value, mixed ...$args): mixed { return $value; } }
     if (! function_exists('home_url')) { function home_url(string $path = ''): string { return 'https://example.test/' . ltrim($path, '/'); } }
     if (! function_exists('wp_parse_url')) { function wp_parse_url(string $url): array|false { return parse_url($url); } }
+    if (! function_exists('esc_url_raw')) { function esc_url_raw(string $url, array $protocols = []): string { return $url; } }
 
     require_once dirname(__DIR__) . '/includes/contracts/interface-timeline-provider.php';
+    require_once dirname(__DIR__) . '/includes/class-public-url.php';
     require_once dirname(__DIR__) . '/includes/class-normalized-timeline-item.php';
     require_once dirname(__DIR__) . '/includes/class-timeline-registry.php';
     require_once dirname(__DIR__) . '/includes/class-timeline-service.php';
@@ -76,6 +78,7 @@ namespace Sabri\PublicExperience\Tests {
 }
 
 namespace {
+    use Sabri\PublicExperience\Normalized_Timeline_Item;
     use Sabri\PublicExperience\Timeline_Registry;
     use Sabri\PublicExperience\Timeline_Service;
     use Sabri\PublicExperience\Tests\Mutable_Timeline_Provider;
@@ -127,10 +130,73 @@ namespace {
     }
     $check($invalid_version, 'Timeline provider registration must reject malformed versions.');
 
+    $base_item = static function (array $overrides = []): array {
+        return array_merge([
+            'provider_id' => 'timeline-security',
+            'provider_version' => '1.0.0',
+            'native_object_type' => 'publication',
+            'native_object_id' => 'native-77',
+            'author_id' => 7,
+            'public_profile_id' => 7,
+            'title' => 'Public timeline security item',
+            'safe_excerpt' => 'Public excerpt',
+            'canonical_url' => 'https://example.test/publication/security/',
+            'published_at' => '2026-08-03T01:30:00+05:00',
+            'visibility_state' => 'public',
+            'native_status' => 'published',
+            'content_type' => 'post',
+            'review_state' => 'published',
+        ], $overrides);
+    };
+
+    $internal_thumbnail = new Normalized_Timeline_Item($base_item(['thumbnail_reference' => 987]));
+    $internal_public = $internal_thumbnail->to_public_array();
+    $check(! array_key_exists('thumbnail_reference', $internal_public), 'Native thumbnail identifiers must never enter public timeline output.');
+    $check(! array_key_exists('thumbnail_url', $internal_public), 'A native attachment ID must not be converted into a public thumbnail URL.');
+    $check(($internal_public['published_at'] ?? '') === '2026-08-02T20:30:00Z', 'Offset publication dates must normalize deterministically to UTC.');
+
+    $same_site_thumbnail = new Normalized_Timeline_Item($base_item([
+        'thumbnail_reference' => 'https://example.test/wp-content/uploads/2026/08/thumb.jpg',
+        'published_at' => '2026-08-03 00:00:00',
+    ]));
+    $same_site_public = $same_site_thumbnail->to_public_array();
+    $check(($same_site_public['thumbnail_url'] ?? '') === 'https://example.test/wp-content/uploads/2026/08/thumb.jpg', 'A strict same-site thumbnail URL may enter public output.');
+    $check(($same_site_public['published_at'] ?? '') === '2026-08-03T00:00:00Z', 'Exact MySQL timestamps must be interpreted as UTC, not server-local time.');
+
+    $remote_thumbnail = new Normalized_Timeline_Item($base_item([
+        'thumbnail_reference' => 'https://cdn.example.invalid/thumb.jpg',
+    ]));
+    $remote_public = $remote_thumbnail->to_public_array();
+    $check(! array_key_exists('thumbnail_url', $remote_public), 'Cross-origin thumbnails must fail closed at the public boundary.');
+
+    $relative_date_rejected = false;
+    try {
+        new Normalized_Timeline_Item($base_item(['published_at' => 'tomorrow']));
+    } catch (InvalidArgumentException) {
+        $relative_date_rejected = true;
+    }
+    $check($relative_date_rejected, 'Relative timeline dates must be rejected as non-deterministic.');
+
+    $ambiguous_date_rejected = false;
+    try {
+        new Normalized_Timeline_Item($base_item(['published_at' => '2026-08-03T00:00:00']));
+    } catch (InvalidArgumentException) {
+        $ambiguous_date_rejected = true;
+    }
+    $check($ambiguous_date_rejected, 'Timezone-less ISO timeline dates must be rejected as ambiguous.');
+
+    $invalid_calendar_rejected = false;
+    try {
+        new Normalized_Timeline_Item($base_item(['published_at' => '2026-02-30T00:00:00Z']));
+    } catch (InvalidArgumentException) {
+        $invalid_calendar_rejected = true;
+    }
+    $check($invalid_calendar_rejected, 'Invalid calendar dates must fail closed.');
+
     if ($failures !== []) {
         fwrite(STDERR, "FAILED\n- " . implode("\n- ", $failures) . "\n");
         exit(1);
     }
 
-    echo "PASS: File 25 immutable timeline provider object metadata contract\n";
+    echo "PASS: File 25 immutable timeline metadata, strict dates, and public thumbnail boundary\n";
 }
