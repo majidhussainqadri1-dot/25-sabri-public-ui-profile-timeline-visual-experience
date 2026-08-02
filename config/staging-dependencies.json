@@ -1,8 +1,13 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "file": 25,
-  "runtime_version": "0.13.0",
-  "purpose": "Exact multi-plugin staging candidate matrix. This file records reviewed source/package expectations and does not claim staging acceptance.",
+  "runtime_version": "0.14.0",
+  "governing_sources": {
+    "platform_master_plan": "Sabri Social Homeopathy Platform Definitive Master Plan 2026 v3.0",
+    "file_20_plan": "File 20 Harmonized Master Plan 2026 v4.1",
+    "file_25_plan": "Complete Public UI, Profile Timeline and Visual Experience — Final Harmonized Specification"
+  },
+  "purpose": "Exact multi-plugin staging candidate matrix. It records reviewed source expectations and mandatory ownership boundaries; it does not claim Hostinger staging, production, merge, or Founder acceptance.",
   "environment": {
     "wordpress_minimum": "6.5",
     "php_minimum": "8.0",
@@ -15,20 +20,22 @@
     {
       "file": 0,
       "name": "Sabri Membership Core",
-      "role": "hard runtime authority for identity, approval, age, visibility, and professional eligibility",
-      "reviewed_package_version": "1.1.13",
-      "accepted_source_range": ">=1.1.13 <1.2.0",
-      "required_symbols": ["SMC_VERSION", "smc_get_profile", "smc_user_status", "smc_is_founder"],
+      "role": "hard runtime authority for identity, membership state, Founder identity, suspension, eligibility, guardian policy and public-profile authorization",
+      "reviewed_package_version": "1.2.4",
+      "accepted_source_range": ">=1.2.4 <1.3.0",
+      "required_contract_version": "1.1.2",
+      "required_symbols": ["SMC_VERSION", "SMC_CONTRACT_VERSION", "SMC_Contracts::assertions", "smc_founder_user_id", "smc_is_founder"],
+      "foreign_table_reads_allowed": false,
       "bundled_with_file_25": false,
       "staging_status": "pending"
     },
     {
       "file": 3,
       "name": "Sabri Profiles and Doctors",
-      "role": "profile master data, photographs, professional data, and explicit public-contact consent",
+      "role": "profile master data, local profile media and explicit public-contact consent",
       "reviewed_package_version": "0.2.0",
       "accepted_source_range": ">=0.2.0 <0.3.0",
-      "required_symbols": ["SPD_VERSION", "SPD_Helpers", "SPD_Helpers::can_show_contact"],
+      "required_symbols": ["SPD_VERSION", "SPD_Helpers", "SPD_Helpers::get", "SPD_Helpers::can_show_contact"],
       "bundled_with_file_25": false,
       "staging_status": "pending"
     },
@@ -39,6 +46,31 @@
       "reviewed_package_version": "0.1.0",
       "accepted_source_range": ">=0.1.0 <0.2.0",
       "required_symbols": ["HE_VERSION", "HE_Content"],
+      "bundled_with_file_25": false,
+      "staging_status": "pending"
+    },
+    {
+      "file": 8,
+      "name": "Worldwide Clinic and Appointments",
+      "role": "canonical clinic, availability and appointment truth; File 25 consumes only a versioned public clinic projection",
+      "reviewed_source_version": "0.2.0",
+      "accepted_source_range": ">=0.2.0 <0.3.0",
+      "required_public_contract_version": "1.0.0",
+      "required_symbols": ["SWC_VERSION", "swc_get_public_clinic_projection or SWC_Helpers::public_clinic_projection"],
+      "contract_status": "public-projection-contract-required-before-staging-acceptance",
+      "foreign_table_reads_allowed": false,
+      "bundled_with_file_25": false,
+      "staging_status": "pending"
+    },
+    {
+      "file": 9,
+      "name": "Global Doctor Onboarding and Verification",
+      "role": "canonical doctor verification decision and immutable approved professional snapshot",
+      "reviewed_source_version": "1.1.0",
+      "accepted_source_range": ">=1.1.0 <1.2.0",
+      "required_symbols": ["GDO_VERSION", "gdo_get_verification_decision", "gdo_get_approved_snapshot", "gdo_user_is_verified"],
+      "source_lifecycle": "draft-corrective-candidate-pending-staging",
+      "foreign_table_reads_allowed": false,
       "bundled_with_file_25": false,
       "staging_status": "pending"
     },
@@ -65,7 +97,7 @@
     {
       "file": 12,
       "name": "PDF Library and Digital Reading",
-      "role": "canonical documents, encryption, reading, and download owner",
+      "role": "canonical documents, encryption, reading and download owner",
       "reviewed_package_version": "0.1.0",
       "accepted_source_range": ">=0.1.0 <0.2.0",
       "required_symbols": ["SPL_VERSION", "SPL_Helpers"],
@@ -75,18 +107,22 @@
     {
       "file": 18,
       "name": "Sabri Marketplace",
-      "role": "canonical seller, listing, moderation, contact, offer, and direct-deal owner",
-      "reviewed_package_version": "1.1.0",
-      "accepted_source_range": ">=1.1.0 <1.2.0",
-      "required_symbols": ["SMP_VERSION", "SMP_DB", "SMP_Activator", "SMP_Utils"],
+      "role": "canonical seller, listing, moderation, contact, offer and direct-deal owner; File 25 consumes owner-executed public DTOs only",
+      "reviewed_source_version": "1.2.0-RC1",
+      "accepted_source_range": ">=1.2.0-RC1 <1.3.0",
+      "required_symbols": ["SMP_VERSION", "smp_get_public_profile_listings or SMP_Utils::current_seller + SMP_REST::products", "SMP_Activator::marketplace_url"],
+      "transitional_adapter": "bounded-first-page-owner-api",
+      "foreign_table_reads_allowed": false,
       "bundled_with_file_25": false,
       "staging_status": "pending"
     },
     {
       "file": 20,
       "name": "Sabri Unified Application Shell",
-      "role": "sole global shell, navigation, sidebar, drawer, and layout owner",
-      "reviewed_package_version": "1.0.0",
+      "role": "sole global shell, navigation, route, sidebar, drawer and structural layout owner; File 25 owns visual tokens and visual regression",
+      "reviewed_source_version": "1.2.0",
+      "governing_plan_version": "4.1",
+      "accepted_source_range": ">=1.2.0 <1.3.0",
       "required_symbols": ["SABRI_SHELL_VERSION"],
       "bundled_with_file_25": false,
       "staging_status": "pending"
@@ -94,7 +130,7 @@
     {
       "file": 21,
       "name": "Home and News Feed",
-      "role": "canonical Home, News, publication, interaction, moderation, and timeline owner",
+      "role": "canonical Home, News, publication, interaction, moderation and timeline owner",
       "reviewed_source_range": ">=1.0.3 <2.0.0",
       "required_symbols": ["SABRI_HNF_VERSION", "sabri_hnf_bootstrap", "Sabri\\HomeNewsFeed\\ProfileTimeline"],
       "exact_staging_package": "pending",
@@ -104,7 +140,7 @@
     {
       "file": 24,
       "name": "Platform Security, Privacy, Compliance and Resilience Center",
-      "role": "canonical security governance, privacy orchestration, audit evidence, incidents, controls, findings, and resilience owner",
+      "role": "canonical security governance, privacy orchestration, audit evidence, incidents, findings and resilience owner",
       "reviewed_package_version": "0.25.3",
       "accepted_source_range": ">=0.25.3 <0.26.0",
       "required_symbols": ["SPCRC_VERSION", "Sabri\\Platform\\Security\\Registry\\ModuleRegistry"],
@@ -117,8 +153,8 @@
     {
       "file": 25,
       "name": "Sabri Unified Global Visual Experience and Design System",
-      "role": "public visual projection, profiles, responsive refinement, accessibility, and visual acceptance",
-      "candidate_version": "0.13.0",
+      "role": "design tokens, public visual projection, profiles, federated timelines, responsive refinement, accessibility and visual acceptance",
+      "candidate_version": "0.14.0",
       "bundled_with_file_25": true,
       "staging_status": "pending",
       "package_status": "build-input-not-acceptance",
@@ -126,7 +162,7 @@
       "installed_preflight": "wp sabri file25 staging-probe --expected-commit=<sha>"
     }
   ],
-  "acceptance_rule": "No module is staging-accepted or production-accepted merely because this matrix, source code, a ZIP, or green CI exists.",
+  "acceptance_rule": "No module is staging-accepted or production-accepted merely because this matrix, source code, a ZIP or green CI exists.",
   "artifact_verification": {
     "verifier": "tools/verify-staging-artifact.php",
     "outer_artifact_sha256_supported": true,
