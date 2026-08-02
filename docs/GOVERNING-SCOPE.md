@@ -1,57 +1,63 @@
 # File 25 Governing Scope
 
-This repository implements the Founder-approved plan for:
+This repository implements the Founder-approved scope for:
 
 ## File 25 — Sabri Unified Global Visual Experience and Design System
 
 **Subtitle:** Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency
 
-This is the same existing File 25. No File 26 is created for this scope.
+This is the existing File 25. No File 26 is created.
+
+## Current governing baseline
+
+- Sabri Social Homeopathy Platform Definitive Master Plan 2026 `v3.0`.
+- File 20 Harmonized Master Plan 2026 `v4.1`.
+- File 00 runtime `1.2.4`, public assertion contract `1.1.2`.
+- File 25 corrective source candidate `0.14.0`, schema `2`.
 
 ## Canonical ownership
 
-- File 00 owns identity, roles, age/guardian authority, account status, and contact consent.
-- File 03 owns profile master data.
-- File 20 owns the global application shell, navigation, sidebars, layout resolver, widths, and base shell tokens.
-- File 21 owns Home/News publications, comments, interactions, moderation states, and the production publication timeline provider.
-- Files 22 and 23 own content creation and private publishing operations.
-- File 24 owns security, privacy, compliance, incident management, cache governance, and resilience.
-- File 25 owns the global public visual system, profile presentation, federated timeline projection, reusable public cards and states, form/table visual primitives, responsive refinement, accessibility, visual consistency, and visual acceptance.
+- **File 00:** identity, membership state, Founder identity, age/guardian policy, approval, suspension, eligibility, professional eligibility, and public-profile authorization.
+- **File 03:** profile master data, profile media, and explicit public-contact consent.
+- **File 08:** clinic, doctor availability, appointment, and scheduling truth.
+- **File 09:** Doctor application, private credential evidence, independent review, verification, renewal, suspension, revocation, appeal, and immutable approved professional snapshot.
+- **File 18:** Marketplace seller, listing, moderation, contact, offer, metric, transaction, and direct-deal truth.
+- **File 20:** global application shell, routes, header, navigation, sidebars, drawers, layout resolver, widths, and structural recovery.
+- **File 21:** Home/News publications, comments, interactions, moderation states, and production publication timeline provider.
+- **Files 22 and 23:** creation orchestration and private publishing operations.
+- **File 24:** security, privacy, compliance, incident, audit-evidence, cache-governance, and resilience plane.
+- **File 25:** public visual system, visual tokens, public profile presentation, federated read projections, reusable cards/states, responsive refinement, accessibility, SEO presentation, visual regression, and visual acceptance.
+
+## Authoritative read laws
+
+1. File 25 consumes File 00 only through runtime `>=1.2.4 <1.3.0`, exact contract `1.1.2`, `SMC_Contracts::assertions()`, and Founder helper functions.
+2. File 25 does not query File 00 applications, professional credentials, clinics, guardian records, or contact-verification tables.
+3. Doctor public status requires both File 00 eligible/can-practice assertions and File 09 current verified/approved decision.
+4. Professional presentation fields come only from File 09's immutable approved snapshot; private credential evidence and license numbers are not projected.
+5. File 25 performs no age calculation. Explicit File 00 minor/guardian assertions govern; unknown ordinary contact state fails closed.
+6. Clinic projection requires File 08 public contract `1.0.0`; until the owner contract exists, the clinic section remains unavailable.
+7. File 25 consumes Marketplace data only through File 18 owner-executed public DTO APIs. Direct File 18 table queries are prohibited.
+8. File 03 contact consent remains mandatory even when another module exposes professional or clinic contact data.
 
 ## Non-duplication law
 
-File 25 must not duplicate native content bodies, comments, reactions, saves, identity documents, professional evidence, patient information, messages, appointments, Marketplace transactions, clinic records, or raw analytics. Timeline data is a rebuildable read projection containing canonical native references and lightweight public display metadata only.
+File 25 must not duplicate native content bodies, comments, reactions, saves, identity documents, professional evidence, patient information, messages, appointments, Marketplace transactions, clinic records, or raw analytics. Timeline and section data are rebuildable read projections containing canonical references and lightweight public display metadata only.
 
-A File 25 content-card type is a presentation variant. It does not transfer canonical data, workflow, permission, transaction, moderation, metric, or interaction ownership from the native module.
+A File 25 card type is a presentation variant. It transfers no permission, workflow, moderation, metric, transaction, or native-data ownership.
 
 ## Link and media law
 
-Reusable File 25 visual components use exact same-origin or root-relative destinations. Protocol-relative, cross-origin, credential-bearing, downgrade, mismatched-port, control-character, backslash, malformed, and fragment-bearing canonical card/media URLs fail closed.
+Reusable File 25 components accept exact same-origin or root-relative destinations only. Protocol-relative, cross-origin, credential-bearing, downgrade, mismatched-port, control-character, backslash, malformed, and forbidden-fragment canonical URLs fail closed. External destinations require a separate governed contract.
 
-External destinations require a separate governed integration contract.
-
-## Canonical public routes
+## Public routes
 
 - `/founder/`
 - `/doctors/{public-slug}/`
 - `/profile/{public-slug}/`
-- role-appropriate sections such as `/timeline/`, `/knowledge/`, `/media/`, `/clinic/`, `/reviews/`, and `/about/`.
+- truthful available sections such as `/timeline/`, `/knowledge/`, `/media/`, `/clinic/`, `/reviews/`, `/research/`, `/marketplace/`, and `/about/`.
 
-Founder and verified Doctors may be publicly discoverable. Other profiles require authoritative public visibility. Minor contacts and private health activity are never public.
-
-## Delivery phases
-
-1. 25A — Governance, numbering, ownership, and integration contracts.
-2. 25B — Plugin foundation, dependencies, Safe Mode, and diagnostics.
-3. 25C — File 20 design-system integration.
-4. 25D — Founder profile.
-5. 25E — Doctor and permitted-member profiles.
-6. 25F/25G — Timeline registry and File 21 production provider.
-7. 25H — global semantic tokens, reusable states, content-card catalog, form/table primitives, and cross-module component adoption.
-8. 25I — optional knowledge, media, review, research, and other native providers.
-9. 25J/25K — responsive, accessibility, privacy, security, performance, SEO, and visual-regression completion.
-10. 25L/25M — migration, rollback, staging acceptance, Founder sign-off, and release.
+Founder and authoritatively verified Doctors may be publicly discoverable. Other profiles require File 00 public-profile authorization. Minor contacts and private health activity are never public.
 
 ## Completion law
 
-A page rendering, a ZIP file, or green CI alone is not production completion. Fresh install, upgrade, reversible migration, rollback, responsive/accessibility evidence, security/privacy tests, real-user staging acceptance, native-module adoption, visual-regression baselines, deployment, and post-deployment monitoring are mandatory.
+A rendered page, green CI, deterministic ZIP, or installed-package preflight is not production completion. Exact Hostinger staging, owner-contract integration, fresh install, upgrade, rollback, restore, responsive/accessibility evidence, security/privacy testing, real-user workflows, deployment, monitoring, and Founder acceptance remain mandatory.
