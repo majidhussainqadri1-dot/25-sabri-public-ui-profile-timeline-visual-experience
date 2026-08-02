@@ -145,15 +145,29 @@ final class Normalized_Timeline_Item implements JsonSerializable
      */
     public function to_public_array(): array
     {
-        return array_diff_key($this->data, array_flip([
+        $public = array_diff_key($this->data, array_flip([
             'provider_id',
             'provider_version',
             'native_object_type',
             'native_object_id',
             'author_id',
             'public_profile_id',
+            'thumbnail_reference',
             'metrics_reference',
         ]));
+
+        // Native attachment IDs and ungoverned remote image references never
+        // cross the public REST boundary. A provider may expose only a strict
+        // same-site thumbnail URL under the public `thumbnail_url` field.
+        $thumbnail = $this->data['thumbnail_reference'] ?? null;
+        if (is_string($thumbnail)) {
+            $thumbnail_url = Public_URL::sanitize_same_site($thumbnail, false);
+            if ($thumbnail_url !== '') {
+                $public['thumbnail_url'] = $thumbnail_url;
+            }
+        }
+
+        return $public;
     }
 
     /** @return array<string,mixed> */
@@ -268,11 +282,12 @@ final class Normalized_Timeline_Item implements JsonSerializable
 
     private function required_date(string $value): string
     {
-        try {
-            return (new DateTimeImmutable($value))->format(DATE_ATOM);
-        } catch (\Throwable $exception) {
-            throw new InvalidArgumentException('Timeline publication date is invalid.', 0, $exception);
+        $normalized = $this->strict_absolute_date($value);
+        if ($normalized === null) {
+            throw new InvalidArgumentException('Timeline publication date must be an absolute, valid UTC or offset timestamp.');
         }
+
+        return $normalized;
     }
 
     private function limit(string $value, int $length): string
@@ -286,8 +301,42 @@ final class Normalized_Timeline_Item implements JsonSerializable
             return null;
         }
 
+        return is_scalar($value) ? $this->strict_absolute_date((string) $value) : null;
+    }
+
+    private function strict_absolute_date(string $value): ?string
+    {
+        $value = trim($value);
+        if ($value === '' || strlen($value) > 64) {
+            return null;
+        }
+
+        $utc = new \DateTimeZone('UTC');
+        if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $value) === 1) {
+            $date = DateTimeImmutable::createFromFormat('!Y-m-d H:i:s', $value, $utc);
+            $errors = DateTimeImmutable::getLastErrors();
+            if (! $date instanceof DateTimeImmutable
+                || (is_array($errors) && ((int) ($errors['warning_count'] ?? 0) > 0 || (int) ($errors['error_count'] ?? 0) > 0))
+                || $date->format('Y-m-d H:i:s') !== $value
+            ) {
+                return null;
+            }
+
+            return $date->format('Y-m-d\TH:i:s\Z');
+        }
+
+        if (preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|[+\-]\d{2}:\d{2})$/', $value) !== 1) {
+            return null;
+        }
+
         try {
-            return (new DateTimeImmutable((string) $value))->format(DATE_ATOM);
+            $date = new DateTimeImmutable($value);
+            $errors = DateTimeImmutable::getLastErrors();
+            if (is_array($errors) && ((int) ($errors['warning_count'] ?? 0) > 0 || (int) ($errors['error_count'] ?? 0) > 0)) {
+                return null;
+            }
+
+            return $date->setTimezone($utc)->format('Y-m-d\TH:i:s\Z');
         } catch (\Throwable) {
             return null;
         }
