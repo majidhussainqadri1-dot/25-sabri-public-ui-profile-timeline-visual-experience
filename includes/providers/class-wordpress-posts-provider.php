@@ -114,7 +114,9 @@ final class WordPress_Posts_Provider implements Timeline_Provider
                     'content_type' => $post->post_type,
                     'topic' => '',
                     'language' => get_locale(),
-                    'thumbnail_reference' => get_post_thumbnail_id($post),
+                    'thumbnail_reference' => function_exists('get_the_post_thumbnail_url')
+                        ? (string) (get_the_post_thumbnail_url($post, 'medium_large') ?: '')
+                        : '',
                     'media_type' => has_post_thumbnail($post) ? 'image' : 'none',
                     'verification_state' => 'native',
                     'review_state' => 'published',
