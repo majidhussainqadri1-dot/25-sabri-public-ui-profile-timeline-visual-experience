@@ -62,7 +62,18 @@ $provider_requirements = [
     'class-file-10-video-media-provider.php' => ['SVW_VERSION', 'SVW_Helpers::TYPE', "'svw_video'", "'publish'", "'author' => \$user_id", "'has_password' => false", "return 'read-only'", "'is_reel'"],
     'class-file-11-reels-media-provider.php' => ['SRL_VERSION', 'SVW_VERSION', 'SVW_Helpers::TYPE', "'svw_video'", "'meta_key' => '_svw_is_reel'", "'meta_value' => '1'", '60', '600', "return 'read-only'"],
     'class-file-12-pdf-media-provider.php' => ['SPL_VERSION', 'SPL_Helpers::TYPE', "'spl_document'", "'publish'", "'author' => \$user_id", "'has_password' => false", "return 'read-only'", 'owns_native_content'],
-    'class-file-18-marketplace-provider.php' => ['SMP_VERSION', "SMP_DB::table('products')", "SMP_DB::table('sellers')", "s.status = 'approved'", "p.status IN ('published','approved')", "return 'read-only'", 'projection_key', 'owns_native_content'],
+    'class-file-18-marketplace-provider.php' => [
+        'SMP_VERSION',
+        "MINIMUM_VERSION = '1.2.0-RC1'",
+        'smp_get_public_profile_listings',
+        'SMP_Utils::current_seller',
+        'SMP_REST::products',
+        'SMP_Activator::marketplace_url',
+        'TRANSITIONAL_FETCH_LIMIT',
+        "return 'read-only'",
+        'projection_key',
+        'owns_native_content',
+    ],
 ];
 foreach ($provider_requirements as $file => $markers) {
     $provider = file_get_contents($root . '/includes/providers/' . $file) ?: '';
@@ -73,6 +84,19 @@ foreach ($provider_requirements as $file => $markers) {
     }
     if (preg_match('/update_|insert_|delete_|wp_insert_post|wp_update_post|wp_delete_post|set_post_thumbnail|media_handle_upload/i', $provider)) {
         $errors[] = $file . ' must remain strictly read-only.';
+    }
+
+    if ($file === 'class-file-18-marketplace-provider.php') {
+        foreach (['$wpdb', 'SMP_DB::table', 'SELECT p.*'] as $forbidden) {
+            if (str_contains($provider, $forbidden)) {
+                $errors[] = $file . ' must consume File 18 owner APIs, not direct table/query marker: ' . $forbidden;
+            }
+        }
+        if (! str_contains($provider, "version_compare(\$version, self::MINIMUM_VERSION, '<')")
+            || ! str_contains($provider, "version_compare(\$version, self::MAXIMUM_VERSION, '>=')")) {
+            $errors[] = $file . ' reviewed File 18 version range is not enforced.';
+        }
+        continue;
     }
 
     if ($file === 'class-file-11-reels-media-provider.php') {
@@ -149,4 +173,4 @@ if ($errors !== []) {
     exit(1);
 }
 
-echo "PASS: native knowledge/media/Marketplace adapters, atomic providers, and component package boundaries\n";
+echo "PASS: native Knowledge/Media/File 18 owner-DTO adapters, atomic providers, and component boundaries\n";
