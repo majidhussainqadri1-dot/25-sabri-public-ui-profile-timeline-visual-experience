@@ -319,7 +319,7 @@ final class Native_Integration
         foreach ([
             'display_name', 'country', 'city', 'clinic', 'qualification',
             'licensing_authority', 'experience_years', 'specialty', 'languages',
-            'consultation_modes', 'phone', 'whatsapp', 'bio',
+            'consultation_modes', 'bio',
         ] as $field) {
             if (isset($source['profile'][$field]) && is_scalar($source['profile'][$field])) {
                 $profile[$field] = $this->plain_text((string) $source['profile'][$field], $field === 'bio' ? 4000 : 300);
@@ -336,6 +336,11 @@ final class Native_Integration
     {
         $assertions = $this->membership_assertions($user_id);
         $decision = $this->doctor_verification_decision($user_id);
+        try {
+            $owner_verified = $this->doctor_verification_available() && (bool) gdo_user_is_verified($user_id);
+        } catch (\Throwable) {
+            $owner_verified = false;
+        }
         $eligible = $assertions !== []
             && ($assertions['membership_type'] ?? '') === 'doctor'
             && ! empty($assertions['approved'])
@@ -343,6 +348,7 @@ final class Native_Integration
             && empty($assertions['suspended'])
             && ! empty($assertions['professional_verified'])
             && ! empty($assertions['can_practice'])
+            && $owner_verified
             && ! empty($decision['verified'])
             && in_array((string) ($decision['state'] ?? ''), ['verified', 'approved'], true);
 
