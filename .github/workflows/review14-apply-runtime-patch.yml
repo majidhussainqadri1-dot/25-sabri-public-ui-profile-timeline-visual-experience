@@ -1,0 +1,49 @@
+name: Apply File 25 Review 14 Runtime Patch
+
+on:
+  push:
+    branches:
+      - feature/25a-25b-foundation
+    paths:
+      - '.review14/runtime.patch'
+      - '.github/workflows/review14-apply-runtime-patch.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: file-25-review14-runtime-patch
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact correction branch
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: feature/25a-25b-foundation
+          fetch-depth: 0
+
+      - name: Apply exact reviewed patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git apply --check .review14/runtime.patch
+          git apply .review14/runtime.patch
+          php -l includes/class-staging-probe.php
+          php -l includes/class-native-integration.php
+          php tests/staging-probe.php
+          php tests/authoritative-native-contracts.php
+
+      - name: Commit corrected runtime and remove temporary applicator
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add includes/class-staging-probe.php includes/class-native-integration.php
+          git rm .review14/runtime.patch .github/workflows/review14-apply-runtime-patch.yml
+          git commit -m 'File 25 review 14: correct staging and Doctor runtime gates [skip ci]'
+          git push origin HEAD:feature/25a-25b-foundation
