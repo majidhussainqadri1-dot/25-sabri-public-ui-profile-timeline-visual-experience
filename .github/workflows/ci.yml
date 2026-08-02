@@ -48,7 +48,10 @@ jobs:
       - name: Provider route parity and fail-closed profile routing
         run: php tests/profile-router.php
 
-      - name: Master-plan and File 25 final-specification reconciliation
+      - name: Authoritative File 00 08 09 native contracts
+        run: php tests/authoritative-native-contracts.php
+
+      - name: Master Plan v3 authoritative-contract reconciliation
         run: php tests/master-plan-reconciliation.php
 
       - name: File 21 timeline adapter contract
@@ -72,7 +75,7 @@ jobs:
       - name: Native File 10 11 12 media provider contracts
         run: php tests/file10-12-media-providers.php
 
-      - name: Native File 18 Marketplace provider contract
+      - name: File 18 owner-executed public DTO contract
         run: php tests/file18-marketplace-provider.php
 
       - name: Reviewed File 24 integration contract
