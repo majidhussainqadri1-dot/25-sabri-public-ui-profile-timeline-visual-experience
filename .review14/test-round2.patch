@@ -1,0 +1,19 @@
+--- a/tests/authoritative-native-contracts.php
++++ b/tests/authoritative-native-contracts.php
+@@ -154,6 +154,7 @@
+ 
+     $approved_profile = [
+         'profile' => [
++            'clinic' => 'Legacy Credential Clinic',
+             'qualification' => 'DHMS',
+             'licensing_authority' => 'National Council',
+             'experience_years' => '12',
+@@ -222,6 +223,8 @@
+     $check(! array_key_exists('license_number', $credentials), 'Sensitive license number must not enter File 25 public credentials.');
+     $check($native->profile_value(7, 'phone', '') === '', 'File 09 contact values must not bypass File 03 profile/contact ownership.');
+     $check($native->profile_value(7, 'whatsapp', '') === '', 'File 09 WhatsApp values must not bypass File 03 profile/contact ownership.');
++    $check($native->profile_value(7, 'clinic_name', '') === '', 'File 09 credential snapshot must not bypass File 08 clinic ownership.');
++    $check(! array_key_exists('clinic', $native->doctor_approved_snapshot(7)['profile'] ?? []), 'File 09 clinic text must not enter the File 25 professional snapshot projection.');
+ 
+     $clinic = $native->clinic(7);
+     $check(($clinic['name'] ?? '') === 'Global Clinic', 'Clinic must come from the File 08 public projection.');
