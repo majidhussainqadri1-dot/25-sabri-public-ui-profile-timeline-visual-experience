@@ -11,34 +11,55 @@ if (! defined('ABSPATH')) {
 }
 
 /**
- * Bounded compatibility layer for the currently shipped Sabri modules.
+ * Fail-closed, read-only adapters for authoritative Sabri modules.
  *
- * It consumes public functions, constants, options, and documented tables
- * without taking ownership of their data. File 00 remains authoritative for
- * identity, account approval, age, and professional eligibility.
+ * File 25 never reads foreign tables and never derives membership, age,
+ * guardian, doctor-verification, clinic, moderation, or transaction truth.
  */
 final class Native_Integration
 {
-    /** @var array<int,array<string,mixed>> */
-    private array $profile_cache = [];
+    public const FILE_00_MINIMUM_VERSION = '1.2.4';
+    public const FILE_00_MAXIMUM_VERSION = '1.3.0';
+    public const FILE_00_CONTRACT_VERSION = '1.1.2';
+    public const FILE_09_MINIMUM_VERSION = '1.1.0';
+    public const FILE_09_MAXIMUM_VERSION = '1.2.0';
+    public const FILE_08_MINIMUM_VERSION = '0.2.0';
+    public const FILE_08_MAXIMUM_VERSION = '0.3.0';
+    public const FILE_08_PUBLIC_PROJECTION_CONTRACT = '1.0.0';
+    public const FILE_18_MINIMUM_VERSION = '1.2.0-RC1';
+    public const FILE_18_MAXIMUM_VERSION = '1.3.0';
 
     /** @var array<int,array<string,mixed>> */
-    private array $credentials_cache = [];
+    private array $assertion_cache = [];
+
+    /** @var array<int,array<string,mixed>> */
+    private array $doctor_decision_cache = [];
+
+    /** @var array<int,array<string,mixed>> */
+    private array $doctor_snapshot_cache = [];
 
     /** @var array<int,array<string,mixed>> */
     private array $clinic_cache = [];
 
-    /** @var array<string,bool> */
-    private array $table_cache = [];
-
     public function membership_available(): bool
     {
         $detected = defined('SMC_VERSION')
-            && function_exists('smc_get_profile')
-            && function_exists('smc_user_status')
+            && defined('SMC_CONTRACT_VERSION')
+            && $this->version_in_range((string) SMC_VERSION, self::FILE_00_MINIMUM_VERSION, self::FILE_00_MAXIMUM_VERSION)
+            && hash_equals(self::FILE_00_CONTRACT_VERSION, trim((string) SMC_CONTRACT_VERSION))
+            && class_exists('SMC_Contracts')
+            && method_exists('SMC_Contracts', 'assertions')
+            && function_exists('smc_founder_user_id')
             && function_exists('smc_is_founder');
 
-        return $detected && (bool) apply_filters('sabri_public_experience/dependency/membership_core', true);
+        $filtered = (bool) apply_filters(
+            'sabri_public_experience/dependency/membership_core',
+            $detected,
+            defined('SMC_VERSION') ? (string) SMC_VERSION : '',
+            defined('SMC_CONTRACT_VERSION') ? (string) SMC_CONTRACT_VERSION : ''
+        );
+
+        return $detected && $filtered;
     }
 
     public function profiles_available(): bool
@@ -46,6 +67,62 @@ final class Native_Integration
         $detected = defined('SPD_VERSION') && class_exists('SPD_Helpers');
 
         return $detected && (bool) apply_filters('sabri_public_experience/dependency/profiles', true);
+    }
+
+    public function doctor_verification_available(): bool
+    {
+        $detected = defined('GDO_VERSION')
+            && $this->version_in_range((string) GDO_VERSION, self::FILE_09_MINIMUM_VERSION, self::FILE_09_MAXIMUM_VERSION)
+            && function_exists('gdo_get_verification_decision')
+            && function_exists('gdo_get_approved_snapshot')
+            && function_exists('gdo_user_is_verified');
+
+        $filtered = (bool) apply_filters(
+            'sabri_public_experience/dependency/doctor_verification',
+            $detected,
+            defined('GDO_VERSION') ? (string) GDO_VERSION : ''
+        );
+
+        return $detected && $filtered;
+    }
+
+    public function clinic_available(): bool
+    {
+        $version_ok = defined('SWC_VERSION')
+            && $this->version_in_range((string) SWC_VERSION, self::FILE_08_MINIMUM_VERSION, self::FILE_08_MAXIMUM_VERSION);
+        $contract_available = function_exists('swc_get_public_clinic_projection')
+            || (class_exists('SWC_Helpers') && method_exists('SWC_Helpers', 'public_clinic_projection'));
+        $detected = $version_ok && $contract_available;
+
+        $filtered = (bool) apply_filters(
+            'sabri_public_experience/dependency/clinic_projection',
+            $detected,
+            defined('SWC_VERSION') ? (string) SWC_VERSION : '',
+            self::FILE_08_PUBLIC_PROJECTION_CONTRACT
+        );
+
+        return $detected && $filtered;
+    }
+
+    public function marketplace_available(): bool
+    {
+        $version_ok = defined('SMP_VERSION')
+            && $this->version_in_range((string) SMP_VERSION, self::FILE_18_MINIMUM_VERSION, self::FILE_18_MAXIMUM_VERSION);
+        $owner_api = function_exists('smp_get_public_profile_listings')
+            || (class_exists('SMP_Utils')
+                && class_exists('SMP_REST')
+                && class_exists('SMP_Activator')
+                && method_exists('SMP_Utils', 'current_seller')
+                && method_exists('SMP_REST', 'products')
+                && method_exists('SMP_Activator', 'marketplace_url'));
+        $detected = $version_ok && $owner_api;
+        $filtered = (bool) apply_filters(
+            'sabri_public_experience/dependency/marketplace_projection',
+            $detected,
+            defined('SMP_VERSION') ? (string) SMP_VERSION : ''
+        );
+
+        return $detected && $filtered;
     }
 
     public function shell_available(): bool
@@ -71,131 +148,216 @@ final class Native_Integration
             File_24_Integration::current_version()
         );
 
-        // Extensions may make the dependency more restrictive, never promote an
-        // absent, malformed, old, or unreviewed File 24 runtime to compatible.
         return $detected && $filtered;
     }
 
     public function founder_user_id(): int
     {
-        if (! function_exists('smc_is_founder')) {
+        if (! $this->membership_available()) {
             return 0;
         }
 
-        $configured = (int) get_option('sabri_public_experience_founder_user_id', 0);
-        $configured = (int) apply_filters('sabri_public_experience/founder_user_id', $configured);
-        if (
-            $configured > 0
-            && get_user_by('id', $configured) instanceof WP_User
-            && smc_is_founder($configured)
-        ) {
-            return $configured;
+        try {
+            $user_id = (int) smc_founder_user_id();
+        } catch (\Throwable) {
+            return 0;
         }
 
-        $ids = get_users([
-            'meta_key' => '_smc_official_founder',
-            'meta_compare' => 'EXISTS',
-            'number' => 10,
-            'fields' => 'ids',
-            'orderby' => 'ID',
-            'order' => 'ASC',
-        ]);
-        foreach ($ids as $user_id) {
-            if (smc_is_founder((int) $user_id)) {
-                return (int) $user_id;
-            }
-        }
-
-        return 0;
+        return $user_id > 0
+            && get_user_by('id', $user_id) instanceof WP_User
+            && smc_is_founder($user_id)
+                ? $user_id
+                : 0;
     }
 
     /** @return array<string,mixed> */
-    public function membership_profile(int $user_id): array
+    public function membership_assertions(int $user_id): array
     {
-        if (array_key_exists($user_id, $this->profile_cache)) {
-            return $this->profile_cache[$user_id];
+        if (array_key_exists($user_id, $this->assertion_cache)) {
+            return $this->assertion_cache[$user_id];
         }
-        if (! function_exists('smc_get_profile')) {
-            return $this->profile_cache[$user_id] = [];
+        if ($user_id <= 0 || ! $this->membership_available()) {
+            return $this->assertion_cache[$user_id] = [];
         }
 
-        $profile = smc_get_profile($user_id);
+        try {
+            $source = \SMC_Contracts::assertions($user_id);
+        } catch (\Throwable) {
+            return $this->assertion_cache[$user_id] = [];
+        }
+        if (! is_array($source)
+            || ! hash_equals(self::FILE_00_CONTRACT_VERSION, trim((string) ($source['contract_version'] ?? '')))
+            || (int) ($source['user_id'] ?? 0) !== $user_id
+        ) {
+            return $this->assertion_cache[$user_id] = [];
+        }
 
-        return $this->profile_cache[$user_id] = is_array($profile) ? $profile : [];
+        $assertions = [
+            'contract_version' => self::FILE_00_CONTRACT_VERSION,
+            'user_id' => $user_id,
+            'account_class' => sanitize_key((string) ($source['account_class'] ?? 'member')),
+            'membership_type' => sanitize_key((string) ($source['membership_type'] ?? '')),
+            'status' => sanitize_key((string) ($source['status'] ?? '')),
+        ];
+        foreach ([
+            'application_exists',
+            'institutional_account',
+            'approved',
+            'suspended',
+            'eligible',
+            'guardian_verified',
+            'professional_verified',
+            'can_practice',
+            'public_profile_allowed',
+            'minor',
+            'guardian_required',
+        ] as $field) {
+            if (array_key_exists($field, $source)) {
+                $assertions[$field] = (bool) $source[$field];
+            }
+        }
+
+        return $this->assertion_cache[$user_id] = $assertions;
     }
 
     public function membership_status(int $user_id): string
     {
-        if (function_exists('smc_user_status')) {
-            return sanitize_key((string) smc_user_status($user_id));
-        }
-
-        return sanitize_key((string) get_user_meta($user_id, '_smc_status', true));
+        return sanitize_key((string) ($this->membership_assertions($user_id)['status'] ?? ''));
     }
 
     public function membership_is_approved(int $user_id): bool
     {
-        return in_array($this->membership_status($user_id), ['approved', 'verified'], true);
-    }
+        $assertions = $this->membership_assertions($user_id);
 
-    public function age(int $user_id): ?int
-    {
-        $profile = $this->membership_profile($user_id);
-        if (! isset($profile['calculated_age'])) {
-            return null;
-        }
-
-        $age = (int) $profile['calculated_age'];
-
-        return $age > 0 && $age <= 130 ? $age : null;
+        return ! empty($assertions['approved']) && empty($assertions['suspended']);
     }
 
     public function is_founder(int $user_id): bool
     {
-        $detected = function_exists('smc_is_founder') && smc_is_founder($user_id);
+        if ($user_id <= 0 || ! $this->membership_available()) {
+            return false;
+        }
 
-        return $detected && (bool) apply_filters('sabri_public_experience/is_founder', true, $user_id);
+        try {
+            $detected = smc_is_founder($user_id);
+        } catch (\Throwable) {
+            $detected = false;
+        }
+        $filtered = (bool) apply_filters('sabri_public_experience/is_founder', $detected, $user_id);
+
+        return $detected && $filtered;
     }
 
     public function is_minor(int $user_id): bool
     {
-        $age = $this->age($user_id);
-        $detected = $age !== null && $age < 18;
-        $additional_restriction = (bool) apply_filters(
-            'sabri_public_experience/additional_minor_restriction',
-            false,
-            $user_id,
-            $age
-        );
+        if ($this->is_founder($user_id) || $this->is_verified_doctor($user_id)) {
+            return false;
+        }
 
-        return $detected || $additional_restriction;
+        $assertions = $this->membership_assertions($user_id);
+        if (array_key_exists('minor', $assertions)) {
+            return (bool) $assertions['minor'];
+        }
+        if (array_key_exists('guardian_required', $assertions)) {
+            return (bool) $assertions['guardian_required'];
+        }
+
+        // File 25 must not calculate age. Until File 00 exposes an explicit
+        // minor assertion, ordinary-account contact projection fails closed.
+        return true;
+    }
+
+    /** @return array<string,mixed> */
+    public function doctor_verification_decision(int $user_id): array
+    {
+        if (array_key_exists($user_id, $this->doctor_decision_cache)) {
+            return $this->doctor_decision_cache[$user_id];
+        }
+        if ($user_id <= 0 || ! $this->doctor_verification_available()) {
+            return $this->doctor_decision_cache[$user_id] = [];
+        }
+
+        try {
+            $source = gdo_get_verification_decision($user_id);
+        } catch (\Throwable) {
+            return $this->doctor_decision_cache[$user_id] = [];
+        }
+        if (! is_array($source)) {
+            return $this->doctor_decision_cache[$user_id] = [];
+        }
+
+        return $this->doctor_decision_cache[$user_id] = [
+            'state' => sanitize_key((string) ($source['state'] ?? '')),
+            'verified' => ! empty($source['verified']),
+            'verified_until' => substr(sanitize_text_field((string) ($source['verified_until'] ?? '')), 0, 32),
+            'fingerprint' => preg_match('/^[a-f0-9]{64}$/', (string) ($source['fingerprint'] ?? '')) === 1
+                ? (string) $source['fingerprint']
+                : '',
+        ];
+    }
+
+    /** @return array<string,mixed> */
+    public function doctor_approved_snapshot(int $user_id): array
+    {
+        if (array_key_exists($user_id, $this->doctor_snapshot_cache)) {
+            return $this->doctor_snapshot_cache[$user_id];
+        }
+        if (! $this->is_verified_doctor($user_id)) {
+            return $this->doctor_snapshot_cache[$user_id] = [];
+        }
+
+        try {
+            $source = gdo_get_approved_snapshot($user_id);
+        } catch (\Throwable) {
+            return $this->doctor_snapshot_cache[$user_id] = [];
+        }
+        if (! is_array($source) || ! is_array($source['profile'] ?? null)) {
+            return $this->doctor_snapshot_cache[$user_id] = [];
+        }
+
+        $profile = [];
+        foreach ([
+            'display_name', 'country', 'city', 'clinic', 'qualification',
+            'licensing_authority', 'experience_years', 'specialty', 'languages',
+            'consultation_modes', 'phone', 'whatsapp', 'bio',
+        ] as $field) {
+            if (isset($source['profile'][$field]) && is_scalar($source['profile'][$field])) {
+                $profile[$field] = $this->plain_text((string) $source['profile'][$field], $field === 'bio' ? 4000 : 300);
+            }
+        }
+
+        return $this->doctor_snapshot_cache[$user_id] = [
+            'profile' => $profile,
+            'fingerprint' => (string) ($this->doctor_verification_decision($user_id)['fingerprint'] ?? ''),
+        ];
     }
 
     public function is_verified_doctor(int $user_id): bool
     {
-        $profile = $this->membership_profile($user_id);
-        $credentials = $this->professional_credentials($user_id);
-        $account_type = sanitize_key((string) ($profile['account_type'] ?? ''));
-        $age = $this->age($user_id);
-        $eligible = $account_type === 'sabri_doctor'
-            && $this->membership_is_approved($user_id)
-            && $age !== null
-            && $age >= 18
-            && trim((string) ($credentials['qualification'] ?? '')) !== ''
-            && $this->professional_document_is_current($credentials);
+        $assertions = $this->membership_assertions($user_id);
+        $decision = $this->doctor_verification_decision($user_id);
+        $eligible = $assertions !== []
+            && ($assertions['membership_type'] ?? '') === 'doctor'
+            && ! empty($assertions['approved'])
+            && ! empty($assertions['eligible'])
+            && empty($assertions['suspended'])
+            && ! empty($assertions['professional_verified'])
+            && ! empty($assertions['can_practice'])
+            && ! empty($decision['verified'])
+            && in_array((string) ($decision['state'] ?? ''), ['verified', 'approved'], true);
 
-        if (class_exists('SPD_Helpers') && method_exists('SPD_Helpers', 'verification_status')) {
-            $profiles_status = sanitize_key((string) \SPD_Helpers::verification_status($user_id));
-            if (in_array($profiles_status, ['rejected', 'suspended'], true)) {
+        if ($eligible && class_exists('SPD_Helpers') && method_exists('SPD_Helpers', 'verification_status')) {
+            try {
+                $profiles_status = sanitize_key((string) \SPD_Helpers::verification_status($user_id));
+            } catch (\Throwable) {
+                $profiles_status = 'unavailable';
+            }
+            if (in_array($profiles_status, ['rejected', 'suspended', 'revoked', 'expired', 'unavailable'], true)) {
                 $eligible = false;
             }
         }
 
-        $filtered = (bool) apply_filters(
-            'sabri_public_experience/is_verified_doctor',
-            $eligible,
-            $user_id
-        );
+        $filtered = (bool) apply_filters('sabri_public_experience/is_verified_doctor', $eligible, $user_id);
 
         return $eligible && $filtered;
     }
@@ -208,23 +370,20 @@ final class Native_Integration
         } elseif ($this->is_verified_doctor($user_id)) {
             $class = 'doctor';
         } else {
-            $profile = $this->membership_profile($user_id);
-            $account_type = sanitize_key((string) ($profile['account_type'] ?? ''));
-            $class = match ($account_type) {
-                'sabri_teacher' => 'teacher',
-                'sabri_researcher' => 'researcher',
-                'sabri_student' => 'student',
-                'sabri_patient' => 'patient',
-                'sabri_pharmacy' => 'pharmacy',
-                'sabri_clinic' => 'institution',
-                'sabri_publisher' => 'publisher',
+            $type = sanitize_key((string) ($this->membership_assertions($user_id)['membership_type'] ?? ''));
+            $class = match ($type) {
+                'teacher' => 'teacher',
+                'researcher' => 'researcher',
+                'student' => 'student',
+                'patient' => 'patient',
+                'pharmacy' => 'pharmacy',
+                'clinic' => 'institution',
+                'publisher' => 'publisher',
                 default => 'member',
             };
         }
 
         $filtered = sanitize_key((string) apply_filters('sabri_public_experience/profile_class', $class, $user));
-        // Role classification is authoritative. Extensions may only reduce a
-        // non-privileged profile to the generic member presentation.
         if ($filtered === 'member' && ! in_array($class, ['founder', 'doctor'], true)) {
             return 'member';
         }
@@ -238,24 +397,17 @@ final class Native_Integration
             return 'public';
         }
 
-        $age = $this->age($user_id);
-        if (! $this->membership_is_approved($user_id) || $age === null || $age < 18) {
+        $assertions = $this->membership_assertions($user_id);
+        if ($assertions === []
+            || empty($assertions['approved'])
+            || empty($assertions['eligible'])
+            || ! empty($assertions['suspended'])
+            || empty($assertions['public_profile_allowed'])
+        ) {
             return 'private';
         }
 
-        if ($this->is_verified_doctor($user_id)) {
-            return 'public';
-        }
-
-        $profile = $this->membership_profile($user_id);
-        $visibility = sanitize_key((string) ($profile['profile_visibility'] ?? ''));
-        if ($visibility === '') {
-            $visibility = sanitize_key((string) get_user_meta($user_id, 'sabri_profile_visibility', true));
-        }
-        if (! in_array($visibility, ['public', 'members', 'private'], true)) {
-            $visibility = 'members';
-        }
-
+        $visibility = 'public';
         $filtered = sanitize_key((string) apply_filters(
             'sabri_public_experience/profile_visibility',
             $visibility,
@@ -272,96 +424,102 @@ final class Native_Integration
 
     public function profile_value(int $user_id, string $key, string $default = ''): string
     {
-        $profile = $this->membership_profile($user_id);
-        if (isset($profile[$key]) && $profile[$key] !== '') {
-            return (string) $profile[$key];
+        if (class_exists('SPD_Helpers') && method_exists('SPD_Helpers', 'get')) {
+            try {
+                $value = \SPD_Helpers::get($user_id, $key, '');
+            } catch (\Throwable) {
+                $value = '';
+            }
+            if (is_scalar($value) && trim((string) $value) !== '') {
+                return $this->plain_text((string) $value, $key === 'bio' ? 12000 : 300);
+            }
         }
 
-        if (class_exists('SPD_Helpers') && method_exists('SPD_Helpers', 'get')) {
-            $value = \SPD_Helpers::get($user_id, $key, '');
-            if ($value !== '') {
-                return (string) $value;
+        $snapshot = $this->doctor_approved_snapshot($user_id);
+        $profile = is_array($snapshot['profile'] ?? null) ? $snapshot['profile'] : [];
+        $aliases = [
+            'specialty' => ['specialty'],
+            'specialization' => ['specialty'],
+            'consultation_mode' => ['consultation_modes'],
+            'clinic_name' => ['clinic'],
+        ];
+        $candidates = $aliases[$key] ?? [$key];
+        foreach ($candidates as $candidate) {
+            if (isset($profile[$candidate]) && trim((string) $profile[$candidate]) !== '') {
+                return (string) $profile[$candidate];
             }
         }
 
         return $default;
     }
 
-    /**
-     * Return only fields needed by public presentation policy.
-     *
-     * @return array<string,mixed>
-     */
+    /** @return array<string,mixed> */
     public function professional_credentials(int $user_id): array
     {
-        if (array_key_exists($user_id, $this->credentials_cache)) {
-            return $this->credentials_cache[$user_id];
-        }
-        if (! $this->membership_available()) {
-            return $this->credentials_cache[$user_id] = [];
-        }
-
-        global $wpdb;
-        $table = $wpdb->prefix . 'smc_professional_credentials';
-        if (! $this->table_exists($table)) {
-            return $this->credentials_cache[$user_id] = [];
+        $snapshot = $this->doctor_approved_snapshot($user_id);
+        $profile = is_array($snapshot['profile'] ?? null) ? $snapshot['profile'] : [];
+        if ($profile === []) {
+            return [];
         }
 
-        $row = $wpdb->get_row(
-            $wpdb->prepare(
-                "SELECT qualification, institution, council, license_expiry, experience_years, specialization, books_studied, consultation_mode, fee, currency, languages FROM {$table} WHERE user_id = %d LIMIT 1",
-                $user_id
-            ),
-            ARRAY_A
-        );
-
-        return $this->credentials_cache[$user_id] = is_array($row) ? $row : [];
+        return array_filter([
+            'qualification' => (string) ($profile['qualification'] ?? ''),
+            'council' => (string) ($profile['licensing_authority'] ?? ''),
+            'experience_years' => (string) ($profile['experience_years'] ?? ''),
+            'specialization' => (string) ($profile['specialty'] ?? ''),
+            'languages' => (string) ($profile['languages'] ?? ''),
+            'consultation_mode' => (string) ($profile['consultation_modes'] ?? ''),
+        ], static fn (mixed $value): bool => is_scalar($value) && trim((string) $value) !== '');
     }
 
-    /**
-     * Return only an explicitly approved clinic projection.
-     *
-     * @return array<string,mixed>
-     */
+    /** @return array<string,mixed> */
     public function clinic(int $user_id): array
     {
         if (array_key_exists($user_id, $this->clinic_cache)) {
             return $this->clinic_cache[$user_id];
         }
-        if (! $this->membership_available()) {
+        if ($user_id <= 0 || ! $this->clinic_available()) {
             return $this->clinic_cache[$user_id] = [];
         }
 
-        global $wpdb;
-        $table = $wpdb->prefix . 'smc_clinics';
-        if (! $this->table_exists($table)) {
+        try {
+            if (function_exists('swc_get_public_clinic_projection')) {
+                $source = swc_get_public_clinic_projection($user_id);
+            } else {
+                $source = \SWC_Helpers::public_clinic_projection($user_id);
+            }
+        } catch (\Throwable) {
+            return $this->clinic_cache[$user_id] = [];
+        }
+        if (! is_array($source)
+            || ! hash_equals(self::FILE_08_PUBLIC_PROJECTION_CONTRACT, trim((string) ($source['contract_version'] ?? '')))
+        ) {
             return $this->clinic_cache[$user_id] = [];
         }
 
-        $authoritative = ['approved'];
-        $requested = (array) apply_filters(
-            'sabri_public_experience/public_clinic_statuses',
-            $authoritative
-        );
-        $requested = array_values(array_filter(array_map('sanitize_key', $requested)));
-        $public_statuses = array_values(array_intersect($authoritative, $requested));
-        if ($public_statuses === []) {
-            return $this->clinic_cache[$user_id] = [];
+        $clinic_source = is_array($source['clinic'] ?? null) ? $source['clinic'] : $source;
+        $clinic = [];
+        foreach (['name', 'address', 'country', 'city', 'hours', 'timezone'] as $field) {
+            if (isset($clinic_source[$field]) && is_scalar($clinic_source[$field])) {
+                $value = $this->plain_text((string) $clinic_source[$field], $field === 'address' ? 500 : 240);
+                if ($value !== '') {
+                    $clinic[$field] = $value;
+                }
+            }
         }
 
-        $placeholders = implode(', ', array_fill(0, count($public_statuses), '%s'));
-        $sql = "SELECT id, name, address, country, city, phone, whatsapp, hours, timezone, status FROM {$table} WHERE owner_user_id = %d AND status IN ({$placeholders}) ORDER BY id DESC LIMIT 1";
-        $parameters = array_merge([$user_id], $public_statuses);
-        $row = $wpdb->get_row($wpdb->prepare($sql, $parameters), ARRAY_A);
-
-        return $this->clinic_cache[$user_id] = is_array($row) ? $row : [];
+        return $this->clinic_cache[$user_id] = $clinic;
     }
 
     /** @return array<string,mixed> */
     public function founder_profile(): array
     {
         if (class_exists('SPD_Helpers') && method_exists('SPD_Helpers', 'founder')) {
-            $profile = \SPD_Helpers::founder();
+            try {
+                $profile = \SPD_Helpers::founder();
+            } catch (\Throwable) {
+                $profile = [];
+            }
 
             return is_array($profile) ? $profile : [];
         }
@@ -369,28 +527,20 @@ final class Native_Integration
         return [];
     }
 
-    /** @param array<string,mixed> $credentials */
-    private function professional_document_is_current(array $credentials): bool
+    private function version_in_range(string $version, string $minimum, string $maximum_exclusive): bool
     {
-        $expiry = trim((string) ($credentials['license_expiry'] ?? ''));
-        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $expiry) !== 1) {
-            return false;
-        }
-
-        $today = function_exists('current_time') ? (string) current_time('Y-m-d') : gmdate('Y-m-d');
-
-        return $expiry >= $today;
+        return preg_match('/^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/', trim($version)) === 1
+            && version_compare($version, $minimum, '>=')
+            && version_compare($version, $maximum_exclusive, '<');
     }
 
-    private function table_exists(string $table): bool
+    private function plain_text(string $value, int $limit): string
     {
-        if (array_key_exists($table, $this->table_cache)) {
-            return $this->table_cache[$table];
-        }
+        $value = sanitize_textarea_field($value);
+        $value = preg_replace('/\s+/u', ' ', $value) ?? $value;
 
-        global $wpdb;
-        $exists = $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $wpdb->esc_like($table)));
-
-        return $this->table_cache[$table] = is_string($exists) && $exists === $table;
+        return function_exists('mb_substr')
+            ? mb_substr(trim($value), 0, $limit)
+            : substr(trim($value), 0, $limit);
     }
 }
