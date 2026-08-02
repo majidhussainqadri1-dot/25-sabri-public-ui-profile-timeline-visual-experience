@@ -16,19 +16,43 @@ WordPress module for the **Sabri Social Homeopathy Platform**. This is the exist
 - Production approved: **No**
 - Live deployment authorized: **No**
 
-Version `0.14.0` corrects the authoritative-contract drift identified after the earlier `0.13.0` source review.
+Version `0.14.0` corrects authoritative-contract drift and now binds the File 25 staging candidate to the reviewed File 08 `0.2.1` public clinic projection.
 
 ## Corrected ownership boundaries
 
 - **File 00 `1.2.4`, contract `1.1.2`:** identity, membership state, Founder identity, suspension, eligibility, guardian policy, professional eligibility, and public-profile authorization.
 - **File 03 `0.2.0`:** profile master data, same-origin profile media, and explicit public-contact consent.
-- **File 08 `0.2.0`:** clinic, availability, and appointment truth. File 25 consumes only public clinic projection contract `1.0.0`; until that owner contract exists, clinic projection fails closed.
+- **File 08 `0.2.1`, public clinic contract `1.0.0`:** clinic, availability, appointment truth, authoritative practitioner gating, and owner-executed public clinic projection. File 25 consumes only the public DTO and performs no File 08 table reads.
 - **File 09 `1.1.0`:** Doctor verification decision and immutable approved professional snapshot.
 - **File 18 `1.2.0-RC1`:** seller, listing, moderation, contact, offer, metric, and direct-deal truth. File 25 consumes owner-executed public DTOs only.
 - **File 20 `1.2.0`:** sole global shell, route, navigation, sidebar, drawer, and structural layout owner.
 - **File 21:** publication, Home/News, interaction, moderation, and timeline truth.
 - **File 24 `>=0.25.3 <0.26.0`:** security, privacy, compliance, incident, audit-evidence, and resilience governance.
 - **File 25:** visual tokens, public visual projection, profiles, federated timelines, reusable components, responsive refinement, accessibility, SEO presentation, visual acceptance, and deterministic staging packaging.
+
+## File 08 exact reviewed input
+
+File 25's deterministic staging matrix is bound to:
+
+```text
+File 08 runtime: 0.2.1
+Public clinic contract: 1.0.0
+Source commit: bd6a10b693991fc518788ef8e3cba49531454821
+Candidate SHA-256: 36ce0c78aa51396b02bd0705021e66782bfc45b74636ac65b0826bd372103578
+Source CI: Corrective Quality #64 / 30744250320
+Hostinger staging status: pending
+```
+
+Required owner symbols:
+
+```php
+SWC_VERSION
+SWC_PUBLIC_CLINIC_CONTRACT_VERSION
+swc_get_public_clinic_projection()
+swc_public_clinic_projection_contract()
+```
+
+The DTO allow list is `name`, dedicated clinic `address`, `country`, `city`, `hours`, and `timezone`. File 25 discards contact fields and native identifiers even if a malformed provider attempts to include them. Phone and WhatsApp remain governed separately by File 03 value ownership and contact consent.
 
 ## Version 0.14.0 corrections
 
@@ -38,7 +62,7 @@ Version `0.14.0` corrects the authoritative-contract drift identified after the 
 - Required both File 00 eligibility/can-practice assertions and File 09 current verification decision.
 - Projected professional presentation only from File 09's immutable approved snapshot.
 - Removed File 25 age calculation; explicit File 00 minor/guardian assertions govern, while unknown ordinary contact state fails closed.
-- Added a versioned File 08 clinic projection boundary and explicit staging blocker.
+- Replaced the File 08 placeholder with the exact reviewed `0.2.1` owner contract and pending-Hostinger staging evidence.
 - Replaced File 18 direct SQL with owner APIs: future `smp_get_public_profile_listings()` or the bounded `SMP_Utils::current_seller()` + `SMP_REST::products()` transitional path.
 - Updated dependency matrix, staging scenarios, Composer tests, CI gates, release-engineering tests, and structural verification.
 
@@ -52,7 +76,7 @@ Version `0.14.0` corrects the authoritative-contract drift identified after the 
 - Public profiles default to two columns; three columns require real owner-declared sidebar content.
 - Visible/structured breadcrumbs, safe `og:image:alt`, and governed 404/410 handling remain active.
 - Knowledge, Media, Reviews, Research, and Marketplace sections remain bounded, optional, read-only projections.
-- Public REST and HTML share one public card allow-list and do not disclose provider/native identifiers.
+- Public REST and HTML share one public card allow list and do not disclose provider/native identifiers.
 - Profile HTML and REST remain `no-store` until a versioned cache-partition contract is reviewed.
 
 ## Public integration API
@@ -107,8 +131,8 @@ A passing source suite, package verifier, or installed preflight authorizes manu
 
 ## Remaining mandatory gates
 
-- File 08 versioned public clinic projection implementation and review.
 - Exact Files 00/03/06/08/09/10/11/12/18/20/21/24/25 installation on canonical Hostinger staging.
+- Real File 08 `0.2.1` public/private/eligible/ineligible/suspended/revoked/empty clinic projections and File 25 rendering behavior.
 - Real Founder, Doctor, Member, Patient, Student, minor, suspended, rejected, private, and wrong-author workflows.
 - File 03 consent-on/consent-off, File 09 expiry/revocation, and File 18 owner-DTO tests.
 - Urdu RTL, keyboard, screen reader, 200%/400% zoom, forced colors, reduced motion, target viewports, and visual regression evidence.
