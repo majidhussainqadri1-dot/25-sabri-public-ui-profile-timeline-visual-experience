@@ -23,6 +23,8 @@ $required = [
     'includes/class-staging-cli.php',
     'includes/class-upgrade-manager.php',
     'includes/class-file-24-integration.php',
+    'includes/class-native-integration.php',
+    'includes/class-dependency-manager.php',
     'includes/class-design-system.php',
     'includes/class-profile-router.php',
     'includes/class-profile-renderer.php',
@@ -31,6 +33,7 @@ $required = [
     'includes/class-rest-controller.php',
     'includes/class-section-registry.php',
     'includes/class-section-service.php',
+    'includes/providers/class-file-18-marketplace-provider.php',
     'templates/public-profile.php',
     'assets/css/design-system.css',
     'assets/css/design-system-components.css',
@@ -40,7 +43,9 @@ $required = [
     'config/staging-dependencies.json',
     'config/staging-test-plan.json',
     'tests/profile-router.php',
+    'tests/authoritative-native-contracts.php',
     'tests/master-plan-reconciliation.php',
+    'tests/file18-marketplace-provider.php',
     'tests/file24-integration.php',
     'tests/staging-probe.php',
     'tests/upgrade-manager.php',
@@ -75,17 +80,28 @@ $contains = static function (string $source, array $markers, string $label) use 
     }
 };
 
+$forbids = static function (string $source, array $markers, string $label) use (&$errors): void {
+    foreach ($markers as $marker) {
+        if (str_contains($source, $marker)) {
+            $errors[] = $label . ' forbidden marker present: ' . $marker;
+        }
+    }
+};
+
 $main = $read('sabri-public-experience.php');
 $readme = $read('readme.txt');
 preg_match('/^\s*\* Version:\s*([^\s]+)/m', $main, $header);
 preg_match("/define\('SABRI_PUBLIC_EXPERIENCE_VERSION',\s*'([^']+)'\)/", $main, $constant);
 preg_match('/^Stable tag:\s*([^\s]+)/mi', $readme, $stable);
 $versions = [$header[1] ?? '', $constant[1] ?? '', $stable[1] ?? ''];
-if (count(array_unique($versions)) !== 1 || $versions[0] !== '0.13.0') {
-    $errors[] = 'Plugin header, constant, and stable tag must all equal 0.13.0.';
+if (count(array_unique($versions)) !== 1 || $versions[0] !== '0.14.0') {
+    $errors[] = 'Plugin header, constant, and stable tag must all equal 0.14.0.';
 }
+$runtimeVersion = (string) ($constant[1] ?? '');
 $contains($main, [
     "define('SABRI_PUBLIC_EXPERIENCE_SCHEMA_VERSION', '2')",
+    'class-native-integration.php',
+    'class-dependency-manager.php',
     'class-file-24-integration.php',
     'class-section-service.php',
     'class-rest-controller.php',
@@ -115,15 +131,55 @@ $contains($file24, [
     "'owns_security_governance' => false",
     "'owns_privacy_orchestration' => false",
 ], 'File 24 integration');
-if (str_contains($file24, 'SABRI_SECURITY_CENTER_VERSION') || str_contains($file24, 'SABRI_SPRC_VERSION')) {
-    $errors[] = 'File 24 integration must use only the reviewed SPCRC_VERSION contract.';
-}
+$forbids($file24, ['SABRI_SECURITY_CENTER_VERSION', 'SABRI_SPRC_VERSION'], 'File 24 integration');
+
+$native = $read('includes/class-native-integration.php');
+$contains($native, [
+    "FILE_00_MINIMUM_VERSION = '1.2.4'",
+    "FILE_00_MAXIMUM_VERSION = '1.3.0'",
+    "FILE_00_CONTRACT_VERSION = '1.1.2'",
+    'SMC_Contracts::assertions',
+    'SMC_CONTRACT_VERSION',
+    'smc_founder_user_id',
+    'gdo_get_verification_decision',
+    'gdo_get_approved_snapshot',
+    "FILE_08_PUBLIC_PROJECTION_CONTRACT = '1.0.0'",
+    'swc_get_public_clinic_projection',
+    "FILE_18_MINIMUM_VERSION = '1.2.0-RC1'",
+    'File 25 must not calculate age',
+], 'Native authority adapter');
+$forbids($native, [
+    '$wpdb',
+    'SHOW TABLES',
+    'smc_get_profile',
+    'smc_professional_credentials',
+    'smc_clinics',
+    'calculated_age',
+    'license_expiry',
+], 'Native authority adapter');
+
+$marketplace = $read('includes/providers/class-file-18-marketplace-provider.php');
+$contains($marketplace, [
+    "MINIMUM_VERSION = '1.2.0-RC1'",
+    'smp_get_public_profile_listings',
+    'SMP_Utils::current_seller',
+    'SMP_REST::products',
+    'SMP_Activator::marketplace_url',
+    'TRANSITIONAL_FETCH_LIMIT',
+], 'File 18 adapter');
+$forbids($marketplace, ['$wpdb', 'SMP_DB::table', 'SELECT p.*'], 'File 18 adapter');
+
+$dependencies = $read('includes/class-dependency-manager.php');
+$contains($dependencies, [
+    'FILE_00_CONTRACT_VERSION',
+    'doctor_verification_available',
+    'clinic_available',
+    'marketplace_available',
+    'File 25 retains visual-token ownership',
+], 'Dependency manager');
 
 $visibility = $read('includes/class-visibility-policy.php');
-$contains($visibility, [
-    'SPD_Helpers::can_show_contact',
-    'return $authoritative && $filtered',
-], 'Contact visibility');
+$contains($visibility, ['SPD_Helpers::can_show_contact', 'return $authoritative && $filtered'], 'Contact visibility');
 if (str_contains($visibility, 'elseif ($this->is_verified_doctor')) {
     $errors[] = 'Verified Doctor status must not bypass File 03 contact consent.';
 }
@@ -146,31 +202,14 @@ $contains($router, [
 ], 'Profile router');
 
 $renderer = $read('includes/class-profile-renderer.php');
-$contains($renderer, [
-    "'@type' => 'BreadcrumbList'",
-    'og:image:alt',
-    'missing_profile_status',
-    'status_header($status)',
-], 'Profile renderer');
-$contains($read('templates/public-profile.php'), [
-    'spux-breadcrumbs',
-    'aria-current="page"',
-], 'Profile template');
+$contains($renderer, ["'@type' => 'BreadcrumbList'", 'og:image:alt', 'missing_profile_status', 'status_header($status)'], 'Profile renderer');
+$contains($read('templates/public-profile.php'), ['spux-breadcrumbs', 'aria-current="page"'], 'Profile template');
 
 $cards = $read('includes/class-content-cards.php');
-$contains($cards, [
-    "CONTRACT_VERSION = '1.2.0'",
-    'public static function normalize_public',
-    "'public_normalizer' => [self::class, 'normalize_public']",
-], 'Content cards');
+$contains($cards, ["CONTRACT_VERSION = '1.2.0'", 'public static function normalize_public', "'public_normalizer' => [self::class, 'normalize_public']"], 'Content cards');
 
 $sections = $read('includes/class-section-service.php');
-$contains($sections, [
-    "PUBLIC_CONTRACT_VERSION = '1.0.0'",
-    'get_public_section',
-    'public_health',
-    'Content_Cards::normalize_public',
-], 'Section service');
+$contains($sections, ["PUBLIC_CONTRACT_VERSION = '1.0.0'", 'get_public_section', 'public_health', 'Content_Cards::normalize_public'], 'Section service');
 
 $rest = $read('includes/class-rest-controller.php');
 $contains($rest, [
@@ -187,12 +226,7 @@ if (preg_match('/provider_id|native_id|projection_key/', $rest)) {
 }
 
 $plugin = $read('includes/class-plugin.php');
-$contains($plugin, [
-    'new File_24_Integration',
-    'new Staging_Probe',
-    'new Upgrade_Manager',
-    'new Rest_Controller($profiles, $timeline, $sections)',
-], 'Plugin bootstrap');
+$contains($plugin, ['new File_24_Integration', 'new Staging_Probe', 'new Upgrade_Manager', 'new Rest_Controller($profiles, $timeline, $sections)'], 'Plugin bootstrap');
 
 $css = '';
 foreach (['assets/css/design-system.css', 'assets/css/design-system-components.css', 'assets/css/public.css', 'assets/css/profile-sections.css'] as $path) {
@@ -228,7 +262,10 @@ foreach ([
 
 $matrix = json_decode($read('config/staging-dependencies.json'), true);
 if (! is_array($matrix)
-    || ($matrix['runtime_version'] ?? '') !== '0.13.0'
+    || ($matrix['schema_version'] ?? null) !== 2
+    || ($matrix['runtime_version'] ?? '') !== $runtimeVersion
+    || ($matrix['governing_sources']['platform_master_plan'] ?? '') !== 'Sabri Social Homeopathy Platform Definitive Master Plan 2026 v3.0'
+    || ($matrix['governing_sources']['file_20_plan'] ?? '') !== 'File 20 Harmonized Master Plan 2026 v4.1'
     || ($matrix['environment']['target_site'] ?? '') !== 'https://sabrisocialstaging.sabrihomeopathy.com/'
     || ($matrix['environment']['live_changes_allowed'] ?? true) !== false
 ) {
@@ -240,15 +277,17 @@ foreach ((array) ($matrix['modules'] ?? []) as $module) {
         $modules[(int) $module['file']] = $module;
     }
 }
-foreach ([0, 3, 6, 10, 11, 12, 18, 20, 21, 24, 25] as $file) {
+foreach ([0, 3, 6, 8, 9, 10, 11, 12, 18, 20, 21, 24, 25] as $file) {
     if (! isset($modules[$file])) {
         $errors[] = 'Staging matrix missing File ' . $file . '.';
     }
 }
-if (($modules[0]['reviewed_package_version'] ?? '') !== '1.1.13'
-    || ($modules[0]['accepted_source_range'] ?? '') !== '>=1.1.13 <1.2.0'
+if (($modules[0]['reviewed_package_version'] ?? '') !== '1.2.4'
+    || ($modules[0]['accepted_source_range'] ?? '') !== '>=1.2.4 <1.3.0'
+    || ($modules[0]['required_contract_version'] ?? '') !== '1.1.2'
+    || ($modules[0]['foreign_table_reads_allowed'] ?? true) !== false
 ) {
-    $errors[] = 'File 00 staging authority is stale.';
+    $errors[] = 'File 00 staging authority is stale or unsafe.';
 }
 if (($modules[3]['reviewed_package_version'] ?? '') !== '0.2.0'
     || ($modules[3]['accepted_source_range'] ?? '') !== '>=0.2.0 <0.3.0'
@@ -256,27 +295,73 @@ if (($modules[3]['reviewed_package_version'] ?? '') !== '0.2.0'
 ) {
     $errors[] = 'File 03 contact-consent staging authority is stale.';
 }
+if (($modules[8]['reviewed_source_version'] ?? '') !== '0.2.0'
+    || ($modules[8]['required_public_contract_version'] ?? '') !== '1.0.0'
+    || ($modules[8]['foreign_table_reads_allowed'] ?? true) !== false
+) {
+    $errors[] = 'File 08 public clinic projection authority is stale or unsafe.';
+}
+if (($modules[9]['reviewed_source_version'] ?? '') !== '1.1.0'
+    || ($modules[9]['foreign_table_reads_allowed'] ?? true) !== false
+) {
+    $errors[] = 'File 09 Doctor verification authority is stale or unsafe.';
+}
+if (($modules[18]['reviewed_source_version'] ?? '') !== '1.2.0-RC1'
+    || ($modules[18]['foreign_table_reads_allowed'] ?? true) !== false
+) {
+    $errors[] = 'File 18 Marketplace authority is stale or unsafe.';
+}
+if (($modules[20]['reviewed_source_version'] ?? '') !== '1.2.0'
+    || ($modules[20]['governing_plan_version'] ?? '') !== '4.1'
+) {
+    $errors[] = 'File 20 shell authority is stale.';
+}
 if (($modules[24]['staging_status'] ?? '') !== 'pending'
     || ($modules[24]['accepted_runtime_contract'] ?? '') !== 'reviewed-source-contract-pending-staging'
 ) {
     $errors[] = 'File 24 pending staging state is inaccurate.';
 }
-if (($modules[25]['candidate_version'] ?? '') !== '0.13.0'
+if (($modules[25]['candidate_version'] ?? '') !== $runtimeVersion
     || ($modules[25]['schema_version'] ?? '') !== '2'
     || ($modules[25]['staging_status'] ?? '') !== 'pending'
 ) {
     $errors[] = 'File 25 candidate state is inaccurate.';
 }
 
+$plan = json_decode($read('config/staging-test-plan.json'), true);
+$scenarioIds = [];
+foreach ((array) ($plan['scenarios'] ?? []) as $scenario) {
+    if (is_array($scenario)) {
+        $scenarioIds[] = (string) ($scenario['id'] ?? '');
+    }
+}
+if (! is_array($plan) || ($plan['schema_version'] ?? null) !== 2) {
+    $errors[] = 'Staging test plan schema 2 is invalid.';
+}
+foreach (['file00-assertions', 'file08-clinic-projection', 'file09-doctor-decision', 'file18-owner-dto'] as $scenarioId) {
+    if (! in_array($scenarioId, $scenarioIds, true)) {
+        $errors[] = 'Staging test plan missing authoritative scenario: ' . $scenarioId;
+    }
+}
+
 $composer = $read('composer.json');
-foreach (['tests/profile-router.php', 'tests/master-plan-reconciliation.php', 'tests/file24-integration.php', 'tests/staging-probe.php'] as $test) {
+foreach ([
+    'tests/profile-router.php',
+    'tests/authoritative-native-contracts.php',
+    'tests/master-plan-reconciliation.php',
+    'tests/file18-marketplace-provider.php',
+    'tests/file24-integration.php',
+    'tests/staging-probe.php',
+] as $test) {
     if (! str_contains($composer, $test)) {
         $errors[] = 'Composer suite missing: ' . $test;
     }
 }
 $workflow = $read('.github/workflows/ci.yml');
 foreach ([
-    'Master-plan and File 25 final-specification reconciliation',
+    'Authoritative File 00 08 09 native contracts',
+    'Master Plan v3 authoritative-contract reconciliation',
+    'File 18 owner-executed public DTO contract',
     'Reviewed File 24 integration contract',
     'Verify assembled candidate with the independent verifier',
 ] as $marker) {
@@ -284,7 +369,7 @@ foreach ([
         $errors[] = 'CI workflow marker missing: ' . $marker;
     }
 }
-if (str_contains($workflow, 'sabri-public-experience-0.13.0.zip')) {
+if ($runtimeVersion !== '' && str_contains($workflow, 'sabri-public-experience-' . $runtimeVersion . '.zip')) {
     $errors[] = 'CI must not hard-code the current package version.';
 }
 
@@ -293,4 +378,4 @@ if ($errors !== []) {
     exit(1);
 }
 
-echo "PASS: File 25 master-plan, privacy, REST, staging, and package structure\n";
+echo "PASS: File 25 authoritative ownership, privacy, REST, staging, and package structure\n";
