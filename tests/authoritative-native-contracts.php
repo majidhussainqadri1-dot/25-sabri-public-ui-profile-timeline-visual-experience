@@ -146,19 +146,13 @@ namespace {
         'account_class' => 'founder',
         'membership_type' => '',
     ]);
-    SMC_Contracts::$assertions[7] = $base(7, 'doctor');
-    SMC_Contracts::$assertions[8] = $base(8, 'doctor');
-    SMC_Contracts::$assertions[9] = $base(9, 'doctor');
+    foreach ([7, 8, 9, 11, 13, 14, 15] as $doctor_id) {
+        SMC_Contracts::$assertions[$doctor_id] = $base($doctor_id, 'doctor');
+    }
     SMC_Contracts::$assertions[10] = $base(10, 'member');
     SMC_Contracts::$assertions[12] = array_merge($base(12), ['contract_version' => '1.1.1']);
 
-    $gdo_decisions[7] = [
-        'state' => 'verified',
-        'verified' => true,
-        'verified_until' => '2027-08-02',
-        'fingerprint' => str_repeat('a', 64),
-    ];
-    $gdo_snapshots[7] = [
+    $approved_profile = [
         'profile' => [
             'qualification' => 'DHMS',
             'licensing_authority' => 'National Council',
@@ -172,14 +166,36 @@ namespace {
         ],
         'evidence' => ['qualification' => ['decision' => 'approved']],
     ];
-    $gdo_decisions[8] = ['state' => 'rejected', 'verified' => false];
-    $gdo_decisions[9] = [
+    $valid_decision = static fn (string $fingerprint): array => [
         'state' => 'verified',
         'verified' => true,
-        'verified_until' => '2027-08-02',
-        'fingerprint' => str_repeat('b', 64),
+        'verified_until' => '2099-12-31',
+        'fingerprint' => $fingerprint,
     ];
+
+    $gdo_decisions[7] = $valid_decision(str_repeat('a', 64));
+    $gdo_snapshots[7] = $approved_profile;
+    $gdo_decisions[8] = ['state' => 'rejected', 'verified' => false];
+    $gdo_decisions[9] = $valid_decision(str_repeat('b', 64));
+    $gdo_snapshots[9] = $approved_profile;
     $gdo_helper_verified_overrides[9] = false;
+    $gdo_decisions[11] = $valid_decision(str_repeat('c', 64));
+    $gdo_decisions[13] = $valid_decision('not-a-valid-fingerprint');
+    $gdo_snapshots[13] = $approved_profile;
+    $gdo_decisions[14] = [
+        'state' => 'verified',
+        'verified' => true,
+        'verified_until' => '2000-01-01',
+        'fingerprint' => str_repeat('d', 64),
+    ];
+    $gdo_snapshots[14] = $approved_profile;
+    $gdo_decisions[15] = [
+        'state' => 'verified',
+        'verified' => true,
+        'verified_until' => '2099-02-30',
+        'fingerprint' => str_repeat('e', 64),
+    ];
+    $gdo_snapshots[15] = $approved_profile;
 
     $failures = [];
     $check = static function (bool $condition, string $message) use (&$failures): void {
@@ -189,9 +205,13 @@ namespace {
     $native = new Native_Integration();
     $check($native->membership_available(), 'File 00 1.2.4 / contract 1.1.2 must be accepted.');
     $check($native->founder_user_id() === 1, 'Founder identity must come only from File 00.');
-    $check($native->is_verified_doctor(7), 'Doctor requires both File 00 eligibility and File 09 verification.');
+    $check($native->is_verified_doctor(7), 'Doctor requires File 00 eligibility, File 09 helper/decision, current validity, and a non-empty approved snapshot.');
     $check(! $native->is_verified_doctor(8), 'Rejected File 09 decision must fail closed.');
     $check(! $native->is_verified_doctor(9), 'File 09 helper/decision disagreement must fail closed.');
+    $check(! $native->is_verified_doctor(11), 'A verified decision without a non-empty approved snapshot must fail closed.');
+    $check(! $native->is_verified_doctor(13), 'A malformed approved-snapshot fingerprint must fail closed.');
+    $check(! $native->is_verified_doctor(14), 'An expired File 09 verification must fail closed even when another helper reports verified.');
+    $check(! $native->is_verified_doctor(15), 'An invalid File 09 validity date must fail closed.');
     $check($native->membership_assertions(12) === [], 'Mismatched File 00 assertion contract must fail closed.');
     $check($native->clinic_available(), 'Exact File 08 0.2.1 owner projection must be available.');
     $check((swc_public_clinic_projection_contract()['contract_version'] ?? '') === '1.0.0', 'File 08 contract introspection must report 1.0.0.');
@@ -217,5 +237,5 @@ namespace {
         exit(1);
     }
 
-    echo "PASS: File 25 authoritative File 00/08/09 native contracts\n";
+    echo "PASS: File 25 authoritative File 00/08/09 current-decision and snapshot contracts\n";
 }
