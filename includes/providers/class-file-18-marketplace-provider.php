@@ -11,17 +11,18 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
 }
 
 /**
- * Read-only File 18 Marketplace profile adapter.
+ * Read-only File 18 Marketplace public-DTO adapter.
  *
- * File 18 remains authoritative for sellers, listings, moderation, contacts,
- * chat, offers, files, metrics, reports, and direct-deal workflows. File 25
- * receives only bounded public card descriptors.
+ * File 18 remains the sole owner of seller/listing queries and visibility.
+ * File 25 consumes only File 18 public APIs and never reads Marketplace tables.
  */
 final class File_18_Marketplace_Provider implements Profile_Section_Provider
 {
-    private const MINIMUM_VERSION = '1.1.0';
-    private const MAXIMUM_VERSION = '1.2.0';
+    private const MINIMUM_VERSION = '1.2.0-RC1';
+    private const MAXIMUM_VERSION = '1.3.0';
+    private const PUBLIC_PROFILE_CONTRACT = '1.0.0';
     private const MAX_ITEMS = 24;
+    private const TRANSITIONAL_FETCH_LIMIT = 50;
 
     public function get_id(): string
     {
@@ -54,34 +55,25 @@ final class File_18_Marketplace_Provider implements Profile_Section_Provider
             return false;
         }
 
-        if (! class_exists('SMP_DB') || ! class_exists('SMP_Activator') || ! class_exists('SMP_Utils')) {
-            return false;
-        }
-        foreach ([
-            ['SMP_DB', 'table'],
-            ['SMP_Activator', 'marketplace_url'],
-            ['SMP_Utils', 'decode_json'],
-        ] as [$class, $method]) {
-            if (! method_exists($class, $method)) {
-                return false;
-            }
+        if (function_exists('smp_get_public_profile_listings')) {
+            return true;
         }
 
-        global $wpdb;
-
-        return is_object($wpdb)
-            && method_exists($wpdb, 'prepare')
-            && method_exists($wpdb, 'get_results');
+        return class_exists('SMP_Utils')
+            && class_exists('SMP_REST')
+            && class_exists('SMP_Activator')
+            && class_exists('WP_REST_Request')
+            && class_exists('WP_REST_Response')
+            && method_exists('SMP_Utils', 'current_seller')
+            && method_exists('SMP_REST', 'products')
+            && method_exists('SMP_Activator', 'marketplace_url');
     }
 
     /** @param array<string,mixed> $profile */
     public function supports_profile(array $profile): bool
     {
-        if (! $this->is_available()) {
-            return false;
-        }
-
-        return in_array(self::key((string) ($profile['class'] ?? '')), ['founder', 'doctor', 'member'], true);
+        return $this->is_available()
+            && in_array(self::key((string) ($profile['class'] ?? '')), ['founder', 'doctor', 'member'], true);
     }
 
     /**
@@ -100,69 +92,41 @@ final class File_18_Marketplace_Provider implements Profile_Section_Provider
             : self::MAX_ITEMS;
         $limit = max(1, min(self::MAX_ITEMS, $requested));
 
-        global $wpdb;
-        $products = (string) \SMP_DB::table('products');
-        $sellers = (string) \SMP_DB::table('sellers');
-        if ($products === '' || $sellers === '') {
-            return [];
-        }
-
-        $sql = "SELECT p.*, s.user_id AS seller_user_id, s.status AS seller_status, s.store_name AS seller_store_name
-            FROM {$products} p
-            INNER JOIN {$sellers} s ON s.id = p.seller_id
-            WHERE s.user_id = %d
-              AND s.status = 'approved'
-              AND p.status IN ('published','approved')
-            ORDER BY COALESCE(NULLIF(p.published_at, ''), p.created_at) DESC, p.id DESC
-            LIMIT %d";
-        $prepared = $wpdb->prepare($sql, $user_id, $limit);
-        if (! is_string($prepared) || $prepared === '') {
-            return [];
-        }
-
-        $rows = $wpdb->get_results($prepared, ARRAY_A);
-        if (! is_array($rows)) {
-            return [];
-        }
-
-        $marketplace_url = (string) \SMP_Activator::marketplace_url();
+        $projection = $this->public_projection($user_id, $limit);
+        $rows = is_array($projection['items'] ?? null) ? $projection['items'] : [];
+        $marketplace_url = self::safe_url((string) ($projection['marketplace_url'] ?? ''));
         $items = [];
+
         foreach (array_slice($rows, 0, $limit) as $row) {
             if (! is_array($row)) {
                 continue;
             }
 
-            $product_id = (int) ($row['id'] ?? 0);
-            $seller_user_id = (int) ($row['seller_user_id'] ?? 0);
-            $seller_status = self::key((string) ($row['seller_status'] ?? ''));
-            $listing_status = self::key((string) ($row['status'] ?? ''));
-            $deal_status = self::key((string) ($row['deal_status'] ?? ''));
+            $native_key = self::text($row['projectionKey'] ?? $row['projection_key'] ?? $row['id'] ?? $row['slug'] ?? '', 255);
             $title = self::text($row['title'] ?? '', 240);
+            $listing_status = self::key((string) ($row['status'] ?? ''));
+            $deal_status = self::key((string) ($row['dealStatus'] ?? $row['deal_status'] ?? ''));
             if (
-                $product_id <= 0
-                || $seller_user_id !== $user_id
-                || $seller_status !== 'approved'
+                $native_key === ''
+                || $title === ''
                 || ! in_array($listing_status, ['published', 'approved'], true)
                 || ! in_array($deal_status, ['available', 'reserved', 'sold'], true)
-                || $title === ''
             ) {
                 continue;
             }
 
-            $images = \SMP_Utils::decode_json($row['images'] ?? '[]');
-            $image_url = self::first_image_url($images);
-            $price = (float) ($row['price'] ?? 0);
-            $sale_price = (float) ($row['sale_price'] ?? 0);
-            $effective_price = $sale_price > 0 && $sale_price < $price ? $sale_price : $price;
+            $price = self::finite_float($row['effectivePrice'] ?? $row['effective_price'] ?? $row['price'] ?? 0);
             $currency = self::text($row['currency'] ?? 'PKR', 10);
             $category = self::text($row['category'] ?? '', 100);
-            $condition = self::text($row['condition_name'] ?? '', 60);
-            $product_type = self::text($row['product_type'] ?? '', 60);
-            $slug = self::text($row['slug'] ?? '', 255);
-            $published_at = self::text(($row['published_at'] ?? '') ?: ($row['created_at'] ?? ''), 80);
-
+            $condition = self::text($row['condition'] ?? $row['condition_name'] ?? '', 60);
+            $product_type = self::text($row['productType'] ?? $row['product_type'] ?? '', 60);
+            $published_at = self::text(
+                $row['publishedAt'] ?? $row['published_at'] ?? $row['updatedAt'] ?? $row['createdAt'] ?? $row['created_at'] ?? '',
+                80
+            );
+            $image_url = self::first_image_url($row);
             $meta = [];
-            foreach ([$product_type, $condition, self::price_label($effective_price, $currency), self::status_label($deal_status)] as $value) {
+            foreach ([$product_type, $condition, self::price_label($price, $currency), self::status_label($deal_status)] as $value) {
                 if ($value !== '' && ! in_array($value, $meta, true)) {
                     $meta[] = $value;
                 }
@@ -172,7 +136,7 @@ final class File_18_Marketplace_Provider implements Profile_Section_Provider
                 'type' => 'marketplace-item',
                 'title' => $title,
                 'url' => $marketplace_url,
-                'excerpt' => self::text($row['short_description'] ?? '', 900),
+                'excerpt' => self::text($row['shortDescription'] ?? $row['short_description'] ?? '', 900),
                 'eyebrow' => self::marketplace_label(),
                 'image_url' => $image_url,
                 'image_alt' => $title,
@@ -181,10 +145,7 @@ final class File_18_Marketplace_Provider implements Profile_Section_Provider
                 'meta' => $meta,
                 'published_at' => $published_at,
                 'action_label' => $marketplace_url !== '' ? self::open_label() : '',
-                // File 18 currently has one Marketplace application URL rather
-                // than public item permalinks. This opaque server-only key keeps
-                // distinct listings visible without exposing the native ID.
-                'projection_key' => hash('sha256', 'file-18-marketplace|' . $product_id . '|' . $slug),
+                'projection_key' => hash('sha256', 'file-18-marketplace|' . $native_key),
             ];
         }
 
@@ -196,18 +157,86 @@ final class File_18_Marketplace_Provider implements Profile_Section_Provider
         return false;
     }
 
-    /** @param array<int|string,mixed> $images */
-    private static function first_image_url(array $images): string
+    /** @return array{items:list<array<string,mixed>>,marketplace_url:string} */
+    private function public_projection(int $user_id, int $limit): array
     {
-        foreach ($images as $image) {
-            if (is_array($image) && is_scalar($image['url'] ?? null)) {
-                $url = trim((string) $image['url']);
-                if ($url !== '') {
-                    return $url;
+        if (function_exists('smp_get_public_profile_listings')) {
+            try {
+                $source = smp_get_public_profile_listings($user_id, [
+                    'limit' => $limit,
+                    'contract_version' => self::PUBLIC_PROFILE_CONTRACT,
+                ]);
+            } catch (\Throwable) {
+                return ['items' => [], 'marketplace_url' => ''];
+            }
+            if (! is_array($source)
+                || ! hash_equals(self::PUBLIC_PROFILE_CONTRACT, trim((string) ($source['contract_version'] ?? '')))
+                || ! is_array($source['items'] ?? null)
+            ) {
+                return ['items' => [], 'marketplace_url' => ''];
+            }
+
+            return [
+                'items' => array_values($source['items']),
+                'marketplace_url' => self::safe_url((string) ($source['marketplace_url'] ?? '')),
+            ];
+        }
+
+        // Transitional File 18 1.2.0-RC1 adapter. The owner module performs the
+        // seller and public-listing queries; File 25 only filters returned DTOs.
+        try {
+            $seller = \SMP_Utils::current_seller($user_id);
+        } catch (\Throwable) {
+            return ['items' => [], 'marketplace_url' => ''];
+        }
+        if (! is_array($seller)
+            || (int) ($seller['userId'] ?? 0) !== $user_id
+            || self::key((string) ($seller['status'] ?? '')) !== 'approved'
+            || (int) ($seller['id'] ?? 0) <= 0
+        ) {
+            return ['items' => [], 'marketplace_url' => ''];
+        }
+
+        try {
+            $request = new \WP_REST_Request('GET', '/sabri-marketplace/v1/products');
+            $request->set_param('limit', self::TRANSITIONAL_FETCH_LIMIT);
+            $request->set_param('page', 1);
+            $request->set_param('search', '');
+            $response = \SMP_REST::products($request);
+            $data = $response instanceof \WP_REST_Response ? $response->get_data() : [];
+            $marketplace_url = self::safe_url((string) \SMP_Activator::marketplace_url());
+        } catch (\Throwable) {
+            return ['items' => [], 'marketplace_url' => ''];
+        }
+        $products = is_array($data) && is_array($data['products'] ?? null) ? $data['products'] : [];
+        $seller_id = (int) $seller['id'];
+        $items = [];
+        foreach ($products as $product) {
+            if (is_array($product) && (int) ($product['sellerId'] ?? 0) === $seller_id) {
+                $items[] = $product;
+                if (count($items) >= $limit) {
+                    break;
                 }
             }
-            if (is_scalar($image)) {
-                $url = trim((string) $image);
+        }
+
+        return ['items' => $items, 'marketplace_url' => $marketplace_url];
+    }
+
+    /** @param array<string,mixed> $row */
+    private static function first_image_url(array $row): string
+    {
+        if (is_scalar($row['image'] ?? null)) {
+            $url = self::safe_url((string) $row['image']);
+            if ($url !== '') {
+                return $url;
+            }
+        }
+        $images = is_array($row['images'] ?? null) ? $row['images'] : [];
+        foreach ($images as $image) {
+            $candidate = is_array($image) ? ($image['url'] ?? '') : $image;
+            if (is_scalar($candidate)) {
+                $url = self::safe_url((string) $candidate);
                 if ($url !== '') {
                     return $url;
                 }
@@ -217,9 +246,16 @@ final class File_18_Marketplace_Provider implements Profile_Section_Provider
         return '';
     }
 
+    private static function finite_float(mixed $value): float
+    {
+        $number = is_numeric($value) ? (float) $value : 0.0;
+
+        return is_finite($number) && $number >= 0 ? $number : 0.0;
+    }
+
     private static function price_label(float $price, string $currency): string
     {
-        if ($price < 0 || ! is_finite($price)) {
+        if ($price <= 0) {
             return '';
         }
         $currency = $currency !== '' ? $currency : 'PKR';
@@ -239,16 +275,22 @@ final class File_18_Marketplace_Provider implements Profile_Section_Provider
 
     private static function marketplace_label(): string
     {
-        return function_exists('__')
-            ? __('Marketplace', 'sabri-public-experience')
-            : 'Marketplace';
+        return function_exists('__') ? __('Marketplace', 'sabri-public-experience') : 'Marketplace';
     }
 
     private static function open_label(): string
     {
-        return function_exists('__')
-            ? __('Open Marketplace', 'sabri-public-experience')
-            : 'Open Marketplace';
+        return function_exists('__') ? __('Open Marketplace', 'sabri-public-experience') : 'Open Marketplace';
+    }
+
+    private static function safe_url(string $value): string
+    {
+        $value = trim($value);
+        if ($value === '' || preg_match('#^https?://#i', $value) !== 1) {
+            return '';
+        }
+
+        return function_exists('esc_url_raw') ? (string) esc_url_raw($value, ['http', 'https']) : $value;
     }
 
     private static function text(mixed $value, int $limit): string
