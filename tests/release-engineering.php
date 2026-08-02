@@ -69,8 +69,17 @@ $check(($modules[0]['required_contract_version'] ?? '') === '1.1.2', 'File 00 co
 $check(($modules[0]['foreign_table_reads_allowed'] ?? true) === false, 'File 00 foreign-table reads must be prohibited.');
 $check(($modules[3]['reviewed_package_version'] ?? '') === '0.2.0', 'File 03 exact reviewed package must be declared.');
 $check(in_array('SPD_Helpers::can_show_contact', (array) ($modules[3]['required_symbols'] ?? []), true), 'File 03 contact-consent symbol must be required.');
-$check(($modules[8]['reviewed_source_version'] ?? '') === '0.2.0', 'File 08 reviewed source must be declared.');
+$check(($modules[8]['reviewed_package_version'] ?? '') === '0.2.1', 'File 08 exact reviewed package must be 0.2.1.');
+$check(($modules[8]['reviewed_source_version'] ?? '') === '0.2.1', 'File 08 exact reviewed source must be 0.2.1.');
+$check(($modules[8]['accepted_source_range'] ?? '') === '>=0.2.1 <0.3.0', 'File 08 accepted source range must begin at 0.2.1.');
 $check(($modules[8]['required_public_contract_version'] ?? '') === '1.0.0', 'File 08 public projection contract must be declared.');
+$check(($modules[8]['reviewed_source_commit'] ?? '') === 'bd6a10b693991fc518788ef8e3cba49531454821', 'File 08 exact reviewed commit must be declared.');
+$check(($modules[8]['reviewed_candidate_sha256'] ?? '') === '36ce0c78aa51396b02bd0705021e66782bfc45b74636ac65b0826bd372103578', 'File 08 exact reviewed candidate digest must be declared.');
+foreach (['SWC_VERSION', 'SWC_PUBLIC_CLINIC_CONTRACT_VERSION', 'swc_get_public_clinic_projection', 'swc_public_clinic_projection_contract'] as $symbol) {
+    $check(in_array($symbol, (array) ($modules[8]['required_symbols'] ?? []), true), 'File 08 staging matrix is missing symbol: ' . $symbol);
+}
+$check(($modules[8]['contract_status'] ?? '') === 'implemented-and-ci-verified-pending-hostinger-staging', 'File 08 source verification must remain distinct from Hostinger acceptance.');
+$check(($modules[8]['staging_status'] ?? '') === 'pending', 'File 08 staging must remain pending.');
 $check(($modules[9]['reviewed_source_version'] ?? '') === '1.1.0', 'File 09 reviewed source must be declared.');
 $check(($modules[18]['reviewed_source_version'] ?? '') === '1.2.0-RC1', 'File 18 reviewed source must be declared.');
 $check(($modules[18]['foreign_table_reads_allowed'] ?? true) === false, 'File 18 foreign-table reads must be prohibited.');
