@@ -1,0 +1,156 @@
+--- a/includes/class-staging-probe.php
++++ b/includes/class-staging-probe.php
+@@ -326,13 +326,57 @@
+             $plan = null;
+         }
+         $scenarios = is_array($plan) && is_array($plan['scenarios'] ?? null) ? $plan['scenarios'] : [];
++        $scenario_ids = [];
++        $scenario_shapes_valid = true;
++        foreach ($scenarios as $scenario) {
++            if (! is_array($scenario)) {
++                $scenario_shapes_valid = false;
++                continue;
++            }
++            $id = sanitize_key((string) ($scenario['id'] ?? ''));
++            $category = sanitize_key((string) ($scenario['category'] ?? ''));
++            $requirement = self::bounded($scenario['requirement'] ?? '', 1000);
++            if ($id === '' || $category === '' || $requirement === '' || isset($scenario_ids[$id])) {
++                $scenario_shapes_valid = false;
++                continue;
++            }
++            $scenario_ids[$id] = true;
++        }
++        $required_scenarios = [
++            'environment-host',
++            'environment-privacy',
++            'package-integrity',
++            'activation-order',
++            'file00-assertions',
++            'file08-clinic-projection',
++            'file09-doctor-decision',
++            'file18-owner-dto',
++            'minor-private',
++            'wrong-author',
++            'responsive-viewports',
++            'urdu-rtl',
++            'accessibility-input',
++            'accessibility-display',
++            'safe-mode',
++            'upgrade-rollback',
++            'performance-errors',
++            'founder-acceptance',
++        ];
++        $required_scenarios_present = array_diff_key(array_flip($required_scenarios), $scenario_ids) === [];
+         $valid = is_array($plan)
+-            && ($plan['schema_version'] ?? null) === 1
++            && ($plan['schema_version'] ?? null) === 2
+             && ($plan['owner'] ?? '') === 'file-25'
+             && ($plan['canonical_staging_host'] ?? '') === self::CANONICAL_STAGING_HOST
+             && ($plan['live_host_must_remain_untouched'] ?? null) === true
++            && ($plan['registration_must_remain_disabled'] ?? null) === true
++            && ($plan['search_indexing_must_remain_disabled'] ?? null) === true
++            && ($plan['source_contract_is_acceptance'] ?? null) === false
++            && ($plan['green_ci_is_acceptance'] ?? null) === false
+             && ($plan['staging_acceptance_implied'] ?? null) === false
+-            && count($scenarios) >= 10
++            && ($plan['production_acceptance_implied'] ?? null) === false
++            && $scenario_shapes_valid
++            && $required_scenarios_present
++            && count($scenarios) >= count($required_scenarios)
+             && count($scenarios) <= 100;
+ 
+         return [
+--- a/includes/class-native-integration.php
++++ b/includes/class-native-integration.php
+@@ -299,10 +299,20 @@
+     /** @return array<string,mixed> */
+     public function doctor_approved_snapshot(int $user_id): array
+     {
++        if (! $this->is_verified_doctor($user_id)) {
++            return [];
++        }
++
++        return $this->raw_doctor_approved_snapshot($user_id);
++    }
++
++    /** @return array<string,mixed> */
++    private function raw_doctor_approved_snapshot(int $user_id): array
++    {
+         if (array_key_exists($user_id, $this->doctor_snapshot_cache)) {
+             return $this->doctor_snapshot_cache[$user_id];
+         }
+-        if (! $this->is_verified_doctor($user_id)) {
++        if ($user_id <= 0 || ! $this->doctor_verification_available()) {
+             return $this->doctor_snapshot_cache[$user_id] = [];
+         }
+ 
+@@ -322,9 +332,15 @@
+             'consultation_modes', 'bio',
+         ] as $field) {
+             if (isset($source['profile'][$field]) && is_scalar($source['profile'][$field])) {
+-                $profile[$field] = $this->plain_text((string) $source['profile'][$field], $field === 'bio' ? 4000 : 300);
++                $value = $this->plain_text((string) $source['profile'][$field], $field === 'bio' ? 4000 : 300);
++                if ($value !== '') {
++                    $profile[$field] = $value;
++                }
+             }
+         }
++        if ($profile === []) {
++            return $this->doctor_snapshot_cache[$user_id] = [];
++        }
+ 
+         return $this->doctor_snapshot_cache[$user_id] = [
+             'profile' => $profile,
+@@ -341,6 +357,7 @@
+         } catch (\Throwable) {
+             $owner_verified = false;
+         }
++        $snapshot = $this->raw_doctor_approved_snapshot($user_id);
+         $eligible = $assertions !== []
+             && ($assertions['membership_type'] ?? '') === 'doctor'
+             && ! empty($assertions['approved'])
+@@ -349,8 +366,8 @@
+             && ! empty($assertions['professional_verified'])
+             && ! empty($assertions['can_practice'])
+             && $owner_verified
+-            && ! empty($decision['verified'])
+-            && in_array((string) ($decision['state'] ?? ''), ['verified', 'approved'], true);
++            && $this->doctor_decision_is_current($decision)
++            && ! empty($snapshot['profile']);
+ 
+         if ($eligible && class_exists('SPD_Helpers') && method_exists('SPD_Helpers', 'verification_status')) {
+             try {
+@@ -368,6 +385,33 @@
+         return $eligible && $filtered;
+     }
+ 
++
++    /** @param array<string,mixed> $decision */
++    private function doctor_decision_is_current(array $decision): bool
++    {
++        if (empty($decision['verified'])
++            || ! in_array((string) ($decision['state'] ?? ''), ['verified', 'approved'], true)
++            || preg_match('/^[a-f0-9]{64}$/', (string) ($decision['fingerprint'] ?? '')) !== 1
++        ) {
++            return false;
++        }
++
++        $until = trim((string) ($decision['verified_until'] ?? ''));
++        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $until) !== 1) {
++            return false;
++        }
++        $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $until, new \DateTimeZone('UTC'));
++        $errors = \DateTimeImmutable::getLastErrors();
++        if (! $date instanceof \DateTimeImmutable
++            || (is_array($errors) && ((int) ($errors['warning_count'] ?? 0) > 0 || (int) ($errors['error_count'] ?? 0) > 0))
++            || $date->format('Y-m-d') !== $until
++        ) {
++            return false;
++        }
++
++        return $until >= gmdate('Y-m-d');
++    }
++
+     public function profile_class(WP_User $user): string
+     {
+         $user_id = (int) $user->ID;
