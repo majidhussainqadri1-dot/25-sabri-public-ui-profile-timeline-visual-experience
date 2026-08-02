@@ -7,7 +7,7 @@
     "file_20_plan": "File 20 Harmonized Master Plan 2026 v4.1",
     "file_25_plan": "Complete Public UI, Profile Timeline and Visual Experience — Final Harmonized Specification"
   },
-  "purpose": "Exact multi-plugin staging candidate matrix. It records reviewed source expectations and mandatory ownership boundaries; it does not claim Hostinger staging, production, merge, or Founder acceptance.",
+  "purpose": "Exact multi-plugin staging candidate matrix. It records reviewed source expectations and mandatory ownership boundaries; it does not claim Hostinger staging, production, merge or Founder acceptance.",
   "environment": {
     "wordpress_minimum": "6.5",
     "php_minimum": "8.0",
@@ -52,12 +52,16 @@
     {
       "file": 8,
       "name": "Worldwide Clinic and Appointments",
-      "role": "canonical clinic, availability and appointment truth; File 25 consumes only a versioned public clinic projection",
-      "reviewed_source_version": "0.2.0",
-      "accepted_source_range": ">=0.2.0 <0.3.0",
+      "role": "canonical clinic, availability and appointment truth; File 25 consumes only the versioned owner-executed public clinic projection",
+      "reviewed_package_version": "0.2.1",
+      "reviewed_source_version": "0.2.1",
+      "accepted_source_range": ">=0.2.1 <0.3.0",
       "required_public_contract_version": "1.0.0",
-      "required_symbols": ["SWC_VERSION", "swc_get_public_clinic_projection or SWC_Helpers::public_clinic_projection"],
-      "contract_status": "public-projection-contract-required-before-staging-acceptance",
+      "required_symbols": ["SWC_VERSION", "SWC_PUBLIC_CLINIC_CONTRACT_VERSION", "swc_get_public_clinic_projection", "swc_public_clinic_projection_contract"],
+      "reviewed_source_commit": "bd6a10b693991fc518788ef8e3cba49531454821",
+      "reviewed_candidate_sha256": "36ce0c78aa51396b02bd0705021e66782bfc45b74636ac65b0826bd372103578",
+      "reviewed_ci_run": "Corrective Quality #64 / 30744250320",
+      "contract_status": "implemented-and-ci-verified-pending-hostinger-staging",
       "foreign_table_reads_allowed": false,
       "bundled_with_file_25": false,
       "staging_status": "pending"
