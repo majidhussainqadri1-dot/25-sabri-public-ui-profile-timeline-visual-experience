@@ -17,7 +17,7 @@ jobs:
   apply-source:
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout exact branch
+      - name: Checkout exact corrective branch
         uses: actions/checkout@v4
         with:
           ref: feature/25a-25b-foundation
