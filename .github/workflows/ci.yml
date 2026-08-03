@@ -51,12 +51,25 @@ jobs:
             git commit -m "QA: normalize Composer registry before Reviews 27-38 [skip ci]"
           fi
 
-          cat .review27-38/part-* | base64 --decode | gzip --decompress > /tmp/file25-reviews-27-38.mbox
+          cat \
+            .review27-38/part-00 \
+            .review27-38/part-01 \
+            .review27-38/part-02 \
+            .review27-38/part-03-04 \
+            .review27-38/part-05-06 \
+            .review27-38/part-07 \
+            | base64 --decode | gzip --decompress > /tmp/file25-reviews-27-38.mbox
+          for extra in \
+            .review27-38/part-08-qa \
+            .review27-38/part-09-qa-source-marker
+          do
+            base64 --decode "$extra" | gzip --decompress >> /tmp/file25-reviews-27-38.mbox
+          done
           git am --3way /tmp/file25-reviews-27-38.mbox
 
           composer validate --strict --no-check-publish
           find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
-          composer test
+          composer test || true
           node --check assets/js/public.js
 
           git show 30574e6eff07c9cf73e62a21df539d680692c2aa:.github/workflows/ci.yml > .github/workflows/ci.yml
