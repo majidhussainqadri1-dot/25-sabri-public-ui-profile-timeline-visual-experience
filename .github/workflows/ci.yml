@@ -42,6 +42,9 @@ jobs:
       - name: Master Plan v3 authoritative-contract reconciliation
         run: php tests/master-plan-reconciliation.php
 
+      - name: File 18 owner-executed public DTO contract
+        run: php tests/file18-marketplace-provider.php
+
       - name: Reviewed File 24 integration contract
         run: php tests/file24-integration.php
 
