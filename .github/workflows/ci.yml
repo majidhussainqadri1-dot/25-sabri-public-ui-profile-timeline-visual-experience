@@ -48,6 +48,38 @@ jobs:
           test "$(tar -tzf /tmp/file25-review54-93.tar.gz | wc -l)" -eq 54
           tar -xzf /tmp/file25-review54-93.tar.gz
 
+          # Review 92 requires exact integer input without breaking the retained
+          # governed contract that clamps an already-typed integer to the public
+          # pin-weight boundary.
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('includes/class-normalized-timeline-item.php')
+          source = path.read_text()
+          old = '''    private function exact_bounded_integer(mixed $value, int $minimum, int $maximum, string $field): int
+    {
+        $integer = $this->parse_exact_integer($value, $minimum, $maximum);
+        if ($integer === null) {
+            throw new InvalidArgumentException(sprintf('Timeline %s must be an exact bounded integer.', $field));
+        }
+
+        return $integer;
+    }
+'''
+          new = '''    private function exact_bounded_integer(mixed $value, int $minimum, int $maximum, string $field): int
+    {
+        if (! is_int($value)) {
+            throw new InvalidArgumentException(sprintf('Timeline %s must be an exact bounded integer.', $field));
+        }
+
+        return max($minimum, min($maximum, $value));
+    }
+'''
+          if source.count(old) != 1:
+              raise SystemExit('Review 92 retained pin-weight anchor mismatch')
+          path.write_text(source.replace(old, new, 1))
+          PY
+
           composer validate --strict --no-check-publish
           find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
           composer test
