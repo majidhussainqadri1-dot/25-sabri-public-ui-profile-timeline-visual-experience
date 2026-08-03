@@ -50,10 +50,18 @@ jobs:
             git commit -m "QA: normalize Composer registry before Reviews 27-38 [skip ci]"
           fi
 
-          cat .review27-38/combined-00 \
-              .review27-38/combined-01 \
-              .review27-38/combined-02 \
-              .review27-38/combined-03 \
+          cat .review27-38/exact-00 \
+              .review27-38/exact-01 \
+              .review27-38/exact-02 \
+              .review27-38/exact-03 \
+              .review27-38/exact-04 \
+              .review27-38/exact-05 \
+              .review27-38/exact-06 \
+              .review27-38/exact-07 \
+              .review27-38/exact-08 \
+              .review27-38/exact-09 \
+              .review27-38/exact-10 \
+              .review27-38/exact-11 \
             | base64 --decode | gzip --decompress > /tmp/file25-reviews-27-38.mbox
           git am --3way /tmp/file25-reviews-27-38.mbox
 
