@@ -83,7 +83,8 @@ final class Section_Service
      */
     public function get_public_section(int $user_id, array $profile, string $section): array
     {
-        $section = self::key($section);
+        $raw_section = $section;
+        $section = self::exact_section($raw_section) ? $raw_section : '';
         $empty = [
             'contract_version' => self::PUBLIC_CONTRACT_VERSION,
             'section' => $section,
@@ -98,8 +99,9 @@ final class Section_Service
         }
 
         $profile_digest = self::profile_cache_digest($profile);
-        $cache_key = $profile_digest !== null
-            ? $user_id . ':' . $section . ':' . $profile_digest
+        $registry_fingerprint = $this->registry->metadata_fingerprint($section);
+        $cache_key = $profile_digest !== null && $registry_fingerprint !== ''
+            ? $user_id . ':' . $section . ':' . $registry_fingerprint . ':' . $profile_digest
             : null;
         if ($cache_key !== null && isset($this->public_cache[$cache_key])) {
             /** @var array{contract_version:string,section:string,label:string,items:list<array<string,mixed>>,provider_error_count:int,truncated:bool,is_provider_section:bool} */
@@ -132,29 +134,47 @@ final class Section_Service
                 continue;
             }
 
-            if (! is_array($raw)) {
+            if (! is_array($raw) || ! self::is_list($raw)) {
                 $errors++;
                 continue;
             }
-            if (count($raw) > self::MAX_ITEMS_PER_PROVIDER) {
+            if (count($raw) >= self::MAX_ITEMS_PER_PROVIDER) {
                 $truncated = true;
             }
 
+            // One provider response is one transaction. A malformed candidate
+            // invalidates the complete untrusted batch; valid duplicates remain
+            // harmless and are removed only after the batch has validated.
+            $provider_cards = [];
+            $provider_keys = [];
+            $provider_invalid = false;
             foreach (array_slice($raw, 0, self::MAX_ITEMS_PER_PROVIDER) as $candidate) {
                 if (! is_array($candidate)) {
-                    continue;
+                    $provider_invalid = true;
+                    break;
                 }
 
                 $card = Content_Cards::normalize_public($candidate);
-                if ($card === null) {
+                $key = $card !== null ? self::candidate_key($candidate, $card) : '';
+                if ($card === null || $key === '') {
+                    $provider_invalid = true;
+                    break;
+                }
+                if (isset($provider_keys[$key])) {
                     continue;
                 }
+                $provider_keys[$key] = true;
+                $provider_cards[$key] = $card;
+            }
+            if ($provider_invalid) {
+                $errors++;
+                continue;
+            }
 
-                $key = self::candidate_key($candidate, $card);
-                if ($key === '' || isset($seen[$key])) {
+            foreach ($provider_cards as $key => $card) {
+                if (isset($seen[$key])) {
                     continue;
                 }
-
                 $seen[$key] = true;
                 $items[] = $card;
                 if (count($items) >= self::MAX_ITEMS_PER_SECTION) {
@@ -205,7 +225,15 @@ final class Section_Service
                 }
                 $consistent++;
                 if (in_array($metadata['maturity'], ['read-only', 'staging-accepted', 'production-accepted'], true)) {
-                    $enabled++;
+                    try {
+                        if ($provider->is_available()) {
+                            $enabled++;
+                        }
+                    } catch (\Throwable $exception) {
+                        $errors++;
+                        $healthy = false;
+                        self::emit_error($exception, $section);
+                    }
                 }
             }
             $sections[$section] = [
@@ -247,13 +275,28 @@ final class Section_Service
         }
     }
 
+
+    private static function exact_section(string $section): bool
+    {
+        return Section_Registry::section_is_approved($section)
+            && strlen($section) <= 64
+            && preg_match('/^[a-z0-9][a-z0-9_-]{0,63}$/', $section) === 1;
+    }
+
+    /** @param array<mixed> $value */
+    private static function is_list(array $value): bool
+    {
+        return $value === [] || array_keys($value) === range(0, count($value) - 1);
+    }
+
     /** @param array<string,mixed> $candidate @param array<string,mixed> $card */
     private static function candidate_key(array $candidate, array $card): string
     {
-        $projection_key = is_scalar($candidate['projection_key'] ?? null)
-            ? strtolower(trim((string) $candidate['projection_key']))
-            : '';
-        if (preg_match('/^[a-f0-9]{64}$/', $projection_key) === 1) {
+        if (array_key_exists('projection_key', $candidate)) {
+            $projection_key = $candidate['projection_key'];
+            if (! is_string($projection_key) || preg_match('/^[a-f0-9]{64}$/', $projection_key) !== 1) {
+                return '';
+            }
             return hash('sha256', 'projection|' . $projection_key);
         }
 

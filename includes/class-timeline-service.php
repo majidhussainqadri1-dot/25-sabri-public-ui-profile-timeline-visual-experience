@@ -30,16 +30,26 @@ final class Timeline_Service
      */
     public function get_for_author(int $author_id, array $query = []): array
     {
-        $per_page = min(self::MAX_PER_PAGE, max(1, (int) ($query['per_page'] ?? 20)));
-        $requested_page = max(1, (int) ($query['page'] ?? 1));
+        $per_page = self::exact_positive_integer($query['per_page'] ?? 20, self::MAX_PER_PAGE);
+        $requested_page = self::exact_positive_integer($query['page'] ?? 1, PHP_INT_MAX);
+        $content_type = self::exact_optional_key($query['content_type'] ?? '');
+        $provider_filter = self::exact_optional_key($query['provider'] ?? '');
+        if ($per_page === null || $requested_page === null || $content_type === null || $provider_filter === null) {
+            return [
+                'items' => [],
+                'page' => 1,
+                'per_page' => 20,
+                'has_more' => false,
+                'truncated' => false,
+                'provider_errors' => [],
+            ];
+        }
         $max_page = max(1, intdiv(self::MAX_CANDIDATES_PER_PROVIDER - 1, $per_page) + 1);
         $page = $requested_page;
         $offset = ($page - 1) * $per_page;
         $candidate_limit = $requested_page > $max_page
             ? self::MAX_CANDIDATES_PER_PROVIDER
             : min(self::MAX_CANDIDATES_PER_PROVIDER, $offset + $per_page + 1);
-        $content_type = sanitize_key((string) ($query['content_type'] ?? ''));
-        $provider_filter = sanitize_key((string) ($query['provider'] ?? ''));
         $items = [];
         $canonical_items = [];
         $errors = [];
@@ -83,9 +93,11 @@ final class Timeline_Service
                 $provider_version = $metadata['version'];
 
                 $provider_items = $provider->get_public_author_items($author_id, $provider_query);
+                if (count($provider_items) >= $candidate_limit) {
+                    $provider_limit_reached = true;
+                }
                 if (count($provider_items) > $candidate_limit) {
                     $provider_items = array_slice($provider_items, 0, $candidate_limit);
-                    $provider_limit_reached = true;
                 }
 
                 // Treat one provider response as an atomic public projection. A
@@ -188,6 +200,38 @@ final class Timeline_Service
         ];
     }
 
+
+    private static function exact_positive_integer(mixed $value, int $maximum): ?int
+    {
+        if (is_int($value)) {
+            return $value >= 1 && $value <= $maximum ? $value : null;
+        }
+        if (! is_string($value)
+            || preg_match('/^[1-9][0-9]*$/', $value) !== 1
+            || strlen($value) > 19
+        ) {
+            return null;
+        }
+        $integer = (int) $value;
+
+        return (string) $integer === $value && $integer <= $maximum ? $integer : null;
+    }
+
+    private static function exact_optional_key(mixed $value): ?string
+    {
+        if (! is_string($value) || strlen($value) > 64) {
+            return null;
+        }
+        if ($value === '') {
+            return '';
+        }
+        $canonical = function_exists('sanitize_key')
+            ? sanitize_key($value)
+            : trim(preg_replace('/[^a-z0-9_-]/', '-', strtolower(trim($value))) ?? '', '-');
+
+        return hash_equals($canonical, $value) ? $value : null;
+    }
+
     private function canonical_is_allowed(string $url, Normalized_Timeline_Item $item): bool
     {
         $safe = Public_URL::sanitize_same_site($url, false);
@@ -196,12 +240,16 @@ final class Timeline_Service
             && in_array(strtolower((string) ($parts['scheme'] ?? '')), ['http', 'https'], true)
             && trim((string) ($parts['host'] ?? '')) !== '';
 
-        $filtered = (bool) apply_filters(
+        $filtered = apply_filters(
             'sabri_public_experience/canonical_url_allowed',
             $detected,
             $safe,
             $item
         );
+
+        if ($filtered !== true) {
+            return false;
+        }
 
         return $detected && $filtered;
     }

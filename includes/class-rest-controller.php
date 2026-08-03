@@ -49,17 +49,18 @@ final class Rest_Controller
         $pagination = [
             'page' => [
                 'default' => 1,
-                'sanitize_callback' => 'absint',
-                'validate_callback' => static fn ($value): bool => is_numeric($value) && (int) $value >= 1,
+                'sanitize_callback' => [self::class, 'sanitize_exact_positive_integer'],
+                'validate_callback' => static fn ($value): bool => self::exact_positive_integer($value, PHP_INT_MAX) !== null,
             ],
             'per_page' => [
                 'default' => 20,
-                'sanitize_callback' => 'absint',
-                'validate_callback' => static fn ($value): bool => is_numeric($value) && (int) $value >= 1 && (int) $value <= 50,
+                'sanitize_callback' => [self::class, 'sanitize_exact_positive_integer'],
+                'validate_callback' => static fn ($value): bool => self::exact_positive_integer($value, 50) !== null,
             ],
             'content_type' => [
                 'default' => '',
-                'sanitize_callback' => 'sanitize_key',
+                'sanitize_callback' => static fn ($value): string => is_string($value) ? $value : '',
+                'validate_callback' => static fn ($value): bool => self::exact_optional_key($value) !== null,
             ],
         ];
 
@@ -224,10 +225,12 @@ final class Rest_Controller
     /** @param array<string,mixed> $data */
     private function response(array $data, int $status, ?WP_REST_Request $request = null): WP_REST_Response
     {
-        $canonical = self::canonicalize_for_etag($data);
-        $encoded = function_exists('wp_json_encode')
-            ? wp_json_encode($canonical)
-            : json_encode($canonical);
+        $entries = 0;
+        $cacheable = true;
+        $canonical = self::canonicalize_for_etag($data, 0, $entries, $cacheable);
+        $encoded = $cacheable
+            ? (function_exists('wp_json_encode') ? wp_json_encode($canonical) : json_encode($canonical))
+            : false;
         $etag = is_string($encoded) ? '"' . hash('sha256', $encoded) . '"' : '';
         $headers = [
             'Cache-Control' => 'no-store, private, max-age=0',
@@ -251,10 +254,17 @@ final class Rest_Controller
         }
 
         $header = trim((string) $request->get_header('if-none-match'));
-        if ($header === '') {
+        if ($header === ''
+            || strlen($header) > 4096
+            || preg_match('/[ -]/', $header) === 1
+        ) {
             return false;
         }
-        foreach (explode(',', $header) as $candidate) {
+        $candidates = explode(',', $header);
+        if (count($candidates) > 32) {
+            return false;
+        }
+        foreach ($candidates as $candidate) {
             $candidate = trim($candidate);
             if ($candidate === '*') {
                 return true;
@@ -270,20 +280,71 @@ final class Rest_Controller
         return false;
     }
 
-    private static function canonicalize_for_etag(mixed $value): mixed
+    public static function sanitize_exact_positive_integer(mixed $value): int|string
     {
+        return self::exact_positive_integer($value, PHP_INT_MAX) ?? '';
+    }
+
+    private static function exact_positive_integer(mixed $value, int $maximum): ?int
+    {
+        if (is_int($value)) {
+            return $value >= 1 && $value <= $maximum ? $value : null;
+        }
+        if (! is_string($value) || strlen($value) > 19 || preg_match('/^[1-9][0-9]*$/', $value) !== 1) {
+            return null;
+        }
+        $integer = (int) $value;
+
+        return (string) $integer === $value && $integer <= $maximum ? $integer : null;
+    }
+
+    private static function exact_optional_key(mixed $value): ?string
+    {
+        if (! is_string($value) || strlen($value) > 64) {
+            return null;
+        }
+        if ($value === '') {
+            return '';
+        }
+
+        return preg_match('/^[a-z0-9][a-z0-9_-]{0,63}$/', $value) === 1 ? $value : null;
+    }
+
+    private static function canonicalize_for_etag(
+        mixed $value,
+        int $depth = 0,
+        int &$entries = 0,
+        bool &$cacheable = true
+    ): mixed {
+        if ($depth > 12 || $entries >= 4096) {
+            $cacheable = false;
+            return null;
+        }
+        $entries++;
         if (! is_array($value)) {
+            if (is_object($value) || is_resource($value)) {
+                $cacheable = false;
+                return null;
+            }
             return $value;
         }
-        if ($value === [] || array_keys($value) === range(0, count($value) - 1)) {
-            return array_map([self::class, 'canonicalize_for_etag'], $value);
-        }
 
-        ksort($value, SORT_STRING);
+        $list = $value === [] || array_keys($value) === range(0, count($value) - 1);
+        $normalized = [];
         foreach ($value as $key => $item) {
-            $value[$key] = self::canonicalize_for_etag($item);
+            if ($entries >= 4096) {
+                $cacheable = false;
+                break;
+            }
+            $normalized[$key] = self::canonicalize_for_etag($item, $depth + 1, $entries, $cacheable);
+            if (! $cacheable) {
+                break;
+            }
+        }
+        if (! $list) {
+            ksort($normalized, SORT_STRING);
         }
 
-        return $value;
+        return $normalized;
     }
 }

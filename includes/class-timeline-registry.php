@@ -32,33 +32,32 @@ final class Timeline_Registry
     public function register(Timeline_Provider $provider): void
     {
         try {
-            $raw_id = trim($provider->get_provider_id());
-            $id = $this->provider_key($raw_id);
-            $version = trim($provider->get_provider_version());
-            $maturity = trim($provider->get_maturity_level());
+            $raw_id = $provider->get_provider_id();
+            $version = $provider->get_provider_version();
+            $maturity = $provider->get_maturity_level();
         } catch (\Throwable $exception) {
             throw new InvalidArgumentException('Timeline provider metadata could not be read safely.', 0, $exception);
         }
 
-        if ($id === '' || $raw_id !== $id) {
-            throw new InvalidArgumentException('Timeline provider ID must be a canonical lowercase safe key.');
+        if (! self::provider_id_is_exact($raw_id)) {
+            throw new InvalidArgumentException('Timeline provider ID must be an exact canonical lowercase safe key.');
         }
-        if (isset($this->providers[$id])) {
-            throw new InvalidArgumentException(sprintf('Timeline provider already registered: %s', $id));
+        if (! self::version_is_valid($version) || trim($version) !== $version) {
+            throw new InvalidArgumentException(sprintf('Timeline provider version is invalid: %s', $raw_id));
+        }
+        if (! self::maturity_is_exact($maturity)) {
+            throw new InvalidArgumentException(sprintf('Invalid timeline provider maturity: %s', $maturity));
+        }
+        if (isset($this->providers[$raw_id])) {
+            throw new InvalidArgumentException(sprintf('Timeline provider already registered: %s', $raw_id));
         }
         if (count($this->providers) >= self::MAX_PROVIDERS) {
             throw new InvalidArgumentException('Timeline provider registry reached its safe provider limit.');
         }
-        if (! self::version_is_valid($version)) {
-            throw new InvalidArgumentException(sprintf('Timeline provider version is invalid: %s', $id));
-        }
-        if (! in_array($maturity, self::MATURITY_LEVELS, true)) {
-            throw new InvalidArgumentException(sprintf('Invalid timeline provider maturity: %s', $maturity));
-        }
 
-        $this->providers[$id] = $provider;
-        $this->registered_metadata[$id] = [
-            'id' => $id,
+        $this->providers[$raw_id] = $provider;
+        $this->registered_metadata[$raw_id] = [
+            'id' => $raw_id,
             'version' => $version,
             'maturity' => $maturity,
             'object_id' => spl_object_id($provider),
@@ -69,8 +68,10 @@ final class Timeline_Registry
 
     public function unregister(string $provider_id): void
     {
-        $id = $this->provider_key($provider_id);
-        unset($this->providers[$id], $this->registered_metadata[$id]);
+        if (! self::provider_id_is_exact($provider_id)) {
+            return;
+        }
+        unset($this->providers[$provider_id], $this->registered_metadata[$provider_id]);
     }
 
     /** @return array<string,Timeline_Provider> */
@@ -81,40 +82,57 @@ final class Timeline_Registry
 
     public function get(string $provider_id): ?Timeline_Provider
     {
-        return $this->providers[$this->provider_key($provider_id)] ?? null;
+        return self::provider_id_is_exact($provider_id)
+            ? ($this->providers[$provider_id] ?? null)
+            : null;
     }
 
     /** @return array{id:string,version:string,maturity:string,object_id:int}|null */
     public function validated_metadata(Timeline_Provider $provider, string $expected_id): ?array
     {
+        if (! self::provider_id_is_exact($expected_id)) {
+            return null;
+        }
+
         try {
-            $raw_id = trim($provider->get_provider_id());
             $current = [
-                'id' => $this->provider_key($raw_id),
-                'version' => trim($provider->get_provider_version()),
-                'maturity' => trim($provider->get_maturity_level()),
+                'id' => $provider->get_provider_id(),
+                'version' => $provider->get_provider_version(),
+                'maturity' => $provider->get_maturity_level(),
                 'object_id' => spl_object_id($provider),
             ];
         } catch (\Throwable) {
             return null;
         }
 
-        $expected_id = $this->provider_key($expected_id);
         $registered = $this->registered_metadata[$expected_id] ?? null;
         if (! is_array($registered)) {
             return null;
         }
 
-        $consistent = $raw_id === $current['id']
+        $consistent = self::provider_id_is_exact($current['id'])
+            && self::version_is_valid($current['version'])
+            && trim($current['version']) === $current['version']
+            && self::maturity_is_exact($current['maturity'])
             && hash_equals($registered['id'], $current['id'])
             && hash_equals($registered['version'], $current['version'])
             && hash_equals($registered['maturity'], $current['maturity'])
             && $registered['object_id'] === $current['object_id']
-            && $current['id'] === $expected_id
-            && self::version_is_valid($current['version'])
-            && in_array($current['maturity'], self::MATURITY_LEVELS, true);
+            && hash_equals($expected_id, $current['id']);
 
         return $consistent ? $registered : null;
+    }
+
+    private static function provider_id_is_exact(string $provider_id): bool
+    {
+        return $provider_id !== ''
+            && strlen($provider_id) <= 64
+            && preg_match('/^[a-z0-9][a-z0-9_-]{0,63}$/', $provider_id) === 1;
+    }
+
+    private static function maturity_is_exact(string $maturity): bool
+    {
+        return in_array($maturity, self::MATURITY_LEVELS, true);
     }
 
     private static function version_is_valid(string $version): bool
@@ -122,13 +140,5 @@ final class Timeline_Registry
         return $version !== ''
             && strlen($version) <= 64
             && preg_match('/^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/', $version) === 1;
-    }
-
-    private function provider_key(string $provider_id): string
-    {
-        $provider_id = strtolower(trim($provider_id));
-        $provider_id = preg_replace('/[^a-z0-9_\-]/', '-', $provider_id) ?? '';
-
-        return substr(trim($provider_id, '-'), 0, 64);
     }
 }

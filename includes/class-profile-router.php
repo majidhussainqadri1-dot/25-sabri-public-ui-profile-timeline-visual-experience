@@ -70,11 +70,15 @@ final class Profile_Router
         // two-column public profile layout by default and may use a third column
         // only when an integration explicitly confirms that real sidebar content
         // exists. This prevents an empty right rail on every Doctor profile.
-        $right_sidebar_available = (bool) apply_filters(
+        $right_sidebar_available = apply_filters(
             'sabri_public_experience/profile_right_sidebar_available',
             false,
             $this->context()
         );
+
+        if ($right_sidebar_available !== true) {
+            return 'two';
+        }
 
         return $right_sidebar_available ? 'three' : 'two';
     }
@@ -101,16 +105,16 @@ final class Profile_Router
     /** @return array{type:string,slug:string,section:string} */
     public function context(): array
     {
-        $section = sanitize_key((string) get_query_var('spux_profile_section'));
+        $raw_type = (string) get_query_var('spux_profile_type');
+        $raw_section = (string) get_query_var('spux_profile_section');
         $raw_slug = (string) get_query_var('spux_profile_slug');
 
-        // Preserve the exact routed slug. Profile_Repository performs the
-        // canonical identity check; sanitizing here would turn aliases such as
-        // uppercase, whitespace, or punctuation variants into a valid account.
+        // Preserve every routed identity exactly. Validation rejects aliases;
+        // routing must never repair one request into another public identity.
         return [
-            'type' => sanitize_key((string) get_query_var('spux_profile_type')),
+            'type' => self::exact_key($raw_type) ? $raw_type : '',
             'slug' => $raw_slug,
-            'section' => $section !== '' ? $section : 'overview',
+            'section' => $raw_section === '' ? 'overview' : (self::exact_key($raw_section) ? $raw_section : ''),
         ];
     }
 
@@ -132,6 +136,13 @@ final class Profile_Router
     {
         (new self())->register_rewrite_rules();
         flush_rewrite_rules(false);
+    }
+
+    private static function exact_key(string $value): bool
+    {
+        return $value !== ''
+            && strlen($value) <= 64
+            && preg_match('/^[a-z0-9][a-z0-9_-]{0,63}$/', $value) === 1;
     }
 
     private static function section_pattern(): string

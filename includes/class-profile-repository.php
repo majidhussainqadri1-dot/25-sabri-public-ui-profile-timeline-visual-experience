@@ -261,7 +261,12 @@ final class Profile_Repository
         $filtered = (array) apply_filters('sabri_public_experience/public_contacts', $canonical, $user_id);
         $public = [];
         foreach ($canonical as $field => $value) {
-            if (array_key_exists($field, $filtered) && (bool) $filtered[$field]) {
+            if (! array_key_exists($field, $filtered) || $filtered[$field] !== true) {
+                continue;
+            }
+            if ($filtered[$field] === true
+                && array_key_exists($field, $filtered) && (bool) $filtered[$field]
+            ) {
                 $public[$field] = $value;
             }
         }
@@ -360,9 +365,11 @@ final class Profile_Repository
             if (! is_scalar($section)) {
                 continue;
             }
-            $section = sanitize_key((string) $section);
-            if (in_array($section, $sections, true)) {
-                $clean[] = $section;
+            $raw_section = (string) $section;
+            if (preg_match('/^[a-z0-9][a-z0-9_-]{0,63}$/', $raw_section) === 1
+                && in_array($raw_section, $sections, true)
+            ) {
+                $clean[] = $raw_section;
             }
         }
         if (! in_array('overview', $clean, true)) {

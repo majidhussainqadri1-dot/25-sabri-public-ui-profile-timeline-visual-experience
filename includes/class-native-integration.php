@@ -57,12 +57,12 @@ final class Native_Integration
             && function_exists('smc_founder_user_id')
             && function_exists('smc_is_founder');
 
-        return $detected && (bool) apply_filters(
+        return $detected && self::strict_boolean_filter(apply_filters(
             'sabri_public_experience/dependency/membership_core',
             $detected,
             defined('SMC_VERSION') ? (string) SMC_VERSION : '',
             defined('SMC_CONTRACT_VERSION') ? (string) SMC_CONTRACT_VERSION : ''
-        );
+        ));
     }
 
     public function profiles_available(): bool
@@ -75,11 +75,11 @@ final class Native_Integration
             && method_exists('SPD_Helpers', 'can_show_contact')
             && method_exists('SPD_Helpers', 'verification_status');
 
-        return $detected && (bool) apply_filters(
+        return $detected && self::strict_boolean_filter(apply_filters(
             'sabri_public_experience/dependency/profiles',
             $detected,
             defined('SPD_VERSION') ? (string) SPD_VERSION : ''
-        );
+        ));
     }
 
     public function doctor_verification_available(): bool
@@ -90,11 +90,11 @@ final class Native_Integration
             && function_exists('gdo_get_approved_snapshot')
             && function_exists('gdo_user_is_verified');
 
-        return $detected && (bool) apply_filters(
+        return $detected && self::strict_boolean_filter(apply_filters(
             'sabri_public_experience/dependency/doctor_verification',
             $detected,
             defined('GDO_VERSION') ? (string) GDO_VERSION : ''
-        );
+        ));
     }
 
     public function clinic_available(): bool
@@ -102,12 +102,12 @@ final class Native_Integration
         $contract = $this->clinic_contract();
         $detected = $contract !== [];
 
-        return $detected && (bool) apply_filters(
+        return $detected && self::strict_boolean_filter(apply_filters(
             'sabri_public_experience/dependency/clinic_projection',
             $detected,
             defined('SWC_VERSION') ? (string) SWC_VERSION : '',
             self::FILE_08_PUBLIC_PROJECTION_CONTRACT
-        );
+        ));
     }
 
     /** @return array<string,mixed> */
@@ -171,36 +171,36 @@ final class Native_Integration
             && $this->version_in_range((string) SMP_VERSION, self::FILE_18_MINIMUM_VERSION, self::FILE_18_MAXIMUM_VERSION)
             && function_exists('smp_get_public_profile_listings');
 
-        return $detected && (bool) apply_filters(
+        return $detected && self::strict_boolean_filter(apply_filters(
             'sabri_public_experience/dependency/marketplace_projection',
             $detected,
             defined('SMP_VERSION') ? (string) SMP_VERSION : ''
-        );
+        ));
     }
 
     public function shell_available(): bool
     {
         $detected = defined('SABRI_SHELL_VERSION');
 
-        return $detected && (bool) apply_filters('sabri_public_experience/dependency/application_shell', $detected);
+        return $detected && self::strict_boolean_filter(apply_filters('sabri_public_experience/dependency/application_shell', $detected));
     }
 
     public function home_news_available(): bool
     {
         $detected = defined('SABRI_HNF_VERSION') && function_exists('sabri_hnf_bootstrap');
 
-        return $detected && (bool) apply_filters('sabri_public_experience/dependency/home_news', $detected);
+        return $detected && self::strict_boolean_filter(apply_filters('sabri_public_experience/dependency/home_news', $detected));
     }
 
     public function security_center_available(): bool
     {
         $detected = File_24_Integration::is_compatible();
 
-        return $detected && (bool) apply_filters(
+        return $detected && self::strict_boolean_filter(apply_filters(
             'sabri_public_experience/dependency/security_center',
             $detected,
             File_24_Integration::current_version()
-        );
+        ));
     }
 
     public function founder_user_id(): int
@@ -303,7 +303,7 @@ final class Native_Integration
             return false;
         }
 
-        return $detected && (bool) apply_filters('sabri_public_experience/is_founder', $detected, $user_id);
+        return $detected && self::strict_boolean_filter(apply_filters('sabri_public_experience/is_founder', $detected, $user_id));
     }
 
     public function is_minor(int $user_id): bool
@@ -463,7 +463,7 @@ final class Native_Integration
             }
         }
 
-        return $eligible && (bool) apply_filters('sabri_public_experience/is_verified_doctor', $eligible, $user_id);
+        return $eligible && self::strict_boolean_filter(apply_filters('sabri_public_experience/is_verified_doctor', $eligible, $user_id));
     }
 
     /** @param array<string,mixed> $decision */
@@ -682,6 +682,11 @@ final class Native_Integration
         }
 
         return array_values(array_unique($keys));
+    }
+
+    private static function strict_boolean_filter(mixed $value): bool
+    {
+        return $value === true;
     }
 
     private function version_in_range(string $version, string $minimum, string $maximum_exclusive): bool

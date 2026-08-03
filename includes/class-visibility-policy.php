@@ -39,7 +39,7 @@ final class Visibility_Policy
     public function can_render_publicly(WP_User $user): bool
     {
         $authoritative = $this->native->public_visibility((int) $user->ID) === 'public';
-        $filtered = (bool) apply_filters(
+        $filtered = apply_filters(
             'sabri_public_experience/can_render_profile',
             $authoritative,
             $user
@@ -47,7 +47,7 @@ final class Visibility_Policy
 
         // The extension hook may make a profile more restrictive, never publicize
         // a profile denied by File 00 or the minor/suspension rules.
-        return $authoritative && $filtered;
+        return $authoritative && $filtered === true;
     }
 
     public function can_show_contact(int $user_id, string $field): bool
@@ -67,16 +67,17 @@ final class Visibility_Policy
         $authoritative = false;
         if (class_exists('SPD_Helpers') && method_exists('SPD_Helpers', 'can_show_contact')) {
             try {
-                $authoritative = (bool) \SPD_Helpers::can_show_contact(
+                $decision = \SPD_Helpers::can_show_contact(
                     $user_id,
                     $this->is_founder($user_id)
                 );
+                $authoritative = $decision === true;
             } catch (\Throwable) {
                 $authoritative = false;
             }
         }
 
-        $filtered = (bool) apply_filters(
+        $filtered = apply_filters(
             'sabri_public_experience/can_show_contact',
             $authoritative,
             $user_id,
@@ -85,6 +86,6 @@ final class Visibility_Policy
 
         // Privacy filters may revoke contact display but may never grant it after
         // File 03 or the minor/public-profile authority denied the projection.
-        return $authoritative && $filtered;
+        return $authoritative && $filtered === true;
     }
 }

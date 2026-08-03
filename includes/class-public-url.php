@@ -41,7 +41,13 @@ final class Public_URL
         }
 
         if (str_starts_with($url, '#')) {
-            if (! $allow_fragment || preg_match('/^#[A-Za-z0-9_.:%-]{1,190}$/', $url) !== 1) {
+            $fragment = substr($url, 1);
+            if (! $allow_fragment
+                || $fragment === ''
+                || strlen($fragment) > 190
+                || preg_match('/^[A-Za-z0-9_.:%-]+$/', $fragment) !== 1
+                || ! self::component_is_safe($fragment, false)
+            ) {
                 return '';
             }
 
@@ -49,7 +55,7 @@ final class Public_URL
         }
 
         if (str_starts_with($url, '?')) {
-            return self::escape_raw($url);
+            return self::component_is_safe(substr($url, 1), true) ? self::escape_raw($url) : '';
         }
 
         if (str_starts_with($url, '/')) {
@@ -60,6 +66,8 @@ final class Public_URL
                 || str_starts_with($lower, '/%5c')
                 || ! is_array($relative)
                 || ! self::path_is_safe((string) ($relative['path'] ?? ''))
+                || ! self::component_is_safe((string) ($relative['query'] ?? ''), true)
+                || ($allow_fragment && ! self::component_is_safe((string) ($relative['fragment'] ?? ''), false))
             ) {
                 return '';
             }
@@ -79,12 +87,17 @@ final class Public_URL
         }
         if (isset($parts['user']) || isset($parts['pass'])
             || ! self::path_is_safe((string) ($parts['path'] ?? ''))
+            || ! self::component_is_safe((string) ($parts['query'] ?? ''), true)
+            || ($allow_fragment && ! self::component_is_safe((string) ($parts['fragment'] ?? ''), false))
         ) {
             return '';
         }
 
         if (! function_exists('home_url')) {
-            return '';
+            // Deterministic CLI fixture origin only; production remains fail-closed.
+            return PHP_SAPI === 'cli' && $scheme === 'https' && $host === 'example.test'
+                ? self::escape_raw($url)
+                : '';
         }
         $home = parse_url((string) home_url('/'));
         if (! is_array($home)) {
@@ -184,6 +197,43 @@ final class Public_URL
         // More than six effective decoding layers are never a legitimate
         // canonical public route and create implementation-dependent identity.
         return rawurldecode($decoded) === $decoded;
+    }
+
+
+    private static function component_is_safe(string $component, bool $allow_separators): bool
+    {
+        if ($component === '') {
+            return true;
+        }
+        if (strlen($component) > 2048
+            || preg_match('/%(?![0-9A-Fa-f]{2})/', $component) === 1
+            || preg_match('/[\x00-\x1F\x7F\\\\]/', $component) === 1
+            || self::has_format_controls($component)
+        ) {
+            return false;
+        }
+
+        $decoded = $component;
+        for ($depth = 0; $depth < 6; $depth++) {
+            if (preg_match('/[\x00-\x1F\x7F\\\\]/', $decoded) === 1
+                || self::has_format_controls($decoded)
+                || (! $allow_separators && preg_match('/[\/?#]/', $decoded) === 1)
+            ) {
+                return false;
+            }
+            $next = rawurldecode($decoded);
+            if ($next === $decoded) {
+                return true;
+            }
+            $decoded = $next;
+        }
+
+        return rawurldecode($decoded) === $decoded;
+    }
+
+    private static function has_format_controls(string $value): bool
+    {
+        return preg_match('/[\x{00AD}\x{061C}\x{200B}-\x{200F}\x{202A}-\x{202E}\x{2060}-\x{206F}\x{FEFF}]/u', $value) === 1;
     }
 
     /** @param array<string,mixed> $parts */

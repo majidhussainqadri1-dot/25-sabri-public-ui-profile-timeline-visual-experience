@@ -12,6 +12,10 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
     exit;
 }
 
+if (! class_exists(Public_URL::class)) {
+    require_once __DIR__ . '/class-public-url.php';
+}
+
 /**
  * Immutable, presentation-safe pointer to a native public object.
  *
@@ -76,9 +80,9 @@ final class Normalized_Timeline_Item implements JsonSerializable
             }
         }
 
-        $author_id = (int) $data['author_id'];
-        $profile_id = (int) $data['public_profile_id'];
-        if ($author_id <= 0 || $profile_id <= 0) {
+        $author_id = $this->exact_positive_integer($data['author_id']);
+        $profile_id = $this->exact_positive_integer($data['public_profile_id']);
+        if ($author_id === null || $profile_id === null) {
             throw new InvalidArgumentException('Timeline author and profile identifiers must be positive integers.');
         }
         if ((string) $data['visibility_state'] !== 'public') {
@@ -104,7 +108,7 @@ final class Normalized_Timeline_Item implements JsonSerializable
             throw new InvalidArgumentException('Timeline review state is not publicly eligible.');
         }
 
-        $canonical_url = $this->validated_url((string) $data['canonical_url']);
+        $canonical_url = $this->validated_same_site_url($data['canonical_url']);
         $published_at = $this->required_date((string) $data['published_at']);
         $updated_at = $this->normalize_optional_date($data['updated_at'] ?? null);
         if (array_key_exists('updated_at', $data)
@@ -140,10 +144,10 @@ final class Normalized_Timeline_Item implements JsonSerializable
             'verification_state' => $this->clean_key((string) ($data['verification_state'] ?? 'unverified'), 64) ?: 'unverified',
             'review_state' => $review_state,
             'correction_state' => $this->clean_key((string) ($data['correction_state'] ?? 'none'), 64) ?: 'none',
-            'safety_flags' => $this->safe_key_list((array) ($data['safety_flags'] ?? [])),
-            'available_actions' => $this->safe_action_list((array) ($data['available_actions'] ?? [])),
+            'safety_flags' => $this->exact_key_list($data['safety_flags'] ?? [], 'safety flags'),
+            'available_actions' => $this->exact_action_list($data['available_actions'] ?? []),
             'metrics_reference' => $this->scalar_reference($data['metrics_reference'] ?? null),
-            'pin_weight' => max(0, min(1000, (int) ($data['pin_weight'] ?? 0))),
+            'pin_weight' => $this->exact_bounded_integer($data['pin_weight'] ?? 0, 0, 1000, 'pin weight'),
         ];
     }
 
@@ -228,35 +232,81 @@ final class Normalized_Timeline_Item implements JsonSerializable
         return $this->limit(trim($value, '-'), $limit);
     }
 
-    /** @param array<mixed> $values @return list<string> */
-    private function safe_key_list(array $values): array
+    /** @return list<string> */
+    private function exact_key_list(mixed $values, string $field): array
     {
+        if (! is_array($values) || ($values !== [] && array_keys($values) !== range(0, count($values) - 1)) || count($values) > 20) {
+            throw new InvalidArgumentException(sprintf('Timeline %s must be a bounded list.', $field));
+        }
         $clean = [];
-        foreach (array_slice($values, 0, 20) as $value) {
+        foreach ($values as $value) {
+            if (! is_string($value)) {
+                throw new InvalidArgumentException(sprintf('Timeline %s must contain exact string keys.', $field));
+            }
+            $key = $this->exact_key($value, 64, $field);
+            if (isset($clean[$key])) {
+                continue;
+            }
+            $clean[$key] = $key;
+        }
+
+        return array_values($clean);
+    }
+
+    /** @return list<string> */
+    private function exact_action_list(mixed $values): array
+    {
+        if (! is_array($values)
+            || ($values !== [] && array_keys($values) !== range(0, count($values) - 1))
+            || count($values) > 20
+        ) {
+            throw new InvalidArgumentException('Timeline available actions must be a bounded list.');
+        }
+
+        $actions = [];
+        foreach ($values as $value) {
             if (! is_string($value)) {
                 continue;
             }
-            $key = $this->clean_key($value, 64);
-            if ($key !== '') {
-                $clean[] = $key;
+            $canonical = $this->clean_key($value, 64);
+            if ($value === ''
+                || strlen($value) > 64
+                || ! hash_equals($canonical, $value)
+                || ! in_array($value, self::ALLOWED_ACTIONS, true)
+            ) {
+                continue;
             }
+            $actions[$value] = $value;
         }
 
-        return array_values(array_unique($clean));
+        return array_values($actions);
     }
 
-
-    /** @param array<mixed> $values @return list<string> */
-    private function safe_action_list(array $values): array
+    private function exact_positive_integer(mixed $value): ?int
     {
-        $actions = [];
-        foreach ($this->safe_key_list($values) as $action) {
-            if (in_array($action, self::ALLOWED_ACTIONS, true)) {
-                $actions[] = $action;
-            }
+        return $this->parse_exact_integer($value, 1, PHP_INT_MAX);
+    }
+
+    private function exact_bounded_integer(mixed $value, int $minimum, int $maximum, string $field): int
+    {
+        if (! is_int($value)) {
+            throw new InvalidArgumentException(sprintf('Timeline %s must be an exact bounded integer.', $field));
         }
 
-        return array_values(array_unique($actions));
+        return max($minimum, min($maximum, $value));
+    }
+
+    private function parse_exact_integer(mixed $value, int $minimum, int $maximum): ?int
+    {
+        if (is_int($value)) {
+            return $value >= $minimum && $value <= $maximum ? $value : null;
+        }
+        if (! is_string($value) || preg_match('/^(?:0|[1-9][0-9]*)$/', $value) !== 1 || strlen($value) > 19) {
+            return null;
+        }
+        $integer = (int) $value;
+
+        return (string) $integer === $value && $integer >= $minimum && $integer <= $maximum ? $integer : null;
     }
 
     private function scalar_reference(mixed $value): int|string|null
@@ -318,6 +368,23 @@ final class Normalized_Timeline_Item implements JsonSerializable
         }
 
         return $value;
+    }
+
+    private function validated_same_site_url(mixed $value): string
+    {
+        if (! is_string($value) || trim($value) !== $value) {
+            throw new InvalidArgumentException('Timeline canonical URL must be an exact same-site HTTP(S) URL.');
+        }
+        $safe = Public_URL::sanitize_same_site($value, false);
+        $parts = $safe !== '' ? parse_url($safe) : false;
+        if (! is_array($parts)
+            || ! isset($parts['scheme'], $parts['host'])
+            || ! hash_equals($safe, $value)
+        ) {
+            throw new InvalidArgumentException('Timeline canonical URL must be an exact same-site HTTP(S) URL.');
+        }
+
+        return $safe;
     }
 
     private function validated_url(string $url): string
