@@ -29,7 +29,10 @@ final class Public_URL
         if ($url === '' || strlen($url) > self::MAX_LENGTH) {
             return '';
         }
-        if (preg_match('/[\x00-\x20\x7F]/', $url) === 1 || str_contains($url, '\\')) {
+        if (preg_match('/[\x00-\x20\x7F]/', $url) === 1
+            || preg_match('/%(?:00|0a|0d|7f)/i', $url) === 1
+            || str_contains($url, '\\')
+        ) {
             return '';
         }
 
@@ -51,7 +54,13 @@ final class Public_URL
 
         if (str_starts_with($url, '/')) {
             $lower = strtolower($url);
-            if (str_starts_with($url, '//') || str_starts_with($lower, '/%2f') || str_starts_with($lower, '/%5c')) {
+            $relative = parse_url($url);
+            if (str_starts_with($url, '//')
+                || str_starts_with($lower, '/%2f')
+                || str_starts_with($lower, '/%5c')
+                || ! is_array($relative)
+                || ! self::path_is_safe((string) ($relative['path'] ?? ''))
+            ) {
                 return '';
             }
 
@@ -68,7 +77,9 @@ final class Public_URL
         if (! in_array($scheme, ['http', 'https'], true) || $host === '') {
             return '';
         }
-        if (isset($parts['user']) || isset($parts['pass'])) {
+        if (isset($parts['user']) || isset($parts['pass'])
+            || ! self::path_is_safe((string) ($parts['path'] ?? ''))
+        ) {
             return '';
         }
 
@@ -134,6 +145,26 @@ final class Public_URL
         $port = $port_number === $default_port ? '' : ':' . $port_number;
 
         return $scheme . '://' . $host . $port . $path . $query . $fragment;
+    }
+
+
+    private static function path_is_safe(string $path): bool
+    {
+        if ($path === '') {
+            return true;
+        }
+
+        // Encoded separators and dot-only segments can be decoded differently
+        // by proxies, web servers, WordPress, and browsers. Reject both direct
+        // and double-encoded variants so one public object has one route identity.
+        if (preg_match('/%(?:2f|5c)|%25(?:2f|5c|2e)/i', $path) === 1) {
+            return false;
+        }
+        if (preg_match('#(?:^|/)(?:(?:\.|%2e)){1,2}(?:/|$)#i', $path) === 1) {
+            return false;
+        }
+
+        return true;
     }
 
     /** @param array<string,mixed> $parts */
