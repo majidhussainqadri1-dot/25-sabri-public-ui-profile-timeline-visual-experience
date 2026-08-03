@@ -145,7 +145,19 @@ jobs:
           workflow = Path(".github/workflows/ci.yml")
           text = workflow.read_text()
           anchor_block = "      - name: Master Plan v3 authoritative-contract reconciliation\n        run: php tests/master-plan-reconciliation.php\n"
-          insert = """      - name: Review 15 exact File 08 owner contract\n        run: php tests/review15-file08-contract.php\n\n      - name: Review 16 File 03 profile media authority\n        run: php tests/review16-file03-profile-media.php\n\n      - name: Review 17 canonical URL normalization\n        run: php tests/review17-canonical-url-normalization.php\n\n      - name: Review 18 public section cache binding\n        run: php tests/review18-section-cache-binding.php\n\n"""
+          insert = """      - name: Review 15 exact File 08 owner contract
+        run: php tests/review15-file08-contract.php
+
+      - name: Review 16 File 03 profile media authority
+        run: php tests/review16-file03-profile-media.php
+
+      - name: Review 17 canonical URL normalization
+        run: php tests/review17-canonical-url-normalization.php
+
+      - name: Review 18 public section cache binding
+        run: php tests/review18-section-cache-binding.php
+
+"""
           if insert not in text:
               if anchor_block not in text:
                   raise SystemExit("CI insertion anchor not found")
@@ -155,14 +167,27 @@ jobs:
           changelog = Path("CHANGELOG.md")
           changelog_text = changelog.read_text()
           marker = "## 0.14.0 — Four Additional Review and Correction Rounds"
-          block = """## 0.14.0 — Four Additional Review and Correction Rounds\n\n- Review 15: enforced the exact File 08 `0.2.1` owner contract, contract introspection, field/exclusion declarations, and removed the legacy clinic helper fallback.\n- Review 16: enforced File 03 `0.2.x` facade compatibility, constrained File 09 fallbacks, and validated profile media owner, purpose, type, image state, size, and same-site URL.\n- Review 17: normalized default ports in canonical timeline identity and added deterministic final ordering ties.\n- Review 18: bound request-local public-section cache identity to the complete bounded public profile projection.\n- Added four dedicated regression suites and four review records.\n- Hostinger staging, production, merge, deployment, and Founder acceptance remain pending.\n\n"""
+          block = """## 0.14.0 — Four Additional Review and Correction Rounds
+
+- Review 15: enforced the exact File 08 `0.2.1` owner contract, contract introspection, field/exclusion declarations, and removed the legacy clinic helper fallback.
+- Review 16: enforced File 03 `0.2.x` facade compatibility, constrained File 09 fallbacks, and validated profile media owner, purpose, type, image state, size, and same-site URL.
+- Review 17: normalized default ports in canonical timeline identity and added deterministic final ordering ties.
+- Review 18: bound request-local public-section cache identity to the complete bounded public profile projection.
+- Added four dedicated regression suites and four review records.
+- Hostinger staging, production, merge, deployment, and Founder acceptance remain pending.
+
+"""
           if marker not in changelog_text:
               changelog.write_text(block + changelog_text)
 
           readme = Path("README.md")
           readme_text = readme.read_text()
           readme_marker = "## Four additional review-and-correction rounds"
-          readme_block = """\n## Four additional review-and-correction rounds\n\nThe current corrective branch additionally enforces the exact File 08 public clinic owner contract, the File 03 profile/media authority boundary, normalized canonical timeline identity, and profile-bound request-local section caching. Four independent regression suites and review records cover these corrections. These are source and automated-test results only; Hostinger staging and production acceptance remain pending.\n"""
+          readme_block = """
+## Four additional review-and-correction rounds
+
+The current corrective branch additionally enforces the exact File 08 public clinic owner contract, the File 03 profile/media authority boundary, normalized canonical timeline identity, and profile-bound request-local section caching. Four independent regression suites and review records cover these corrections. These are source and automated-test results only; Hostinger staging and production acceptance remain pending.
+"""
           if readme_marker not in readme_text:
               readme.write_text(readme_text.rstrip() + "\n" + readme_block)
           PY
@@ -284,3 +309,5 @@ jobs:
           EOF
           )
           gh api "repos/${GITHUB_REPOSITORY}/issues/1/comments" -f body="$body"
+
+# Triggered through the governed contents API on 2026-08-03.
