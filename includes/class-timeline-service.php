@@ -33,9 +33,11 @@ final class Timeline_Service
         $per_page = min(self::MAX_PER_PAGE, max(1, (int) ($query['per_page'] ?? 20)));
         $requested_page = max(1, (int) ($query['page'] ?? 1));
         $max_page = max(1, intdiv(self::MAX_CANDIDATES_PER_PROVIDER - 1, $per_page) + 1);
-        $page = min($requested_page, $max_page);
+        $page = $requested_page;
         $offset = ($page - 1) * $per_page;
-        $candidate_limit = min(self::MAX_CANDIDATES_PER_PROVIDER, $offset + $per_page + 1);
+        $candidate_limit = $requested_page > $max_page
+            ? self::MAX_CANDIDATES_PER_PROVIDER
+            : min(self::MAX_CANDIDATES_PER_PROVIDER, $offset + $per_page + 1);
         $content_type = sanitize_key((string) ($query['content_type'] ?? ''));
         $provider_filter = sanitize_key((string) ($query['provider'] ?? ''));
         $items = [];
@@ -58,7 +60,7 @@ final class Timeline_Service
             'page' => 1,
             'per_page' => $candidate_limit,
             'candidate_limit' => $candidate_limit,
-            'requested_page' => $page,
+            'requested_page' => $requested_page,
             'content_type' => $content_type,
         ];
 
@@ -72,7 +74,10 @@ final class Timeline_Service
                 if ($metadata === null) {
                     throw new \UnexpectedValueException('Timeline provider metadata or concrete identity changed after registration.');
                 }
-                if ($metadata['maturity'] === 'disabled' || ! $provider->is_available()) {
+                if ($metadata['maturity'] === 'disabled'
+                    || ! in_array($metadata['maturity'], ['read-only', 'staging-accepted', 'production-accepted'], true)
+                    || ! $provider->is_available()
+                ) {
                     continue;
                 }
                 $provider_version = $metadata['version'];
@@ -83,6 +88,11 @@ final class Timeline_Service
                     $provider_limit_reached = true;
                 }
 
+                // Treat one provider response as an atomic public projection. A
+                // malformed late item must invalidate the complete untrusted batch;
+                // otherwise earlier items would survive a provider contract failure.
+                $provider_items_by_key = [];
+                $provider_canonical_items = [];
                 foreach ($provider_items as $item) {
                     if (! $item instanceof Normalized_Timeline_Item) {
                         throw new \UnexpectedValueException('Timeline providers must return normalized timeline items.');
@@ -102,14 +112,23 @@ final class Timeline_Service
 
                     $key = $provider_id . ':' . $item->get('native_object_type') . ':' . $item->get('native_object_id');
                     $canonical_key = $this->canonical_key((string) $item->get('canonical_url'));
-                    if (isset($items[$key]) || ($canonical_key !== '' && isset($canonical_items[$canonical_key]))) {
+                    if (isset($provider_items_by_key[$key])
+                        || isset($items[$key])
+                        || ($canonical_key !== '' && (isset($provider_canonical_items[$canonical_key]) || isset($canonical_items[$canonical_key])))
+                    ) {
                         continue;
                     }
 
-                    $items[$key] = $item;
+                    $provider_items_by_key[$key] = $item;
                     if ($canonical_key !== '') {
-                        $canonical_items[$canonical_key] = $key;
+                        $provider_canonical_items[$canonical_key] = $key;
                     }
+                }
+                foreach ($provider_items_by_key as $key => $item) {
+                    $items[$key] = $item;
+                }
+                foreach ($provider_canonical_items as $canonical_key => $key) {
+                    $canonical_items[$canonical_key] = $key;
                 }
             } catch (\Throwable $exception) {
                 $errors[] = (string) $provider_id;
@@ -147,7 +166,7 @@ final class Timeline_Service
             }
         );
 
-        $slice = array_slice($items, $offset, $per_page + 1);
+        $slice = $requested_page > $max_page ? [] : array_slice($items, $offset, $per_page + 1);
         $has_more = count($slice) > $per_page;
         if ($has_more) {
             array_pop($slice);

@@ -241,21 +241,39 @@ final class Native_Integration
             return $this->assertion_cache[$user_id] = [];
         }
 
+        $account_class = (string) ($source['account_class'] ?? 'member');
+        $membership_type = (string) ($source['membership_type'] ?? '');
+        $status = (string) ($source['status'] ?? '');
+        foreach ([$account_class, $membership_type, $status] as $index => $raw_key) {
+            $canonical = sanitize_key($raw_key);
+            $may_be_empty = $index === 1;
+            if ((! $may_be_empty && $canonical === '')
+                || strlen($raw_key) > 64
+                || ! hash_equals($canonical, $raw_key)
+            ) {
+                return $this->assertion_cache[$user_id] = [];
+            }
+        }
+
         $assertions = [
             'contract_version' => self::FILE_00_CONTRACT_VERSION,
             'user_id' => $user_id,
-            'account_class' => sanitize_key((string) ($source['account_class'] ?? 'member')),
-            'membership_type' => sanitize_key((string) ($source['membership_type'] ?? '')),
-            'status' => sanitize_key((string) ($source['status'] ?? '')),
+            'account_class' => $account_class,
+            'membership_type' => $membership_type,
+            'status' => $status,
         ];
         foreach ([
             'application_exists', 'institutional_account', 'approved', 'suspended',
             'eligible', 'guardian_verified', 'professional_verified', 'can_practice',
             'public_profile_allowed', 'minor', 'guardian_required',
         ] as $field) {
-            if (array_key_exists($field, $source)) {
-                $assertions[$field] = (bool) $source[$field];
+            if (! array_key_exists($field, $source)) {
+                continue;
             }
+            if (! is_bool($source[$field])) {
+                return $this->assertion_cache[$user_id] = [];
+            }
+            $assertions[$field] = $source[$field];
         }
 
         return $this->assertion_cache[$user_id] = $assertions;
@@ -290,11 +308,16 @@ final class Native_Integration
 
     public function is_minor(int $user_id): bool
     {
+        $assertions = $this->membership_assertions($user_id);
+        // Explicit File 00 age/guardian truth always outranks a presentation
+        // class. A contradictory Doctor claim must never unlock public contact.
+        if (! empty($assertions['minor']) || ! empty($assertions['guardian_required'])) {
+            return true;
+        }
         if ($this->is_founder($user_id) || $this->is_verified_doctor($user_id)) {
             return false;
         }
 
-        $assertions = $this->membership_assertions($user_id);
         if (array_key_exists('minor', $assertions)) {
             return (bool) $assertions['minor'];
         }
@@ -326,13 +349,32 @@ final class Native_Integration
             return $this->doctor_decision_cache[$user_id] = [];
         }
 
-        $fingerprint = strtolower(trim((string) ($source['fingerprint'] ?? '')));
+        $state = (string) ($source['state'] ?? '');
+        $verified_until = (string) ($source['verified_until'] ?? '');
+        $fingerprint = (string) ($source['fingerprint'] ?? '');
+        if (! array_key_exists('verified', $source)
+            || ! is_bool($source['verified'])
+            || strlen($state) > 64
+            || ! hash_equals(sanitize_key($state), $state)
+            || strlen($verified_until) > 64
+            || trim($verified_until) !== $verified_until
+            || strlen($fingerprint) > 64
+            || trim($fingerprint) !== $fingerprint
+        ) {
+            return $this->doctor_decision_cache[$user_id] = [];
+        }
+        if ($source['verified']
+            && (preg_match('/^[a-f0-9]{64}$/', $fingerprint) !== 1
+                || preg_match('/^\d{4}-\d{2}-\d{2}$/', $verified_until) !== 1)
+        ) {
+            return $this->doctor_decision_cache[$user_id] = [];
+        }
 
         return $this->doctor_decision_cache[$user_id] = [
-            'state' => sanitize_key((string) ($source['state'] ?? '')),
-            'verified' => ! empty($source['verified']),
-            'verified_until' => substr(sanitize_text_field((string) ($source['verified_until'] ?? '')), 0, 10),
-            'fingerprint' => preg_match('/^[a-f0-9]{64}$/', $fingerprint) === 1 ? $fingerprint : '',
+            'state' => $state,
+            'verified' => $source['verified'],
+            'verified_until' => $verified_until,
+            'fingerprint' => $fingerprint,
         ];
     }
 
@@ -403,6 +445,8 @@ final class Native_Integration
             && empty($assertions['suspended'])
             && ! empty($assertions['professional_verified'])
             && ! empty($assertions['can_practice'])
+            && empty($assertions['minor'])
+            && empty($assertions['guardian_required'])
             && $owner_verified
             && $this->doctor_decision_is_current($decision)
             && ! empty($snapshot['profile'])
@@ -474,11 +518,21 @@ final class Native_Integration
 
     public function public_visibility(int $user_id): string
     {
+        $assertions = $this->membership_assertions($user_id);
+        $status = (string) ($assertions['status'] ?? '');
+        $hard_blocked = in_array($status, [
+            'rejected', 'suspended', 'revoked', 'appeal_review',
+            'erasure_pending', 'deleted', 'invalid_application',
+        ], true);
         if ($this->is_founder($user_id)) {
-            return 'public';
+            return $assertions !== []
+                && empty($assertions['suspended'])
+                && ! $hard_blocked
+                && (! array_key_exists('public_profile_allowed', $assertions) || $assertions['public_profile_allowed'] === true)
+                    ? 'public'
+                    : 'private';
         }
 
-        $assertions = $this->membership_assertions($user_id);
         if ($assertions === []
             || empty($assertions['approved'])
             || empty($assertions['eligible'])

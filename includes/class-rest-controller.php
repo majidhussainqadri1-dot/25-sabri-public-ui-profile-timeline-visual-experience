@@ -31,11 +31,20 @@ final class Rest_Controller
         $public = ['permission_callback' => '__return_true'];
         $slug = [
             'required' => true,
-            'sanitize_callback' => 'sanitize_title',
-            'validate_callback' => static fn ($value): bool => is_string($value)
-                && $value !== ''
-                && ! ctype_digit($value)
-                && strlen($value) <= 200,
+            // Preserve the exact route identity. Validation may reject aliases,
+            // but sanitization must never transform one public account slug into
+            // another valid account before Profile_Repository checks equality.
+            'sanitize_callback' => static fn ($value): string => is_string($value) ? $value : '',
+            'validate_callback' => static function ($value): bool {
+                if (! is_string($value) || $value === '' || strlen($value) > 200 || ctype_digit($value)) {
+                    return false;
+                }
+                if (trim($value) !== $value || preg_match('/[\x00-\x20\x7F]/', $value) === 1) {
+                    return false;
+                }
+
+                return sanitize_title($value) === $value;
+            },
         ];
         $pagination = [
             'page' => [

@@ -85,13 +85,13 @@ final class Normalized_Timeline_Item implements JsonSerializable
             throw new InvalidArgumentException('Only public items may enter the public timeline projection.');
         }
 
-        $provider_id = $this->clean_key((string) $data['provider_id'], 64);
-        $provider_version = $this->limit(trim((string) $data['provider_version']), 64);
-        $object_type = $this->clean_key((string) $data['native_object_type'], 64);
-        $object_id = $this->limit(trim((string) $data['native_object_id']), 191);
-        $content_type = $this->clean_key((string) $data['content_type'], 64);
-        $native_status = $this->clean_key((string) $data['native_status'], 64);
-        $review_state = $this->clean_key((string) ($data['review_state'] ?? 'published'), 64);
+        $provider_id = $this->exact_key((string) $data['provider_id'], 64, 'provider ID');
+        $provider_version = $this->exact_scalar((string) $data['provider_version'], 64, 'provider version');
+        $object_type = $this->exact_key((string) $data['native_object_type'], 64, 'native object type');
+        $object_id = $this->exact_scalar((string) $data['native_object_id'], 191, 'native object ID');
+        $content_type = $this->exact_key((string) $data['content_type'], 64, 'content type');
+        $native_status = $this->exact_key((string) $data['native_status'], 64, 'native status');
+        $review_state = $this->exact_key((string) ($data['review_state'] ?? 'published'), 64, 'review state');
         $title = $this->plain_text((string) $data['title'], 300);
 
         if ($provider_id === '' || $provider_version === '' || $object_type === '' || $object_id === '' || $content_type === '' || $title === '') {
@@ -107,6 +107,13 @@ final class Normalized_Timeline_Item implements JsonSerializable
         $canonical_url = $this->validated_url((string) $data['canonical_url']);
         $published_at = $this->required_date((string) $data['published_at']);
         $updated_at = $this->normalize_optional_date($data['updated_at'] ?? null);
+        if (array_key_exists('updated_at', $data)
+            && $data['updated_at'] !== null
+            && $data['updated_at'] !== ''
+            && $updated_at === null
+        ) {
+            throw new InvalidArgumentException('Timeline update date must be an absolute, valid UTC or offset timestamp.');
+        }
         if ($updated_at !== null && strcmp($updated_at, $published_at) < 0) {
             throw new InvalidArgumentException('Timeline update date cannot precede its publication date.');
         }
@@ -187,6 +194,30 @@ final class Normalized_Timeline_Item implements JsonSerializable
     public function jsonSerialize(): array
     {
         return $this->to_public_array();
+    }
+
+
+    private function exact_key(string $value, int $limit, string $field): string
+    {
+        $canonical = $this->clean_key($value, $limit);
+        if ($value === '' || strlen($value) > $limit || ! hash_equals($canonical, $value)) {
+            throw new InvalidArgumentException(sprintf('Timeline %s must be an exact canonical lowercase safe key.', $field));
+        }
+
+        return $value;
+    }
+
+    private function exact_scalar(string $value, int $limit, string $field): string
+    {
+        if ($value === ''
+            || strlen($value) > $limit
+            || trim($value) !== $value
+            || preg_match('/[\x00-\x1F\x7F]/', $value) === 1
+        ) {
+            throw new InvalidArgumentException(sprintf('Timeline %s must be an exact bounded scalar.', $field));
+        }
+
+        return $value;
     }
 
     private function clean_key(string $value, int $limit): string
@@ -279,9 +310,14 @@ final class Normalized_Timeline_Item implements JsonSerializable
 
     private function language(string $value): string
     {
-        $value = preg_replace('/[^A-Za-z0-9\-]/', '', trim($value)) ?? '';
+        if (strlen($value) > 35
+            || trim($value) !== $value
+            || preg_match('/^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$/', $value) !== 1
+        ) {
+            throw new InvalidArgumentException('Timeline language must be an exact hyphenated BCP 47 language tag.');
+        }
 
-        return $this->limit($value !== '' ? $value : 'en-US', 35);
+        return $value;
     }
 
     private function validated_url(string $url): string

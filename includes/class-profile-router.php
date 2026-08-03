@@ -92,17 +92,24 @@ final class Profile_Router
             return true;
         }
 
-        return $context['slug'] !== '' && ! ctype_digit($context['slug']);
+        return $context['slug'] !== ''
+            && strlen($context['slug']) <= 200
+            && preg_match('/[\x00-\x20\x7F]/', $context['slug']) !== 1
+            && ! ctype_digit($context['slug']);
     }
 
     /** @return array{type:string,slug:string,section:string} */
     public function context(): array
     {
         $section = sanitize_key((string) get_query_var('spux_profile_section'));
+        $raw_slug = (string) get_query_var('spux_profile_slug');
 
+        // Preserve the exact routed slug. Profile_Repository performs the
+        // canonical identity check; sanitizing here would turn aliases such as
+        // uppercase, whitespace, or punctuation variants into a valid account.
         return [
             'type' => sanitize_key((string) get_query_var('spux_profile_type')),
-            'slug' => sanitize_title((string) get_query_var('spux_profile_slug')),
+            'slug' => $raw_slug,
             'section' => $section !== '' ? $section : 'overview',
         ];
     }

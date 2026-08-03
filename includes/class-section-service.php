@@ -204,7 +204,7 @@ final class Section_Service
                     continue;
                 }
                 $consistent++;
-                if ($metadata['maturity'] !== 'disabled') {
+                if (in_array($metadata['maturity'], ['read-only', 'staging-accepted', 'production-accepted'], true)) {
                     $enabled++;
                 }
             }
@@ -232,7 +232,9 @@ final class Section_Service
                 self::emit_error(new \RuntimeException('Profile-section provider metadata or concrete identity changed after registration.'), $section);
                 return 'error';
             }
-            if ($metadata['maturity'] === 'disabled') {
+            if ($metadata['maturity'] === 'disabled'
+                || ! in_array($metadata['maturity'], ['read-only', 'staging-accepted', 'production-accepted'], true)
+            ) {
                 return 'skip';
             }
 

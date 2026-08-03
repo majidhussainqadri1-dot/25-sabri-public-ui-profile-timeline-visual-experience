@@ -153,18 +153,37 @@ final class Public_URL
         if ($path === '') {
             return true;
         }
-
-        // Encoded separators and dot-only segments can be decoded differently
-        // by proxies, web servers, WordPress, and browsers. Reject both direct
-        // and double-encoded variants so one public object has one route identity.
-        if (preg_match('/%(?:2f|5c)|%25(?:2f|5c|2e)/i', $path) === 1) {
-            return false;
-        }
-        if (preg_match('#(?:^|/)(?:(?:\.|%2e)){1,2}(?:/|$)#i', $path) === 1) {
+        if (strlen($path) > 2048
+            || preg_match('/%(?![0-9A-Fa-f]{2})/', $path) === 1
+            || preg_match('/[\x00-\x1F\x7F\\\\]/', $path) === 1
+        ) {
             return false;
         }
 
-        return true;
+        // Decode repeatedly because different proxies, servers, WordPress, and
+        // browsers may consume different encoding layers. Any separator,
+        // control byte, backslash, or dot-only segment at any bounded layer is
+        // an ambiguous public-route identity and therefore fails closed.
+        $decoded = $path;
+        for ($depth = 0; $depth < 6; $depth++) {
+            if (preg_match('#(?:^|/)(?:\.{1,2})(?:/|$)#', $decoded) === 1
+                || preg_match('/[\x00-\x1F\x7F\\\\]/', $decoded) === 1
+            ) {
+                return false;
+            }
+            if (preg_match('/%(?:2f|5c)/i', $decoded) === 1) {
+                return false;
+            }
+            $next = rawurldecode($decoded);
+            if ($next === $decoded) {
+                return true;
+            }
+            $decoded = $next;
+        }
+
+        // More than six effective decoding layers are never a legitimate
+        // canonical public route and create implementation-dependent identity.
+        return rawurldecode($decoded) === $decoded;
     }
 
     /** @param array<string,mixed> $parts */

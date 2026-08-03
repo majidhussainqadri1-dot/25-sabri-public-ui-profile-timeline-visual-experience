@@ -45,18 +45,23 @@ final class WordPress_Posts_Provider implements Timeline_Provider
     public function get_public_author_items(int $author_id, array $query): array
     {
         $candidate_limit = min(500, max(1, (int) ($query['candidate_limit'] ?? $query['per_page'] ?? 20)));
-        $post_types = array_slice((array) apply_filters(
+        $requested_post_types = array_slice((array) apply_filters(
             'sabri_public_experience/wordpress_post_types',
             ['post']
         ), 0, 10);
-        $post_types = array_values(array_filter(array_map('sanitize_key', $post_types), static function (string $post_type): bool {
-            if ($post_type === 'attachment' || ! post_type_exists($post_type)) {
-                return false;
+        // This compatibility provider belongs only to WordPress core posts.
+        // Native modules register their own owner-aware providers; a filter may
+        // disable the fallback but cannot expand it into foreign post types.
+        $post_types = [];
+        foreach ($requested_post_types as $post_type) {
+            if (is_string($post_type) && hash_equals('post', $post_type) && post_type_exists('post')) {
+                $object = get_post_type_object('post');
+                if ($object !== null && ! empty($object->public)) {
+                    $post_types[] = 'post';
+                }
             }
-            $object = get_post_type_object($post_type);
-
-            return $object !== null && ! empty($object->public);
-        }));
+        }
+        $post_types = array_values(array_unique($post_types));
         if ($post_types === []) {
             return [];
         }
@@ -77,7 +82,12 @@ final class WordPress_Posts_Provider implements Timeline_Provider
 
         $items = [];
         foreach ($wp_query->posts as $post) {
-            if (! $post instanceof WP_Post || (int) $post->post_author !== $author_id || $post->post_password !== '') {
+            if (! $post instanceof WP_Post
+                || (int) $post->post_author !== $author_id
+                || $post->post_password !== ''
+                || (string) $post->post_status !== 'publish'
+                || ! in_array((string) $post->post_type, $post_types, true)
+            ) {
                 continue;
             }
 
@@ -113,7 +123,7 @@ final class WordPress_Posts_Provider implements Timeline_Provider
                     'native_status' => 'publish',
                     'content_type' => $post->post_type,
                     'topic' => '',
-                    'language' => get_locale(),
+                    'language' => str_replace('_', '-', (string) get_locale()),
                     'thumbnail_reference' => function_exists('get_the_post_thumbnail_url')
                         ? (string) (get_the_post_thumbnail_url($post, 'medium_large') ?: '')
                         : '',
