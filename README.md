@@ -12,11 +12,37 @@ WordPress module for the **Sabri Social Homeopathy Platform**. This is the exist
 - Pull request: Draft PR #1
 - Governing product plan: Master Plan `v3.0`
 - Governing shell plan: File 20 `v4.1`
+- Source implementation status: **Complete**
+- Known unresolved source defects: **0**
 - Hostinger staging accepted: **No**
 - Production approved: **No**
 - Live deployment authorized: **No**
 
-Version `0.14.0` corrects authoritative-contract drift and now binds the File 25 staging candidate to the reviewed File 08 `0.2.1` public clinic projection.
+Version `0.14.0` corrects authoritative-contract drift, binds the File 25 staging candidate to the reviewed File 08 `0.2.1` public clinic projection, and now carries a machine-verifiable dual-plan source-completion declaration.
+
+## Source implementation completion
+
+The governed File 25 source scope is complete against the Sabri Social Homeopathy Platform Definitive Master Plan `v3.0` and File 25 Final Harmonized Specification `2.0`.
+
+Machine-readable traceability:
+
+```text
+config/source-completion-matrix.json
+```
+
+Executable verification:
+
+```bash
+php tools/verify-source-completion.php
+```
+
+Human-readable declaration:
+
+```text
+docs/SOURCE-IMPLEMENTATION-COMPLETION-DECLARATION-2026-08-04.md
+```
+
+“Source implementation complete” means the governed File 25 source-owned capabilities are implemented, delegated ownership boundaries are enforced, Reviews 20–93 remain executable, and no known unresolved source defect is open. It does **not** mean Hostinger staging, Founder acceptance, production approval, live deployment or operational acceptance.
 
 ## Corrected ownership boundaries
 
@@ -64,7 +90,8 @@ The DTO allow list is `name`, dedicated clinic `address`, `country`, `city`, `ho
 - Removed File 25 age calculation; explicit File 00 minor/guardian assertions govern, while unknown ordinary contact state fails closed.
 - Replaced the File 08 placeholder with the exact reviewed `0.2.1` owner contract and pending-Hostinger staging evidence.
 - Replaced File 18 direct SQL with owner APIs: future `smp_get_public_profile_listings()` or the bounded `SMP_Utils::current_seller()` + `SMP_REST::products()` transitional path.
-- Updated dependency matrix, staging scenarios, Composer tests, CI gates, release-engineering tests, and structural verification.
+- Updated the File 00/03/08/09/18/20/21/24/25 dependency matrix and Hostinger staging scenarios.
+- Added the dual-plan source-completion matrix and executable verifier without changing the external acceptance boundary.
 
 ## Existing visual and public contracts retained
 
@@ -110,6 +137,7 @@ composer validate --strict --no-check-publish
 composer test
 node --check assets/js/public.js
 php tools/verify-structure.php
+php tools/verify-source-completion.php
 ```
 
 Deterministic staging package:
