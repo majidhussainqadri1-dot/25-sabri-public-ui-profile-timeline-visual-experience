@@ -49,6 +49,7 @@ jobs:
             git commit -m "QA: normalize Composer registry before Reviews 27-38 [skip ci]"
           fi
 
+          # Decode the single exact combined payload; chunks are contiguous slices.
           cat .review27-38/combined-00 \
               .review27-38/combined-01 \
               .review27-38/combined-02 \
