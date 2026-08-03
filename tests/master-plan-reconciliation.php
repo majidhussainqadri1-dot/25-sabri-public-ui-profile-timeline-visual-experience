@@ -39,8 +39,8 @@ foreach (['smc_get_profile', 'smc_professional_credentials', 'smc_clinics', 'SHO
 $check(! str_contains($native, 'calculated_age'), 'File 25 must not calculate or consume a locally derived age field.');
 $check(
     str_contains($native, 'public function is_minor')
-    && str_contains($native, "if (array_key_exists('minor', $assertions))")
-    && str_contains($native, "if (array_key_exists('guardian_required', $assertions))")
+    && str_contains($native, 'if (array_key_exists(\'minor\', $assertions))')
+    && str_contains($native, 'if (array_key_exists(\'guardian_required\', $assertions))')
     && str_contains($native, 'return true;'),
     'Unknown minor state must fail closed without local age calculation.'
 );
