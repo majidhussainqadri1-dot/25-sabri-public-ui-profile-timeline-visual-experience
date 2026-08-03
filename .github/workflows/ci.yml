@@ -30,7 +30,7 @@ jobs:
           coverage: none
           extensions: zip
 
-      - name: Apply fifteen corrections, resolve retained metadata verifier, verify, clean, and push
+      - name: Apply fifteen corrections and push source-only commit
         shell: bash
         run: |
           set -euo pipefail
@@ -49,14 +49,9 @@ jobs:
             .review39-53/part-053 \
             .review39-53/part-06 \
             | base64 --decode > /tmp/file25-reviews39-53.tar.gz
-
           echo "29e9ac38c4cb00ffd7413125ca97e254ebce2fa2959bfbaf3d079efb77e86c38  /tmp/file25-reviews39-53.tar.gz" | sha256sum --check
-          tar -tzf /tmp/file25-reviews39-53.tar.gz | tee /tmp/file25-reviews39-53.list
-          test "$(wc -l </tmp/file25-reviews39-53.list)" -eq 28
           tar -xzf /tmp/file25-reviews39-53.tar.gz
 
-          # Reviews 39 and 40 strengthen the maturity allow-list. Preserve the
-          # older governed package verifier's explicit disabled-state marker too.
           python - <<'PY'
           from pathlib import Path
 
@@ -77,7 +72,7 @@ jobs:
           section.write_text(source.replace(old, new, 1))
           PY
 
-          # Restore the governed CI contract before the complete release suite.
+          cp .github/workflows/ci.yml /tmp/review39-53-applicator.yml
           git show a256ce9ae68a84d56be014aa3f95e1518b8bf37d:.github/workflows/ci.yml > .github/workflows/ci.yml
 
           composer validate --strict --no-check-publish
@@ -85,7 +80,9 @@ jobs:
           composer test
           node --check assets/js/public.js
 
-          rm -rf .review39-53 .github/workflows/review39-53-apply.yml
+          cp /tmp/review39-53-applicator.yml .github/workflows/ci.yml
+          rm -rf .review39-53
           git add -A
+          git reset .github/workflows/ci.yml .github/workflows/review39-53-apply.yml
           git commit -m "File 25 Reviews 39-53: fifteen corrective rounds"
           git push origin HEAD:feature/25a-25b-foundation
