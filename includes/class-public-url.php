@@ -50,7 +50,6 @@ final class Public_URL
         }
 
         if (str_starts_with($url, '/')) {
-            // Prevent protocol-relative and backslash-normalization escapes.
             $lower = strtolower($url);
             if (str_starts_with($url, '//') || str_starts_with($lower, '/%2f') || str_starts_with($lower, '/%5c')) {
                 return '';
@@ -91,6 +90,50 @@ final class Public_URL
         }
 
         return self::escape_raw($url);
+    }
+
+    /**
+     * Produce one deterministic identity for an already permitted same-site URL.
+     * Default ports and trailing host dots are normalized; path case and query
+     * semantics remain intact. The public URL itself is not rewritten.
+     */
+    public static function canonical_same_site_identity(mixed $value, bool $allow_fragment = false): string
+    {
+        $safe = self::sanitize_same_site($value, $allow_fragment);
+        if ($safe === '') {
+            return '';
+        }
+        if (str_starts_with($safe, '#') || str_starts_with($safe, '?')) {
+            return $safe;
+        }
+
+        $parts = parse_url($safe);
+        if (! is_array($parts)) {
+            return '';
+        }
+
+        $path = (string) ($parts['path'] ?? '/');
+        $path = $path === '' ? '/' : $path;
+        $path = $path === '/' ? '/' : rtrim($path, '/');
+        $query = isset($parts['query']) && $parts['query'] !== '' ? '?' . $parts['query'] : '';
+        $fragment = $allow_fragment && isset($parts['fragment']) && $parts['fragment'] !== ''
+            ? '#' . $parts['fragment']
+            : '';
+
+        if (! isset($parts['scheme']) && ! isset($parts['host'])) {
+            return $path . $query . $fragment;
+        }
+
+        $scheme = strtolower((string) ($parts['scheme'] ?? ''));
+        $host = strtolower(rtrim((string) ($parts['host'] ?? ''), '.'));
+        if (! in_array($scheme, ['http', 'https'], true) || $host === '') {
+            return '';
+        }
+        $port_number = self::port($parts, $scheme);
+        $default_port = $scheme === 'https' ? 443 : 80;
+        $port = $port_number === $default_port ? '' : ':' . $port_number;
+
+        return $scheme . '://' . $host . $port . $path . $query . $fragment;
     }
 
     /** @param array<string,mixed> $parts */

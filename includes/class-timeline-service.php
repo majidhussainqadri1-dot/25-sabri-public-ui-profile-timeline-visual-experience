@@ -121,8 +121,6 @@ final class Timeline_Service
                     return $pin;
                 }
 
-                // Normalized_Timeline_Item guarantees UTC `Y-m-dTH:i:sZ`, so
-                // lexical comparison is deterministic and avoids permissive parsing.
                 $date = strcmp((string) $right->get('published_at'), (string) $left->get('published_at'));
                 if ($date !== 0) {
                     return $date;
@@ -187,26 +185,6 @@ final class Timeline_Service
 
     private function canonical_key(string $url): string
     {
-        $safe = Public_URL::sanitize_same_site($url, false);
-        $parts = $safe !== '' ? parse_url($safe) : false;
-        if (! is_array($parts)) {
-            return '';
-        }
-
-        $scheme = strtolower((string) ($parts['scheme'] ?? ''));
-        $host = strtolower(rtrim((string) ($parts['host'] ?? ''), '.'));
-        if (! in_array($scheme, ['http', 'https'], true) || $host === '') {
-            return '';
-        }
-
-        $port_number = isset($parts['port']) ? (int) $parts['port'] : ($scheme === 'https' ? 443 : 80);
-        $default_port = $scheme === 'https' ? 443 : 80;
-        $port = $port_number === $default_port ? '' : ':' . $port_number;
-        $path = (string) ($parts['path'] ?? '/');
-        $path = $path === '' ? '/' : $path;
-        $path = $path === '/' ? '/' : rtrim($path, '/');
-        $query = isset($parts['query']) && $parts['query'] !== '' ? '?' . $parts['query'] : '';
-
-        return $scheme . '://' . $host . $port . $path . $query;
+        return Public_URL::canonical_same_site_identity($url, false);
     }
 }

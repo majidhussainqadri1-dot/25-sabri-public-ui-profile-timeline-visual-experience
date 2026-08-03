@@ -97,9 +97,6 @@ final class Section_Service
             return $empty;
         }
 
-        // Request-local cache identity is bound to the complete bounded public
-        // projection, not merely the user/class pair. A changed contact, clinic,
-        // visibility, professional, or presentation value cannot reuse stale data.
         $cache_key = $user_id . ':' . $section . ':' . self::profile_cache_digest($profile);
         if (isset($this->public_cache[$cache_key])) {
             /** @var array{contract_version:string,section:string,label:string,items:list<array<string,mixed>>,provider_error_count:int,truncated:bool,is_provider_section:bool} */
@@ -255,7 +252,7 @@ final class Section_Service
             return hash('sha256', 'projection|' . $projection_key);
         }
 
-        $url = Public_URL::sanitize_same_site($candidate['url'] ?? '', false);
+        $url = Public_URL::canonical_same_site_identity($candidate['url'] ?? '', false);
         if ($url !== '') {
             return hash('sha256', 'url|' . $url);
         }
