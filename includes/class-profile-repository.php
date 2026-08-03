@@ -79,6 +79,8 @@ final class Profile_Repository
         // File 03 owns presentation media. File 25 projects a local image only
         // when File 03 ownership, purpose, attachment type, MIME, dimensions,
         // and same-site delivery all agree. Every mismatch fails closed.
+        // Empty media deliberately leaves the template's privacy-safe initials;
+        // File 25 never falls back to an external avatar service.
         $avatar = $this->owned_media_url($photo_id, $user_id, 'profile', 'medium');
         $cover = $this->owned_media_url($cover_id, $user_id, 'cover', 'large');
         $headline = $profile_class === 'founder'
