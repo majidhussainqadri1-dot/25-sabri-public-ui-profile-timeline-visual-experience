@@ -37,22 +37,27 @@ foreach (['smc_get_profile', 'smc_professional_credentials', 'smc_clinics', 'SHO
     $check(! str_contains($native, $forbidden), 'Native integration contains forbidden foreign authority/table access: ' . $forbidden);
 }
 $check(! str_contains($native, 'calculated_age'), 'File 25 must not calculate or consume a locally derived age field.');
-$check(str_contains($native, 'File 25 must not calculate age'), 'Unknown minor state must be documented as fail closed.');
+$check(
+    str_contains($native, 'public function is_minor')
+    && str_contains($native, "if (array_key_exists('minor', $assertions))")
+    && str_contains($native, "if (array_key_exists('guardian_required', $assertions))")
+    && str_contains($native, 'return true;'),
+    'Unknown minor state must fail closed without local age calculation.'
+);
 
 foreach (['GDO_VERSION', 'gdo_get_verification_decision', 'gdo_get_approved_snapshot', 'can_practice'] as $marker) {
     $check(str_contains($native, $marker), 'File 09 authoritative Doctor marker is missing: ' . $marker);
 }
 $check(! str_contains($native, 'license_expiry'), 'File 25 must not derive Doctor status from a locally queried license-expiry field.');
-$check(str_contains($native, 'elseif ($this->is_verified_doctor($user_id))'), 'Displayed Doctor class must be tied to the authoritative verification policy.');
+$check(str_contains($native, 'if ($this->is_verified_doctor($user_id))'), 'Displayed Doctor class must be tied to the authoritative verification policy.');
 
-foreach (['FILE_08_PUBLIC_PROJECTION_CONTRACT', 'swc_get_public_clinic_projection', 'public_clinic_projection'] as $marker) {
+foreach (['FILE_08_PUBLIC_PROJECTION_CONTRACT', 'swc_get_public_clinic_projection', 'swc_public_clinic_projection_contract'] as $marker) {
     $check(str_contains($native, $marker), 'File 08 public clinic projection marker is missing: ' . $marker);
 }
 $check(str_contains($native, "['name', 'address', 'country', 'city', 'hours', 'timezone']"), 'Clinic public projection must use an explicit field allow-list.');
+$check(str_contains($native, "['phone', 'whatsapp', 'email', 'user_id', 'native_id', 'appointments', 'patient_data']"), 'Clinic contract must require private-field exclusions.');
 
-foreach (['SMP_REST::products', 'SMP_Utils::current_seller', 'smp_get_public_profile_listings'] as $marker) {
-    $check(str_contains($marketplace, $marker), 'File 18 owner public API marker is missing: ' . $marker);
-}
+$check(str_contains($native, 'smp_get_public_profile_listings'), 'File 18 owner public DTO API must be required by native integration.');
 foreach (['$wpdb', 'SMP_DB::table', 'SELECT p.*'] as $forbidden) {
     $check(! str_contains($marketplace, $forbidden), 'Marketplace adapter contains forbidden direct query coupling: ' . $forbidden);
 }
@@ -64,6 +69,7 @@ $check(str_contains($visibility, 'return $authoritative && $filtered'), 'Contact
 $check(str_contains($repository, "FOUNDER_DISPLAY_NAME = 'Dr. Allamah Majid Hussain Sabri Muhaddith Mursheed'"), 'Canonical Founder spelling must be frozen in code.');
 $check(! str_contains($repository, 'get_avatar_url'), 'File 25 must not silently use external avatar services.');
 $check(str_contains($repository, 'Public_URL::sanitize_same_site'), 'Profile media must use same-origin URL enforcement.');
+$check(str_contains($repository, 'monotonic_media_filter'), 'Profile media filters must be revoke-only after File 03 validation.');
 $check(str_contains($router, 'profile_right_sidebar_available'), 'Three-column profile layout must require real right-sidebar content.');
 $check(str_contains($router, 'return $right_sidebar_available ? \'three\' : \'two\';'), 'Profile layout must default to two columns.');
 $check(str_contains($renderer, "'@type' => 'BreadcrumbList'"), 'Profile SEO must include BreadcrumbList structured data.');
@@ -74,6 +80,7 @@ $check(str_contains($cards, 'public static function normalize_public'), 'HTML an
 $check(str_contains($sections, 'get_public_section'), 'Optional sections must expose structured public projections.');
 $check(str_contains($sections, 'public_health'), 'Provider health must have a bounded aggregate public projection.');
 $check(str_contains($sections, 'Provider IDs, versions'), 'Public health must explicitly keep provider identifiers private.');
+$check(str_contains($sections, 'profile_cache_digest'), 'Section cache identity must be bound to the complete bounded public profile projection.');
 
 foreach ([
     '/founder/knowledge', '/founder/media',
