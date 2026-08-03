@@ -3,6 +3,7 @@ name: File 25 Four Review Bootstrap
 on:
   push:
     branches: [feature/25a-25b-foundation]
+  pull_request:
 
 permissions:
   contents: write
@@ -190,7 +191,7 @@ jobs:
 
           - Review 15: `${{ needs.four-round-review.outputs.r15 }}`
           - Review 16: `${{ needs.four-round-review.outputs.r16 }}`
-          - Review 17: `${{ needs.four-round-review.outputs.r17 }}`
+          - Review 17: `${{ neds.four-round-review.outputs.r17 }}`
           - Review 18 / final exact candidate: `${{ needs.four-round-review.outputs.r18 }}`
           - Workflow run: `${{ github.run_id }}`
 
@@ -198,5 +199,3 @@ jobs:
           EOF
           )
           gh api "repos/${GITHUB_REPOSITORY}/issues/1/comments" -f body="$body"
-
-# Contents API trigger
