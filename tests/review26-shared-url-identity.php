@@ -45,7 +45,8 @@ if (! is_string($timeline) || ! str_contains($timeline, 'Public_URL::canonical_s
     fwrite(STDERR, "Timeline service does not use the shared canonical URL identity.\n");
     exit(1);
 }
-if (! is_string($sections) || ! str_contains($sections, "Public_URL::canonical_same_site_identity($candidate['url'] ?? '', false)")) {
+$section_marker = 'Public_URL::canonical_same_site_identity($candidate[\'url\'] ?? \'\', false)';
+if (! is_string($sections) || ! str_contains($sections, $section_marker)) {
     fwrite(STDERR, "Section service does not use the shared canonical URL identity.\n");
     exit(1);
 }
