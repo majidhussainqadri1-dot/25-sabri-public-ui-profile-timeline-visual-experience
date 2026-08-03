@@ -30,7 +30,7 @@ jobs:
           coverage: none
           extensions: zip
 
-      - name: Apply fifteen corrections, verify, clean, and push
+      - name: Apply fifteen corrections, verify canonical CI, clean, and push
         shell: bash
         run: |
           set -euo pipefail
@@ -55,12 +55,14 @@ jobs:
           test "$(wc -l </tmp/file25-reviews39-53.list)" -eq 28
           tar -xzf /tmp/file25-reviews39-53.tar.gz
 
+          # Restore the governed CI contract before the complete release-engineering suite.
+          git show a256ce9ae68a84d56be014aa3f95e1518b8bf37d:.github/workflows/ci.yml > .github/workflows/ci.yml
+
           composer validate --strict --no-check-publish
           find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
           composer test
           node --check assets/js/public.js
 
-          git show a256ce9ae68a84d56be014aa3f95e1518b8bf37d:.github/workflows/ci.yml > .github/workflows/ci.yml
           rm -rf .review39-53 .github/workflows/review39-53-apply.yml
           git add -A
           git commit -m "File 25 Reviews 39-53: fifteen corrective rounds"
