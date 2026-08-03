@@ -260,11 +260,8 @@ final class Profile_Repository
     {
         $contacts = [];
         foreach (['phone', 'whatsapp'] as $field) {
-            $value = isset($values[$field]) && is_scalar($values[$field]) ? (string) $values[$field] : '';
-            $clean = preg_replace('/[^0-9+]/', '', $value) ?? '';
-            $clean = preg_replace('/(?!^)\+/', '', $clean) ?? '';
-            $clean = substr($clean, 0, 18);
-            if ($clean === '' || $clean === '+') {
+            $clean = self::canonical_contact($values[$field] ?? null);
+            if ($clean === '') {
                 continue;
             }
             if ($this->visibility->can_show_contact($user_id, $field)) {
@@ -273,6 +270,32 @@ final class Profile_Repository
         }
 
         return $contacts;
+    }
+
+
+    private static function canonical_contact(mixed $value): string
+    {
+        if (! is_scalar($value)) {
+            return '';
+        }
+
+        $raw = trim((string) $value);
+        if ($raw === '' || preg_match('/[\x00-\x1F\x7F]/', $raw) === 1) {
+            return '';
+        }
+
+        // Preserve only conventional human-readable separators. Any other
+        // character, repeated plus sign, or overlong value fails closed rather
+        // than being silently transformed into a different destination.
+        $clean = preg_replace('/[\s().-]+/u', '', $raw) ?? '';
+        if (preg_match('/^\+?[0-9]{7,15}$/', $clean) !== 1) {
+            return '';
+        }
+        if (str_starts_with($clean, '+') && preg_match('/^\+[1-9][0-9]{6,14}$/', $clean) !== 1) {
+            return '';
+        }
+
+        return $clean;
     }
 
     /**

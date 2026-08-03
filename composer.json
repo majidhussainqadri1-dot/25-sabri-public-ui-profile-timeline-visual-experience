@@ -22,6 +22,7 @@
       "@php tests/review26-shared-url-identity.php",
       "@php tests/review27-timeline-template-date.php",
       "@php tests/review28-timeline-filter-allowlist.php",
+      "@php tests/review29-contact-canonicalization.php",
       "@php tests/master-plan-reconciliation.php",
       "@php tests/file21-provider.php",
       "@php tests/design-system.php",
