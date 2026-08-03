@@ -44,6 +44,53 @@ PHP;
         file_put_contents($review92_target, str_replace($review92_old, $review92_new, $review92_source));
     }
 
+    $review32_source = is_file($review92_target) ? file_get_contents($review92_target) : false;
+    $review32_old = <<<'PHP'
+    private function exact_action_list(mixed $values): array
+    {
+        $actions = $this->exact_key_list($values, 'available actions');
+        foreach ($actions as $action) {
+            if (! in_array($action, self::ALLOWED_ACTIONS, true)) {
+                throw new InvalidArgumentException('Timeline available action is not publicly allowed.');
+            }
+        }
+
+        return $actions;
+    }
+PHP;
+    $review32_new = <<<'PHP'
+    private function exact_action_list(mixed $values): array
+    {
+        if (! is_array($values)
+            || ($values !== [] && array_keys($values) !== range(0, count($values) - 1))
+            || count($values) > 20
+        ) {
+            throw new InvalidArgumentException('Timeline available actions must be a bounded list.');
+        }
+
+        $actions = [];
+        foreach ($values as $value) {
+            if (! is_string($value)) {
+                continue;
+            }
+            $canonical = $this->clean_key($value, 64);
+            if ($value === ''
+                || strlen($value) > 64
+                || ! hash_equals($canonical, $value)
+                || ! in_array($value, self::ALLOWED_ACTIONS, true)
+            ) {
+                continue;
+            }
+            $actions[$value] = $value;
+        }
+
+        return array_values($actions);
+    }
+PHP;
+    if (is_string($review32_source) && substr_count($review32_source, $review32_old) === 1) {
+        file_put_contents($review92_target, str_replace($review32_old, $review32_new, $review32_source));
+    }
+
     $review62_target = dirname(__DIR__) . '/class-timeline-service.php';
     $review62_source = is_file($review62_target) ? file_get_contents($review62_target) : false;
     $review62_old = <<<'PHP'
