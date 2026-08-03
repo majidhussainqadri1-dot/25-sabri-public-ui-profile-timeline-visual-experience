@@ -115,10 +115,13 @@ PHP;
             }
 PHP;
     $review89_new = <<<'PHP'
-            if (! array_key_exists($field, $filtered) || $filtered[$field] !== true) {
+            if (! array_key_exists($field, $filtered)) {
                 continue;
             }
-            if (array_key_exists($field, $filtered) && (bool) $filtered[$field]) {
+            if ($filtered[$field] === true
+                && array_key_exists($field, $filtered)
+                && (bool) $filtered[$field]
+            ) {
                 $public[$field] = $value;
             }
 PHP;
