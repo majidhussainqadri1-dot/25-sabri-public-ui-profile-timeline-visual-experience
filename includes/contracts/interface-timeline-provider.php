@@ -10,13 +10,6 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-if (PHP_SAPI === 'cli') {
-    $bridge = __DIR__ . '/review54-93-bridge.php';
-    if (is_file($bridge)) {
-        require $bridge;
-    }
-}
-
 /**
  * Read-only contract for native content providers.
  *
