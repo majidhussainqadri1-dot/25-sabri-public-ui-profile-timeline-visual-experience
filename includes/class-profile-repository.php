@@ -34,19 +34,33 @@ final class Profile_Repository
 
     public function find_by_slug(string $slug): ?WP_User
     {
-        $slug = sanitize_title($slug);
-        if ($slug === '' || ctype_digit($slug)) {
+        $input_slug = $slug;
+        $raw_slug = trim($input_slug);
+        $slug = sanitize_title($raw_slug);
+        if (! hash_equals($input_slug, $raw_slug)
+            || $slug === ''
+            || ctype_digit($slug)
+            || ! hash_equals($slug, $raw_slug)
+        ) {
             return null;
         }
 
         $external = apply_filters('sabri_public_experience/profile_by_slug', null, $slug);
         if ($external instanceof WP_User) {
-            return $external;
+            $external_slug = (string) $external->user_nicename;
+            if ($external_slug !== '' && hash_equals($slug, $external_slug)) {
+                return $external;
+            }
         }
 
         $user = get_user_by('slug', $slug);
+        if (! $user instanceof WP_User) {
+            return null;
+        }
 
-        return $user instanceof WP_User ? $user : null;
+        $canonical_slug = (string) $user->user_nicename;
+
+        return $canonical_slug !== '' && hash_equals($slug, $canonical_slug) ? $user : null;
     }
 
     /** @return array<string,mixed>|null */
@@ -271,7 +285,6 @@ final class Profile_Repository
 
         return $contacts;
     }
-
 
     private static function canonical_contact(mixed $value): string
     {
