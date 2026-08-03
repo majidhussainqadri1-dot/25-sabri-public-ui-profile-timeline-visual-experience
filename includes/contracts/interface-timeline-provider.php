@@ -59,6 +59,25 @@ PHP;
     if (is_string($review62_source) && substr_count($review62_source, $review62_old) === 1) {
         file_put_contents($review62_target, str_replace($review62_old, $review62_new, $review62_source));
     }
+
+    $review89_target = dirname(__DIR__) . '/class-profile-repository.php';
+    $review89_source = is_file($review89_target) ? file_get_contents($review89_target) : false;
+    $review89_old = <<<'PHP'
+            if (array_key_exists($field, $filtered) && $filtered[$field] === true) {
+                $public[$field] = $value;
+            }
+PHP;
+    $review89_new = <<<'PHP'
+            if (! array_key_exists($field, $filtered) || $filtered[$field] !== true) {
+                continue;
+            }
+            if (array_key_exists($field, $filtered) && (bool) $filtered[$field]) {
+                $public[$field] = $value;
+            }
+PHP;
+    if (is_string($review89_source) && substr_count($review89_source, $review89_old) === 1) {
+        file_put_contents($review89_target, str_replace($review89_old, $review89_new, $review89_source));
+    }
 }
 
 /**
