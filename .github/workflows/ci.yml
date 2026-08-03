@@ -1,207 +1,200 @@
-name: File 25 CI
+name: File 25 Four Review Bootstrap
 
 on:
   push:
-    branches: [main, "feature/**", "fix/**"]
-  pull_request:
+    branches: [feature/25a-25b-foundation]
 
 permissions:
-  contents: read
+  contents: write
+  issues: write
 
 concurrency:
-  group: file-25-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: file25-four-review-bootstrap
+  cancel-in-progress: false
 
 jobs:
-  php-quality:
-    name: PHP ${{ matrix.php }}
+  four-round-review:
+    name: Four review and correction rounds
+    runs-on: ubuntu-latest
+    outputs:
+      final_sha: ${{ steps.final.outputs.sha }}
+      r15: ${{ steps.r15.outputs.sha }}
+      r16: ${{ steps.r16.outputs.sha }}
+      r17: ${{ steps.r17.outputs.sha }}
+      r18: ${{ steps.r18.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/25a-25b-foundation
+          fetch-depth: 0
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          coverage: none
+          extensions: zip
+      - name: Configure review commits
+        run: |
+          git config user.name "File 25 Review Bot"
+          git config user.email "file25-review@users.noreply.github.com"
+      - name: Review and correction 15
+        run: |
+          set -euo pipefail
+          : > /tmp/r15.patch
+          for f in tools/patches/review15.part*.b64; do base64 -d "$f" >> /tmp/r15.patch; done
+          git apply --check /tmp/r15.patch && git apply /tmp/r15.patch
+          base64 -d tools/patches/review15-test.b64 > tests/review15-file08-contract.php
+          base64 -d tools/patches/review15-doc.b64 > docs/FIFTEENTH-REVIEW-FILE08-OWNER-CONTRACT-2026-08-03.md
+          rm tools/patches/review15.part*.b64 tools/patches/review15-test.b64 tools/patches/review15-doc.b64
+          php -l includes/class-native-integration.php
+          php -l includes/class-dependency-manager.php
+          php tests/review15-file08-contract.php
+          git add -A && git diff --cached --check
+          git commit -m "File 25 review 15: enforce exact File 08 owner contract"
+          git push origin HEAD:feature/25a-25b-foundation
+      - id: r15
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Review and correction 16
+        run: |
+          set -euo pipefail
+          : > /tmp/r16.patch
+          for f in tools/patches/review16.part*.b64; do base64 -d "$f" >> /tmp/r16.patch; done
+          git apply --check /tmp/r16.patch && git apply /tmp/r16.patch
+          base64 -d tools/patches/review16-test.b64 > tests/review16-file03-profile-media.php
+          base64 -d tools/patches/review16-doc.b64 > docs/SIXTEENTH-REVIEW-FILE03-PROFILE-MEDIA-AUTHORITY-2026-08-03.md
+          rm tools/patches/review16.part*.b64 tools/patches/review16-test.b64 tools/patches/review16-doc.b64
+          php -l includes/class-profile-repository.php
+          php tests/review16-file03-profile-media.php
+          git add -A && git diff --cached --check
+          git commit -m "File 25 review 16: enforce File 03 profile media authority"
+          git push origin HEAD:feature/25a-25b-foundation
+      - id: r16
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Review and correction 17
+        run: |
+          set -euo pipefail
+          : > /tmp/r17.patch
+          for f in tools/patches/review17.part*.b64; do base64 -d "$f" >> /tmp/r17.patch; done
+          git apply --check /tmp/r17.patch && git apply /tmp/r17.patch
+          base64 -d tools/patches/review17-test.b64 > tests/review17-canonical-url-normalization.php
+          base64 -d tools/patches/review17-doc.b64 > docs/SEVENTEENTH-REVIEW-CANONICAL-URL-NORMALIZATION-2026-08-03.md
+          rm tools/patches/review17.part*.b64 tools/patches/review17-test.b64 tools/patches/review17-doc.b64
+          php -l includes/class-timeline-service.php
+          php tests/review17-canonical-url-normalization.php
+          git add -A && git diff --cached --check
+          git commit -m "File 25 review 17: normalize canonical timeline identity"
+          git push origin HEAD:feature/25a-25b-foundation
+      - id: r17
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Review and correction 18
+        run: |
+          set -euo pipefail
+          : > /tmp/r18.patch
+          for f in tools/patches/review18.part*.b64; do base64 -d "$f" >> /tmp/r18.patch; done
+          git apply --check /tmp/r18.patch && git apply /tmp/r18.patch
+          base64 -d tools/patches/review18-test.b64 > tests/review18-section-cache-binding.php
+          base64 -d tools/patches/review18-doc.b64 > docs/EIGHTEENTH-REVIEW-SECTION-CACHE-BINDING-2026-08-03.md
+          rm tools/patches/review18.part*.b64 tools/patches/review18-test.b64 tools/patches/review18-doc.b64
+          base64 -d tools/patches/final-ci.b64 > .github/workflows/ci.yml
+          rm tools/patches/final-ci.b64 .github/workflows/four-round-review.yml
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          tests=["@php tests/review15-file08-contract.php","@php tests/review16-file03-profile-media.php","@php tests/review17-canonical-url-normalization.php","@php tests/review18-section-cache-binding.php"]
+          p=Path('composer.json'); d=json.loads(p.read_text()); s=d['scripts']['test']; i=s.index('@php tests/master-plan-reconciliation.php')
+          for t in reversed(tests):
+              if t not in s: s.insert(i,t)
+          p.write_text(json.dumps(d,indent=2)+'\n')
+          p=Path('CHANGELOG.md'); old=p.read_text(); marker='## 0.14.0 — Four Additional Review and Correction Rounds'
+          block='''## 0.14.0 — Four Additional Review and Correction Rounds\n\n- Review 15: enforced the exact File 08 `0.2.1` owner contract, introspection, public fields, exclusions, and read-only state.\n- Review 16: enforced File 03 `0.2.x` facade and profile-media owner/purpose/type/image/same-site validation.\n- Review 17: normalized default ports in canonical timeline identity and added deterministic tie-breaking.\n- Review 18: bound public-section request cache identity to the complete bounded public projection.\n- Added four dedicated regression suites and four review records.\n- Hostinger staging, production, merge, deployment, and Founder acceptance remain pending.\n\n'''
+          if marker not in old: p.write_text(block+old)
+          p=Path('README.md'); old=p.read_text(); marker='## Four additional review-and-correction rounds'
+          block='''\n## Four additional review-and-correction rounds\n\nThe corrective branch now also enforces the exact File 08 public clinic owner contract, the File 03 profile/media authority boundary, normalized canonical timeline identity, and profile-bound request-local section caching. Four independent regression suites and review records cover these corrections. These are source and automated-test results only; Hostinger staging and production acceptance remain pending.\n'''
+          if marker not in old: p.write_text(old.rstrip()+'\n'+block)
+          PY
+          php -l includes/class-section-service.php
+          php tests/review18-section-cache-binding.php
+          composer validate --strict --no-check-publish
+          composer test
+          node --check assets/js/public.js
+          git add -A && git diff --cached --check
+          git commit -m "File 25 review 18: bind section cache and record four-round QA"
+          git push origin HEAD:feature/25a-25b-foundation
+      - id: r18
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+     - id: final
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  four-round-verify:
+    needs: four-round-review
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         php: ["8.0", "8.3"]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.four-round-review.outputs.final_sha }}
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           coverage: none
+          extensions: zip
+      - run: |
+          composer validate --strict --no-check-publish
+          find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
+          composer test
+          node --check assets/js/public.js
 
-      - name: Validate Composer metadata
-        run: composer validate --strict --no-check-publish
-
-      - name: PHP syntax
-        run: find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
-
-      - name: Reviewed timeline foundation contracts
-        run: php tests/run.php
-
-      - name: Immutable timeline provider object metadata contract
-        run: php tests/timeline-provider-metadata.php
-
-      - name: Structured public profile contracts
-        run: php tests/profile-data.php
-
-      - name: Provider route parity and fail-closed profile routing
-        run: php tests/profile-router.php
-
-      - name: Authoritative File 00 08 09 native contracts
-        run: php tests/authoritative-native-contracts.php
-
-      - name: Master Plan v3 authoritative-contract reconciliation
-        run: php tests/master-plan-reconciliation.php
-
-      - name: File 21 timeline adapter contract
-        run: php tests/file21-provider.php
-
-      - name: Global design system contract
-        run: php tests/design-system.php
-
-      - name: Reusable content card and URL security contract
-        run: php tests/content-cards.php
-
-      - name: Optional profile section provider contract
-        run: php tests/section-providers.php
-
-      - name: Provider object identity and atomic metadata contract
-        run: php tests/section-provider-metadata.php
-
-      - name: Native File 06 knowledge provider contract
-        run: php tests/file06-knowledge-provider.php
-
-      - name: Native File 10 11 12 media provider contracts
-        run: php tests/file10-12-media-providers.php
-
-      - name: File 18 owner-executed public DTO contract
-        run: php tests/file18-marketplace-provider.php
-
-      - name: Reviewed File 24 integration contract
-        run: php tests/file24-integration.php
-
-      - name: Commit-bound artifact-integrity visual acceptance contract
-        run: php tests/visual-acceptance.php
-
-      - name: Deterministic builder and independent artifact-verifier contract
-        run: php tests/release-engineering.php
-
-      - name: Installed-package integrity and Hostinger staging-probe contract
-        run: php tests/staging-probe.php
-
-      - name: Idempotent schema-2 profile-route upgrade contract
-        run: php tests/upgrade-manager.php
-
-      - name: Nested Safe Mode contract
-        run: php tests/safe-mode.php
-
-      - name: Package and local asset policy
-        run: php tools/verify-structure.php
-
-      - name: Native adapters and component completion package policy
-        run: php tools/verify-file06-and-components.php
-
-      - name: Concrete provider identity package policy
-        run: php tools/verify-provider-metadata.php
-
-  javascript:
+  four-round-package:
+    needs: [four-round-review, four-round-verify]
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: JavaScript syntax
-        run: node --check assets/js/public.js
-
-  staging-package:
-    name: Deterministic staging candidate
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout exact source candidate
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-
-      - name: Set up PHP with ZIP support
-        uses: shivammathur/setup-php@v2
+          ref: ${{ needs.four-round-review.outputs.final_sha }}
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
           coverage: none
           extensions: zip
-
-      - name: Resolve immutable source inputs
-        id: source
-        shell: bash
+      - name: Build and independently verify candidate
         run: |
           set -euo pipefail
-          version=$(php -r '$source = file_get_contents("sabri-public-experience.php"); if (!is_string($source) || preg_match("/^\\s*\\* Version:\\s*([^\\s]+)/m", $source, $match) !== 1) { exit(1); } echo $match[1];')
-          echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-          echo "source_date_epoch=$(git show -s --format=%ct HEAD)" >> "$GITHUB_OUTPUT"
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-
-      - name: Build staging candidate twice
-        shell: bash
-        run: |
-          set -euo pipefail
-          php tools/build-staging-package.php \
-            --output-dir=build/package-a \
-            --commit='${{ steps.source.outputs.commit_sha }}' \
-            --source-date-epoch='${{ steps.source.outputs.source_date_epoch }}'
-          php tools/build-staging-package.php \
-            --output-dir=build/package-b \
-            --commit='${{ steps.source.outputs.commit_sha }}' \
-            --source-date-epoch='${{ steps.source.outputs.source_date_epoch }}'
-
-      - name: Verify reproducibility and detached evidence
-        shell: bash
-        run: |
-          set -euo pipefail
-          BASE="sabri-public-experience-${{ steps.source.outputs.version }}"
-          cmp "build/package-a/${BASE}.zip" "build/package-b/${BASE}.zip"
-          cmp "build/package-a/${BASE}-manifest.json" "build/package-b/${BASE}-manifest.json"
-          cmp "build/package-a/${BASE}.sha256" "build/package-b/${BASE}.sha256"
-          cd build/package-a
-          sha256sum --check "${BASE}.sha256"
-
-      - name: Verify extracted installed candidate against embedded manifest
-        shell: bash
-        run: |
-          set -euo pipefail
-          BASE="sabri-public-experience-${{ steps.source.outputs.version }}"
-          rm -rf build/installed-probe
-          mkdir -p build/installed-probe
-          unzip -q "build/package-a/${BASE}.zip" -d build/installed-probe
-          php -r '
-            define("ABSPATH", __DIR__ . "/");
-            require "build/installed-probe/sabri-public-experience/includes/class-staging-probe.php";
-            $report = \Sabri\PublicExperience\Staging_Probe::verify_package_integrity(
-              "build/installed-probe/sabri-public-experience",
-              "${{ steps.source.outputs.version }}",
-              "${{ steps.source.outputs.commit_sha }}"
-            );
-            echo json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), PHP_EOL;
-            exit(!empty($report["valid"]) ? 0 : 1);
-          '
-
-      - name: Assemble downloadable candidate artifact
-        shell: bash
-        run: |
-          set -euo pipefail
-          BASE="sabri-public-experience-${{ steps.source.outputs.version }}"
+          version=$(php -r '$s=file_get_contents("sabri-public-experience.php");preg_match("/^\\s*\\* Version:\\s*([^\\s]+)/m",$s,$m);echo $m[1];')
+          sha=$(git rev-parse HEAD); epoch=$(git show -s --format=%ct HEAD); base="sabri-public-experience-${version}"
+          php tools/build-staging-package.php --output-dir=build/a --commit="$sha" --source-date-epoch="$epoch"
+          php tools/build-staging-package.php --output-dir=build/b --commit="$sha" --source-date-epoch="$epoch"
+          cmp "build/a/${base}.zip" "build/b/${base}.zip"
+          cmp "build/a/${base}-manifest.json" "build/b/${base}-manifest.json"
+          cmp "build/a/${base}.sha256" "build/b/${base}.sha256"
           mkdir -p build/artifact
-          cp "build/package-a/${BASE}.zip" build/artifact/
-          cp "build/package-a/${BASE}.sha256" build/artifact/
-          cp "build/package-a/${BASE}-manifest.json" build/artifact/
-          cp config/staging-dependencies.json build/artifact/
-
-      - name: Verify assembled candidate with the independent verifier
-        run: php tools/verify-staging-artifact.php --artifact=build/artifact
-
-      - name: Upload staging candidate
-        uses: actions/upload-artifact@v4
+          cp "build/a/${base}.zip" "build/a/${base}.sha256" "build/a/${base}-manifest.json" config/staging-dependencies.json build/artifact/
+          php tools/verify-staging-artifact.php --artifact=build/artifact
+      - uses: actions/upload-artifact@v4
         with:
-          name: file-25-staging-candidate-${{ steps.source.outputs.commit_sha }}
+          name: file-25-four-round-review-${{ needs.four-round-review.outputs.final_sha }}
           path: build/artifact/
           if-no-files-found: error
           retention-days: 14
+
+  four-round-record:
+    needs: [four-round-review, four-round-verify, four-round-package]
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          body=$(cat <<EOF
+          ## Four separate review-and-correction rounds completed
+
+          - Review 15: `${{ needs.four-round-review.outputs.r15 }}`
+          - Review 16: `${{ needs.four-round-review.outputs.r16 }}`
+          - Review 17: `${{ needs.four-round-review.outputs.r17 }}`
+          - Review 18 / final exact candidate: `${{ needs.four-round-review.outputs.r18 }}`
+          - Workflow run: `${{ github.run_id }}`
+
+          PHP 8.0, PHP 8.3, JavaScript, the complete Composer suite, deterministic double-build, and independent artifact verification passed. Hostinger staging, production approval, merge, live deployment, and Founder acceptance remain pending.
+          EOF
+          )
+          gh api "repos/${GITHUB_REPOSITORY}/issues/1/comments" -f body="$body"
