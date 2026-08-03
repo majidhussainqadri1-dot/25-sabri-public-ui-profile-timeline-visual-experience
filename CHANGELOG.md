@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.14.0 — Source Implementation Completion Declaration
+
+### Added
+
+- Added `config/source-completion-matrix.json`, a machine-readable traceability record joining the Definitive Master Plan `v3.0` and File 25 Final Harmonized Specification `2.0` to source evidence.
+- Added `tools/verify-source-completion.php` and made it part of the governed Composer test suite.
+- Added `docs/SOURCE-IMPLEMENTATION-COMPLETION-DECLARATION-2026-08-04.md`.
+
+### Completion boundary
+
+- File 25 source implementation is declared complete within its approved canonical scope.
+- Known unresolved source defects at this declaration point: `0`.
+- Hostinger staging, real installed integrations, browser/accessibility/RTL evidence, Founder acceptance, merge, production, live deployment and operational evidence remain separate deferred gates.
+- Any new defect, dependency change, security finding or user evidence reopens review and correction.
+
 ## 0.14.0 — Authoritative Contracts and Foreign-Table Decoupling
 
 ### Corrected
