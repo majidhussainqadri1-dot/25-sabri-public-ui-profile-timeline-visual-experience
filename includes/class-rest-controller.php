@@ -97,9 +97,9 @@ final class Rest_Controller
         ]);
     }
 
-    public function get_founder_profile(): WP_REST_Response
+    public function get_founder_profile(?WP_REST_Request $request = null): WP_REST_Response
     {
-        return $this->profile_response($this->profiles->get_founder());
+        return $this->profile_response($this->profiles->get_founder(), $request);
     }
 
     public function get_founder_timeline(WP_REST_Request $request): WP_REST_Response
@@ -107,19 +107,19 @@ final class Rest_Controller
         return $this->timeline_response($this->profiles->get_founder(), $request);
     }
 
-    public function get_founder_knowledge(): WP_REST_Response
+    public function get_founder_knowledge(?WP_REST_Request $request = null): WP_REST_Response
     {
-        return $this->section_response($this->profiles->get_founder(), 'knowledge');
+        return $this->section_response($this->profiles->get_founder(), 'knowledge', $request);
     }
 
-    public function get_founder_media(): WP_REST_Response
+    public function get_founder_media(?WP_REST_Request $request = null): WP_REST_Response
     {
-        return $this->section_response($this->profiles->get_founder(), 'media');
+        return $this->section_response($this->profiles->get_founder(), 'media', $request);
     }
 
     public function get_profile(WP_REST_Request $request): WP_REST_Response
     {
-        return $this->profile_response($this->profiles->find_by_slug((string) $request['slug']));
+        return $this->profile_response($this->profiles->find_by_slug((string) $request['slug']), $request);
     }
 
     public function get_timeline(WP_REST_Request $request): WP_REST_Response
@@ -134,7 +134,8 @@ final class Rest_Controller
     {
         return $this->section_response(
             $this->profiles->find_by_slug((string) $request['slug']),
-            'knowledge'
+            'knowledge',
+            $request
         );
     }
 
@@ -142,30 +143,31 @@ final class Rest_Controller
     {
         return $this->section_response(
             $this->profiles->find_by_slug((string) $request['slug']),
-            'media'
+            'media',
+            $request
         );
     }
 
-    public function get_provider_health(): WP_REST_Response
+    public function get_provider_health(?WP_REST_Request $request = null): WP_REST_Response
     {
-        return $this->response($this->sections->public_health(), 200);
+        return $this->response($this->sections->public_health(), 200, $request);
     }
 
-    private function profile_response(?WP_User $user): WP_REST_Response
+    private function profile_response(?WP_User $user, ?WP_REST_Request $request = null): WP_REST_Response
     {
         $profile = $user instanceof WP_User ? $this->profiles->get_public_profile($user) : null;
         if ($profile === null) {
-            return $this->response(['code' => 'profile_not_found'], 404);
+            return $this->response(['code' => 'profile_not_found'], 404, $request);
         }
 
-        return $this->response($profile, 200);
+        return $this->response($profile, 200, $request);
     }
 
     private function timeline_response(?WP_User $user, WP_REST_Request $request): WP_REST_Response
     {
         $profile = $user instanceof WP_User ? $this->profiles->get_public_profile($user) : null;
         if (! $user instanceof WP_User || $profile === null) {
-            return $this->response(['code' => 'profile_not_found'], 404);
+            return $this->response(['code' => 'profile_not_found'], 404, $request);
         }
 
         $result = $this->timeline->get_for_author((int) $user->ID, [
@@ -183,19 +185,19 @@ final class Rest_Controller
         ];
 
         // Provider identifiers and exception details remain server-side diagnostics.
-        return $this->response($public_result, 200);
+        return $this->response($public_result, 200, $request);
     }
 
-    private function section_response(?WP_User $user, string $section): WP_REST_Response
+    private function section_response(?WP_User $user, string $section, ?WP_REST_Request $request = null): WP_REST_Response
     {
         $section = sanitize_key($section);
         if (! in_array($section, ['knowledge', 'media'], true)) {
-            return $this->response(['code' => 'section_not_found'], 404);
+            return $this->response(['code' => 'section_not_found'], 404, $request);
         }
 
         $profile = $user instanceof WP_User ? $this->profiles->get_public_profile($user) : null;
         if (! $user instanceof WP_User || $profile === null) {
-            return $this->response(['code' => 'profile_not_found'], 404);
+            return $this->response(['code' => 'profile_not_found'], 404, $request);
         }
 
         $result = $this->sections->get_public_section((int) $user->ID, $profile, $section);
@@ -207,13 +209,16 @@ final class Rest_Controller
             'items' => $result['items'],
             'truncated' => $result['truncated'],
             'partial' => $result['provider_error_count'] > 0,
-        ], 200);
+        ], 200, $request);
     }
 
     /** @param array<string,mixed> $data */
-    private function response(array $data, int $status): WP_REST_Response
+    private function response(array $data, int $status, ?WP_REST_Request $request = null): WP_REST_Response
     {
-        $encoded = function_exists('wp_json_encode') ? wp_json_encode($data) : json_encode($data);
+        $canonical = self::canonicalize_for_etag($data);
+        $encoded = function_exists('wp_json_encode')
+            ? wp_json_encode($canonical)
+            : json_encode($canonical);
         $etag = is_string($encoded) ? '"' . hash('sha256', $encoded) . '"' : '';
         $headers = [
             'Cache-Control' => 'no-store, private, max-age=0',
@@ -223,7 +228,53 @@ final class Rest_Controller
         if ($etag !== '') {
             $headers['ETag'] = $etag;
         }
+        if ($status === 200 && $etag !== '' && self::request_matches_etag($request, $etag)) {
+            return new WP_REST_Response(null, 304, $headers);
+        }
 
         return new WP_REST_Response($data, $status, $headers);
+    }
+
+    private static function request_matches_etag(?WP_REST_Request $request, string $etag): bool
+    {
+        if (! $request instanceof WP_REST_Request || ! method_exists($request, 'get_header')) {
+            return false;
+        }
+
+        $header = trim((string) $request->get_header('if-none-match'));
+        if ($header === '') {
+            return false;
+        }
+        foreach (explode(',', $header) as $candidate) {
+            $candidate = trim($candidate);
+            if ($candidate === '*') {
+                return true;
+            }
+            if (str_starts_with($candidate, 'W/')) {
+                $candidate = trim(substr($candidate, 2));
+            }
+            if ($candidate !== '' && hash_equals($etag, $candidate)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static function canonicalize_for_etag(mixed $value): mixed
+    {
+        if (! is_array($value)) {
+            return $value;
+        }
+        if ($value === [] || array_keys($value) === range(0, count($value) - 1)) {
+            return array_map([self::class, 'canonicalize_for_etag'], $value);
+        }
+
+        ksort($value, SORT_STRING);
+        foreach ($value as $key => $item) {
+            $value[$key] = self::canonicalize_for_etag($item);
+        }
+
+        return $value;
     }
 }
