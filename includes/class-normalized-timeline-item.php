@@ -40,6 +40,7 @@ final class Normalized_Timeline_Item implements JsonSerializable
         'retracted',
     ];
 
+
     private const ALLOWED_ACTIONS = [
         'view',
         'read',
@@ -105,6 +106,10 @@ final class Normalized_Timeline_Item implements JsonSerializable
 
         $canonical_url = $this->validated_url((string) $data['canonical_url']);
         $published_at = $this->required_date((string) $data['published_at']);
+        $updated_at = $this->normalize_optional_date($data['updated_at'] ?? null);
+        if ($updated_at !== null && strcmp($updated_at, $published_at) < 0) {
+            throw new InvalidArgumentException('Timeline update date cannot precede its publication date.');
+        }
 
         $this->data = [
             'provider_id' => $provider_id,
@@ -117,7 +122,7 @@ final class Normalized_Timeline_Item implements JsonSerializable
             'safe_excerpt' => $this->plain_text((string) $data['safe_excerpt'], 1200),
             'canonical_url' => $canonical_url,
             'published_at' => $published_at,
-            'updated_at' => $this->normalize_optional_date($data['updated_at'] ?? null),
+            'updated_at' => $updated_at,
             'visibility_state' => 'public',
             'native_status' => $native_status,
             'content_type' => $content_type,
