@@ -8,6 +8,10 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
     exit;
 }
 
+if (! class_exists(Public_URL::class)) {
+    require_once __DIR__ . '/class-public-url.php';
+}
+
 final class Timeline_Service
 {
     private const MAX_PER_PAGE = 50;
