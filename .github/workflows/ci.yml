@@ -1,4 +1,4 @@
-name: File 25 Reviews 39-53 Payload Diagnosis
+name: Apply File 25 Reviews 39-53
 
 on:
   push:
@@ -6,14 +6,14 @@ on:
   pull_request:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
-  group: file-25-review39-53-diagnosis-${{ github.ref }}
+  group: file-25-review39-53-apply-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  diagnose-payload:
+  apply-reviewed-series:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     steps:
@@ -21,20 +21,47 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: feature/25a-25b-foundation
+          fetch-depth: 0
 
-      - name: Verify every payload part
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        with:
+          php-version: "8.3"
+          coverage: none
+          extensions: zip
+
+      - name: Apply fifteen corrections, verify, clean, and push
         shell: bash
         run: |
           set -euo pipefail
-          wc -c .review39-53/part-*
-          sha256sum .review39-53/part-*
-          cat > /tmp/expected.sha256 <<'EOF'
-          d0ff909b6f61dbc617ca7dbdc38d66e451cc5d1e27f5fe4619946107836dff11  .review39-53/part-00
-          019a9b2a13a2e46d9de315331ba46ec695feb7e3f0009eb40913159a48f79ead  .review39-53/part-01
-          8f48c985c6eb0051723446c4965ebcae4f92942b312c338fbb55f020431c9298  .review39-53/part-02
-          a94becbbacd3db48b82cc332889540f2ef312a7617ef036852d2aca885945c7a  .review39-53/part-03
-          7fdad61aac28114a49fdc1848cf26803a45de61cc6a361b01509abf0d1b42b9c  .review39-53/part-04
-          a2208f7841cf05296fabff39ea7babdb36220a0b37b686b799029a32e8713767  .review39-53/part-05
-          a92980e1547b25cb07d20b449b2d9f6dd67bbd3246e5ac3b18fd26f671947cdf  .review39-53/part-06
-          EOF
-          sha256sum --check /tmp/expected.sha256
+          git config user.name "Sabri File 25 Review Bot"
+          git config user.email "file25-review@users.noreply.github.com"
+
+          cat \
+            .review39-53/part-00 \
+            .review39-53/part-01 \
+            .review39-53/part-02 \
+            .review39-53/part-03 \
+            .review39-53/part-04 \
+            .review39-53/part-050 \
+            .review39-53/part-051 \
+            .review39-53/part-052 \
+            .review39-53/part-053 \
+            .review39-53/part-06 \
+            | base64 --decode > /tmp/file25-reviews39-53.tar.gz
+
+          echo "29e9ac38c4cb00ffd7413125ca97e254ebce2fa2959bfbaf3d079efb77e86c38  /tmp/file25-reviews39-53.tar.gz" | sha256sum --check
+          tar -tzf /tmp/file25-reviews39-53.tar.gz | tee /tmp/file25-reviews39-53.list
+          test "$(wc -l </tmp/file25-reviews39-53.list)" -eq 28
+          tar -xzf /tmp/file25-reviews39-53.tar.gz
+
+          composer validate --strict --no-check-publish
+          find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
+          composer test
+          node --check assets/js/public.js
+
+          git show a256ce9ae68a84d56be014aa3f95e1518b8bf37d:.github/workflows/ci.yml > .github/workflows/ci.yml
+          rm -rf .review39-53 .github/workflows/review39-53-apply.yml
+          git add -A
+          git commit -m "File 25 Reviews 39-53: fifteen corrective rounds"
+          git push origin HEAD:feature/25a-25b-foundation
