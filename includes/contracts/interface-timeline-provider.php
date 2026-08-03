@@ -46,7 +46,9 @@ PHP;
 
     $review62_target = dirname(__DIR__) . '/class-timeline-service.php';
     $review62_source = is_file($review62_target) ? file_get_contents($review62_target) : false;
-    $review62_old = "        return $detected && $filtered === true;";
+    $review62_old = <<<'PHP'
+        return $detected && $filtered === true;
+PHP;
     $review62_new = <<<'PHP'
         if ($filtered !== true) {
             return false;
