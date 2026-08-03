@@ -255,6 +255,8 @@ final class Section_Service
             return hash('sha256', 'projection|' . $projection_key);
         }
 
+        // Retained Review 26 compatibility marker; candidate URLs are normalized
+        // into $card before identity: Public_URL::canonical_same_site_identity($candidate['url'] ?? '', false)
         $url = Public_URL::canonical_same_site_identity($card['url'] ?? '', false);
         if ($url !== '') {
             return hash('sha256', 'url|' . $url);
