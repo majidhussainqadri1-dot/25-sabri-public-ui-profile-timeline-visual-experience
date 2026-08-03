@@ -1,0 +1,205 @@
+{
+  "schema": 1,
+  "module": {
+    "file_number": 25,
+    "title": "Sabri Unified Global Visual Experience and Design System",
+    "subtitle": "Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency",
+    "runtime": "0.14.0",
+    "master_plan": "SSH-PMP-2026-v3.0",
+    "file_plan": "File 25 — Complete Public UI, Profile Timeline and Visual Experience — Final Harmonized Specification 2.0"
+  },
+  "declaration": {
+    "source_scope_status": "complete",
+    "known_unresolved_source_defects": 0,
+    "automated_qa_required": true,
+    "hostinger_staging_accepted": false,
+    "founder_acceptance": false,
+    "production_accepted": false,
+    "live_deployed": false,
+    "operational": false,
+    "truthful_boundary": "Source implementation and automated evidence are complete within the governed File 25 scope. Environment, human, Founder, production and operational acceptance remain separate deferred gates."
+  },
+  "requirements": [
+    {
+      "id": "MP-R03-R07-FILE25-IDENTITY-BOUNDARY",
+      "source": "Master Plan v3.0 R-03 and R-07; File 25 sections 17-25",
+      "status": "implemented",
+      "summary": "File 25 remains the visual/profile/timeline module and does not create a File 26, second shell, second profile system or duplicate backend.",
+      "evidence": ["sabri-public-experience.php", "docs/GOVERNING-SCOPE.md", "docs/ARCHITECTURE.md", "tests/master-plan-reconciliation.php"]
+    },
+    {
+      "id": "MP-P04-P05-IDENTITY-OWNERSHIP",
+      "source": "Master Plan v3.0 P-04 and P-05; File 25 sections 5, 22 and 23",
+      "status": "delegated",
+      "summary": "File 00/03/08/09/18/20/21/24 retain canonical ownership; File 25 consumes bounded versioned projections only.",
+      "evidence": ["includes/class-native-integration.php", "includes/class-dependency-manager.php", "config/staging-dependencies.json", "tests/authoritative-native-contracts.php", "tests/review20-owner-contracts.php"]
+    },
+    {
+      "id": "MP-P06-PUBLIC-READING",
+      "source": "Master Plan v3.0 P-06; File 25 public route architecture",
+      "status": "implemented",
+      "summary": "Eligible public profiles and public timeline projections are readable without converting public reading into a global login wall.",
+      "evidence": ["includes/class-profile-router.php", "includes/class-profile-renderer.php", "includes/class-rest-controller.php", "tests/profile-router.php"]
+    },
+    {
+      "id": "MP-P08-P15-SAFETY-PRIVACY",
+      "source": "Master Plan v3.0 P-08 and P-15; File 25 sections 64-66",
+      "status": "implemented",
+      "summary": "Visibility, contact consent, minor state, suspension, same-origin media and public DTO boundaries fail closed and remain privacy-minimized.",
+      "evidence": ["includes/class-visibility-policy.php", "includes/class-public-url.php", "includes/class-profile-data.php", "tests/review24-contact-monotonicity.php", "tests/review44-founder-hard-blocks.php", "tests/review45-minor-doctor-conflict.php"]
+    },
+    {
+      "id": "MP-P09-TRUTHFUL-STATUS",
+      "source": "Master Plan v3.0 P-09 and completion-status constitution",
+      "status": "implemented",
+      "summary": "Coded, packaged, automated-QA, staging, Founder, production, live and operational states remain explicitly separate.",
+      "evidence": ["README.md", "config/staging-test-plan.json", "includes/class-staging-probe.php", "tests/staging-probe.php"]
+    },
+    {
+      "id": "F25-DESIGN-SYSTEM-25-28",
+      "source": "File 25 sections 25-28",
+      "status": "implemented",
+      "summary": "File 20 base tokens are preserved while File 25 supplies governed extension tokens, typography and reusable visual components.",
+      "evidence": ["includes/class-design-system.php", "includes/class-components.php", "assets/css/design-system.css", "assets/css/design-system-components.css", "tests/design-system.php"]
+    },
+    {
+      "id": "F25-PUBLIC-ROUTES-29",
+      "source": "File 25 section 29",
+      "status": "implemented",
+      "summary": "Canonical Founder and permitted profile routes, sections, 404/410 handling and REST route parity are implemented without duplicate archives.",
+      "evidence": ["includes/class-profile-router.php", "includes/class-rest-controller.php", "tests/profile-router.php", "tests/review41-raw-route-slug.php", "tests/review42-rest-slug-exactness.php"]
+    },
+    {
+      "id": "F25-PROFILE-CLASSES-HERO-30-38",
+      "source": "File 25 sections 30-38",
+      "status": "implemented",
+      "summary": "Founder, Doctor and permitted Member presentation, profile hero, overview sections, actions and public-view boundaries are implemented from owner assertions.",
+      "evidence": ["includes/class-profile-repository.php", "includes/class-profile-data.php", "includes/class-profile-renderer.php", "templates/public-profile.php", "templates/partials/profile-hero.php", "templates/partials/founder-overview.php", "templates/partials/doctor-overview.php"]
+    },
+    {
+      "id": "F25-TIMELINE-39-48",
+      "source": "File 25 sections 39-48",
+      "status": "implemented",
+      "summary": "Federated read-only timeline eligibility, sorting, pinning, filters, pagination, provider contract, normalized objects and bounded indexing are implemented.",
+      "evidence": ["includes/class-timeline-registry.php", "includes/class-timeline-service.php", "includes/class-normalized-timeline-item.php", "templates/partials/timeline.php", "tests/timeline-provider-metadata.php", "tests/review52-timeline-page-overflow.php", "tests/review53-provider-transactionality.php"]
+    },
+    {
+      "id": "F25-CONTENT-CARDS-49-54",
+      "source": "File 25 sections 49-54",
+      "status": "implemented",
+      "summary": "Shared public content cards, card contract, detail presentation, safe Read More behavior, knowledge gateway and profile-local discovery presentation are implemented.",
+      "evidence": ["includes/class-content-cards.php", "docs/CONTENT-CARD-CONTRACT.md", "templates/partials/provider-section.php", "tests/content-cards.php", "tests/review31-content-card-image-alt.php", "tests/review38-section-card-deduplication.php"]
+    },
+    {
+      "id": "F25-STATES-55-58",
+      "source": "File 25 sections 55-58",
+      "status": "implemented",
+      "summary": "Loading, empty, warning, offline, error, suspended, deleted, corrected and retracted presentation states are represented without inventing native owner decisions.",
+      "evidence": ["includes/class-components.php", "includes/class-profile-renderer.php", "templates/partials/timeline.php", "assets/css/design-system-components.css", "tests/run.php"]
+    },
+    {
+      "id": "F25-RESPONSIVE-ACCESSIBILITY-RTL-59-61",
+      "source": "File 25 sections 59-61; Master Plan v3.0 P-11",
+      "status": "implemented",
+      "summary": "Mobile-first responsive CSS, keyboard semantics, focus treatment, reduced-motion support and RTL-aware component presentation are present in source.",
+      "evidence": ["assets/css/public.css", "assets/css/profile-sections.css", "assets/js/public.js", "includes/class-visual-acceptance.php", "tests/visual-acceptance.php"]
+    },
+    {
+      "id": "F25-PERFORMANCE-RELIABILITY-62-63",
+      "source": "File 25 sections 62-63",
+      "status": "implemented",
+      "summary": "Bounded queries, pagination, fail-closed providers, deterministic ETags, no-store user-sensitive output and graceful optional dependency degradation are implemented.",
+      "evidence": ["includes/class-timeline-service.php", "includes/class-section-service.php", "includes/class-rest-controller.php", "includes/class-dependency-manager.php", "tests/review37-rest-etag-revalidation.php", "tests/review76-corrective-regression.php"]
+    },
+    {
+      "id": "F25-SECURITY-FILE24-64",
+      "source": "File 25 section 64; File 24 native-enforcement boundary",
+      "status": "delegated",
+      "summary": "File 25 enforces secure rendering and reports bounded assurance evidence while File 24 remains the security/privacy/compliance/resilience governance owner.",
+      "evidence": ["includes/class-file-24-integration.php", "SECURITY.md", "PRIVACY.md", "tests/file24-integration.php"]
+    },
+    {
+      "id": "F25-SEO-METRICS-COMPLETION-68-70",
+      "source": "File 25 sections 68-70",
+      "status": "implemented",
+      "summary": "Canonical titles, structured metadata, OpenGraph presentation, owner-approved public metrics and profile-completion presentation are implemented without raw analytics ownership.",
+      "evidence": ["includes/class-profile-renderer.php", "includes/class-profile-data.php", "tests/review34-section-aware-seo-title.php", "tests/master-plan-reconciliation.php"]
+    },
+    {
+      "id": "F25-ADMIN-CONFIG-71",
+      "source": "File 25 section 71",
+      "status": "implemented",
+      "summary": "Governed presentation preferences, provider declarations, dependency state and safe defaults are exposed through bounded configuration rather than foreign data mutation.",
+      "evidence": ["includes/class-plugin.php", "includes/class-section-registry.php", "includes/class-timeline-registry.php", "docs/ARCHITECTURE.md"]
+    },
+    {
+      "id": "F25-REST-COMPONENT-API-72-73",
+      "source": "File 25 sections 72-73",
+      "status": "implemented",
+      "summary": "Public REST projections and reusable component APIs share strict public allow-lists and safe rendering contracts.",
+      "evidence": ["includes/class-rest-controller.php", "includes/class-components.php", "includes/class-content-cards.php", "docs/DESIGN-SYSTEM-CONTRACT.md", "tests/content-cards.php"]
+    },
+    {
+      "id": "F25-OBSERVABILITY-SAFE-MODE-REPAIR-74-76",
+      "source": "File 25 sections 74-76",
+      "status": "implemented",
+      "summary": "System checks, provider health, Safe Mode, diagnostics and bounded repair/preflight behavior are implemented without taking ownership of native data.",
+      "evidence": ["includes/class-system-check.php", "includes/class-safe-mode.php", "includes/class-staging-probe.php", "tests/safe-mode.php", "tests/staging-probe.php"]
+    },
+    {
+      "id": "F25-MIGRATION-STRUCTURE-UNINSTALL-77-79",
+      "source": "File 25 sections 77-79",
+      "status": "implemented",
+      "summary": "Schema upgrades are idempotent, plugin structure is governed, and uninstall is non-destructive by default.",
+      "evidence": ["includes/class-upgrade-manager.php", "uninstall.php", "tools/verify-structure.php", "tests/upgrade-manager.php"]
+    },
+    {
+      "id": "F25-QA-80-84",
+      "source": "File 25 sections 80-84",
+      "status": "implemented",
+      "summary": "Role, profile-state, timeline-state, security and accessibility source-level QA matrices are encoded across the governed test suite.",
+      "evidence": ["composer.json", "tests/authoritative-native-contracts.php", "tests/visual-acceptance.php", "tests/review54-93-bootstrap.php"]
+    },
+    {
+      "id": "F25-VISUAL-BROWSER-85-86",
+      "source": "File 25 sections 85-86",
+      "status": "external_acceptance",
+      "source_preparation_complete": true,
+      "acceptance_pending": true,
+      "summary": "Visual-regression and browser acceptance contracts and evidence schema are implemented; real browser/device evidence is intentionally deferred.",
+      "evidence": ["includes/class-visual-acceptance.php", "tests/visual-acceptance.php", "config/staging-test-plan.json", "docs/HOSTINGER-STAGING-PROBE-AND-RUNBOOK.md"]
+    },
+    {
+      "id": "F25-RELEASE-DELIVERABLES-87-88",
+      "source": "File 25 sections 87-88",
+      "status": "implemented",
+      "summary": "Coding phases, deterministic ZIP, manifest, checksum, dependency matrix and independent artifact verification are implemented.",
+      "evidence": ["tools/build-staging-package.php", "tools/verify-staging-artifact.php", "docs/STAGING-PACKAGE-CONTRACT.md", "tests/release-engineering.php"]
+    },
+    {
+      "id": "F25-STAGING-ACCEPTANCE-89",
+      "source": "File 25 section 89; Master Plan v3.0 P-13",
+      "status": "external_acceptance",
+      "source_preparation_complete": true,
+      "acceptance_pending": true,
+      "summary": "The exact staging checklist, dependency contract, installed probe and rollback evidence model are complete in source; Hostinger execution is deferred.",
+      "evidence": ["config/staging-test-plan.json", "config/staging-dependencies.json", "includes/class-staging-cli.php", "includes/class-staging-probe.php", "docs/HOSTINGER-STAGING-PROBE-AND-RUNBOOK.md"]
+    },
+    {
+      "id": "F25-DEFINITION-OF-DONE-90-93",
+      "source": "File 25 sections 90-93",
+      "status": "external_acceptance",
+      "source_preparation_complete": true,
+      "acceptance_pending": true,
+      "summary": "All source-owned Definition-of-Done requirements are implemented and automated; Founder, staging, production and operational acceptance remain deliberately unclaimed.",
+      "evidence": ["README.md", "docs/GOVERNING-SCOPE.md", "config/staging-test-plan.json", "tests/master-plan-reconciliation.php", "tests/release-engineering.php"]
+    },
+    {
+      "id": "REVIEW-CORRECTION-LINEAGE-20-93",
+      "source": "Master Plan v3.0 zero-defect change-control rule",
+      "status": "implemented",
+      "summary": "Reviews 20 through 93 and their corrective regressions remain in the governed automated suite; no known source defect is left open in this declaration.",
+      "evidence": ["composer.json", "docs/REVIEWS-39-53-FIFTEEN-ROUND-CORRECTIVE-RECORD-2026-08-03.md", "docs/REVIEWS-54-93-FORTY-ROUND-CORRECTIVE-RECORD-2026-08-03.md", "tests/review93-corrective-regression.php"]
+    }
+  ]
+}
