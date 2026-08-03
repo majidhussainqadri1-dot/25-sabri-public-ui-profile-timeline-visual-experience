@@ -14,6 +14,7 @@
       "@php tests/profile-router.php",
       "@php tests/authoritative-native-contracts.php",
       "@php tests/review20-owner-contracts.php",
+      "@php tests/review21-profile-media-authority.php",
       "@php tests/master-plan-reconciliation.php",
       "@php tests/file21-provider.php",
       "@php tests/design-system.php",

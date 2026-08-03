@@ -6,13 +6,18 @@ namespace Sabri\PublicExperience;
 
 use WP_User;
 
-if (! defined('ABSPATH')) {
+if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
     exit;
 }
 
 final class Profile_Repository
 {
     public const FOUNDER_DISPLAY_NAME = 'Dr. Allamah Majid Hussain Sabri Muhaddith Mursheed';
+
+    private const MEDIA_OWNER_META = '_spd_media_owner_user_id';
+    private const MEDIA_PURPOSE_META = '_spd_media_purpose';
+    private const ALLOWED_IMAGE_MIMES = ['image/jpeg', 'image/png', 'image/webp'];
+    private const MAX_IMAGE_PIXELS = 40000000;
 
     public function __construct(
         private Visibility_Policy $visibility,
@@ -71,11 +76,11 @@ final class Profile_Repository
             $cover_id = (int) ($founder_source['cover_id'] ?? $cover_id);
         }
 
-        // File 25 does not silently call an external avatar service. Only local,
-        // same-origin approved media is projected; otherwise the template renders
-        // privacy-safe initials.
-        $avatar = $photo_id > 0 ? wp_get_attachment_image_url($photo_id, 'medium') : '';
-        $cover = $cover_id > 0 ? wp_get_attachment_image_url($cover_id, 'large') : '';
+        // File 03 owns presentation media. File 25 projects a local image only
+        // when File 03 ownership, purpose, attachment type, MIME, dimensions,
+        // and same-site delivery all agree. Every mismatch fails closed.
+        $avatar = $this->owned_media_url($photo_id, $user_id, 'profile', 'medium');
+        $cover = $this->owned_media_url($cover_id, $user_id, 'cover', 'large');
         $headline = $profile_class === 'founder'
             ? (string) ($founder_source['title'] ?? '')
             : (string) ($professional['specialization'] ?? $this->native->profile_value($user_id, 'specialty'));
@@ -114,8 +119,8 @@ final class Profile_Repository
             'class' => $profile_class,
             'role_label' => $this->role_label($profile_class),
             'verified' => in_array($profile_class, ['founder', 'doctor'], true),
-            'avatar_url' => Public_URL::sanitize_same_site(is_string($avatar) ? $avatar : '', false),
-            'cover_url' => Public_URL::sanitize_same_site(is_string($cover) ? $cover : '', false),
+            'avatar_url' => $avatar,
+            'cover_url' => $cover,
             'headline' => $headline,
             'bio' => $bio,
             'country' => $country,
@@ -316,6 +321,39 @@ final class Profile_Repository
         }
 
         return array_values(array_unique($clean));
+    }
+
+    private function owned_media_url(int $attachment_id, int $user_id, string $purpose, string $size): string
+    {
+        if ($attachment_id <= 0 || $user_id <= 0) {
+            return '';
+        }
+        if (get_post_type($attachment_id) !== 'attachment'
+            || ! wp_attachment_is_image($attachment_id)
+            || (int) get_post_meta($attachment_id, self::MEDIA_OWNER_META, true) !== $user_id
+            || sanitize_key((string) get_post_meta($attachment_id, self::MEDIA_PURPOSE_META, true)) !== $purpose
+        ) {
+            return '';
+        }
+
+        $mime = strtolower((string) get_post_mime_type($attachment_id));
+        if (! in_array($mime, self::ALLOWED_IMAGE_MIMES, true)) {
+            return '';
+        }
+
+        $metadata = wp_get_attachment_metadata($attachment_id);
+        if (! is_array($metadata)) {
+            return '';
+        }
+        $width = (int) ($metadata['width'] ?? 0);
+        $height = (int) ($metadata['height'] ?? 0);
+        if ($width <= 0 || $height <= 0 || $width * $height > self::MAX_IMAGE_PIXELS) {
+            return '';
+        }
+
+        $url = wp_get_attachment_image_url($attachment_id, $size);
+
+        return Public_URL::sanitize_same_site(is_string($url) ? $url : '', false);
     }
 
     private function plain_text(string $value, int $limit): string
