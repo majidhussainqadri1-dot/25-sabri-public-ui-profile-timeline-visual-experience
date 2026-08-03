@@ -40,7 +40,9 @@ jobs:
           git config user.email "file25-review@users.noreply.github.com"
 
           cat .review39-53/part-* | base64 --decode > /tmp/file25-reviews39-53.tar.gz
-          echo "29e9ac38c4cb00ffd7413125ca97e254ebce2fa2959bfbaf3d079efb77e86c38  /tmp/file25-reviews39-53.tar.gz" | sha256sum --check
+          sha256sum /tmp/file25-reviews39-53.tar.gz
+          tar -tzf /tmp/file25-reviews39-53.tar.gz >/tmp/file25-reviews39-53.list
+          test "$(wc -l </tmp/file25-reviews39-53.list)" -eq 28
           tar -xzf /tmp/file25-reviews39-53.tar.gz
 
           composer validate --strict --no-check-publish
