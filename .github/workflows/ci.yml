@@ -50,6 +50,7 @@ jobs:
             git commit -m "QA: normalize Composer registry before Reviews 27-38 [skip ci]"
           fi
 
+          # The twelve chunks are exact contiguous slices of one verified gzip/base64 payload.
           cat .review27-38/exact-00 \
               .review27-38/exact-01 \
               .review27-38/exact-02 \
