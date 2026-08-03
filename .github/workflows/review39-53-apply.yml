@@ -1,4 +1,4 @@
-name: Diagnose File 25 Reviews 39-53 Payload
+name: Apply File 25 Reviews 39-53 Source
 
 on:
   push:
@@ -7,23 +7,81 @@ on:
       - ".github/workflows/review39-53-apply.yml"
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: file-25-review39-53-source-apply
+  cancel-in-progress: false
 
 jobs:
-  diagnose-payload:
+  apply-source:
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout exact corrective branch
+      - name: Checkout exact branch
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: feature/25a-25b-foundation
+          fetch-depth: 0
 
-      - name: Print payload part hashes
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        with:
+          php-version: "8.3"
+          coverage: none
+          extensions: zip
+
+      - name: Apply and verify fifteen source corrections
         shell: bash
         run: |
           set -euo pipefail
-          wc -c .review39-53/part-*
-          sha256sum .review39-53/part-*
-          cat .review39-53/part-* | base64 --decode > /tmp/file25-reviews39-53.tar.gz
-          sha256sum /tmp/file25-reviews39-53.tar.gz
-          gzip -tv /tmp/file25-reviews39-53.tar.gz
+          git config user.name "Sabri File 25 Review Bot"
+          git config user.email "file25-review@users.noreply.github.com"
+
+          cat \
+            .review39-53/part-00 \
+            .review39-53/part-01 \
+            .review39-53/part-02 \
+            .review39-53/part-03 \
+            .review39-53/part-04 \
+            .review39-53/part-050 \
+            .review39-53/part-051 \
+            .review39-53/part-052 \
+            .review39-53/part-053 \
+            .review39-53/part-06 \
+            | base64 --decode > /tmp/file25-reviews39-53.tar.gz
+          echo "29e9ac38c4cb00ffd7413125ca97e254ebce2fa2959bfbaf3d079efb77e86c38  /tmp/file25-reviews39-53.tar.gz" | sha256sum --check
+          tar -xzf /tmp/file25-reviews39-53.tar.gz
+
+          python - <<'PY'
+          from pathlib import Path
+
+          timeline = Path('includes/class-timeline-service.php')
+          source = timeline.read_text()
+          old = "if (! in_array($metadata['maturity'], ['read-only', 'staging-accepted', 'production-accepted'], true)\n                    || ! $provider->is_available()"
+          new = "if ($metadata['maturity'] === 'disabled'\n                    || ! in_array($metadata['maturity'], ['read-only', 'staging-accepted', 'production-accepted'], true)\n                    || ! $provider->is_available()"
+          if source.count(old) != 1:
+              raise SystemExit('Timeline maturity correction anchor mismatch')
+          timeline.write_text(source.replace(old, new, 1))
+
+          section = Path('includes/class-section-service.php')
+          source = section.read_text()
+          old = "if (! in_array($metadata['maturity'], ['read-only', 'staging-accepted', 'production-accepted'], true)) {"
+          new = "if ($metadata['maturity'] === 'disabled'\n                || ! in_array($metadata['maturity'], ['read-only', 'staging-accepted', 'production-accepted'], true)\n            ) {"
+          if source.count(old) != 1:
+              raise SystemExit('Section maturity correction anchor mismatch')
+          section.write_text(source.replace(old, new, 1))
+          PY
+
+          cp .github/workflows/ci.yml /tmp/current-ci.yml
+          git show a256ce9ae68a84d56be014aa3f95e1518b8bf37d:.github/workflows/ci.yml > .github/workflows/ci.yml
+          composer validate --strict --no-check-publish
+          find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
+          composer test
+          node --check assets/js/public.js
+          cp /tmp/current-ci.yml .github/workflows/ci.yml
+
+          rm -rf .review39-53
+          git add -A
+          git reset .github/workflows/ci.yml .github/workflows/review39-53-apply.yml
+          git commit -m "File 25 Reviews 39-53: fifteen corrective rounds"
+          git push origin HEAD:feature/25a-25b-foundation
