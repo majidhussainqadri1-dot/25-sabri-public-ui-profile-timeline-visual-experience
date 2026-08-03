@@ -114,10 +114,10 @@ final class Profile_Renderer
             'provider_errors' => [],
         ];
         if ($requested_section === 'timeline') {
-            $content_type = '';
-            if (isset($_GET['type']) && is_scalar($_GET['type'])) {
-                $content_type = sanitize_key((string) wp_unslash($_GET['type']));
-            }
+            $timeline_filters = $this->timeline_filters($profile);
+            $content_type = $this->requested_timeline_content_type($timeline_filters);
+            $context['timeline_filters'] = $timeline_filters;
+            $context['timeline_content_type'] = $content_type;
             $timeline = $this->timeline->get_for_author((int) $user->ID, [
                 'page' => max(1, (int) get_query_var('paged')),
                 'per_page' => 20,
@@ -171,7 +171,9 @@ final class Profile_Renderer
             return $robots;
         }
 
-        $filtered = isset($_GET['type']) || (int) get_query_var('paged') > 1;
+        $context = (array) ($GLOBALS['sabri_public_experience_context'] ?? []);
+        $filtered = sanitize_key((string) ($context['timeline_content_type'] ?? '')) !== ''
+            || (int) get_query_var('paged') > 1;
         $profile = (array) ($GLOBALS['sabri_public_experience_profile'] ?? []);
         $profile_class = sanitize_key((string) ($profile['class'] ?? ''));
         $professional = in_array($profile_class, ['founder', 'doctor'], true);
@@ -283,6 +285,57 @@ final class Profile_Renderer
         echo '<script type="application/ld+json">'
             . wp_json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT)
             . '</script>' . "\n";
+    }
+
+
+    /** @param array<string,mixed> $profile @return array<string,string> */
+    private function timeline_filters(array $profile): array
+    {
+        $base = [
+            '' => __('All', 'sabri-public-experience'),
+            'post' => __('Posts', 'sabri-public-experience'),
+        ];
+        $requested = (array) apply_filters(
+            'sabri_public_experience/timeline_filters',
+            $base,
+            $profile
+        );
+        $filters = [];
+        foreach (array_slice($requested, 0, 20, true) as $type => $label) {
+            if (! is_scalar($type) || ! is_scalar($label)) {
+                continue;
+            }
+            $raw_type = (string) $type;
+            $type = sanitize_key($raw_type);
+            $label = sanitize_text_field((string) $label);
+            if ($label === ''
+                || ($type !== ''
+                    && ($type !== $raw_type || preg_match('/^[a-z0-9_-]{1,64}$/', $type) !== 1))
+            ) {
+                continue;
+            }
+            $filters[$type] = $label;
+        }
+        if (! isset($filters[''])) {
+            $filters = ['' => __('All', 'sabri-public-experience')] + $filters;
+        }
+
+        return $filters;
+    }
+
+    /** @param array<string,string> $filters */
+    private function requested_timeline_content_type(array $filters): string
+    {
+        if (! isset($_GET['type']) || ! is_scalar($_GET['type'])) {
+            return '';
+        }
+        $raw = (string) wp_unslash($_GET['type']);
+        $requested = sanitize_key($raw);
+        if ($requested === '' || $requested !== $raw || strlen($requested) > 64) {
+            return '';
+        }
+
+        return array_key_exists($requested, $filters) ? $requested : '';
     }
 
     private function resolve_user(): ?WP_User

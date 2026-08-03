@@ -5,20 +5,9 @@ $page = max(1, (int) ($timeline['page'] ?? 1));
 $has_more = ! empty($timeline['has_more']);
 $partial = ! empty($timeline['provider_errors']);
 $truncated = ! empty($timeline['truncated']);
-$current_type = isset($_GET['type']) && is_scalar($_GET['type'])
-    ? sanitize_key((string) wp_unslash($_GET['type']))
-    : '';
-$base_filters = [
-    '' => __('All', 'sabri-public-experience'),
-    'post' => __('Posts', 'sabri-public-experience'),
-];
-$requested_filters = (array) apply_filters(
-    'sabri_public_experience/timeline_filters',
-    $base_filters,
-    (array) ($profile ?? [])
-);
+$current_type = sanitize_key((string) ($context['timeline_content_type'] ?? ''));
 $filters = [];
-foreach (array_slice($requested_filters, 0, 20, true) as $type => $label) {
+foreach ((array) ($context['timeline_filters'] ?? []) as $type => $label) {
     if (! is_scalar($type) || ! is_scalar($label)) {
         continue;
     }
