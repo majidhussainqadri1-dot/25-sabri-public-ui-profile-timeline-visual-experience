@@ -3,9 +3,7 @@
   "description": "File 25 global design system, public profiles, federated timelines, authoritative File 00/03/08/09/18 adapters, File 03 contact-consent enforcement, reviewed File 24 integration, structured public profile-section REST, visual acceptance, deterministic staging release engineering, and installed-candidate preflight for the Sabri Social Homeopathy Platform.",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
-  "require": {
-    "php": ">=8.0"
-  },
+  "require": {"php": ">=8.0"},
   "scripts": {
     "test": [
       "@php tests/run.php",
@@ -17,6 +15,7 @@
       "@php tests/review21-profile-media-authority.php",
       "@php tests/review22-timeline-identity.php",
       "@php tests/review23-section-cache-binding.php",
+      "@php tests/review24-contact-monotonicity.php",
       "@php tests/master-plan-reconciliation.php",
       "@php tests/file21-provider.php",
       "@php tests/design-system.php",

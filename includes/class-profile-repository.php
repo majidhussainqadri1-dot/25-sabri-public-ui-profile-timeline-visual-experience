@@ -230,16 +230,29 @@ final class Profile_Repository
      */
     private function public_contacts(int $user_id, array $clinic, array $founder): array
     {
+        // File 03 owns contact values and consent. File 08 explicitly excludes
+        // contact data, so clinic projections can never become a contact source.
         $values = [
-            'phone' => (string) ($founder['phone'] ?? $clinic['phone'] ?? $this->native->profile_value($user_id, 'phone')),
-            'whatsapp' => (string) ($founder['whatsapp'] ?? $clinic['whatsapp'] ?? $this->native->profile_value($user_id, 'whatsapp')),
+            'phone' => (string) ($founder['phone'] ?? $this->native->profile_value($user_id, 'phone')),
+            'whatsapp' => (string) ($founder['whatsapp'] ?? $this->native->profile_value($user_id, 'whatsapp')),
         ];
-        $contacts = $this->sanitize_contacts($values, $user_id);
+        $canonical = $this->sanitize_contacts($values, $user_id);
 
-        /** @var array<string,mixed> $filtered */
-        $filtered = (array) apply_filters('sabri_public_experience/public_contacts', $contacts, $user_id);
+        /**
+         * Filters may revoke a canonical field only. They cannot add a field,
+         * replace the File 03 value, or bypass File 03 consent.
+         *
+         * @var array<string,mixed> $filtered
+         */
+        $filtered = (array) apply_filters('sabri_public_experience/public_contacts', $canonical, $user_id);
+        $public = [];
+        foreach ($canonical as $field => $value) {
+            if (array_key_exists($field, $filtered) && (bool) $filtered[$field]) {
+                $public[$field] = $value;
+            }
+        }
 
-        return $this->sanitize_contacts($filtered, $user_id);
+        return $public;
     }
 
     /** @param array<string,mixed> $values @return array<string,string> */
