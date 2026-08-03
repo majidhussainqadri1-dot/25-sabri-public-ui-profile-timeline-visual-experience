@@ -145,13 +145,13 @@ final class Section_Service
                     continue;
                 }
 
-                $key = self::candidate_key($candidate);
-                if ($key === '' || isset($seen[$key])) {
+                $card = Content_Cards::normalize_public($candidate);
+                if ($card === null) {
                     continue;
                 }
 
-                $card = Content_Cards::normalize_public($candidate);
-                if ($card === null) {
+                $key = self::candidate_key($candidate, $card);
+                if ($key === '' || isset($seen[$key])) {
                     continue;
                 }
 
@@ -245,14 +245,9 @@ final class Section_Service
         }
     }
 
-    /** @param array<string,mixed> $candidate */
-    private static function candidate_key(array $candidate): string
+    /** @param array<string,mixed> $candidate @param array<string,mixed> $card */
+    private static function candidate_key(array $candidate, array $card): string
     {
-        $title = self::text($candidate['title'] ?? '', 240);
-        if ($title === '') {
-            return '';
-        }
-
         $projection_key = is_scalar($candidate['projection_key'] ?? null)
             ? strtolower(trim((string) $candidate['projection_key']))
             : '';
@@ -260,15 +255,18 @@ final class Section_Service
             return hash('sha256', 'projection|' . $projection_key);
         }
 
-        $url = Public_URL::canonical_same_site_identity($candidate['url'] ?? '', false);
+        $url = Public_URL::canonical_same_site_identity($card['url'] ?? '', false);
         if ($url !== '') {
             return hash('sha256', 'url|' . $url);
         }
 
-        $type = self::key((string) ($candidate['type'] ?? 'article'));
-        $date = self::text($candidate['published_at'] ?? '', 80);
+        // A title/type/date fallback can collapse distinct native cards that
+        // legitimately share those three fields. Hash the complete normalized
+        // public projection instead; identical display cards still deduplicate,
+        // while different excerpts, badges, media, or metadata remain distinct.
+        $json = json_encode($card, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
-        return hash('sha256', 'fallback|' . $type . '|' . $title . '|' . $date);
+        return is_string($json) ? hash('sha256', 'card|' . $json) : '';
     }
 
     /** @param array<string,mixed> $profile */
