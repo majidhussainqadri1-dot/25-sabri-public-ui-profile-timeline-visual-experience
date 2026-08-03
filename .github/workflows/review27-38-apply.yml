@@ -1,0 +1,63 @@
+name: Apply File 25 Reviews 27-38
+
+on:
+  push:
+    branches: ["feature/25a-25b-foundation"]
+    paths:
+      - ".github/workflows/review27-38-apply.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: file-25-review27-38-apply
+  cancel-in-progress: false
+
+jobs:
+  apply-reviewed-series:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact corrective branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: feature/25a-25b-foundation
+          fetch-depth: 0
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        with:
+          php-version: "8.3"
+          coverage: none
+          extensions: zip
+
+      - name: Apply twelve reviewed corrections
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "Sabri File 25 Review Bot"
+          git config user.email "file25-review@users.noreply.github.com"
+
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path('composer.json')
+          data = json.loads(path.read_text())
+          path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
+          PY
+          git add composer.json
+          if ! git diff --cached --quiet; then
+            git commit -m "QA: normalize Composer registry before Reviews 27-38 [skip ci]"
+          fi
+
+          cat .review27-38/part-* | base64 --decode | gzip --decompress > /tmp/file25-reviews-27-38.mbox
+          git am --3way /tmp/file25-reviews-27-38.mbox
+
+          composer validate --strict --no-check-publish
+          find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
+          composer test
+          node --check assets/js/public.js
+
+          rm -rf .review27-38 .github/workflows/review27-38-apply.yml
+          git add -A
+          git commit -m "QA: finalize and clean Reviews 27-38 evidence series"
+          git push origin HEAD:feature/25a-25b-foundation
