@@ -12,120 +12,105 @@ permissions:
 
 concurrency:
   group: file25-four-round-review
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   review-fix:
     runs-on: ubuntu-latest
     outputs:
       final_sha: ${{ steps.final.outputs.sha }}
-      candidate_branch: ${{ steps.push.outputs.branch }}
       review15_sha: ${{ steps.r15.outputs.sha }}
       review16_sha: ${{ steps.r16.outputs.sha }}
       review17_sha: ${{ steps.r17.outputs.sha }}
       review18_sha: ${{ steps.r18.outputs.sha }}
     steps:
-      - name: Check out staged review input
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: feature/25a-25b-foundation
           fetch-depth: 0
-
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
           coverage: none
           extensions: zip
-
-      - name: Configure governed commit identity
+      - name: Configure commit identity
         run: |
           git config user.name "File 25 Review Bot"
           git config user.email "file25-review@users.noreply.github.com"
 
-      - name: Review 15 and correction 15 — exact File 08 owner contract
+      - name: Review 15 and correction 15
         shell: bash
         run: |
           set -euo pipefail
-          : > /tmp/review15.patch
-          for file in tools/patches/review15.part*.b64; do base64 -d "$file" >> /tmp/review15.patch; done
-          git apply --check /tmp/review15.patch
-          git apply /tmp/review15.patch
+          : > /tmp/r15.patch
+          for f in tools/patches/review15.part*.b64; do base64 -d "$f" >> /tmp/r15.patch; done
+          git apply --check /tmp/r15.patch
+          git apply /tmp/r15.patch
           base64 -d tools/patches/review15-test.b64 > tests/review15-file08-contract.php
           base64 -d tools/patches/review15-doc.b64 > docs/FIFTEENTH-REVIEW-FILE08-OWNER-CONTRACT-2026-08-03.md
           rm tools/patches/review15.part*.b64 tools/patches/review15-test.b64 tools/patches/review15-doc.b64
           php -l includes/class-native-integration.php
           php -l includes/class-dependency-manager.php
           php tests/review15-file08-contract.php
-          git add -A
-          git diff --cached --check
+          git add -A && git diff --cached --check
           git commit -m "File 25 review 15: enforce exact File 08 owner contract"
-
+          git push origin HEAD:feature/25a-25b-foundation
       - id: r15
-        name: Record review 15 commit
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-      - name: Review 16 and correction 16 — File 03 profile/media authority
+      - name: Review 16 and correction 16
         shell: bash
         run: |
           set -euo pipefail
-          : > /tmp/review16.patch
-          for file in tools/patches/review16.part*.b64; do base64 -d "$file" >> /tmp/review16.patch; done
-          git apply --check /tmp/review16.patch
-          git apply /tmp/review16.patch
+          : > /tmp/r16.patch
+          for f in tools/patches/review16.part*.b64; do base64 -d "$f" >> /tmp/r16.patch; done
+          git apply --check /tmp/r16.patch
+          git apply /tmp/r16.patch
           base64 -d tools/patches/review16-test.b64 > tests/review16-file03-profile-media.php
           base64 -d tools/patches/review16-doc.b64 > docs/SIXTEENTH-REVIEW-FILE03-PROFILE-MEDIA-AUTHORITY-2026-08-03.md
           rm tools/patches/review16.part*.b64 tools/patches/review16-test.b64 tools/patches/review16-doc.b64
           php -l includes/class-profile-repository.php
           php -l includes/class-native-integration.php
           php tests/review16-file03-profile-media.php
-          git add -A
-          git diff --cached --check
+          git add -A && git diff --cached --check
           git commit -m "File 25 review 16: enforce File 03 profile media authority"
-
+          git push origin HEAD:feature/25a-25b-foundation
       - id: r16
-        name: Record review 16 commit
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-      - name: Review 17 and correction 17 — canonical URL normalization
+      - name: Review 17 and correction 17
         shell: bash
         run: |
           set -euo pipefail
-          : > /tmp/review17.patch
-          for file in tools/patches/review17.part*.b64; do base64 -d "$file" >> /tmp/review17.patch; done
-          git apply --check /tmp/review17.patch
-          git apply /tmp/review17.patch
+          : > /tmp/r17.patch
+          for f in tools/patches/review17.part*.b64; do base64 -d "$f" >> /tmp/r17.patch; done
+          git apply --check /tmp/r17.patch
+          git apply /tmp/r17.patch
           base64 -d tools/patches/review17-test.b64 > tests/review17-canonical-url-normalization.php
           base64 -d tools/patches/review17-doc.b64 > docs/SEVENTEENTH-REVIEW-CANONICAL-URL-NORMALIZATION-2026-08-03.md
           rm tools/patches/review17.part*.b64 tools/patches/review17-test.b64 tools/patches/review17-doc.b64
           php -l includes/class-timeline-service.php
           php tests/review17-canonical-url-normalization.php
-          git add -A
-          git diff --cached --check
+          git add -A && git diff --cached --check
           git commit -m "File 25 review 17: normalize canonical timeline identity"
-
+          git push origin HEAD:feature/25a-25b-foundation
       - id: r17
-        name: Record review 17 commit
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-      - name: Review 18 and correction 18 — public-section cache binding
+      - name: Review 18 and correction 18
         shell: bash
         run: |
           set -euo pipefail
-          : > /tmp/review18.patch
-          for file in tools/patches/review18.part*.b64; do base64 -d "$file" >> /tmp/review18.patch; done
-          git apply --check /tmp/review18.patch
-          git apply /tmp/review18.patch
+          : > /tmp/r18.patch
+          for f in tools/patches/review18.part*.b64; do base64 -d "$f" >> /tmp/r18.patch; done
+          git apply --check /tmp/r18.patch
+          git apply /tmp/r18.patch
           base64 -d tools/patches/review18-test.b64 > tests/review18-section-cache-binding.php
           base64 -d tools/patches/review18-doc.b64 > docs/EIGHTEENTH-REVIEW-SECTION-CACHE-BINDING-2026-08-03.md
           rm tools/patches/review18.part*.b64 tools/patches/review18-test.b64 tools/patches/review18-doc.b64
-          php -l includes/class-section-service.php
-          php tests/review18-section-cache-binding.php
-
           python3 - <<'PY'
           import json
           from pathlib import Path
-
           tests = [
               "@php tests/review15-file08-contract.php",
               "@php tests/review16-file03-profile-media.php",
@@ -136,14 +121,14 @@ jobs:
           data = json.loads(composer.read_text())
           scripts = data["scripts"]["test"]
           anchor = "@php tests/master-plan-reconciliation.php"
-          index = scripts.index(anchor)
+          idx = scripts.index(anchor)
           for test in reversed(tests):
               if test not in scripts:
-                  scripts.insert(index, test)
+                  scripts.insert(idx, test)
           composer.write_text(json.dumps(data, indent=2) + "\n")
 
-          workflow = Path(".github/workflows/ci.yml")
-          text = workflow.read_text()
+          ci = Path(".github/workflows/ci.yml")
+          text = ci.read_text()
           anchor_block = "      - name: Master Plan v3 authoritative-contract reconciliation\n        run: php tests/master-plan-reconciliation.php\n"
           insert = """      - name: Review 15 exact File 08 owner contract
         run: php tests/review15-file08-contract.php
@@ -159,13 +144,11 @@ jobs:
 
 """
           if insert not in text:
-              if anchor_block not in text:
-                  raise SystemExit("CI insertion anchor not found")
               text = text.replace(anchor_block, insert + anchor_block, 1)
-          workflow.write_text(text)
+          ci.write_text(text)
 
           changelog = Path("CHANGELOG.md")
-          changelog_text = changelog.read_text()
+          old = changelog.read_text()
           marker = "## 0.14.0 — Four Additional Review and Correction Rounds"
           block = """## 0.14.0 — Four Additional Review and Correction Rounds
 
@@ -177,45 +160,33 @@ jobs:
 - Hostinger staging, production, merge, deployment, and Founder acceptance remain pending.
 
 """
-          if marker not in changelog_text:
-              changelog.write_text(block + changelog_text)
+          if marker not in old:
+              changelog.write_text(block + old)
 
           readme = Path("README.md")
-          readme_text = readme.read_text()
-          readme_marker = "## Four additional review-and-correction rounds"
-          readme_block = """
+          old = readme.read_text()
+          marker = "## Four additional review-and-correction rounds"
+          block = """
 ## Four additional review-and-correction rounds
 
 The current corrective branch additionally enforces the exact File 08 public clinic owner contract, the File 03 profile/media authority boundary, normalized canonical timeline identity, and profile-bound request-local section caching. Four independent regression suites and review records cover these corrections. These are source and automated-test results only; Hostinger staging and production acceptance remain pending.
 """
-          if readme_marker not in readme_text:
-              readme.write_text(readme_text.rstrip() + "\n" + readme_block)
+          if marker not in old:
+              readme.write_text(old.rstrip() + "\n" + block)
           PY
-
-          rm .github/workflows/four-round-review.yml
+          php -l includes/class-section-service.php
+          php tests/review18-section-cache-binding.php
           composer validate --strict --no-check-publish
           composer test
           node --check assets/js/public.js
-          git add -A
-          git diff --cached --check
+          rm .github/workflows/four-round-review.yml
+          git add -A && git diff --cached --check
           git commit -m "File 25 review 18: bind section cache and record four-round QA"
-
+          git push origin HEAD:feature/25a-25b-foundation
       - id: r18
-        name: Record review 18 commit
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-
       - id: final
-        name: Record final exact source
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-
-      - id: push
-        name: Push governed four-round candidate branch
-        shell: bash
-        run: |
-          set -euo pipefail
-          branch="automation/file25-four-round-review-${GITHUB_RUN_ID}"
-          git push origin "HEAD:refs/heads/${branch}"
-          echo "branch=${branch}" >> "$GITHUB_OUTPUT"
 
   verify:
     needs: review-fix
@@ -225,18 +196,15 @@ The current corrective branch additionally enforces the exact File 08 public cli
       matrix:
         php: ["8.0", "8.3"]
     steps:
-      - name: Check out exact four-round candidate
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: ${{ needs.review-fix.outputs.final_sha }}
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           coverage: none
           extensions: zip
-      - name: Verify exact candidate
-        run: |
+      - run: |
           composer validate --strict --no-check-publish
           find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
           composer test
@@ -246,21 +214,19 @@ The current corrective branch additionally enforces the exact File 08 public cli
     needs: [review-fix, verify]
     runs-on: ubuntu-latest
     steps:
-      - name: Check out exact four-round candidate
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: ${{ needs.review-fix.outputs.final_sha }}
-      - name: Set up PHP with ZIP support
-        uses: shivammathur/setup-php@v2
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
           coverage: none
           extensions: zip
-      - name: Build and independently verify deterministic candidate
+      - name: Build and verify deterministic candidate
         shell: bash
         run: |
           set -euo pipefail
-          version=$(php -r '$source=file_get_contents("sabri-public-experience.php"); if(!is_string($source)||preg_match("/^\\s*\\* Version:\\s*([^\\s]+)/m",$source,$m)!==1){exit(1);} echo $m[1];')
+          version=$(php -r '$s=file_get_contents("sabri-public-experience.php"); preg_match("/^\\s*\\* Version:\\s*([^\\s]+)/m",$s,$m); echo $m[1];')
           epoch=$(git show -s --format=%ct HEAD)
           sha=$(git rev-parse HEAD)
           php tools/build-staging-package.php --output-dir=build/a --commit="$sha" --source-date-epoch="$epoch"
@@ -275,8 +241,7 @@ The current corrective branch additionally enforces the exact File 08 public cli
           cp "build/a/${base}-manifest.json" build/artifact/
           cp config/staging-dependencies.json build/artifact/
           php tools/verify-staging-artifact.php --artifact=build/artifact
-      - name: Upload exact four-round candidate
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: file-25-four-round-review-${{ needs.review-fix.outputs.final_sha }}
           path: build/artifact/
@@ -287,27 +252,21 @@ The current corrective branch additionally enforces the exact File 08 public cli
     needs: [review-fix, verify, package]
     runs-on: ubuntu-latest
     steps:
-      - name: Record exact four-round evidence on PR 1
+      - name: Record four-round evidence
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          set -euo pipefail
           body=$(cat <<EOF
           ## Four separate review-and-correction rounds completed
 
-          - Review 15 commit: `${{ needs.review-fix.outputs.review15_sha }}`
-          - Review 16 commit: `${{ needs.review-fix.outputs.review16_sha }}`
-          - Review 17 commit: `${{ needs.review-fix.outputs.review17_sha }}`
-          - Review 18 commit / exact final candidate: `${{ needs.review-fix.outputs.review18_sha }}`
-          - Candidate branch: `${{ needs.review-fix.outputs.candidate_branch }}`
+          - Review 15: `${{ needs.review-fix.outputs.review15_sha }}`
+          - Review 16: `${{ needs.review-fix.outputs.review16_sha }}`
+          - Review 17: `${{ needs.review-fix.outputs.review17_sha }}`
+          - Review 18 / final exact candidate: `${{ needs.review-fix.outputs.review18_sha }}`
           - Workflow run: `${{ github.run_id }}`
 
-          PHP 8.0, PHP 8.3, JavaScript, the complete Composer suite, deterministic double-build, and independent artifact verification passed against the exact final candidate.
-
-          This evidence does not claim Hostinger staging acceptance, production approval, merge, live deployment, or Founder acceptance.
+          PHP 8.0, PHP 8.3, JavaScript, the complete Composer suite, deterministic double-build, and independent artifact verification passed. Hostinger staging, production approval, merge, live deployment, and Founder acceptance remain pending.
           EOF
           )
           gh api "repos/${GITHUB_REPOSITORY}/issues/1/comments" -f body="$body"
-
-# Triggered through the governed contents API on 2026-08-03.
