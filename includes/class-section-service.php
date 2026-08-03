@@ -20,6 +20,9 @@ final class Section_Service
 
     private const MAX_ITEMS_PER_PROVIDER = 24;
     private const MAX_ITEMS_PER_SECTION = 48;
+    private const MAX_CACHE_PROFILE_DEPTH = 5;
+    private const MAX_CACHE_PROFILE_ENTRIES = 160;
+    private const MAX_CACHE_PROFILE_STRING = 1000;
 
     /** @var array<string,array<string,mixed>> */
     private array $public_cache = [];
@@ -94,7 +97,10 @@ final class Section_Service
             return $empty;
         }
 
-        $cache_key = $user_id . ':' . $section . ':' . self::key((string) ($profile['class'] ?? 'member'));
+        // Request-local cache identity is bound to the complete bounded public
+        // projection, not merely the user/class pair. A changed contact, clinic,
+        // visibility, professional, or presentation value cannot reuse stale data.
+        $cache_key = $user_id . ':' . $section . ':' . self::profile_cache_digest($profile);
         if (isset($this->public_cache[$cache_key])) {
             /** @var array{contract_version:string,section:string,label:string,items:list<array<string,mixed>>,provider_error_count:int,truncated:bool,is_provider_section:bool} */
             return $this->public_cache[$cache_key];
@@ -242,8 +248,6 @@ final class Section_Service
             return '';
         }
 
-        // Native systems without item permalinks may provide a server-only opaque
-        // SHA-256 projection key. The value is never passed to the public card.
         $projection_key = is_scalar($candidate['projection_key'] ?? null)
             ? strtolower(trim((string) $candidate['projection_key']))
             : '';
@@ -253,8 +257,6 @@ final class Section_Service
 
         $url = Public_URL::sanitize_same_site($candidate['url'] ?? '', false);
         if ($url !== '') {
-            // The canonical destination is the strongest identity. Preserve path
-            // case while collapsing duplicate cards from multiple providers.
             return hash('sha256', 'url|' . $url);
         }
 
@@ -262,6 +264,53 @@ final class Section_Service
         $date = self::text($candidate['published_at'] ?? '', 80);
 
         return hash('sha256', 'fallback|' . $type . '|' . $title . '|' . $date);
+    }
+
+    /** @param array<string,mixed> $profile */
+    private static function profile_cache_digest(array $profile): string
+    {
+        $entries = 0;
+        $normalized = self::normalize_cache_value($profile, 0, $entries);
+        $json = json_encode($normalized, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+        return hash('sha256', is_string($json) ? $json : 'invalid-profile-projection');
+    }
+
+    private static function normalize_cache_value(mixed $value, int $depth, int &$entries): mixed
+    {
+        if ($depth > self::MAX_CACHE_PROFILE_DEPTH || $entries >= self::MAX_CACHE_PROFILE_ENTRIES) {
+            return '__bounded__';
+        }
+        $entries++;
+
+        if (is_array($value)) {
+            $normalized = [];
+            $associative = array_keys($value) !== range(0, count($value) - 1);
+            foreach ($value as $key => $item) {
+                if ($entries >= self::MAX_CACHE_PROFILE_ENTRIES) {
+                    $normalized['__truncated__'] = true;
+                    break;
+                }
+                $clean_key = is_int($key) ? (string) $key : self::text((string) $key, 120);
+                if ($clean_key === '') {
+                    continue;
+                }
+                $normalized[$clean_key] = self::normalize_cache_value($item, $depth + 1, $entries);
+            }
+            if ($associative) {
+                ksort($normalized, SORT_STRING);
+            }
+
+            return $normalized;
+        }
+        if (is_bool($value) || is_int($value) || is_float($value) || $value === null) {
+            return $value;
+        }
+        if (is_scalar($value)) {
+            return self::text((string) $value, self::MAX_CACHE_PROFILE_STRING);
+        }
+
+        return '__unsupported__';
     }
 
     private static function emit_error(\Throwable $exception, string $section): void
