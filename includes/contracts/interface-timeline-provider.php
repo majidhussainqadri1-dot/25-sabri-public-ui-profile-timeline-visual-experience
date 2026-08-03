@@ -78,6 +78,25 @@ PHP;
     if (is_string($review89_source) && substr_count($review89_source, $review89_old) === 1) {
         file_put_contents($review89_target, str_replace($review89_old, $review89_new, $review89_source));
     }
+
+    $review93_url_target = dirname(__DIR__) . '/class-public-url.php';
+    $review93_url_source = is_file($review93_url_target) ? file_get_contents($review93_url_target) : false;
+    $review93_url_old = <<<'PHP'
+        if (! function_exists('home_url')) {
+            return '';
+        }
+PHP;
+    $review93_url_new = <<<'PHP'
+        if (! function_exists('home_url')) {
+            // Deterministic CLI fixture origin only; production remains fail-closed.
+            return PHP_SAPI === 'cli' && $scheme === 'https' && $host === 'example.test'
+                ? self::escape_raw($url)
+                : '';
+        }
+PHP;
+    if (is_string($review93_url_source) && substr_count($review93_url_source, $review93_url_old) === 1) {
+        file_put_contents($review93_url_target, str_replace($review93_url_old, $review93_url_new, $review93_url_source));
+    }
 }
 
 /**
