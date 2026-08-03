@@ -15,7 +15,7 @@ concurrency:
 jobs:
   apply-reviews-27-38:
     name: Apply Reviews 27-38 corrective series
-    if: github.ref == 'refs/heads/feature/25a-25b-foundation'
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout exact corrective branch
