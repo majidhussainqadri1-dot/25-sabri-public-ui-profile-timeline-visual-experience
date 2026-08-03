@@ -30,7 +30,7 @@ jobs:
           coverage: none
           extensions: zip
 
-      - name: Apply, verify, and push forty corrective rounds
+      - name: Apply, verify, and push forty corrected review rounds
         shell: bash
         run: |
           set -euo pipefail
