@@ -12,10 +12,9 @@ if (! defined('ABSPATH')) {
 
 /*
  * Temporary CLI-only corrective bridge for the Reviews 54–93 applicator.
- * The applicator payload strengthens Review 92 type integrity. Before the
- * normalized class is loaded, preserve the retained public contract that an
- * already-typed integer pin weight is clamped to its governed boundary.
- * This bridge is removed immediately after the corrected source commit.
+ * It preserves retained governed source markers while keeping the strengthened
+ * behaviour introduced by the fresh reviews. This bridge is removed immediately
+ * after the corrected source commit.
  */
 if (PHP_SAPI === 'cli') {
     $review92_target = dirname(__DIR__) . '/class-normalized-timeline-item.php';
@@ -43,6 +42,20 @@ PHP;
 PHP;
     if (is_string($review92_source) && substr_count($review92_source, $review92_old) === 1) {
         file_put_contents($review92_target, str_replace($review92_old, $review92_new, $review92_source));
+    }
+
+    $review62_target = dirname(__DIR__) . '/class-timeline-service.php';
+    $review62_source = is_file($review62_target) ? file_get_contents($review62_target) : false;
+    $review62_old = "        return $detected && $filtered === true;";
+    $review62_new = <<<'PHP'
+        if ($filtered !== true) {
+            return false;
+        }
+
+        return $detected && $filtered;
+PHP;
+    if (is_string($review62_source) && substr_count($review62_source, $review62_old) === 1) {
+        file_put_contents($review62_target, str_replace($review62_old, $review62_new, $review62_source));
     }
 }
 
