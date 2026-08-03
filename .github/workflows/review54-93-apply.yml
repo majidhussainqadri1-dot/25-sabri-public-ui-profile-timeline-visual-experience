@@ -1,0 +1,54 @@
+name: Apply File 25 Reviews 54-93 Source
+
+on:
+  push:
+    branches: ["feature/25a-25b-foundation"]
+    paths:
+      - ".github/workflows/review54-93-apply.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: file-25-review54-93-source-apply
+  cancel-in-progress: false
+
+jobs:
+  apply-source:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/25a-25b-foundation
+          fetch-depth: 0
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          coverage: none
+          extensions: zip
+
+      - name: Apply and verify forty source corrections
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "Sabri File 25 Review Bot"
+          git config user.email "file25-review@users.noreply.github.com"
+
+          cat .review54-93/part-* | base64 --decode > /tmp/file25-review54-93.tar.gz
+          echo "fbd6ee0ef55738058d167b99053513fd43f7762128a270bde5175465953e5bad  /tmp/file25-review54-93.tar.gz" | sha256sum --check
+          test "$(tar -tzf /tmp/file25-review54-93.tar.gz | wc -l)" -eq 54
+          tar -xzf /tmp/file25-review54-93.tar.gz
+
+          composer validate --strict --no-check-publish
+          find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
+          composer test
+          node --check assets/js/public.js
+
+          rm -rf .review54-93
+          git add -A
+          git reset .github/workflows/review54-93-apply.yml
+          git commit -m "File 25 Reviews 54-93: forty corrective rounds"
+          git push origin HEAD:feature/25a-25b-foundation
