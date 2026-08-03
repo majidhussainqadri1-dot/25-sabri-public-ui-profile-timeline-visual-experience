@@ -25,6 +25,7 @@
       "@php tests/review29-contact-canonicalization.php",
       "@php tests/review30-public-url-path-hardening.php",
       "@php tests/review31-content-card-image-alt.php",
+      "@php tests/review32-timeline-action-allowlist.php",
       "@php tests/master-plan-reconciliation.php",
       "@php tests/file21-provider.php",
       "@php tests/design-system.php",

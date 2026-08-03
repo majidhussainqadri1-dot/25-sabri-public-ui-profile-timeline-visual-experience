@@ -40,6 +40,14 @@ final class Normalized_Timeline_Item implements JsonSerializable
         'retracted',
     ];
 
+    private const ALLOWED_ACTIONS = [
+        'view',
+        'read',
+        'watch',
+        'download',
+        'share',
+    ];
+
     /** @var array<string,mixed> */
     private array $data;
 
@@ -121,7 +129,7 @@ final class Normalized_Timeline_Item implements JsonSerializable
             'review_state' => $review_state,
             'correction_state' => $this->clean_key((string) ($data['correction_state'] ?? 'none'), 64) ?: 'none',
             'safety_flags' => $this->safe_key_list((array) ($data['safety_flags'] ?? [])),
-            'available_actions' => $this->safe_key_list((array) ($data['available_actions'] ?? [])),
+            'available_actions' => $this->safe_action_list((array) ($data['available_actions'] ?? [])),
             'metrics_reference' => $this->scalar_reference($data['metrics_reference'] ?? null),
             'pin_weight' => max(0, min(1000, (int) ($data['pin_weight'] ?? 0))),
         ];
@@ -199,6 +207,20 @@ final class Normalized_Timeline_Item implements JsonSerializable
         }
 
         return array_values(array_unique($clean));
+    }
+
+
+    /** @param array<mixed> $values @return list<string> */
+    private function safe_action_list(array $values): array
+    {
+        $actions = [];
+        foreach ($this->safe_key_list($values) as $action) {
+            if (in_array($action, self::ALLOWED_ACTIONS, true)) {
+                $actions[] = $action;
+            }
+        }
+
+        return array_values(array_unique($actions));
     }
 
     private function scalar_reference(mixed $value): int|string|null
