@@ -97,8 +97,11 @@ final class Section_Service
             return $empty;
         }
 
-        $cache_key = $user_id . ':' . $section . ':' . self::profile_cache_digest($profile);
-        if (isset($this->public_cache[$cache_key])) {
+        $profile_digest = self::profile_cache_digest($profile);
+        $cache_key = $profile_digest !== null
+            ? $user_id . ':' . $section . ':' . $profile_digest
+            : null;
+        if ($cache_key !== null && isset($this->public_cache[$cache_key])) {
             /** @var array{contract_version:string,section:string,label:string,items:list<array<string,mixed>>,provider_error_count:int,truncated:bool,is_provider_section:bool} */
             return $this->public_cache[$cache_key];
         }
@@ -161,7 +164,7 @@ final class Section_Service
             }
         }
 
-        return $this->public_cache[$cache_key] = [
+        $result = [
             'contract_version' => self::PUBLIC_CONTRACT_VERSION,
             'section' => $section,
             'label' => self::label($section),
@@ -170,6 +173,11 @@ final class Section_Service
             'truncated' => $truncated,
             'is_provider_section' => true,
         ];
+        if ($cache_key !== null) {
+            $this->public_cache[$cache_key] = $result;
+        }
+
+        return $result;
     }
 
     /**
@@ -264,19 +272,29 @@ final class Section_Service
     }
 
     /** @param array<string,mixed> $profile */
-    private static function profile_cache_digest(array $profile): string
+    private static function profile_cache_digest(array $profile): ?string
     {
         $entries = 0;
-        $normalized = self::normalize_cache_value($profile, 0, $entries);
+        $cacheable = true;
+        $normalized = self::normalize_cache_value($profile, 0, $entries, $cacheable);
+        if (! $cacheable) {
+            return null;
+        }
+
         $json = json_encode($normalized, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
-        return hash('sha256', is_string($json) ? $json : 'invalid-profile-projection');
+        return is_string($json) ? hash('sha256', $json) : null;
     }
 
-    private static function normalize_cache_value(mixed $value, int $depth, int &$entries): mixed
-    {
+    private static function normalize_cache_value(
+        mixed $value,
+        int $depth,
+        int &$entries,
+        bool &$cacheable
+    ): mixed {
         if ($depth > self::MAX_CACHE_PROFILE_DEPTH || $entries >= self::MAX_CACHE_PROFILE_ENTRIES) {
-            return '__bounded__';
+            $cacheable = false;
+            return null;
         }
         $entries++;
 
@@ -285,14 +303,23 @@ final class Section_Service
             $associative = array_keys($value) !== range(0, count($value) - 1);
             foreach ($value as $key => $item) {
                 if ($entries >= self::MAX_CACHE_PROFILE_ENTRIES) {
-                    $normalized['__truncated__'] = true;
+                    $cacheable = false;
                     break;
                 }
                 $clean_key = is_int($key) ? (string) $key : self::text((string) $key, 120);
-                if ($clean_key === '') {
-                    continue;
+                if ($clean_key === '' || array_key_exists($clean_key, $normalized)) {
+                    $cacheable = false;
+                    break;
                 }
-                $normalized[$clean_key] = self::normalize_cache_value($item, $depth + 1, $entries);
+                $normalized[$clean_key] = self::normalize_cache_value(
+                    $item,
+                    $depth + 1,
+                    $entries,
+                    $cacheable
+                );
+                if (! $cacheable) {
+                    break;
+                }
             }
             if ($associative) {
                 ksort($normalized, SORT_STRING);
@@ -300,14 +327,26 @@ final class Section_Service
 
             return $normalized;
         }
-        if (is_bool($value) || is_int($value) || is_float($value) || $value === null) {
+        if (is_bool($value) || is_int($value) || $value === null) {
+            return $value;
+        }
+        if (is_float($value)) {
+            if (! is_finite($value)) {
+                $cacheable = false;
+                return null;
+            }
             return $value;
         }
         if (is_scalar($value)) {
-            return self::text((string) $value, self::MAX_CACHE_PROFILE_STRING);
+            $text = self::text((string) $value, self::MAX_CACHE_PROFILE_STRING);
+            if (strlen((string) $value) > self::MAX_CACHE_PROFILE_STRING) {
+                $cacheable = false;
+            }
+            return $text;
         }
 
-        return '__unsupported__';
+        $cacheable = false;
+        return null;
     }
 
     private static function emit_error(\Throwable $exception, string $section): void
