@@ -105,7 +105,7 @@ jobs:
               if t not in s: s.insert(i,t)
           p.write_text(json.dumps(d,indent=2)+'\n')
           p=Path('CHANGELOG.md'); old=p.read_text(); marker='## 0.14.0 — Four Additional Review and Correction Rounds'
-          block='''## 0.14.0 — Four Additional Review and Correction Rounds\n\n- Review 15: enforced the exact File 08 `0.2.1` owner contract, introspection, public fields, exclusions, and read-only state.\n- Review 16: enforced File 03 `0.2.x` facade and profile-media owner/purpose/type/image/same-site validation.\n- Review 17: normalized default ports in canonical timeline identity and added deterministic tie-breaking.\n- Review 18: bound public-section request cache identity to the complete bounded public projection.\n- Added four dedicated regression suites and four review records.\n- Hostinger staging, production, merge, deployment, and Founder acceptance remain pending.\n\n'''
+          block='''## 0.14.0 — Four Additional Review and Correction Rounds\n\n- Review 15: enforced the exact File 08 `0.2.1` owner contract, introspection, public fields, exclusions, and read-only state.\n- Review 16: enforced File 03 `0.2.x` facade and profile-media owner/purpose/type/image/same-site validation.\n- Review 17: normalized default ports in canonical timeline identity and added deterministic tie-breaking.\n- Review 18: bound public-section request cache identity to the complete bounded public profile projection.\n- Added four dedicated regression suites and four review records.\n- Hostinger staging, production, merge, deployment, and Founder acceptance remain pending.\n\n'''
           if marker not in old: p.write_text(block+old)
           p=Path('README.md'); old=p.read_text(); marker='## Four additional review-and-correction rounds'
           block='''\n## Four additional review-and-correction rounds\n\nThe corrective branch now also enforces the exact File 08 public clinic owner contract, the File 03 profile/media authority boundary, normalized canonical timeline identity, and profile-bound request-local section caching. Four independent regression suites and review records cover these corrections. These are source and automated-test results only; Hostinger staging and production acceptance remain pending.\n'''
@@ -121,7 +121,7 @@ jobs:
           git push origin HEAD:feature/25a-25b-foundation
       - id: r18
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-     - id: final
+      - id: final
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
   four-round-verify:
@@ -198,3 +198,5 @@ jobs:
           EOF
           )
           gh api "repos/${GITHUB_REPOSITORY}/issues/1/comments" -f body="$body"
+
+# Contents API trigger
