@@ -1,6 +1,6 @@
 {
   "name": "sabri/file-25-global-visual-experience",
-  "description": "File 25 global design system, public profiles, federated timelines, authoritative File 00/03/08/09/18 adapters, File 03 contact-consent enforcement, reviewed File 24 integration, structured public profile-section REST, visual acceptance, deterministic staging release engineering, and installed-candidate preflight for the Sabri Social Homeopathy Platform.",
+  "description": "File 25 global design system, public profiles, federated timelines, authoritative File 00/03/08/09/18 adapters, File 03 contact-consent enforcement, reviewed File 24 integration, structured public profile-section REST, visual acceptance, deterministic staging release engineering, installed-candidate preflight, and dual-plan source-completion verification for the Sabri Social Homeopathy Platform.",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
   "require": {
@@ -102,6 +102,7 @@
       "@php tests/staging-probe.php",
       "@php tests/upgrade-manager.php",
       "@php tests/safe-mode.php",
+      "@php tools/verify-source-completion.php",
       "@php tools/verify-structure.php",
       "@php tools/verify-file06-and-components.php",
       "@php tools/verify-provider-metadata.php"
