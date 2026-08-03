@@ -30,7 +30,7 @@ jobs:
           coverage: none
           extensions: zip
 
-      - name: Apply fifteen corrections, verify canonical CI, clean, and push
+      - name: Apply fifteen corrections, resolve retained metadata verifier, verify, clean, and push
         shell: bash
         run: |
           set -euo pipefail
@@ -55,7 +55,29 @@ jobs:
           test "$(wc -l </tmp/file25-reviews39-53.list)" -eq 28
           tar -xzf /tmp/file25-reviews39-53.tar.gz
 
-          # Restore the governed CI contract before the complete release-engineering suite.
+          # Reviews 39 and 40 strengthen the maturity allow-list. Preserve the
+          # older governed package verifier's explicit disabled-state marker too.
+          python - <<'PY'
+          from pathlib import Path
+
+          timeline = Path('includes/class-timeline-service.php')
+          source = timeline.read_text()
+          old = "if (! in_array($metadata['maturity'], ['read-only', 'staging-accepted', 'production-accepted'], true)\n                    || ! $provider->is_available()"
+          new = "if ($metadata['maturity'] === 'disabled'\n                    || ! in_array($metadata['maturity'], ['read-only', 'staging-accepted', 'production-accepted'], true)\n                    || ! $provider->is_available()"
+          if source.count(old) != 1:
+              raise SystemExit('Timeline maturity correction anchor mismatch')
+          timeline.write_text(source.replace(old, new, 1))
+
+          section = Path('includes/class-section-service.php')
+          source = section.read_text()
+          old = "if (! in_array($metadata['maturity'], ['read-only', 'staging-accepted', 'production-accepted'], true)) {"
+          new = "if ($metadata['maturity'] === 'disabled'\n                || ! in_array($metadata['maturity'], ['read-only', 'staging-accepted', 'production-accepted'], true)\n            ) {"
+          if source.count(old) != 1:
+              raise SystemExit('Section maturity correction anchor mismatch')
+          section.write_text(source.replace(old, new, 1))
+          PY
+
+          # Restore the governed CI contract before the complete release suite.
           git show a256ce9ae68a84d56be014aa3f95e1518b8bf37d:.github/workflows/ci.yml > .github/workflows/ci.yml
 
           composer validate --strict --no-check-publish
