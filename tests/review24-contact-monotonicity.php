@@ -10,12 +10,12 @@ if (! is_string($source)) {
 
 $required = [
     '$canonical = $this->sanitize_contacts($values, $user_id);',
-    "apply_filters('sabri_public_experience/public_contacts', $canonical, $user_id)",
+    'apply_filters(\'sabri_public_experience/public_contacts\', $canonical, $user_id)',
     'foreach ($canonical as $field => $value)',
     'array_key_exists($field, $filtered) && (bool) $filtered[$field]',
     '$public[$field] = $value;',
-    "$founder['phone'] ?? $this->native->profile_value($user_id, 'phone')",
-    "$founder['whatsapp'] ?? $this->native->profile_value($user_id, 'whatsapp')",
+    '$founder[\'phone\'] ?? $this->native->profile_value($user_id, \'phone\')',
+    '$founder[\'whatsapp\'] ?? $this->native->profile_value($user_id, \'whatsapp\')',
 ];
 foreach ($required as $needle) {
     if (! str_contains($source, $needle)) {
@@ -25,8 +25,8 @@ foreach ($required as $needle) {
 }
 
 $forbidden = [
-    "$clinic['phone']",
-    "$clinic['whatsapp']",
+    '$clinic[\'phone\']',
+    '$clinic[\'whatsapp\']',
     'return $this->sanitize_contacts($filtered, $user_id);',
 ];
 foreach ($forbidden as $needle) {
