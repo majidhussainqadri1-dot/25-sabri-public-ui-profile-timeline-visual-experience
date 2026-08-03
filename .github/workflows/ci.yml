@@ -1,72 +1,153 @@
 name: File 25 CI
 
 on:
-  pull_request:
   push:
     branches: [main, "feature/**", "fix/**"]
+  pull_request:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: file-25-review27-38-finalizer-${{ github.ref }}
+  group: file-25-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  apply-reviews-27-38:
-    name: Apply Reviews 27-38 corrective series
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-24.04
+  php-quality:
+    name: PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ["8.0", "8.3"]
     steps:
-      - name: Checkout exact corrective branch
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with:
-          ref: feature/25a-25b-foundation
-          fetch-depth: 0
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Set up PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - name: Validate Composer metadata
+        run: composer validate --strict --no-check-publish
+
+      - name: PHP syntax
+        run: find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
+
+      - name: Authoritative File 00 08 09 native contracts
+        run: php tests/authoritative-native-contracts.php
+
+      - name: Master Plan v3 authoritative-contract reconciliation
+        run: php tests/master-plan-reconciliation.php
+
+      - name: File 18 owner-executed public DTO contract
+        run: php tests/file18-marketplace-provider.php
+
+      - name: Reviewed File 24 integration contract
+        run: php tests/file24-integration.php
+
+      - name: Complete governed test suite
+        run: composer test
+
+  javascript:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: JavaScript syntax
+        run: node --check assets/js/public.js
+
+  staging-package:
+    name: Deterministic staging candidate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact source candidate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Set up PHP with ZIP support
+        uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
           coverage: none
           extensions: zip
 
-      - name: Apply exact reviewed series and push source corrections
+      - name: Resolve immutable source inputs
+        id: source
         shell: bash
         run: |
           set -euo pipefail
-          git config user.name "Sabri File 25 Review Bot"
-          git config user.email "file25-review@users.noreply.github.com"
+          version=$(php -r '$source = file_get_contents("sabri-public-experience.php"); if (!is_string($source) || preg_match("/^\\s*\\* Version:\\s*([^\\s]+)/m", $source, $match) !== 1) { exit(1); } echo $match[1];')
+          echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "source_date_epoch=$(git show -s --format=%ct HEAD)" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          path = Path('composer.json')
-          data = json.loads(path.read_text())
-          path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
-          PY
-          git add composer.json
-          if ! git diff --cached --quiet; then
-            git commit -m "QA: normalize Composer registry before Reviews 27-38 [skip ci]"
-          fi
+      - name: Build staging candidate twice
+        shell: bash
+        run: |
+          set -euo pipefail
+          php tools/build-staging-package.php \
+            --output-dir=build/package-a \
+            --commit='${{ steps.source.outputs.commit_sha }}' \
+            --source-date-epoch='${{ steps.source.outputs.source_date_epoch }}'
+          php tools/build-staging-package.php \
+            --output-dir=build/package-b \
+            --commit='${{ steps.source.outputs.commit_sha }}' \
+            --source-date-epoch='${{ steps.source.outputs.source_date_epoch }}'
 
-          cat .review27-38/exact-00 \
-              .review27-38/exact-01 \
-              .review27-38/exact-02 \
-              .review27-38/exact-03 \
-              .review27-38/exact-04 \
-              .review27-38/exact-05 \
-              .review27-38/exact-06 \
-              .review27-38/exact-07 \
-              .review27-38/exact-08 \
-              .review27-38/exact-09 \
-              .review27-38/exact-10 \
-              .review27-38/exact-11 \
-            | base64 --decode | gzip --decompress > /tmp/file25-reviews-27-38.mbox
-          git am --3way /tmp/file25-reviews-27-38.mbox
+      - name: Verify reproducibility and detached evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="sabri-public-experience-${{ steps.source.outputs.version }}"
+          cmp "build/package-a/${BASE}.zip" "build/package-b/${BASE}.zip"
+          cmp "build/package-a/${BASE}-manifest.json" "build/package-b/${BASE}-manifest.json"
+          cmp "build/package-a/${BASE}.sha256" "build/package-b/${BASE}.sha256"
+          cd build/package-a
+          sha256sum --check "${BASE}.sha256"
 
-          composer validate --strict --no-check-publish
-          find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
-          node --check assets/js/public.js
+      - name: Verify extracted installed candidate against embedded manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="sabri-public-experience-${{ steps.source.outputs.version }}"
+          rm -rf build/installed-probe
+          mkdir -p build/installed-probe
+          unzip -q "build/package-a/${BASE}.zip" -d build/installed-probe
+          php -r '
+            define("ABSPATH", __DIR__ . "/");
+            require "build/installed-probe/sabri-public-experience/includes/class-staging-probe.php";
+            $report = \Sabri\PublicExperience\Staging_Probe::verify_package_integrity(
+              "build/installed-probe/sabri-public-experience",
+              "${{ steps.source.outputs.version }}",
+              "${{ steps.source.outputs.commit_sha }}"
+            );
+            echo json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), PHP_EOL;
+            exit(!empty($report["valid"]) ? 0 : 1);
+          '
 
-          git push origin HEAD:feature/25a-25b-foundation
+      - name: Assemble downloadable candidate artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="sabri-public-experience-${{ steps.source.outputs.version }}"
+          mkdir -p build/artifact
+          cp "build/package-a/${BASE}.zip" build/artifact/
+          cp "build/package-a/${BASE}.sha256" build/artifact/
+          cp "build/package-a/${BASE}-manifest.json" build/artifact/
+          cp config/staging-dependencies.json build/artifact/
+
+      - name: Verify assembled candidate with the independent verifier
+        run: php tools/verify-staging-artifact.php --artifact=build/artifact
+
+      - name: Upload staging candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: file-25-staging-candidate-${{ steps.source.outputs.commit_sha }}
+          path: build/artifact/
+          if-no-files-found: error
+          retention-days: 14
