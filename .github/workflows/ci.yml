@@ -36,6 +36,15 @@ jobs:
       - name: PHP syntax
         run: find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
 
+      - name: Authoritative File 00 08 09 native contracts
+        run: php tests/authoritative-native-contracts.php
+
+      - name: Master Plan v3 authoritative-contract reconciliation
+        run: php tests/master-plan-reconciliation.php
+
+      - name: Reviewed File 24 integration contract
+        run: php tests/file24-integration.php
+
       - name: Complete governed test suite
         run: composer test
 
