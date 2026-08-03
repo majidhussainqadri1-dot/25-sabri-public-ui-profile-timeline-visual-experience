@@ -52,9 +52,9 @@ for ($i = 0; $i < 20; $i++) {
     $cursor['level_' . $i] = [];
     $cursor =& $cursor['level_' . $i];
 }
-$deep_digest = (string) $method->invoke(null, $deep);
-if (preg_match('/^[a-f0-9]{64}$/', $deep_digest) !== 1) {
-    fwrite(STDERR, "Bounded deep projection did not produce a valid cache identity.\n");
+$deep_digest = $method->invoke(null, $deep);
+if ($deep_digest !== null) {
+    fwrite(STDERR, "Over-depth profile projections must disable request-local caching.\n");
     exit(1);
 }
 
