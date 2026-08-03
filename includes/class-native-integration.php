@@ -302,6 +302,8 @@ final class Native_Integration
             return (bool) $assertions['guardian_required'];
         }
 
+        // File 25 must not calculate age. Unknown ordinary-account age and
+        // guardian state therefore fail closed for public-contact projection.
         return true;
     }
 
