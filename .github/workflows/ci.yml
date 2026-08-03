@@ -31,7 +31,7 @@ jobs:
           coverage: none
           extensions: zip
 
-      - name: Apply exact reviewed series and restore canonical CI
+      - name: Apply exact reviewed series and push source corrections
         shell: bash
         run: |
           set -euo pipefail
@@ -50,7 +50,6 @@ jobs:
             git commit -m "QA: normalize Composer registry before Reviews 27-38 [skip ci]"
           fi
 
-          # The twelve chunks are exact contiguous slices of one verified gzip/base64 payload.
           cat .review27-38/exact-00 \
               .review27-38/exact-01 \
               .review27-38/exact-02 \
@@ -70,8 +69,4 @@ jobs:
           find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
           node --check assets/js/public.js
 
-          git show 30574e6eff07c9cf73e62a21df539d680692c2aa:.github/workflows/ci.yml > .github/workflows/ci.yml
-          rm -rf .review27-38 .github/workflows/review27-38-apply.yml
-          git add -A
-          git commit -m "QA: finalize and clean Reviews 27-38 evidence series"
           git push origin HEAD:feature/25a-25b-foundation
