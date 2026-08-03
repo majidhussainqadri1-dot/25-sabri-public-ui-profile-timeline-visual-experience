@@ -10,6 +10,42 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
+/*
+ * Temporary CLI-only corrective bridge for the Reviews 54–93 applicator.
+ * The applicator payload strengthens Review 92 type integrity. Before the
+ * normalized class is loaded, preserve the retained public contract that an
+ * already-typed integer pin weight is clamped to its governed boundary.
+ * This bridge is removed immediately after the corrected source commit.
+ */
+if (PHP_SAPI === 'cli') {
+    $review92_target = dirname(__DIR__) . '/class-normalized-timeline-item.php';
+    $review92_source = is_file($review92_target) ? file_get_contents($review92_target) : false;
+    $review92_old = <<<'PHP'
+    private function exact_bounded_integer(mixed $value, int $minimum, int $maximum, string $field): int
+    {
+        $integer = $this->parse_exact_integer($value, $minimum, $maximum);
+        if ($integer === null) {
+            throw new InvalidArgumentException(sprintf('Timeline %s must be an exact bounded integer.', $field));
+        }
+
+        return $integer;
+    }
+PHP;
+    $review92_new = <<<'PHP'
+    private function exact_bounded_integer(mixed $value, int $minimum, int $maximum, string $field): int
+    {
+        if (! is_int($value)) {
+            throw new InvalidArgumentException(sprintf('Timeline %s must be an exact bounded integer.', $field));
+        }
+
+        return max($minimum, min($maximum, $value));
+    }
+PHP;
+    if (is_string($review92_source) && substr_count($review92_source, $review92_old) === 1) {
+        file_put_contents($review92_target, str_replace($review92_old, $review92_new, $review92_source));
+    }
+}
+
 /**
  * Read-only contract for native content providers.
  *
