@@ -81,15 +81,27 @@ if (! isset($filters[''])) {
                 continue;
             }
             $published_at = (string) ($item['published_at'] ?? '');
-            $timestamp = strtotime($published_at);
+            $published_date = \DateTimeImmutable::createFromFormat(
+                '!Y-m-d\TH:i:s\Z',
+                $published_at,
+                new \DateTimeZone('UTC')
+            );
+            $published_errors = \DateTimeImmutable::getLastErrors();
+            $timestamp = $published_date instanceof \DateTimeImmutable
+                && (! is_array($published_errors)
+                    || ((int) ($published_errors['warning_count'] ?? 0) === 0
+                        && (int) ($published_errors['error_count'] ?? 0) === 0))
+                && $published_date->format('Y-m-d\TH:i:s\Z') === $published_at
+                    ? $published_date->getTimestamp()
+                    : null;
             $correction = sanitize_key((string) ($item['correction_state'] ?? 'none'));
             ?>
             <article class="spux-card spux-timeline-card">
                 <div class="spux-card__meta">
                     <span class="spux-type"><?php echo esc_html(ucwords(str_replace('-', ' ', (string) ($item['content_type'] ?? 'publication')))); ?></span>
-                    <?php if ($timestamp !== false) : ?>
+                    <?php if ($timestamp !== null) : ?>
                         <time datetime="<?php echo esc_attr($published_at); ?>">
-                            <?php echo esc_html(wp_date(get_option('date_format'), $timestamp)); ?>
+                            <?php echo esc_html(wp_date(get_option('date_format'), $timestamp, new \DateTimeZone('UTC'))); ?>
                         </time>
                     <?php endif; ?>
                 </div>
