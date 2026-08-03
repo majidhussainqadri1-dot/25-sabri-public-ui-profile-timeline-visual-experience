@@ -217,14 +217,24 @@ final class Content_Cards
             }
         }
 
+        $url = Public_URL::sanitize_same_site($args['url'] ?? '', false);
+        $image_url = Public_URL::sanitize_same_site($args['image_url'] ?? '', false);
+        $image_alt = self::text($args['image_alt'] ?? '', 240);
+        if ($image_url !== '' && $image_alt === '') {
+            $image_alt = $title;
+        }
+        if ($image_url === '') {
+            $image_alt = '';
+        }
+
         return [
             'type' => $type,
             'title' => $title,
-            'url' => Public_URL::sanitize_same_site($args['url'] ?? '', false),
+            'url' => $url,
             'excerpt' => self::text($args['excerpt'] ?? '', 900),
             'eyebrow' => self::text($args['eyebrow'] ?? '', 100),
-            'image_url' => Public_URL::sanitize_same_site($args['image_url'] ?? '', false),
-            'image_alt' => self::text($args['image_alt'] ?? '', 240),
+            'image_url' => $image_url,
+            'image_alt' => $image_alt,
             'badge' => self::text($args['badge'] ?? '', 100),
             'badge_tone' => $badge_tone,
             'meta' => self::text_list($args['meta'] ?? [], 6, 140),
