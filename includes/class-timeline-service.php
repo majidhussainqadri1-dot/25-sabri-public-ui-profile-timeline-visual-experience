@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Sabri\PublicExperience;
 
-if (! defined('ABSPATH')) {
+if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
     exit;
 }
 
@@ -115,16 +115,33 @@ final class Timeline_Service
 
         usort(
             $items,
-            static function (Normalized_Timeline_Item $left, Normalized_Timeline_Item $right): int {
+            function (Normalized_Timeline_Item $left, Normalized_Timeline_Item $right): int {
                 $pin = (int) $right->get('pin_weight') <=> (int) $left->get('pin_weight');
                 if ($pin !== 0) {
                     return $pin;
                 }
 
-                $right_time = strtotime((string) $right->get('published_at')) ?: 0;
-                $left_time = strtotime((string) $left->get('published_at')) ?: 0;
+                // Normalized_Timeline_Item guarantees UTC `Y-m-dTH:i:sZ`, so
+                // lexical comparison is deterministic and avoids permissive parsing.
+                $date = strcmp((string) $right->get('published_at'), (string) $left->get('published_at'));
+                if ($date !== 0) {
+                    return $date;
+                }
 
-                return $right_time <=> $left_time;
+                $left_identity = [
+                    $this->canonical_key((string) $left->get('canonical_url')),
+                    (string) $left->get('provider_id'),
+                    (string) $left->get('native_object_type'),
+                    (string) $left->get('native_object_id'),
+                ];
+                $right_identity = [
+                    $this->canonical_key((string) $right->get('canonical_url')),
+                    (string) $right->get('provider_id'),
+                    (string) $right->get('native_object_type'),
+                    (string) $right->get('native_object_id'),
+                ];
+
+                return strcmp(implode('|', $left_identity), implode('|', $right_identity));
             }
         );
 
@@ -152,39 +169,41 @@ final class Timeline_Service
 
     private function canonical_is_allowed(string $url, Normalized_Timeline_Item $item): bool
     {
-        if (! function_exists('home_url')) {
-            return true;
-        }
+        $safe = Public_URL::sanitize_same_site($url, false);
+        $parts = $safe !== '' ? parse_url($safe) : false;
+        $detected = is_array($parts)
+            && in_array(strtolower((string) ($parts['scheme'] ?? '')), ['http', 'https'], true)
+            && trim((string) ($parts['host'] ?? '')) !== '';
 
-        $site = wp_parse_url(home_url('/'));
-        $target = wp_parse_url($url);
-        $same_site = is_array($site)
-            && is_array($target)
-            && strtolower((string) ($site['scheme'] ?? '')) === strtolower((string) ($target['scheme'] ?? ''))
-            && strtolower((string) ($site['host'] ?? '')) === strtolower((string) ($target['host'] ?? ''))
-            && (int) ($site['port'] ?? 0) === (int) ($target['port'] ?? 0);
-
-        $allowed = (bool) apply_filters(
+        $filtered = (bool) apply_filters(
             'sabri_public_experience/canonical_url_allowed',
-            $same_site,
-            $url,
+            $detected,
+            $safe,
             $item
         );
 
-        return $same_site && $allowed;
+        return $detected && $filtered;
     }
 
     private function canonical_key(string $url): string
     {
-        $parts = function_exists('wp_parse_url') ? wp_parse_url($url) : parse_url($url);
+        $safe = Public_URL::sanitize_same_site($url, false);
+        $parts = $safe !== '' ? parse_url($safe) : false;
         if (! is_array($parts)) {
             return '';
         }
 
         $scheme = strtolower((string) ($parts['scheme'] ?? ''));
-        $host = strtolower((string) ($parts['host'] ?? ''));
-        $port = isset($parts['port']) ? ':' . (int) $parts['port'] : '';
+        $host = strtolower(rtrim((string) ($parts['host'] ?? ''), '.'));
+        if (! in_array($scheme, ['http', 'https'], true) || $host === '') {
+            return '';
+        }
+
+        $port_number = isset($parts['port']) ? (int) $parts['port'] : ($scheme === 'https' ? 443 : 80);
+        $default_port = $scheme === 'https' ? 443 : 80;
+        $port = $port_number === $default_port ? '' : ':' . $port_number;
         $path = (string) ($parts['path'] ?? '/');
+        $path = $path === '' ? '/' : $path;
         $path = $path === '/' ? '/' : rtrim($path, '/');
         $query = isset($parts['query']) && $parts['query'] !== '' ? '?' . $parts['query'] : '';
 
