@@ -46,6 +46,7 @@ namespace {
         public static function verification_status(int $user_id): string { return self::$status; }
         public static function get(int $user_id, string $key, string $default = ''): string { return $default; }
         public static function founder(): array { return []; }
+        public static function can_show_contact(int $user_id, bool $founder = false): bool { return false; }
     }
 
     /** @var array<int,array<string,mixed>> */
@@ -114,6 +115,21 @@ namespace {
             'contract_version' => '1.0.0',
             'owner' => 'file-08',
             'fields' => ['name', 'address', 'country', 'city', 'hours', 'timezone'],
+            'excludes' => [
+                'phone',
+                'whatsapp',
+                'email',
+                'user_id',
+                'native_id',
+                'verification_evidence',
+                'appointments',
+                'patient_data',
+                'private_notes',
+                'analytics',
+                'payments',
+                'clinical_records',
+                'messages',
+            ],
             'writes_data' => false,
         ];
     }
