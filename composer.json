@@ -27,6 +27,7 @@
       "@php tests/review31-content-card-image-alt.php",
       "@php tests/review32-timeline-action-allowlist.php",
       "@php tests/review33-timeline-chronology.php",
+      "@php tests/review34-section-aware-seo-title.php",
       "@php tests/master-plan-reconciliation.php",
       "@php tests/file21-provider.php",
       "@php tests/design-system.php",

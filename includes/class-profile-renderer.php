@@ -153,13 +153,7 @@ final class Profile_Renderer
 
         $profile = (array) $GLOBALS['sabri_public_experience_profile'];
         $context = (array) ($GLOBALS['sabri_public_experience_context'] ?? []);
-        $section = sanitize_key((string) ($context['section'] ?? 'overview'));
-        $labels = (array) ($profile['section_labels'] ?? []);
-        $title = (string) $profile['display_name'];
-        if ($section !== 'overview' && isset($labels[$section])) {
-            $title = (string) $labels[$section] . ' — ' . $title;
-        }
-        $parts['title'] = $title;
+        $parts['title'] = $this->page_title($profile, $context);
 
         return $parts;
     }
@@ -200,6 +194,7 @@ final class Profile_Renderer
 
         $profile = (array) $GLOBALS['sabri_public_experience_profile'];
         $context = (array) ($GLOBALS['sabri_public_experience_context'] ?? []);
+        $page_title = $this->page_title($profile, $context);
         $canonical = Public_URL::sanitize_same_site($profile['canonical_url'] ?? '', false);
         if ($canonical === '') {
             return;
@@ -217,7 +212,7 @@ final class Profile_Renderer
             echo '<meta property="og:description" content="' . esc_attr($description) . '">' . "\n";
         }
         echo '<meta property="og:type" content="profile">' . "\n";
-        echo '<meta property="og:title" content="' . esc_attr((string) ($profile['display_name'] ?? '')) . '">' . "\n";
+        echo '<meta property="og:title" content="' . esc_attr($page_title) . '">' . "\n";
         echo '<meta property="og:url" content="' . esc_url($canonical) . '">' . "\n";
         $avatar = Public_URL::sanitize_same_site($profile['avatar_url'] ?? '', false);
         if ($avatar !== '') {
@@ -261,6 +256,7 @@ final class Profile_Renderer
         $schema = [
             '@context' => 'https://schema.org',
             '@type' => 'ProfilePage',
+            'name' => $page_title,
             'url' => $canonical,
             'mainEntity' => $entity,
             'isPartOf' => [
@@ -346,6 +342,22 @@ final class Profile_Renderer
         }
 
         return $this->profiles->find_by_slug($context['slug']);
+    }
+
+
+    /** @param array<string,mixed> $profile @param array<string,mixed> $context */
+    private function page_title(array $profile, array $context): string
+    {
+        $name = trim(wp_strip_all_tags((string) ($profile['display_name'] ?? '')));
+        $section = sanitize_key((string) ($context['section'] ?? 'overview')) ?: 'overview';
+        $labels = (array) ($profile['section_labels'] ?? []);
+        if ($section === 'overview' || ! isset($labels[$section]) || ! is_scalar($labels[$section])) {
+            return $name;
+        }
+
+        $label = trim(wp_strip_all_tags((string) $labels[$section]));
+
+        return $label !== '' && $name !== '' ? $label . ' — ' . $name : $name;
     }
 
     /** @param array<string,mixed> $profile @param array<string,mixed> $context @return list<array{label:string,url:string}> */
