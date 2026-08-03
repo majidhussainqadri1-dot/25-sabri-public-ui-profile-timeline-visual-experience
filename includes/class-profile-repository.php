@@ -138,23 +138,21 @@ final class Profile_Repository
         /** @var array<string,mixed> $filtered */
         $filtered = (array) apply_filters('sabri_public_experience/public_profile_data', $profile, $user);
 
-        // Public identity and policy fields remain authoritative. Extensions may
-        // modify bounded presentation text and local presentation media only.
-        if ($profile_class === 'founder') {
-            $profile['display_name'] = self::FOUNDER_DISPLAY_NAME;
-        } else {
-            $filtered_name = $this->plain_text((string) ($filtered['display_name'] ?? $profile['display_name']), 190);
-            $profile['display_name'] = $filtered_name !== '' ? $filtered_name : $this->plain_text($default_name, 190);
-        }
+        // Canonical identity and validated File 03 media are immutable. Filters
+        // may change bounded headline/bio presentation and may revoke existing
+        // media, but they cannot rename an account or substitute another URL.
+        $profile['display_name'] = $profile_class === 'founder'
+            ? self::FOUNDER_DISPLAY_NAME
+            : $this->plain_text($default_name, 190);
         $profile['headline'] = $this->plain_text((string) ($filtered['headline'] ?? $profile['headline']), 300);
         $profile['bio'] = $this->plain_text((string) ($filtered['bio'] ?? $profile['bio']), 12000);
-        $profile['avatar_url'] = Public_URL::sanitize_same_site(
-            $filtered['avatar_url'] ?? $profile['avatar_url'],
-            false
+        $profile['avatar_url'] = $this->monotonic_media_filter(
+            $profile['avatar_url'],
+            $filtered['avatar_url'] ?? $profile['avatar_url']
         );
-        $profile['cover_url'] = Public_URL::sanitize_same_site(
-            $filtered['cover_url'] ?? $profile['cover_url'],
-            false
+        $profile['cover_url'] = $this->monotonic_media_filter(
+            $profile['cover_url'],
+            $filtered['cover_url'] ?? $profile['cover_url']
         );
         $profile['country'] = $this->plain_text((string) $profile['country'], 100);
         $profile['city'] = $this->plain_text((string) $profile['city'], 100);
@@ -367,6 +365,16 @@ final class Profile_Repository
         $url = wp_get_attachment_image_url($attachment_id, $size);
 
         return Public_URL::sanitize_same_site(is_string($url) ? $url : '', false);
+    }
+
+    private function monotonic_media_filter(string $canonical, mixed $filtered): string
+    {
+        if ($canonical === '' || ! is_scalar($filtered)) {
+            return '';
+        }
+        $candidate = Public_URL::sanitize_same_site((string) $filtered, false);
+
+        return $candidate !== '' && hash_equals($canonical, $candidate) ? $canonical : '';
     }
 
     private function plain_text(string $value, int $limit): string
