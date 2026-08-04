@@ -2,11 +2,9 @@
 
 declare(strict_types=1);
 
-if (! defined('ABSPATH')) {
-    define('ABSPATH', __DIR__ . '/fixtures/');
-}
+namespace Sabri\PublicExperience;
 
-if (! function_exists('wp_strip_all_tags')) {
+if (! function_exists(__NAMESPACE__ . '\\wp_strip_all_tags')) {
     function wp_strip_all_tags(string $text, bool $remove_breaks = false): string
     {
         $text = preg_replace('@<(script|style)[^>]*?>.*?</\\1>@si', '', $text) ?? '';
