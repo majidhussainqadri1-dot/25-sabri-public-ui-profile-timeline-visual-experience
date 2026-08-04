@@ -41,7 +41,7 @@ $rounds = [
     119 => "header('Retry-After', '10')",
     120 => "Cache-Control', 'no-store, private, max-age=0'",
     121 => "X-Content-Type-Options', 'nosniff'",
-    122 => "get_user_by('id', $userId)",
+    122 => 'get_user_by(\'id\', $userId)',
     123 => "rest_profile_reconciled",
     124 => 'sanitize_public_metrics',
     125 => 'MAX_PUBLIC_METRIC',
