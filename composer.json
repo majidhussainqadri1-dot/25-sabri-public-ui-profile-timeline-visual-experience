@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": [
-      "@php tests/run.php",
+      "@php -d auto_prepend_file=includes/class-plan-completion.php tests/run.php",
       "@php tests/timeline-provider-metadata.php",
       "@php tests/profile-data.php",
       "@php tests/profile-router.php",
