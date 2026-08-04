@@ -1,4 +1,4 @@
-name: Diagnose File 25 Reviews 94-133 Payload
+name: Apply File 25 Reviews 94-133
 
 on:
   push:
@@ -6,23 +6,51 @@ on:
   pull_request:
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: file-25-reviews94-133-apply-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  diagnose:
+  apply-and-verify:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout exact branch
+      - name: Checkout exact corrective branch
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: feature/25a-25b-foundation
-      - name: Print chunk and character validation
+          fetch-depth: 0
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        with:
+          php-version: "8.3"
+          coverage: none
+          extensions: zip
+
+      - name: Apply forty corrections, run full QA, and push
         shell: bash
         run: |
           set -euo pipefail
-          wc -c .review94-133/chunk-*
-          sha256sum .review94-133/chunk-*
-          grep -nHv '^[A-Za-z0-9+/=]*$' .review94-133/chunk-* || true
-          cat .review94-133/chunk-* | base64 --decode > /tmp/reviews94-133-payload.tar.gz || true
-          sha256sum /tmp/reviews94-133-payload.tar.gz
+          git config user.name "Sabri File 25 Review Bot"
+          git config user.email "file25-review@users.noreply.github.com"
+
+          cat .review94-133/chunk-* | base64 --decode > /tmp/reviews94-133-payload.tar.gz
+          echo "a89a1aeb693bc6cb5902cde4067b7a06458302317ff23b9bac79ff9c375bff15  /tmp/reviews94-133-payload.tar.gz" | sha256sum --check
+          tar -tzf /tmp/reviews94-133-payload.tar.gz | tee /tmp/reviews94-133-files.txt
+          test "$(wc -l < /tmp/reviews94-133-files.txt)" -eq 18
+          tar -xzf /tmp/reviews94-133-payload.tar.gz
+
+          composer validate --strict --no-check-publish
+          find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
+          php tests/review94-133-forty-round-adversarial.php
+          composer test
+          node --check assets/js/public.js
+
+          rm -rf .review94-133
+          git add -A
+          git reset .github/workflows/ci.yml .github/workflows/reviews94-133-apply.yml
+          git commit -m "File 25 Reviews 94-133: forty corrective rounds"
+          git push origin HEAD:feature/25a-25b-foundation
