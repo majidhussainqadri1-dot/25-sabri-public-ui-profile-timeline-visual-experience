@@ -105,6 +105,7 @@ $spux_files = [
     'includes/class-rest-controller.php',
     'includes/class-system-check.php',
     'includes/class-plan-completion.php',
+    'includes/class-forty-round-hardening.php',
     'includes/class-plugin.php',
 ];
 
