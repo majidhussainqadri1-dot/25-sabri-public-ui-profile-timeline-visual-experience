@@ -45,9 +45,6 @@ final class Plugin
         update_option('sabri_public_experience_schema_version', SABRI_PUBLIC_EXPERIENCE_SCHEMA_VERSION, false);
         update_option('sabri_public_experience_runtime_version', SABRI_PUBLIC_EXPERIENCE_VERSION, false);
         add_option('sabri_public_experience_safe_mode', '0', '', false);
-        // Retained only as a backward-compatible historical option. Runtime
-        // Founder identity is frozen by Profile_Repository and cannot be changed
-        // through this presentation option.
         add_option('sabri_public_experience_founder_display_name', Profile_Repository::FOUNDER_DISPLAY_NAME, '', false);
         Profile_Router::flush();
     }
@@ -69,6 +66,7 @@ final class Plugin
         Safe_Mode::begin('bootstrap');
 
         load_plugin_textdomain('sabri-public-experience', false, dirname(plugin_basename(SABRI_PUBLIC_EXPERIENCE_FILE)) . '/languages');
+        (new Plan_Completion())->register();
 
         $router = new Profile_Router();
         $file_24 = new File_24_Integration($router);
