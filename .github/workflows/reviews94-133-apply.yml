@@ -1,7 +1,10 @@
 name: Apply File 25 Reviews 94-133
 
 on:
-  pull_request:
+  push:
+    branches: ["feature/25a-25b-foundation"]
+    paths:
+      - ".github/workflows/reviews94-133-apply.yml"
 
 permissions:
   contents: write
