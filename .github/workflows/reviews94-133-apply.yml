@@ -1,16 +1,13 @@
 name: Apply File 25 Reviews 94-133
 
 on:
-  push:
-    branches: ["feature/25a-25b-foundation"]
-    paths:
-      - ".github/workflows/reviews94-133-apply.yml"
+  pull_request:
 
 permissions:
   contents: write
 
 concurrency:
-  group: file-25-reviews94-133-apply
+  group: file-25-reviews94-133-source-apply
   cancel-in-progress: false
 
 jobs:
@@ -30,18 +27,48 @@ jobs:
           coverage: none
           extensions: zip
 
-      - name: Apply forty-round corrective payload and verify
+      - name: Apply forty corrections, run full QA, and push source commit
         shell: bash
         run: |
           set -euo pipefail
+          if [ ! -f .review94-133/chunk-00 ]; then
+            echo "Reviews 94-133 payload already applied; no further mutation required."
+            exit 0
+          fi
+
           git config user.name "Sabri File 25 Review Bot"
           git config user.email "file25-review@users.noreply.github.com"
 
           cat .review94-133/chunk-* | base64 --decode > /tmp/reviews94-133-payload.tar.gz
           echo "a89a1aeb693bc6cb5902cde4067b7a06458302317ff23b9bac79ff9c375bff15  /tmp/reviews94-133-payload.tar.gz" | sha256sum --check
           tar -tzf /tmp/reviews94-133-payload.tar.gz | tee /tmp/reviews94-133-files.txt
-          test "$(wc -l < /tmp/reviews94-133-files.txt)" -eq 14
+          test "$(wc -l < /tmp/reviews94-133-files.txt)" -eq 18
           tar -xzf /tmp/reviews94-133-payload.tar.gz
+
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('includes/class-timeline-service.php')
+          source = path.read_text()
+          old = """        $raw_search = $query['search'] ?? '';
+        $search = is_string($raw_search) ? Plan_Completion::normalize_search_query($raw_search) : '';
+        $search_invalid = $raw_search !== '' && (! is_string($raw_search) || $search === '');
+"""
+          new = """        $raw_search = $query['search'] ?? '';
+        $search = '';
+        $search_invalid = false;
+        if ($raw_search !== '') {
+            if (! is_string($raw_search) || ! class_exists(Plan_Completion::class)) {
+                $search_invalid = true;
+            } else {
+                $search = Plan_Completion::normalize_search_query($raw_search);
+                $search_invalid = $search === '';
+            }
+        }
+"""
+          if source.count(old) != 1:
+              raise SystemExit('Timeline search bootstrap correction anchor mismatch')
+          path.write_text(source.replace(old, new, 1))
+          PY
 
           composer validate --strict --no-check-publish
           find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
