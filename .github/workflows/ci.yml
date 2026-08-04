@@ -43,6 +43,31 @@ jobs:
           test "$(wc -l < /tmp/reviews94-133-files.txt)" -eq 18
           tar -xzf /tmp/reviews94-133-payload.tar.gz
 
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('includes/class-timeline-service.php')
+          source = path.read_text()
+          old = """        $raw_search = $query['search'] ?? '';
+        $search = is_string($raw_search) ? Plan_Completion::normalize_search_query($raw_search) : '';
+        $search_invalid = $raw_search !== '' && (! is_string($raw_search) || $search === '');
+"""
+          new = """        $raw_search = $query['search'] ?? '';
+        $search = '';
+        $search_invalid = false;
+        if ($raw_search !== '') {
+            if (! is_string($raw_search) || ! class_exists(Plan_Completion::class)) {
+                $search_invalid = true;
+            } else {
+                $search = Plan_Completion::normalize_search_query($raw_search);
+                $search_invalid = $search === '';
+            }
+        }
+"""
+          if source.count(old) != 1:
+              raise SystemExit('Timeline search bootstrap correction anchor mismatch')
+          path.write_text(source.replace(old, new, 1))
+          PY
+
           composer validate --strict --no-check-publish
           find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
           php tests/review94-133-forty-round-adversarial.php
