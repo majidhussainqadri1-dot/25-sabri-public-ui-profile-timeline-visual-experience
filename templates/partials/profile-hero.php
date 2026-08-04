@@ -30,19 +30,13 @@ if ($location === '') {
             <div class="spux-identity__title-row">
                 <h1><?php echo esc_html($display_name); ?></h1>
                 <?php if (! empty($profile['verified'])) : ?>
-                    <span class="spux-badge">
-                        <?php echo esc_html((string) $profile['role_label']); ?>
-                    </span>
+                    <span class="spux-badge"><?php echo esc_html((string) $profile['role_label']); ?></span>
                 <?php elseif (! empty($profile['role_label'])) : ?>
                     <span class="spux-role-label"><?php echo esc_html((string) $profile['role_label']); ?></span>
                 <?php endif; ?>
             </div>
-            <?php if (! empty($profile['headline'])) : ?>
-                <p class="spux-headline"><?php echo esc_html((string) $profile['headline']); ?></p>
-            <?php endif; ?>
-            <?php if ($location !== '') : ?>
-                <p class="spux-location"><?php echo esc_html($location); ?></p>
-            <?php endif; ?>
+            <?php if (! empty($profile['headline'])) : ?><p class="spux-headline"><?php echo esc_html((string) $profile['headline']); ?></p><?php endif; ?>
+            <?php if ($location !== '') : ?><p class="spux-location"><?php echo esc_html($location); ?></p><?php endif; ?>
         </div>
         <div class="spux-actions" aria-label="<?php esc_attr_e('Profile actions', 'sabri-public-experience'); ?>">
             <?php foreach ((array) ($profile['contacts'] ?? []) as $type => $value) : ?>
@@ -50,32 +44,16 @@ if ($location === '') {
                 $digits = preg_replace('/[^0-9+]/', '', (string) $value) ?? '';
                 $href = match ($type) {
                     'phone' => $digits !== '' ? 'tel:' . $digits : '',
-                    'whatsapp' => preg_replace('/[^0-9]/', '', $digits) !== ''
-                        ? 'https://wa.me/' . preg_replace('/[^0-9]/', '', $digits)
-                        : '',
+                    'whatsapp' => preg_replace('/[^0-9]/', '', $digits) !== '' ? 'https://wa.me/' . preg_replace('/[^0-9]/', '', $digits) : '',
                     default => '',
                 };
-                $label = $type === 'whatsapp'
-                    ? __('WhatsApp', 'sabri-public-experience')
-                    : __('Call', 'sabri-public-experience');
-                if ($href === '') {
-                    continue;
-                }
+                $label = $type === 'whatsapp' ? __('WhatsApp', 'sabri-public-experience') : __('Call', 'sabri-public-experience');
+                if ($href === '') { continue; }
                 ?>
-                <a class="spux-button spux-button--secondary" href="<?php echo esc_url($href); ?>" rel="noopener noreferrer">
-                    <?php echo esc_html($label); ?>
-                </a>
+                <a class="spux-button spux-button--secondary" href="<?php echo esc_url($href); ?>" rel="noopener noreferrer"><?php echo esc_html($label); ?></a>
             <?php endforeach; ?>
-            <button
-                class="spux-button spux-share"
-                type="button"
-                data-spux-share
-                data-title="<?php echo esc_attr($display_name); ?>"
-                data-url="<?php echo esc_url((string) ($profile['canonical_url'] ?? '')); ?>"
-                aria-describedby="spux-share-status"
-            >
-                <?php esc_html_e('Share', 'sabri-public-experience'); ?>
-            </button>
+            <?php echo \Sabri\PublicExperience\Plan_Completion::render_profile_actions($profile); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+            <button class="spux-button spux-share" type="button" data-spux-share data-title="<?php echo esc_attr($display_name); ?>" data-url="<?php echo esc_url((string) ($profile['canonical_url'] ?? '')); ?>" aria-describedby="spux-share-status"><?php esc_html_e('Share', 'sabri-public-experience'); ?></button>
             <span id="spux-share-status" class="spux-sr-only" role="status" aria-live="polite"></span>
         </div>
     </div>
