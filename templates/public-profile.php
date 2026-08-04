@@ -20,6 +20,8 @@ $profile = (array) ($GLOBALS['sabri_public_experience_profile'] ?? []);
 $context = (array) ($GLOBALS['sabri_public_experience_context'] ?? []);
 $timeline = (array) ($GLOBALS['sabri_public_experience_timeline'] ?? []);
 $provider_section = (array) ($GLOBALS['sabri_public_experience_provider_section'] ?? []);
+$metrics = (array) ($GLOBALS['sabri_public_experience_metrics'] ?? []);
+$completion_assistant = (array) ($GLOBALS['sabri_public_experience_completion_assistant'] ?? []);
 $section = sanitize_key((string) ($context['section'] ?? 'overview')) ?: 'overview';
 $sections = (array) ($profile['section_labels'] ?? []);
 $profile_class = sanitize_key((string) ($profile['class'] ?? 'member'));
@@ -28,7 +30,7 @@ $breadcrumbs = array_values(array_filter(
     'is_array'
 ));
 ?>
-<main id="sabri-main-content" class="spux-profile" tabindex="-1" data-spux-profile-class="<?php echo esc_attr($profile_class); ?>" data-spux-section="<?php echo esc_attr($section); ?>">
+<main id="sabri-main-content" class="spux-profile" tabindex="-1" data-spux-profile-class="<?php echo esc_attr($profile_class); ?>" data-spux-section="<?php echo esc_attr($section); ?>" data-spux-density="<?php echo esc_attr((string) ($profile['visual_density'] ?? 'comfortable')); ?>" data-spux-cover-focal-point="<?php echo esc_attr((string) ($profile['cover_focal_point'] ?? 'center')); ?>">
     <div class="spux-container sabri-ui-container">
         <?php if (is_404() || $profile === []) : ?>
             <?php
@@ -66,6 +68,48 @@ $breadcrumbs = array_values(array_filter(
             <?php endif; ?>
 
             <?php require SABRI_PUBLIC_EXPERIENCE_DIR . 'templates/partials/profile-hero.php'; ?>
+
+            <?php if (! empty($context['preview_mode'])) : ?>
+                <div class="spux-notice spux-notice--warning" role="status">
+                    <p><?php echo esc_html(sprintf(__('Preview mode: %s. This response is private and not indexable.', 'sabri-public-experience'), (string) $context['preview_mode'])); ?></p>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($metrics !== []) : ?>
+                <section class="spux-public-metrics" aria-labelledby="spux-public-metrics-title">
+                    <h2 id="spux-public-metrics-title" class="spux-sr-only"><?php esc_html_e('Public profile metrics', 'sabri-public-experience'); ?></h2>
+                    <dl>
+                        <?php foreach ($metrics as $metric => $value) : ?>
+                            <div class="spux-public-metrics__item">
+                                <dt><?php echo esc_html(ucwords(str_replace('_', ' ', (string) $metric))); ?></dt>
+                                <dd><?php echo esc_html(number_format_i18n((int) $value)); ?></dd>
+                            </div>
+                        <?php endforeach; ?>
+                    </dl>
+                </section>
+            <?php endif; ?>
+
+            <?php if (($completion_assistant['authorized'] ?? null) === true) : ?>
+                <aside class="spux-card spux-completion-assistant" aria-labelledby="spux-completion-title">
+                    <h2 id="spux-completion-title"><?php esc_html_e('Public Profile Completion Assistant', 'sabri-public-experience'); ?></h2>
+                    <?php if (($completion_assistant['complete'] ?? null) === true) : ?>
+                        <p><?php esc_html_e('All currently governed public-profile fields are complete.', 'sabri-public-experience'); ?></p>
+                    <?php else : ?>
+                        <p><?php esc_html_e('Complete or review these public-profile items:', 'sabri-public-experience'); ?></p>
+                        <ul>
+                            <?php foreach ((array) ($completion_assistant['missing'] ?? []) as $missing) : ?>
+                                <?php if (is_string($missing) && $missing !== '') : ?>
+                                    <li><?php echo esc_html(ucwords(str_replace('_', ' ', $missing))); ?></li>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                    <?php $edit_url = \Sabri\PublicExperience\Public_URL::sanitize_same_site($completion_assistant['edit_url'] ?? '', false); ?>
+                    <?php if ($edit_url !== '') : ?>
+                        <a class="spux-button spux-button--secondary" href="<?php echo esc_url($edit_url); ?>"><?php esc_html_e('Edit profile with native owner', 'sabri-public-experience'); ?></a>
+                    <?php endif; ?>
+                </aside>
+            <?php endif; ?>
 
             <?php if (count($sections) > 1) : ?>
                 <nav class="spux-tabs" aria-label="<?php esc_attr_e('Profile sections', 'sabri-public-experience'); ?>">

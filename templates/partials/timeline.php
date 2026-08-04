@@ -6,6 +6,9 @@ $has_more = ! empty($timeline['has_more']);
 $partial = ! empty($timeline['provider_errors']);
 $truncated = ! empty($timeline['truncated']);
 $current_type = sanitize_key((string) ($context['timeline_content_type'] ?? ''));
+$search_query = (string) ($context['timeline_search_query'] ?? '');
+$search_error = sanitize_key((string) ($context['timeline_search_error'] ?? ''));
+$search_enabled = (($context['preferences']['profile_local_search'] ?? null) === true);
 $filters = [];
 foreach ((array) ($context['timeline_filters'] ?? []) as $type => $label) {
     if (! is_scalar($type) || ! is_scalar($label)) {
@@ -25,6 +28,28 @@ if (! isset($filters[''])) {
     <h2 id="spux-section-title"><?php esc_html_e('Timeline', 'sabri-public-experience'); ?></h2>
     <p><?php esc_html_e('Approved public contributions from their native canonical sources.', 'sabri-public-experience'); ?></p>
 </div>
+
+<?php if ($search_enabled) : ?>
+    <form class="spux-timeline-search" method="get" action="<?php echo esc_url(remove_query_arg(['profile_q', 'paged'])); ?>" role="search">
+        <?php if ($current_type !== '') : ?>
+            <input type="hidden" name="type" value="<?php echo esc_attr($current_type); ?>">
+        <?php endif; ?>
+        <label for="spux-profile-search"><?php esc_html_e('Search this profile timeline', 'sabri-public-experience'); ?></label>
+        <div class="spux-timeline-search__controls">
+            <input id="spux-profile-search" type="search" name="profile_q" value="<?php echo esc_attr($search_query); ?>" maxlength="120" autocomplete="off">
+            <button class="spux-button" type="submit"><?php esc_html_e('Search', 'sabri-public-experience'); ?></button>
+            <?php if ($search_query !== '') : ?>
+                <a class="spux-button spux-button--secondary" href="<?php echo esc_url(remove_query_arg(['profile_q', 'paged'])); ?>"><?php esc_html_e('Clear search', 'sabri-public-experience'); ?></a>
+            <?php endif; ?>
+        </div>
+    </form>
+<?php endif; ?>
+
+<?php if ($search_error !== '') : ?>
+    <div class="spux-notice spux-notice--warning" role="alert">
+        <p><?php esc_html_e('The profile search request was invalid or search is disabled. No unsafe query was executed.', 'sabri-public-experience'); ?></p>
+    </div>
+<?php endif; ?>
 
 <?php if (count($filters) > 1) : ?>
     <nav class="spux-filter-bar" aria-label="<?php esc_attr_e('Timeline filters', 'sabri-public-experience'); ?>">
@@ -57,8 +82,13 @@ if (! isset($filters[''])) {
 
 <?php if ($items === []) : ?>
     <div class="spux-state spux-state--empty" role="status">
-        <h3><?php esc_html_e('No public publications yet', 'sabri-public-experience'); ?></h3>
-        <p><?php esc_html_e('Approved contributions will appear here when their native providers publish them.', 'sabri-public-experience'); ?></p>
+        <?php if ($search_query !== '') : ?>
+            <h3><?php esc_html_e('No matching public contributions', 'sabri-public-experience'); ?></h3>
+            <p><?php esc_html_e('Try a different keyword or clear the profile-local search.', 'sabri-public-experience'); ?></p>
+        <?php else : ?>
+            <h3><?php esc_html_e('No public publications yet', 'sabri-public-experience'); ?></h3>
+            <p><?php esc_html_e('Approved contributions will appear here when their native providers publish them.', 'sabri-public-experience'); ?></p>
+        <?php endif; ?>
     </div>
 <?php else : ?>
     <div class="spux-timeline">

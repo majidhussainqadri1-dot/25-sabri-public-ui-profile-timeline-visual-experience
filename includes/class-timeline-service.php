@@ -34,7 +34,10 @@ final class Timeline_Service
         $requested_page = self::exact_positive_integer($query['page'] ?? 1, PHP_INT_MAX);
         $content_type = self::exact_optional_key($query['content_type'] ?? '');
         $provider_filter = self::exact_optional_key($query['provider'] ?? '');
-        if ($per_page === null || $requested_page === null || $content_type === null || $provider_filter === null) {
+        $raw_search = $query['search'] ?? '';
+        $search = is_string($raw_search) ? Plan_Completion::normalize_search_query($raw_search) : '';
+        $search_invalid = $raw_search !== '' && (! is_string($raw_search) || $search === '');
+        if ($per_page === null || $requested_page === null || $content_type === null || $provider_filter === null || $search_invalid) {
             return [
                 'items' => [],
                 'page' => 1,
@@ -72,6 +75,7 @@ final class Timeline_Service
             'candidate_limit' => $candidate_limit,
             'requested_page' => $requested_page,
             'content_type' => $content_type,
+            'search' => $search,
         ];
 
         foreach ($this->registry->all() as $provider_id => $provider) {
@@ -116,6 +120,9 @@ final class Timeline_Service
                         throw new \UnexpectedValueException('Timeline provider returned an item for a different author or profile.');
                     }
                     if ($content_type !== '' && $item->get('content_type') !== $content_type) {
+                        continue;
+                    }
+                    if ($search !== '' && ! Plan_Completion::timeline_item_matches_search($item->to_public_array(), $search)) {
                         continue;
                     }
                     if (! $this->canonical_is_allowed((string) $item->get('canonical_url'), $item)) {

@@ -309,3 +309,80 @@
         transition-duration: 0.01ms !important;
     }
 }
+
+.spux-timeline-search {
+    margin-block: 1rem;
+}
+
+.spux-timeline-search label {
+    display: block;
+    font-weight: 700;
+    margin-block-end: 0.4rem;
+}
+
+.spux-timeline-search__controls {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.spux-timeline-search input[type="search"] {
+    border: 1px solid var(--spux-border);
+    border-radius: var(--spux-radius-sm);
+    flex: 1 1 16rem;
+    min-block-size: 2.75rem;
+    padding: 0.65rem 0.75rem;
+}
+
+.spux-public-metrics {
+    margin-block: 1rem;
+}
+
+.spux-public-metrics dl {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+    margin: 0;
+}
+
+.spux-public-metrics__item {
+    background: var(--spux-surface, #fff);
+    border: 1px solid var(--spux-border);
+    border-radius: var(--spux-radius-sm);
+    padding: 0.75rem;
+    text-align: center;
+}
+
+.spux-public-metrics__item dt {
+    color: var(--spux-muted);
+    font-size: 0.8125rem;
+}
+
+.spux-public-metrics__item dd {
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin: 0.25rem 0 0;
+}
+
+.spux-completion-assistant {
+    margin-block: 1rem;
+}
+
+.spux-profile[data-spux-density="compact"] .spux-card,
+.spux-profile[data-spux-density="compact"] .spux-public-metrics__item {
+    padding: 0.65rem;
+}
+
+.spux-profile[data-spux-cover-focal-point="top"] .spux-hero__cover img { object-position: center top; }
+.spux-profile[data-spux-cover-focal-point="bottom"] .spux-hero__cover img { object-position: center bottom; }
+.spux-profile[data-spux-cover-focal-point="left"] .spux-hero__cover img { object-position: left center; }
+.spux-profile[data-spux-cover-focal-point="right"] .spux-hero__cover img { object-position: right center; }
+
+@media (forced-colors: active) {
+    .spux-timeline-search input[type="search"],
+    .spux-public-metrics__item,
+    .spux-completion-assistant {
+        border: 1px solid CanvasText;
+    }
+}

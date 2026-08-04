@@ -57,6 +57,15 @@ final class Profile_Renderer
             return;
         }
 
+        $preview_mode = Plan_Completion::preview_mode($profile);
+        $owner_context = get_current_user_id() === (int) $user->ID || current_user_can('manage_options');
+        if ($preview_mode === 'denied'
+            || (Plan_Completion::preferences()['public_visibility'] !== true && ! $owner_context)
+        ) {
+            $this->set_unavailable($context);
+            return;
+        }
+
         $provider_labels = $this->sections->available_for_profile((int) $user->ID, $profile);
         $available_sections = array_values(array_filter(
             (array) ($profile['available_sections'] ?? ['overview']),
@@ -68,6 +77,9 @@ final class Profile_Renderer
         }
         $profile['available_sections'] = $available_sections;
         $profile['section_labels'] = array_merge((array) ($profile['section_labels'] ?? []), $provider_labels);
+        $profile = Plan_Completion::apply_profile_preferences($profile);
+        $available_sections = array_values((array) ($profile['available_sections'] ?? ['overview']));
+        $provider_labels = array_intersect_key($provider_labels, array_flip($available_sections));
 
         $requested_type = $context['type'];
         $canonical_type = (string) $profile['class'];
@@ -104,6 +116,8 @@ final class Profile_Renderer
         $context['section'] = $requested_section;
         $context['available_sections'] = $available_sections;
         $context['breadcrumbs'] = $this->breadcrumbs($profile, $context);
+        $context['preview_mode'] = $preview_mode;
+        $context['preferences'] = Plan_Completion::preferences();
 
         $timeline = [
             'items' => [],
@@ -116,13 +130,34 @@ final class Profile_Renderer
         if ($requested_section === 'timeline') {
             $timeline_filters = $this->timeline_filters($profile);
             $content_type = $this->requested_timeline_content_type($timeline_filters);
+            $search_query = '';
+            $search_error = '';
+            if (isset($_GET['profile_q'])) {
+                if (! is_scalar($_GET['profile_q'])) {
+                    $search_error = 'invalid_search_query';
+                } else {
+                    $raw_search = (string) wp_unslash($_GET['profile_q']);
+                    $search_query = Plan_Completion::normalize_search_query($raw_search);
+                    if ($raw_search !== '' && $search_query === '') {
+                        $search_error = 'invalid_search_query';
+                    }
+                }
+            }
+            if (Plan_Completion::preferences()['profile_local_search'] !== true) {
+                $search_query = '';
+                $search_error = isset($_GET['profile_q']) ? 'search_disabled' : '';
+            }
             $context['timeline_filters'] = $timeline_filters;
             $context['timeline_content_type'] = $content_type;
+            $context['timeline_search_query'] = $search_query;
+            $context['timeline_search_error'] = $search_error;
             $timeline = $this->timeline->get_for_author((int) $user->ID, [
                 'page' => max(1, (int) get_query_var('paged')),
                 'per_page' => 20,
                 'content_type' => $content_type,
+                'search' => $search_query,
             ]);
+            $context['timeline_search_result_count'] = count((array) ($timeline['items'] ?? []));
         }
 
         $provider_section = [
@@ -142,6 +177,8 @@ final class Profile_Renderer
         $GLOBALS['sabri_public_experience_context'] = $context;
         $GLOBALS['sabri_public_experience_timeline'] = $timeline;
         $GLOBALS['sabri_public_experience_provider_section'] = $provider_section;
+        $GLOBALS['sabri_public_experience_metrics'] = Plan_Completion::public_metrics($profile);
+        $GLOBALS['sabri_public_experience_completion_assistant'] = Plan_Completion::completion_assistant($profile);
     }
 
     /** @param array<string,string> $parts @return array<string,string> */
@@ -167,7 +204,9 @@ final class Profile_Renderer
 
         $context = (array) ($GLOBALS['sabri_public_experience_context'] ?? []);
         $filtered = sanitize_key((string) ($context['timeline_content_type'] ?? '')) !== ''
-            || (int) get_query_var('paged') > 1;
+            || trim((string) ($context['timeline_search_query'] ?? '')) !== ''
+            || (int) get_query_var('paged') > 1
+            || trim((string) ($context['preview_mode'] ?? '')) !== '';
         $profile = (array) ($GLOBALS['sabri_public_experience_profile'] ?? []);
         $profile_class = sanitize_key((string) ($profile['class'] ?? ''));
         $professional = in_array($profile_class, ['founder', 'doctor'], true);
@@ -188,7 +227,12 @@ final class Profile_Renderer
 
     public function render_meta(): void
     {
-        if (! $this->router->is_profile_request() || is_404() || empty($GLOBALS['sabri_public_experience_profile'])) {
+        if (! $this->router->is_profile_request()
+            || is_404()
+            || empty($GLOBALS['sabri_public_experience_profile'])
+            || Plan_Completion::preferences()['seo_enabled'] !== true
+            || ! empty($GLOBALS['sabri_public_experience_context']['preview_mode'])
+        ) {
             return;
         }
 
