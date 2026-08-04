@@ -9,5 +9,23 @@
   "scripts": {
     "test": "bash tests/run-governed-suite.sh",
     "lint": "find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l"
+  },
+  "extra": {
+    "governed-test-manifest": [
+      "tests/profile-router.php",
+      "tests/authoritative-native-contracts.php",
+      "tests/master-plan-reconciliation.php",
+      "tests/file18-marketplace-provider.php",
+      "tests/file24-integration.php",
+      "tests/staging-probe.php",
+      "tests/upgrade-manager.php",
+      "tests/design-system.php",
+      "tests/release-engineering.php",
+      "tests/review94-133-forty-round-adversarial.php",
+      "tools/verify-source-completion.php",
+      "tools/verify-structure.php",
+      "tools/verify-file06-and-components.php",
+      "tools/verify-provider-metadata.php"
+    ]
   }
 }
