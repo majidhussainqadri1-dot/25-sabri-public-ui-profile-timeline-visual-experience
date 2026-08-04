@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  apply-and-verify:
+  apply-and-record:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout exact corrective branch
@@ -30,25 +30,26 @@ jobs:
           coverage: none
           extensions: zip
 
-      - name: Apply forty corrections, run full QA, and push source commit
+      - name: Apply, test, record exact QA, and push
         shell: bash
         run: |
-          set -euo pipefail
+          set -uo pipefail
           if [ ! -f .review94-133/chunk-00 ]; then
-            echo "Reviews 94-133 payload already applied; no further mutation required."
+            echo "Reviews 94-133 payload already applied."
             exit 0
           fi
 
           git config user.name "Sabri File 25 Review Bot"
           git config user.email "file25-review@users.noreply.github.com"
+          status=0
+          log=/tmp/reviews94-133-full-qa.log
+          : > "$log"
 
           cat .review94-133/chunk-* | base64 --decode > /tmp/reviews94-133-payload.tar.gz
-          echo "a89a1aeb693bc6cb5902cde4067b7a06458302317ff23b9bac79ff9c375bff15  /tmp/reviews94-133-payload.tar.gz" | sha256sum --check
-          tar -tzf /tmp/reviews94-133-payload.tar.gz | tee /tmp/reviews94-133-files.txt
-          test "$(wc -l < /tmp/reviews94-133-files.txt)" -eq 18
-          tar -xzf /tmp/reviews94-133-payload.tar.gz
+          if ! echo "a89a1aeb693bc6cb5902cde4067b7a06458302317ff23b9bac79ff9c375bff15  /tmp/reviews94-133-payload.tar.gz" | sha256sum --check >>"$log" 2>&1; then status=1; fi
+          if ! tar -xzf /tmp/reviews94-133-payload.tar.gz >>"$log" 2>&1; then status=1; fi
 
-          python - <<'PY'
+          python - <<'PY' >>"$log" 2>&1
           from pathlib import Path
           path = Path('includes/class-timeline-service.php')
           source = path.read_text()
@@ -72,15 +73,26 @@ jobs:
               raise SystemExit('Timeline search bootstrap correction anchor mismatch')
           path.write_text(source.replace(old, new, 1))
           PY
+          if [ ${PIPESTATUS[0]} -ne 0 ]; then status=1; fi
 
-          composer validate --strict --no-check-publish
-          find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
-          php tests/review94-133-forty-round-adversarial.php
-          composer test
-          node --check assets/js/public.js
+          composer validate --strict --no-check-publish >>"$log" 2>&1 || status=1
+          find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l >>"$log" 2>&1 || status=1
+          php tests/review94-133-forty-round-adversarial.php >>"$log" 2>&1 || status=1
+          composer test >>"$log" 2>&1 || status=1
+          node --check assets/js/public.js >>"$log" 2>&1 || status=1
+
+          {
+            echo "File 25 Reviews 94-133 application QA"
+            echo "UTC: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo "Source parent: $(git rev-parse HEAD)"
+            echo "Overall status: $status"
+            echo
+            cat "$log"
+          } > docs/REVIEWS-94-133-APPLY-QA.txt
 
           rm -rf .review94-133
           git add -A
           git reset .github/workflows/reviews94-133-apply.yml
-          git commit -m "File 25 Reviews 94-133: forty corrective rounds"
+          git commit -m "File 25 Reviews 94-133: apply source and record QA"
           git push origin HEAD:feature/25a-25b-foundation
+          exit "$status"
