@@ -104,6 +104,7 @@ $spux_files = [
     'includes/class-assets.php',
     'includes/class-rest-controller.php',
     'includes/class-system-check.php',
+    'includes/class-plan-completion.php',
     'includes/class-plugin.php',
 ];
 
@@ -155,6 +156,55 @@ if (! function_exists('sabri_visual_experience_render_card')) {
     function sabri_visual_experience_render_card(array $args = []): string
     {
         return \Sabri\PublicExperience\Content_Cards::render($args);
+    }
+}
+
+if (! function_exists('sabri_public_render_profile_card')) {
+    function sabri_public_render_profile_card(array $profile = []): string
+    {
+        return \Sabri\PublicExperience\Content_Cards::render(['type' => 'profile', 'profile' => $profile, 'title' => (string) ($profile['display_name'] ?? '')]);
+    }
+}
+
+if (! function_exists('sabri_public_render_content_card')) {
+    function sabri_public_render_content_card(array $args = []): string
+    {
+        return \Sabri\PublicExperience\Content_Cards::render($args);
+    }
+}
+
+if (! function_exists('sabri_public_render_badge')) {
+    function sabri_public_render_badge(string $label, string $type = 'default'): string
+    {
+        return '<span class="spux-badge spux-badge--' . esc_attr(sanitize_key($type)) . '">' . esc_html($label) . '</span>';
+    }
+}
+
+if (! function_exists('sabri_public_render_empty_state')) {
+    function sabri_public_render_empty_state(array $args = []): string
+    {
+        return \Sabri\PublicExperience\Components::render_state(array_merge(['type' => 'empty'], $args));
+    }
+}
+
+if (! function_exists('sabri_public_render_author_header')) {
+    function sabri_public_render_author_header(array $profile = []): string
+    {
+        return '<header class="spux-author-header"><strong>' . esc_html((string) ($profile['display_name'] ?? '')) . '</strong></header>';
+    }
+}
+
+if (! function_exists('sabri_public_register_timeline_provider')) {
+    function sabri_public_register_timeline_provider($provider): void
+    {
+        do_action('sabri_public_experience/external_timeline_provider', $provider);
+    }
+}
+
+if (! function_exists('sabri_public_register_card_variant')) {
+    function sabri_public_register_card_variant(string $variant, callable $renderer): void
+    {
+        do_action('sabri_public_experience/register_card_variant', sanitize_key($variant), $renderer);
     }
 }
 
