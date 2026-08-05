@@ -16,6 +16,10 @@ This is the existing File 25, canonically named “Sabri Unified Global Visual E
 
 The reviewed 0.14.0 source correction includes:
 
+* explicit three-plan traceability for Master Plan v3.0, All-Chats v2.1, and File 25 Specification 2.0;
+* canonical File 03 contact preservation with monotonic revoke-only filters and substitution denial;
+* fail-closed high-risk rebuild/migration authorization requiring strict explicit approval;
+* `CHAT-UX-001` accessible green welcome visual presentation with File 20 retaining the 30-day frequency owner;
 * Master Plan v3.0 and File 20 plan v4.1 ownership reconciliation;
 * File 00 `1.2.4` / contract `1.1.2` as the sole membership, Founder, suspension, eligibility, guardian-policy and public-profile assertion authority;
 * File 09 `1.1.0` verification decisions and immutable approved professional snapshots as the Doctor-verification authority;
@@ -52,6 +56,9 @@ This candidate is not production-complete. Exact multi-plugin Hostinger staging,
 == Changelog ==
 
 = 0.14.0 =
+* Added All-Chats v2.1 traceability and the File 25 welcome visual primitive while preserving File 20 frequency ownership.
+* Corrected canonical public-contact retention and high-risk authorization default-deny behavior.
+* Corrected File 24 source-integration documentation without claiming Hostinger or production acceptance.
 * Reconciled File 25 with Master Plan v3.0, File 20 plan v4.1, and current canonical owners.
 * Replaced stale File 00 assumptions with exact runtime `1.2.4` and assertion contract `1.1.2`.
 * Made File 09 verification decisions and immutable approved snapshots authoritative for Doctor status and professional fields.

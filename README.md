@@ -18,16 +18,17 @@ WordPress module for the **Sabri Social Homeopathy Platform**. This is the exist
 - Production approved: **No**
 - Live deployment authorized: **No**
 
-Version `0.14.0` corrects authoritative-contract drift, binds the File 25 staging candidate to the reviewed File 08 `0.2.1` public clinic projection, and now carries a machine-verifiable dual-plan source-completion declaration.
+Version `0.14.0` corrects authoritative-contract drift, binds the File 25 staging candidate to the reviewed File 08 `0.2.1` public clinic projection, and now carries machine-verifiable three-plan traceability for Master Plan v3.0, All-Chats v2.1, and File 25 Specification 2.0.
 
 ## Source implementation completion
 
-The governed File 25 source scope is complete against the Sabri Social Homeopathy Platform Definitive Master Plan `v3.0` and File 25 Final Harmonized Specification `2.0`.
+The governed File 25 source scope is complete against the Sabri Social Homeopathy Platform Definitive Master Plan `v3.0`, the All-Chats Recovered Directive Register `v2.1`, and File 25 Final Harmonized Specification `2.0`.
 
 Machine-readable traceability:
 
 ```text
 config/source-completion-matrix.json
+config/all-chats-directive-matrix.json
 ```
 
 Executable verification:
@@ -82,6 +83,10 @@ The DTO allow list is `name`, dedicated clinic `address`, `country`, `city`, `ho
 
 ## Version 0.14.0 corrections
 
+- Corrected the canonical-contact filter so consented File 03 phone/WhatsApp values survive the default filter while substitutions remain denied.
+- Changed high-risk rebuild/migration authorization to fail closed unless an authoritative provider explicitly returns `true`.
+- Added `CHAT-UX-001` welcome visual presentation with File 20 retained as the exclusive first-visit/session/30-day frequency owner.
+- Added All-Chats v2.1 directive traceability and corrected the File 24 source-integration status wording in `SECURITY.md`.
 - Replaced stale File 00 assumptions with exact `SMC_Contracts::assertions()` contract `1.1.2`.
 - Removed File 25 reads from foreign File 00 professional-credential and clinic tables.
 - Removed locally derived Doctor verification, qualification-role inference, and license-expiry authority.
@@ -114,6 +119,7 @@ sabri_visual_experience_acceptance_contract(): array
 sabri_visual_experience_render_state(array $args = []): string
 sabri_visual_experience_render_notice(array $args = []): string
 sabri_visual_experience_render_card(array $args = []): string
+sabri_visual_experience_render_welcome(array $args = []): string
 ```
 
 Public read routes include:
