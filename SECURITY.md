@@ -23,7 +23,7 @@ File 24 remains the canonical owner of platform security, privacy, compliance, i
 
 ## Known limits
 
-The current branch has not completed File 24 integration, Hostinger staging, penetration testing, migration/rollback proof, or production monitoring. A green source CI run is not a security certification or production acceptance.
+The reviewed File 24 source-contract integration is implemented in this branch, but Hostinger multi-plugin staging acceptance, independent penetration testing, environment-level migration/rollback proof, Founder acceptance, and production monitoring remain incomplete. A green source CI run is not a security certification or production acceptance.
 
 ## Reporting
 
