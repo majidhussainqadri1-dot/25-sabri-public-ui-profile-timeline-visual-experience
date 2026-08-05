@@ -213,6 +213,9 @@ final class Forty_Round_Hardening
             'rights_privacy_consent_entitlement_gated' => true,
             'file_25_infers_eligibility' => false,
         ];
+        if (! isset($base['renderers']) || ! is_array($base['renderers'])) {
+            $base['renderers'] = [];
+        }
         $base['renderers']['icon'] = [self::class, 'render_icon'];
         $base['renderers']['icon_button'] = [self::class, 'render_icon_button'];
         $base['renderers']['ranking_badge'] = [self::class, 'render_ranking_badge'];
@@ -225,8 +228,8 @@ final class Forty_Round_Hardening
     public static function filter_tokens(mixed $tokens): array
     {
         $base = is_array($tokens) ? $tokens : [];
-        $base['color-primary'] = self::token('--sabri-visual-primary', '--sabri-shell-primary', self::PRIMARY_GREEN);
-        $base['color-primary-strong'] = self::token('--sabri-visual-primary-strong', '--sabri-shell-primary-strong', self::PRIMARY_GREEN_STRONG);
+        $base['color-primary'] = self::token('--sabri-visual-primary', '', self::PRIMARY_GREEN);
+        $base['color-primary-strong'] = self::token('--sabri-visual-primary-strong', '', self::PRIMARY_GREEN_STRONG);
         $base['color-primary-soft'] = self::token('--sabri-visual-primary-soft', '', self::PRIMARY_GREEN_SOFT);
         $base['color-on-primary'] = self::token('--sabri-visual-on-primary', '', self::PRIMARY_ON_GREEN);
         $base['icon-size'] = self::token('--sabri-visual-icon-size', '', '1.25rem');
@@ -257,8 +260,8 @@ final class Forty_Round_Hardening
         return <<<'CSS'
 :root,
 body.sabri-primary-green {
-    --sabri-visual-primary: var(--sabri-shell-primary, #15803d);
-    --sabri-visual-primary-strong: var(--sabri-shell-primary-strong, #14532d);
+    --sabri-visual-primary: #15803d;
+    --sabri-visual-primary-strong: #14532d;
     --sabri-visual-primary-soft: #dcfce7;
     --sabri-visual-on-primary: #ffffff;
     --sabri-visual-icon-size: 1.25rem;
@@ -425,7 +428,7 @@ CSS;
             return '';
         }
 
-        return '<svg class="sabri-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none">'
+        return '<svg class="sabri-ui-icon" data-sabri-icon="' . self::escape_attr($name) . '" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none">'
             . self::ICON_PATHS[$name] . '</svg>';
     }
 
@@ -434,13 +437,16 @@ CSS;
     {
         $label = self::text($args['label'] ?? '', 120);
         $icon = self::key((string) ($args['icon'] ?? ''));
-        $url = Public_URL::sanitize_same_site($args['url'] ?? '');
+        $download_requested = ($args['download'] ?? false) === true;
+        $url = Public_URL::sanitize_same_site($args['url'] ?? '', ! $download_requested);
         $variant = self::key((string) ($args['variant'] ?? 'secondary'));
         if (! in_array($variant, ['primary', 'secondary', 'danger'], true)) {
             $variant = 'secondary';
         }
         $enabled = ($args['enabled'] ?? true) === true;
-        $download = ($args['download'] ?? false) === true;
+        $download = $download_requested;
+        $describedby = self::html_id((string) ($args['describedby'] ?? ''));
+        $aria_label = self::text($args['aria_label'] ?? '', 240);
 
         if ($label === '' || self::render_icon($icon) === '') {
             return '';
@@ -449,14 +455,16 @@ CSS;
         $classes = 'sabri-ui-button sabri-ui-button--' . $variant . ' sabri-ui-icon-button';
         $icon_html = self::render_icon($icon);
         $label_html = '<span class="sabri-ui-icon-button__label">' . self::escape_html($label) . '</span>';
+        $aria = $aria_label !== '' ? ' aria-label="' . self::escape_attr($aria_label) . '"' : '';
+        $aria .= $describedby !== '' ? ' aria-describedby="' . self::escape_attr($describedby) . '"' : '';
 
         if (! $enabled || $url === '') {
-            return '<button class="' . self::escape_attr($classes) . '" type="button" disabled aria-disabled="true">'
+            return '<button class="' . self::escape_attr($classes) . '" type="button" disabled aria-disabled="true"' . $aria . '>'
                 . $icon_html . $label_html . '</button>';
         }
 
         return '<a class="' . self::escape_attr($classes) . '" href="' . self::escape_url($url) . '"'
-            . ($download ? ' download' : '') . '>' . $icon_html . $label_html . '</a>';
+            . ($download ? ' download' : '') . $aria . '>' . $icon_html . $label_html . '</a>';
     }
 
     /** @param array<string,mixed> $args */
@@ -476,12 +484,16 @@ CSS;
         if (! isset($labels[$tier])) {
             $tier = 'all-verified-doctors';
         }
-        $label = self::text($args['label'] ?? $labels[$tier], 120);
+        $default_label = function_exists('__') ? __($labels[$tier], 'sabri-public-experience') : $labels[$tier];
+        $label = self::text($args['label'] ?? $default_label, 120);
         $explanation = self::text($args['explanation'] ?? '', 280);
         $title = $explanation !== '' ? ' title="' . self::escape_attr($explanation) . '"' : '';
+        $aria = $explanation !== ''
+            ? ' aria-label="' . self::escape_attr($label . '. ' . $explanation) . '"'
+            : ' aria-label="' . self::escape_attr($label) . '"';
 
         return '<span class="sabri-ui-ranking-badge" data-ranking-owner="file-26" data-ranking-tier="'
-            . self::escape_attr($tier) . '"' . $title . '>'
+            . self::escape_attr($tier) . '"' . $title . $aria . '>'
             . self::render_icon('ranking') . '<span>' . self::escape_html($label) . '</span></span>';
     }
 
@@ -490,7 +502,7 @@ CSS;
     {
         $label = self::text($args['label'] ?? 'Download', 120);
         $eligible = ($args['native_owner_eligible'] ?? null) === true;
-        $url = $eligible ? Public_URL::sanitize_same_site($args['url'] ?? '') : '';
+        $url = $eligible ? Public_URL::sanitize_same_site($args['url'] ?? '', false) : '';
         $reason = self::text($args['reason'] ?? '', 400);
 
         if ($eligible && $url !== '') {
@@ -505,16 +517,19 @@ CSS;
                 ]) . '</div>';
         }
 
-        $id = 'sabri-download-reason-' . substr(hash('sha256', $label . '|' . $reason), 0, 12);
+        static $reason_sequence = 0;
+        $reason_sequence++;
+        $id = 'sabri-download-reason-' . substr(hash('sha256', $label . '|' . $reason), 0, 12) . '-' . $reason_sequence;
         $button = self::render_icon_button([
             'label' => $label,
             'icon' => 'lock',
             'variant' => 'secondary',
             'enabled' => false,
+            'describedby' => $id,
         ]);
         $message = $reason !== '' ? $reason : 'Download is not available under the current rights, privacy, consent, entitlement, or access policy.';
 
-        return '<div class="sabri-ui-download-unavailable" aria-describedby="' . self::escape_attr($id) . '">'
+        return '<div class="sabri-ui-download-unavailable">'
             . $button . '<p class="sabri-ui-download-reason" id="' . self::escape_attr($id) . '">'
             . self::escape_html($message) . '</p></div>';
     }
@@ -568,11 +583,22 @@ CSS;
         if (! is_scalar($value)) {
             return '';
         }
-        $text = html_entity_decode(strip_tags((string) $value), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = preg_replace('#<(script|style)\b[^>]*>.*?</\1>#is', ' ', (string) $value) ?? (string) $value;
+        $text = html_entity_decode(strip_tags($text), ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $text = preg_replace('/\s+/u', ' ', $text) ?? $text;
         $text = trim($text);
 
         return function_exists('mb_substr') ? mb_substr($text, 0, $limit) : substr($text, 0, $limit);
+    }
+
+    private static function html_id(string $value): string
+    {
+        $value = trim($value);
+        if ($value === '' || preg_match('/^[A-Za-z][A-Za-z0-9_\-:.]{0,127}$/', $value) !== 1) {
+            return '';
+        }
+
+        return $value;
     }
 
     private static function escape_html(string $value): string
