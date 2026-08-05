@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.14.0 — Three-Plan Corrective Review 174–176
+
+### Corrected
+
+- Preserved canonical File 03-owned phone/WhatsApp values through the default public-contact filter while keeping filter behavior monotonic and substitution-proof.
+- Changed index-rebuild and migration execute/rollback authorization from default allow to default deny; strict explicit approval is now required in addition to capability checks.
+- Removed the contradictory Security statement that described reviewed File 24 source-contract integration as incomplete while retaining all environment and acceptance limits.
+
+### Added
+
+- Added `config/all-chats-directive-matrix.json` for All-Chats Recovered Directive Register `v2.1` traceability.
+- Added the `CHAT-UX-001` accessible green welcome visual primitive; File 20 remains the exclusive invocation, session and 30-day persistence owner.
+- Added `tests/review174-176-three-plan-corrections.php` and the corresponding corrective record.
+
+### Acceptance boundary
+
+- Source correction and behavioral regression evidence do not establish Hostinger staging, real-role browser/RTL/accessibility acceptance, Founder acceptance, merge, production, live deployment, or operations.
+
 ## 0.14.0 — Source Implementation Completion Declaration
 
 ### Added
