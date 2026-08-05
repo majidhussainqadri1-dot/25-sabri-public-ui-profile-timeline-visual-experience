@@ -106,6 +106,7 @@ $spux_files = [
     'includes/class-system-check.php',
     'includes/class-plan-completion.php',
     'includes/class-forty-round-hardening.php',
+    'includes/class-three-plan-corrections.php',
     'includes/class-plugin.php',
 ];
 
@@ -118,6 +119,7 @@ try {
         }
         require_once $path;
     }
+    \Sabri\PublicExperience\Three_Plan_Corrections::register();
     \Sabri\PublicExperience\Safe_Mode::end();
 } catch (Throwable $exception) {
     \Sabri\PublicExperience\Safe_Mode::enable('file-loading-exception', $exception);
@@ -157,6 +159,13 @@ if (! function_exists('sabri_visual_experience_render_card')) {
     function sabri_visual_experience_render_card(array $args = []): string
     {
         return \Sabri\PublicExperience\Content_Cards::render($args);
+    }
+}
+
+if (! function_exists('sabri_visual_experience_render_welcome')) {
+    function sabri_visual_experience_render_welcome(array $args = []): string
+    {
+        return \Sabri\PublicExperience\Three_Plan_Corrections::render_welcome_panel($args);
     }
 }
 
