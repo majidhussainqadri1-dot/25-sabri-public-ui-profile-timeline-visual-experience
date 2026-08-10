@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace {
     if (! defined('ABSPATH')) { define('ABSPATH', __DIR__ . '/fixtures/'); }
-    define('SMC_VERSION', '1.2.4');
-    define('SMC_CONTRACT_VERSION', '1.1.2');
+    define('SMC_VERSION', '1.2.38');
+    define('SMC_CONTRACT_VERSION', '1.2.2');
     define('SPD_VERSION', '1.2.0-rc2');
     define('SPD_CONTRACT_VERSION', '1.4.0');
     define('GDO_VERSION', '1.3.0');
@@ -106,7 +106,7 @@ namespace {
 
     $base = static function (int $user_id, string $type = 'member'): array {
         return [
-            'contract_version' => '1.1.2', 'user_id' => $user_id, 'application_exists' => true,
+            'contract_version' => '1.2.2', 'user_id' => $user_id, 'application_exists' => true,
             'institutional_account' => false, 'account_class' => 'member', 'membership_type' => $type,
             'status' => 'approved', 'approved' => true, 'suspended' => false, 'eligible' => true,
             'guardian_verified' => true, 'professional_verified' => $type === 'doctor',
@@ -117,7 +117,7 @@ namespace {
     SMC_Contracts::$assertions[1] = array_merge($base(1), ['institutional_account' => true, 'account_class' => 'founder', 'membership_type' => '']);
     foreach ([7,8,9,11,13,14,15] as $doctor_id) { SMC_Contracts::$assertions[$doctor_id] = $base($doctor_id, 'doctor'); }
     SMC_Contracts::$assertions[10] = $base(10, 'member');
-    SMC_Contracts::$assertions[12] = array_merge($base(12), ['contract_version' => '1.1.1']);
+    SMC_Contracts::$assertions[12] = array_merge($base(12), ['contract_version' => '1.2.1']);
 
     $public_doctor = static function (int $id, bool $verified = true, array $professional = []): array {
         return [
@@ -170,7 +170,7 @@ namespace {
     $check = static function (bool $condition, string $message) use (&$failures): void { if (! $condition) { $failures[] = $message; } };
     $native = new Native_Integration();
 
-    $check($native->membership_available(), 'File 00 1.2.4 / contract 1.1.2 must be accepted.');
+    $check($native->membership_available(), 'File 00 1.2.38 / contract 1.2.2 must be accepted.');
     $check($native->profiles_available(), 'File 03 1.2.0-rc2 / contract 1.4.0 must be accepted through current public DTO APIs.');
     $check($native->doctor_verification_available(), 'File 09 1.3.0 / integration contract 1.1.0 must be accepted.');
     $check($native->founder_user_id() === 1, 'Founder identity must come only from File 00.');
