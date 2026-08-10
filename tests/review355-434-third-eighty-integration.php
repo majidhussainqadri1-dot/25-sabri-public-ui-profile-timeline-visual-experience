@@ -21,10 +21,10 @@ try {
 $check(($ledger['review_range']['first'] ?? null) === 355, 'Third cycle must start at Review 355.');
 $check(($ledger['review_range']['last'] ?? null) === 434, 'Third cycle must end at Review 434.');
 $check(($ledger['review_range']['count'] ?? null) === 80, 'Third cycle must contain exactly 80 reviews.');
-$expectedDefects = [355,356,357,358,359,360,361,362,363,364,365,366,367,368,370,371,372];
+$expectedDefects = [355,356,357,358,359,360,361,362,363,364,365,366,367,368,370,371,372,433];
 $check(($ledger['defect_rounds'] ?? null) === $expectedDefects, 'Defect-bearing review ledger changed unexpectedly.');
 $clean = (array) ($ledger['clean_rounds'] ?? []);
-$check(count($clean) === 63 && in_array(369, $clean, true) && in_array(434, $clean, true), 'Clean-review ledger must contain the remaining 63 rounds.');
+$check(count($clean) === 62 && in_array(369, $clean, true) && in_array(434, $clean, true) && ! in_array(433, $clean, true), 'Clean-review ledger must contain the remaining 62 rounds.');
 $reviews = (array) ($ledger['reviews'] ?? []);
 $numbers = [];
 foreach ($reviews as $review) {
@@ -156,6 +156,10 @@ foreach ([
 ] as $marker) {
     $check(str_contains($verifier, $marker), 'Artifact verifier third-cycle marker missing: ' . $marker);
 }
+
+$composer = $read('composer.json');
+$check(str_contains($composer, 'tests/review355-434-third-eighty-integration.php'), 'Third-cycle executable gate must be in the governed test manifest.');
+$check(is_file($root . '/docs/REVIEWS-355-434-THIRD-EIGHTY-CURRENT-INTEGRATION-2026-08-10.md'), 'Third-cycle human audit record is missing.');
 
 $workflow = $read('.github/workflows/ci.yml');
 $check(str_contains($workflow, 'actions/checkout@v5'), 'CI must use current checkout action.');
