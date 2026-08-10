@@ -19,6 +19,7 @@ $forbids = static function (string $source, array $markers, string $label) use (
 foreach ([
     '.github/workflows/ci.yml','sabri-public-experience.php','composer.json','uninstall.php',
     'includes/class-native-integration.php','includes/class-dependency-manager.php','includes/class-design-system.php',
+    'includes/class-file-20-integration.php','includes/class-admin-integration.php','includes/class-component-api.php',
     'includes/class-profile-router.php','includes/class-profile-renderer.php','includes/class-profile-repository.php',
     'includes/class-visibility-policy.php','includes/class-rest-controller.php','includes/class-file-24-integration.php',
     'assets/css/design-system.css','assets/css/companion-token-bridge.css','assets/js/public.js',
@@ -46,6 +47,14 @@ $contains($native, [
 ], 'Native authority adapter');
 $forbids($native, ['$wpdb','SHOW TABLES','smc_get_profile','smc_professional_credentials','smc_clinics','calculated_age','license_expiry','SPD_Helpers::get','SPD_Helpers::can_show_contact'], 'Native authority adapter');
 
+$file20 = $read('includes/class-file-20-integration.php');
+$contains($file20, [
+    "REVIEWED_MINIMUM_VERSION = '1.4.12'", "REVIEWED_MAXIMUM_VERSION = '1.5.0'",
+    "REVIEWED_CONTRACT_VERSION = '1.0.0'", "REVIEWED_SOURCE_COMMIT = '291486b22c7ed94b8be041192375b6d9b077fac5'",
+    'Sabri\\\\UnifiedShell\\\\CentralPlanContract::CONTRACT_VERSION', 'sabri_shell_contract_registry',
+    'sabri_public_experience/dependency/application_shell',
+], 'File 20 integration');
+
 $visibility = $read('includes/class-visibility-policy.php');
 $contains($visibility, ['profile_contact($user_id, $field)','return $authoritative && $filtered === true;'], 'Contact visibility');
 $repository = $read('includes/class-profile-repository.php');
@@ -59,10 +68,37 @@ $forbids($repository, ['get_avatar_url', "'_spd_profile_photo_id'", "'_spd_cover
 $router = $read('includes/class-profile-router.php');
 $contains($router, ['$non_file03_public_id','profile_right_sidebar_available',"return 'two';","return 'three';"], 'Profile router');
 $design = $read('includes/class-design-system.php');
-$contains($design, ["CONTRACT_VERSION = '1.8.0'","'global_shell_owner' => 'file-20'","'security_governance_owner' => 'file-24'","'public_contact_consent_owner' => 'file-03'",'native-contact-consent','same-origin-profile-media','conditional-profile-layout'], 'Design system');
+$contains($design, [
+    "CONTRACT_VERSION = '1.8.0'", "public const CONTRACT_VERSION = '1.9.0'",
+    "'global_shell_owner' => 'file-20'", "'security_governance_owner' => 'file-24'", "'public_contact_consent_owner' => 'file-03'",
+    'native-contact-consent','same-origin-profile-media','conditional-profile-layout',
+    'sabri_shell_file25_visual_contract', "'primary_color' => '#087A4E'", "'owner' => 'file-25'",
+], 'Design system');
 $bridge = $read('assets/css/companion-token-bridge.css');
 $contains($bridge, ['--sabri-primary: var(--sabri-visual-primary)','--sabri-color-primary: var(--sabri-visual-primary)','--sabri-text: var(--sabri-visual-text)','--sabri-radius: var(--sabri-visual-radius-card)'], 'Companion token bridge');
 $forbids(strtolower($bridge), ['#ff8a1f','#15803d'], 'Companion token bridge');
+
+$admin = $read('includes/class-admin-integration.php');
+$contains($admin, [
+    "SHELL_PARENT_SLUG = 'sabri-shell'", "remove_menu_page('sabri-public-experience')",
+    "remove_submenu_page('sabri-public-experience', 'sabri-public-experience-component-lab')",
+    "'standalone_menu_mode' => 'degraded-fallback-only'", "'canonical_admin_architecture_owner' => 'file-20'",
+], 'Admin integration');
+
+$component = $read('includes/class-component-api.php');
+$contains($component, [
+    "CONTRACT_VERSION = '1.0.0'", 'register_timeline_provider', 'bind_timeline_registry',
+    'register_card_variant', 'MAX_PENDING_TIMELINE_PROVIDERS = 25', 'Timeline_Provider',
+], 'Component API');
+$cards = $read('includes/class-content-cards.php');
+$contains($cards, [
+    "'profile'", "VARIANT_CONTRACT_VERSION = '1.0.0'", 'register_variant',
+    "'variant_input' => 'normalized-public-card-only'", 'wp_kses_post($custom)',
+], 'Content cards');
+$contains($main, [
+    'Component_API::register_timeline_provider($provider)', 'Component_API::register_card_variant($variant, $renderer)',
+    "'type' => 'profile'", "'action_label' => __('View profile'",
+], 'Public Component API wrappers');
 
 $rest = $read('includes/class-rest-controller.php');
 $contains($rest, ['/founder/knowledge','/founder/media','/profiles/(?P<slug>[a-zA-Z0-9_-]+)/knowledge','/providers/health',"'ETag'",'no-store, private, max-age=0'], 'REST controller');
@@ -83,7 +119,11 @@ $module_checks = [
     9 => ($modules[9]['reviewed_source_version'] ?? '') === '1.3.0' && ($modules[9]['required_contract_version'] ?? '') === '1.1.0',
     14 => ($modules[14]['reviewed_source_version'] ?? '') === '1.4.1' && ($modules[14]['required_primary_color'] ?? '') === '#087A4E',
     18 => ($modules[18]['reviewed_source_version'] ?? '') === '1.2.0-RC1',
-    20 => ($modules[20]['governing_plan_version'] ?? '') === '4.1',
+    20 => ($modules[20]['reviewed_source_version'] ?? '') === '1.4.12'
+        && ($modules[20]['reviewed_source_commit'] ?? '') === '291486b22c7ed94b8be041192375b6d9b077fac5'
+        && ($modules[20]['required_contract_version'] ?? '') === '1.0.0'
+        && ($modules[20]['accepted_source_range'] ?? '') === '>=1.4.12 <1.5.0'
+        && ($modules[20]['governing_plan_version'] ?? '') === '4.1',
     22 => ($modules[22]['reviewed_source_version'] ?? '') === '1.0.0-rc.3' && ($modules[22]['required_contract_versions']['rest_api'] ?? '') === '1.2.0',
     23 => ($modules[23]['reviewed_source_commit'] ?? '') === 'a8a8c805f4730998ccb44bd95c87591836561759' && ($modules[23]['future_intelligence_branch']['head'] ?? '') === '50b9489a4a058d4628ef5dda220837393dd32010',
     24 => ($modules[24]['reviewed_package_version'] ?? '') === '0.25.3',
@@ -96,7 +136,11 @@ $plan = json_decode($read('config/staging-test-plan.json'), true);
 if (! is_array($plan) || ($plan['schema_version'] ?? null) !== 3) { $errors[] = 'Staging test plan schema 3 is invalid.'; }
 $ids = [];
 foreach ((array) ($plan['scenarios'] ?? []) as $scenario) { if (is_array($scenario)) { $ids[] = (string) ($scenario['id'] ?? ''); } }
-foreach (['file03-current-public-dto','file03-route-parity','file07-directory-visual-contract','file09-doctor-decision','file14-visual-consumer','file22-create-edit-contract','file23-private-management-contract','companion-token-bridge'] as $id) { if (! in_array($id, $ids, true)) { $errors[] = 'Staging test scenario missing: ' . $id; } }
+foreach ([
+    'file03-current-public-dto','file03-route-parity','file07-directory-visual-contract','file09-doctor-decision','file14-visual-consumer',
+    'file20-current-shell-contract','file20-admin-parent','component-api-runtime',
+    'file22-create-edit-contract','file23-private-management-contract','companion-token-bridge'
+] as $id) { if (! in_array($id, $ids, true)) { $errors[] = 'Staging test scenario missing: ' . $id; } }
 
 $verifier = $read('tools/verify-staging-artifact.php');
 $contains($verifier, ['File25_Staging_Artifact_Verifier','Embedded manifest or dependency matrix differs from detached evidence.','Unsafe, duplicate or symbolic entry detected in workflow artifact.','Unsafe, duplicate or symbolic entry detected in inner ZIP.','MAX_INNER_TOTAL_BYTES'], 'Artifact verifier');
