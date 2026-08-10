@@ -244,6 +244,7 @@ final class Profile_Repository
      */
     private function public_contacts(int $user_id, array $clinic, array $founder): array
     {
+        unset($clinic);
         // File 03 owns contact values and consent. File 08 explicitly excludes
         // contact data, so clinic projections can never become a contact source.
         $values = [
@@ -251,22 +252,26 @@ final class Profile_Repository
             'whatsapp' => (string) ($founder['whatsapp'] ?? $this->native->profile_value($user_id, 'whatsapp')),
         ];
         $canonical = $this->sanitize_contacts($values, $user_id);
+        if ($canonical === []) {
+            return [];
+        }
 
-        /**
-         * Filters may revoke a canonical field only. They cannot add a field,
-         * replace the File 03 value, or bypass File 03 consent.
-         *
-         * @var array<string,mixed> $filtered
-         */
-        $filtered = (array) apply_filters('sabri_public_experience/public_contacts', $canonical, $user_id);
+        // File 03 has already made the authoritative consent decision above.
+        // Extension filters receive a boolean visibility map and may only revoke
+        // a field by changing true to false/removing it. They never receive the
+        // authority to replace a canonical contact destination.
+        $visibility = array_fill_keys(array_keys($canonical), true);
+        $filtered = apply_filters(
+            'sabri_public_experience/public_contacts',
+            $visibility,
+            $user_id,
+            $canonical
+        );
+        $filtered = is_array($filtered) ? $filtered : [];
+
         $public = [];
         foreach ($canonical as $field => $value) {
-            if (! array_key_exists($field, $filtered) || $filtered[$field] !== true) {
-                continue;
-            }
-            if ($filtered[$field] === true
-                && array_key_exists($field, $filtered) && (bool) $filtered[$field]
-            ) {
+            if (array_key_exists($field, $filtered) && $filtered[$field] === true) {
                 $public[$field] = $value;
             }
         }
