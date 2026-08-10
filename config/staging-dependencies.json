@@ -8,11 +8,12 @@
     "file_25_plan": "Complete Public UI, Profile Timeline and Visual Experience — Final Harmonized Specification"
   },
   "governing_addenda": {
-    "central": "6–7 August 2026 current governing addenda",
+    "central": "6–10 August 2026 current governing addenda",
     "file_25": "current governing completion addendum plus Future Public Experience 24",
+    "companion_refresh": "10 August 2026 File 03 Future Superset 18, File 08 Future24 and File 09 sixth-review source reconciliation",
     "rule": "Later explicit approved clauses supersede contradictory historical clauses without converting repository evidence into staging/live evidence."
   },
-  "purpose": "Exact multi-plugin staging candidate matrix. It records reviewed source expectations and mandatory ownership boundaries; it does not claim Hostinger staging, production, merge or Founder acceptance.",
+  "purpose": "Exact multi-plugin staging candidate matrix. Reviewed source expectations are repository evidence only; Hostinger staging, production, merge and Founder acceptance remain separate gates.",
   "environment": {
     "wordpress_minimum": "6.5",
     "php_minimum": "8.0",
@@ -25,7 +26,6 @@
     {
       "file": 0,
       "name": "Sabri Membership Core",
-      "role": "hard runtime authority for identity, membership state, Founder identity, suspension, eligibility, guardian policy and public-profile authorization",
       "reviewed_package_version": "1.2.38",
       "reviewed_source_version": "1.2.38",
       "reviewed_db_version": "1.4.4",
@@ -33,7 +33,6 @@
       "accepted_source_range": ">=1.2.38 <1.3.0",
       "required_contract_version": "1.2.2",
       "required_symbols": ["SMC_VERSION", "SMC_DB_VERSION", "SMC_CONTRACT_VERSION", "SMC_Contracts::assertions", "smc_founder_user_id", "smc_is_founder"],
-      "source_lifecycle": "current-main-source-reviewed-pending-hostinger-staging",
       "foreign_table_reads_allowed": false,
       "bundled_with_file_25": false,
       "staging_status": "pending"
@@ -41,15 +40,17 @@
     {
       "file": 3,
       "name": "Sabri Profiles and Doctors",
-      "role": "canonical profile master, stable public profile identity/URLs, public/private field projection, local profile media and explicit contact audience/consent owner; File 25 consumes only the File 03 public DTO",
+      "role": "canonical profile master and current public personal-site/Future Superset projection owner; File 25 consumes only declared public contracts and metadata",
       "reviewed_source_version": "1.2.0-rc2",
       "reviewed_db_version": "1.2.0",
       "reviewed_contract_version": "1.4.0",
-      "reviewed_source_commit": "b96f74457f54341701c6cdb1a57d42baa1100081",
+      "reviewed_source_branch": "codex/file-03-second-fresh-80-review-20260810",
+      "reviewed_source_commit": "b862efb94be87980e96a5b864bc5c7aec49183d9",
       "accepted_source_range": ">=1.2.0-rc2 <1.3.0",
       "required_contract_version": "1.4.0",
-      "required_symbols": ["SPD_VERSION", "SPD_CONTRACT_VERSION", "spd_get_public_profile", "spd_get_profile_contract_manifest"],
-      "route_truth": "File 03 currently exposes /founder/ plus /profile/{public_id}/ family while the current File 25 plan specifies /founder/, /doctors/{public-slug}/ and /profile/{public-slug}/ presentation routes; staging must prove one canonical public URL, permanent alias redirects and no SEO duplication before acceptance.",
+      "required_symbols": ["SPD_VERSION", "SPD_CONTRACT_VERSION", "spd_get_public_profile", "spd_get_personal_site_profile", "spd_get_profile_contract_manifest", "SPD_Contracts::component_manifest"],
+      "future_superset": "18 enhancements; second fresh 80-review candidate; feature-branch source truth only",
+      "route_truth": "File 03 /profile/{public_id}/ family and File 25 slug presentation routes still require one canonical indexable destination, permanent aliases and no redirect loop/SEO duplication on Hostinger staging.",
       "foreign_table_reads_allowed": false,
       "bundled_with_file_25": false,
       "staging_status": "pending"
@@ -57,7 +58,6 @@
     {
       "file": 6,
       "name": "Homeopathy Encyclopedia",
-      "role": "canonical Knowledge content owner",
       "reviewed_package_version": "0.1.0",
       "accepted_source_range": ">=0.1.0 <0.2.0",
       "required_symbols": ["HE_VERSION", "HE_Content"],
@@ -67,7 +67,6 @@
     {
       "file": 7,
       "name": "Doctors Directory and Discovery",
-      "role": "canonical verified-doctor directory/discovery projection; File 25 supplies canonical visual-token/component presentation and profile destination presentation but owns no directory eligibility or ranking truth",
       "reviewed_source_version": "1.2.0",
       "reviewed_db_version": "1.1.0",
       "reviewed_contract_version": "1.2.0",
@@ -76,24 +75,23 @@
       "reviewed_source_commit": "67c32ec4af45a7de6e3d9c1dbf0f8614d6b5a844",
       "accepted_source_range": ">=1.2.0 <1.3.0",
       "required_symbols": ["DDD_VERSION", "DDD_DB_VERSION", "DDD_CONTRACT_VERSION", "DDD_PROJECTION_SCHEMA"],
-      "runtime_dependency": false,
-      "cross_module_visual_acceptance_required": true,
       "bundled_with_file_25": false,
       "staging_status": "pending"
     },
     {
       "file": 8,
       "name": "Worldwide Clinic and Appointments",
-      "role": "canonical clinic, availability and appointment truth; File 25 consumes only the versioned owner-executed public clinic projection",
-      "reviewed_package_version": "0.2.1",
-      "reviewed_source_version": "0.2.1",
-      "accepted_source_range": ">=0.2.1 <0.3.0",
+      "role": "canonical clinic/appointment owner; current WCA contract 1.1.0 is validated while File 25 consumes the bounded legacy-compatible public-clinic DTO 1.0.0 only",
+      "reviewed_package_version": "1.2.0",
+      "reviewed_source_version": "1.2.0",
+      "reviewed_schema_version": "3.1.0",
+      "reviewed_source_branch": "codex/file08-new-governing-plans-completion-2026",
+      "reviewed_source_commit": "cb302617d2a2def23de1883b8d9fead10bce7ef3",
+      "accepted_source_range": ">=1.2.0 <1.3.0",
+      "required_canonical_contract_version": "1.1.0",
       "required_public_contract_version": "1.0.0",
-      "required_symbols": ["SWC_VERSION", "SWC_PUBLIC_CLINIC_CONTRACT_VERSION", "swc_get_public_clinic_projection", "swc_public_clinic_projection_contract"],
-      "reviewed_source_commit": "bd6a10b693991fc518788ef8e3cba49531454821",
-      "reviewed_candidate_sha256": "36ce0c78aa51396b02bd0705021e66782bfc45b74636ac65b0826bd372103578",
-      "reviewed_ci_run": "Corrective Quality #64 / 30744250320",
-      "contract_status": "implemented-and-ci-verified-pending-hostinger-staging",
+      "required_symbols": ["WCA_VERSION", "WCA_Contracts::PUBLIC_CLINIC_CONTRACT_VERSION", "swc_get_public_clinic_projection", "swc_public_clinic_projection_contract"],
+      "contract_status": "current-feature-branch-source-reviewed-pending-hostinger-staging",
       "foreign_table_reads_allowed": false,
       "bundled_with_file_25": false,
       "staging_status": "pending"
@@ -101,16 +99,15 @@
     {
       "file": 9,
       "name": "Global Doctor Onboarding and Verification",
-      "role": "canonical doctor verification decision, current eligibility and approved professional evidence projection",
       "reviewed_source_version": "1.3.0",
       "reviewed_schema_version": 6,
       "reviewed_contract_version": "1.1.0",
       "reviewed_source_branch": "codex/file09-1.3.0-rc6-80-round-review",
-      "reviewed_source_commit": "6fa0a5cb7063b6b821bd50c105c735470f589b80",
+      "reviewed_source_commit": "9103310fc93d978b6e70661f024a079fc0971003",
       "accepted_source_range": ">=1.3.0 <1.4.0",
       "required_contract_version": "1.1.0",
       "required_symbols": ["GDO_VERSION", "GDO_Integration_Contracts::VERSION", "gdo_file03_doctor_eligibility"],
-      "source_lifecycle": "rc6-feature-branch-fifth-review-candidate-pending-merge-and-hostinger-staging",
+      "source_lifecycle": "rc6-feature-branch-sixth-fresh-80-review-candidate-pending-merge-and-hostinger-staging",
       "foreign_table_reads_allowed": false,
       "bundled_with_file_25": false,
       "staging_status": "pending"
@@ -118,7 +115,6 @@
     {
       "file": 10,
       "name": "Video Wall and Educational Broadcasting",
-      "role": "canonical video and live-broadcasting owner",
       "reviewed_package_version": "0.1.0",
       "accepted_source_range": ">=0.1.0 <0.2.0",
       "required_symbols": ["SVW_VERSION", "SVW_Helpers"],
@@ -128,7 +124,6 @@
     {
       "file": 11,
       "name": "Reels and Short Video Discovery",
-      "role": "canonical Reel policy and discovery owner over File 10 video objects",
       "reviewed_package_version": "0.1.0",
       "accepted_source_range": ">=0.1.0 <0.2.0",
       "required_symbols": ["SRL_VERSION", "SVW_VERSION", "SVW_Helpers"],
@@ -138,7 +133,6 @@
     {
       "file": 12,
       "name": "PDF Library and Digital Reading",
-      "role": "canonical documents, encryption, reading and download owner",
       "reviewed_package_version": "0.1.0",
       "accepted_source_range": ">=0.1.0 <0.2.0",
       "required_symbols": ["SPL_VERSION", "SPL_Helpers"],
@@ -148,26 +142,21 @@
     {
       "file": 14,
       "name": "Global Clinic USP and Conversion Integration",
-      "role": "downstream ethical clinic CTA/copy/placement consumer of File 25 visual tokens/components; Files 07/08/09 retain doctor/clinic/application destination truth",
       "reviewed_source_version": "1.4.2",
       "reviewed_schema_version": 10004,
       "reviewed_source_commit": "b9045a4229d052103a5546477f664ac88b6ff034",
       "accepted_source_range": ">=1.4.2 <1.5.0",
       "required_symbols": ["GCU_VERSION", "GCU_BRAND_PRIMARY"],
       "required_primary_color": "#087A4E",
-      "runtime_dependency": false,
-      "cross_module_visual_acceptance_required": true,
       "bundled_with_file_25": false,
       "staging_status": "pending"
     },
     {
       "file": 18,
       "name": "Sabri Marketplace",
-      "role": "canonical seller, listing, moderation, contact, offer and direct-deal owner; File 25 consumes owner-executed public DTOs only",
       "reviewed_source_version": "1.2.0-RC1",
       "accepted_source_range": ">=1.2.0-RC1 <1.3.0",
-      "required_symbols": ["SMP_VERSION", "smp_get_public_profile_listings or SMP_Utils::current_seller + SMP_REST::products", "SMP_Activator::marketplace_url"],
-      "transitional_adapter": "bounded-first-page-owner-api",
+      "required_symbols": ["SMP_VERSION", "smp_get_public_profile_listings", "SMP_Activator::marketplace_url"],
       "foreign_table_reads_allowed": false,
       "bundled_with_file_25": false,
       "staging_status": "pending"
@@ -175,7 +164,6 @@
     {
       "file": 20,
       "name": "Sabri Unified Application Shell",
-      "role": "sole global shell, navigation, route registry mounting, sidebar, drawer and structural layout owner; File 25 owns visual tokens and visual regression",
       "reviewed_source_version": "1.4.12",
       "reviewed_source_commit": "291486b22c7ed94b8be041192375b6d9b077fac5",
       "reviewed_contract_version": "1.0.0",
@@ -183,14 +171,12 @@
       "accepted_source_range": ">=1.4.12 <1.5.0",
       "required_contract_version": "1.0.0",
       "required_symbols": ["SABRI_SHELL_VERSION", "Sabri\\UnifiedShell\\CentralPlanContract::CONTRACT_VERSION", "sabri_shell_contract_registry", "sabri_shell_file25_visual_contract"],
-      "source_lifecycle": "current-main-source-reviewed-pending-hostinger-staging",
       "bundled_with_file_25": false,
       "staging_status": "pending"
     },
     {
       "file": 21,
       "name": "Home and News Feed",
-      "role": "canonical Home, News, publication, interaction, moderation and timeline owner; File 25 consumes only the bounded public ProfileTimeline projection",
       "reviewed_package_version": "1.0.5",
       "reviewed_runtime_version": "1.0.3",
       "reviewed_schema_version": "1.0.0",
@@ -199,31 +185,19 @@
       "reviewed_source_range": ">=1.0.3 <2.0.0",
       "required_profile_timeline_api": "Sabri\\HomeNewsFeed\\ProfileTimeline::query",
       "required_symbols": ["SABRI_HNF_PACKAGE_VERSION", "SABRI_HNF_VERSION", "SABRI_HNF_SCHEMA_VERSION", "sabri_hnf_bootstrap", "Sabri\\HomeNewsFeed\\ProfileTimeline"],
-      "source_lifecycle": "current-main-source-reviewed-pending-hostinger-staging",
-      "exact_staging_package": "pending",
       "bundled_with_file_25": false,
       "staging_status": "pending"
     },
     {
       "file": 22,
       "name": "Sabri Universal Post Composer",
-      "role": "canonical create/edit/draft/preview/submit orchestration owner for the full profile-owner publishing experience; File 25 links to the owner route but never duplicates creation or publication truth",
       "reviewed_source_version": "1.0.0-rc.3",
       "reviewed_db_version": "1.0.0",
       "reviewed_source_commit": "c3b775b66fbbda4a9dd9891d63c08c74e2178741",
       "accepted_source_range": ">=1.0.0-rc.3 <1.1.0",
-      "required_contract_versions": {
-        "adapter_api": "1.0.0",
-        "workflow_api": "1.0.0",
-        "subject_schema_api": "1.0.0",
-        "governance_api": "1.0.0",
-        "lifecycle_api": "1.0.0",
-        "rest_api": "1.2.0",
-        "plan_contract": "1.0.0"
-      },
-      "required_symbols": ["SUPC_VERSION", "SUPC_SCHEMA_VERSION", "SUPC_ADAPTER_API_VERSION", "SUPC_WORKFLOW_API_VERSION", "SUPC_SUBJECT_SCHEMA_API_VERSION", "SUPC_GOVERNANCE_API_VERSION", "SUPC_LIFECYCLE_API_VERSION", "SUPC_REST_API_VERSION", "SUPC_PLAN_CONTRACT_VERSION", "supc_adapter_governance", "supc_lifecycle_capabilities", "supc_execute_lifecycle"],
+      "required_contract_versions": {"adapter_api":"1.0.0","workflow_api":"1.0.0","subject_schema_api":"1.0.0","governance_api":"1.0.0","lifecycle_api":"1.0.0","rest_api":"1.2.0","plan_contract":"1.0.0"},
+      "required_symbols": ["SUPC_VERSION", "SUPC_SCHEMA_VERSION", "SUPC_REST_API_VERSION", "supc_adapter_governance", "supc_lifecycle_capabilities", "supc_execute_lifecycle"],
       "canonical_public_create_route": "/create/",
-      "source_lifecycle": "main-candidate-automated-qa-green-pending-hostinger-staging",
       "foreign_table_reads_allowed": false,
       "bundled_with_file_25": false,
       "staging_status": "pending"
@@ -231,20 +205,13 @@
     {
       "file": 23,
       "name": "Doctor and Founder Publishing Dashboard",
-      "role": "canonical private federated publishing operations dashboard; File 25 links public profile owners to private management without taking over dashboard state or native publishing actions",
       "reviewed_source_version": "1.2.0",
       "reviewed_source_commit": "a8a8c805f4730998ccb44bd95c87591836561759",
       "accepted_source_range": ">=1.2.0 <1.3.0",
       "required_contract_version": "2.0.0",
       "required_symbols": ["SPDB_VERSION", "SPDB_CONTRACT_VERSION", "spdb", "spdb_get_capabilities", "spdb_get_dependency_manifest"],
       "canonical_private_management_route": "/publishing-dashboard/",
-      "future_intelligence_branch": {
-        "branch": "feature/file23-future-publishing-intelligence-24",
-        "head": "50b9489a4a058d4628ef5dda220837393dd32010",
-        "status": "feature-branch-only-not-main-not-staging-accepted",
-        "required_for_file25_core_profile_management_route": false
-      },
-      "source_lifecycle": "coded-main-candidate-pending-hostinger-staging",
+      "future_intelligence_branch": {"branch":"feature/file23-future-publishing-intelligence-24","head":"50b9489a4a058d4628ef5dda220837393dd32010","status":"feature-branch-only-not-main-not-staging-accepted","required_for_file25_core_profile_management_route":false},
       "foreign_table_reads_allowed": false,
       "bundled_with_file_25": false,
       "staging_status": "pending"
@@ -252,7 +219,6 @@
     {
       "file": 24,
       "name": "Platform Security, Privacy, Compliance and Resilience Center",
-      "role": "canonical security governance, privacy orchestration, audit evidence, incidents, findings and resilience owner",
       "reviewed_package_version": "0.99.0",
       "reviewed_source_version": "0.99.0",
       "reviewed_source_commit": "0be43b3f424d7b53865587b2770479ca33f51a0b",
@@ -260,15 +226,12 @@
       "required_symbols": ["SPCRC_VERSION", "Sabri\\Platform\\Security\\Registry\\ModuleRegistry"],
       "file_25_module_key": "file-25-public-experience",
       "accepted_runtime_contract": "reviewed-current-0.99.0-source-contract-pending-staging",
-      "cache_partition_contract": "not-yet-versioned",
-      "source_lifecycle": "current-main-source-reviewed-pending-hostinger-staging",
       "bundled_with_file_25": false,
       "staging_status": "pending"
     },
     {
       "file": 25,
       "name": "Sabri Unified Global Visual Experience and Design System",
-      "role": "canonical design tokens, public visual projection, profile presentation routes, federated timelines, responsive refinement, accessibility and visual acceptance",
       "candidate_version": "0.14.0",
       "canonical_primary_color": "#087A4E",
       "design_token_owner": "file-25",
