@@ -25,6 +25,9 @@ final class Design_System
         add_filter('sabri_visual_experience/components', [self::class, 'filter_components']);
         add_filter('sabri_visual_experience/content_cards', [Content_Cards::class, 'filter_contract']);
         add_filter('sabri_visual_experience/acceptance', [Visual_Acceptance::class, 'filter_contract']);
+        // Current File 20 1.4.x consumes this exact one-way visual contract.
+        // File 20 remains structural and may never become the visual source of truth.
+        add_filter('sabri_shell_file25_visual_contract', [self::class, 'filter_shell_visual_contract'], 20);
     }
 
     /** @param list<string> $classes @return list<string> */
@@ -92,6 +95,8 @@ final class Design_System
             'profile_master_owner' => 'file-00-file-03',
             'public_contact_consent_owner' => 'file-03',
             'shell_detected' => self::shell_is_available(),
+            'file_20_integration' => File_20_Integration::contract(),
+            'file_20_visual_consumer_hook' => 'sabri_shell_file25_visual_contract',
             'scope' => [
                 'global-design-system',
                 'public-ui',
@@ -222,6 +227,38 @@ final class Design_System
         ];
     }
 
+    /**
+     * Publish File 25's canonical visual values in File 20's reviewed consumer
+     * shape. File 20 sanitizes this contract and uses it only for shell-level
+     * continuity variables; the values remain owned by File 25.
+     *
+     * @param mixed $contract
+     * @return array<string,mixed>
+     */
+    public static function filter_shell_visual_contract(mixed $contract): array
+    {
+        unset($contract);
+
+        return [
+            'owner' => 'file-25',
+            'version' => self::CONTRACT_VERSION,
+            'tokens' => [
+                'primary_color' => '#087A4E',
+                'background' => '#f7f5f1',
+                'surface' => '#ffffff',
+                'surface_strong' => '#E7F5EE',
+                'text' => '#171717',
+                'muted' => '#5f6368',
+                'border' => '#dfe2e6',
+                'focus' => '#0b57d0',
+                'radius' => 16,
+                'font_scale' => 1.0,
+                'density' => 'comfortable',
+                'shadow' => '0 6px 24px rgba(17,17,17,0.10)',
+            ],
+        ];
+    }
+
     /** @param mixed $contract @return array<string,mixed> */
     public static function filter_contract(mixed $contract): array
     {
@@ -248,12 +285,7 @@ final class Design_System
 
     private static function shell_is_available(): bool
     {
-        if (! defined('SABRI_SHELL_VERSION')) {
-            return false;
-        }
-
-        return ! function_exists('apply_filters')
-            || (bool) apply_filters('sabri_public_experience/dependency/application_shell', true);
+        return File_20_Integration::is_compatible();
     }
 
     /** @return array<string,string> */
