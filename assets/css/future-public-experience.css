@@ -12,7 +12,7 @@
     margin-block: 1rem;
     padding: .75rem;
     border: 1px solid var(--sabri-visual-border, #d9e4de);
-    border-radius: var(--sabri-visual-radius-md, .75rem);
+    border-radius: var(--sabri-visual-radius-card, 1rem);
     background: var(--sabri-visual-surface, #fff);
 }
 
@@ -59,7 +59,7 @@
     padding: .7rem .85rem;
     border-inline-start: 4px solid var(--sabri-visual-primary, #087A4E);
     background: var(--sabri-visual-primary-soft, #E7F5EE);
-    border-radius: .5rem;
+    border-radius: var(--sabri-visual-radius-control, .75rem);
 }
 
 .spux-trust-capsule > span,
@@ -104,14 +104,14 @@
 .spux-translation-panel__content article {
     padding: 1rem;
     border: 1px solid var(--sabri-visual-border, #d9e4de);
-    border-radius: .6rem;
+    border-radius: var(--sabri-visual-radius-control, .75rem);
 }
 
 .spux-translation-note,
 .spux-content-freshness,
 .spux-item-freshness {
     font-size: .9em;
-    color: var(--sabri-visual-text-muted, #52665b);
+    color: var(--sabri-visual-muted, #52665b);
 }
 
 .spux-share-studio {
@@ -125,9 +125,9 @@
     min-inline-size: min(100%, 20rem);
     padding: .75rem;
     border: 1px solid var(--sabri-visual-border, #d9e4de);
-    border-radius: .75rem;
+    border-radius: var(--sabri-visual-radius-control, .75rem);
     background: var(--sabri-visual-surface, #fff);
-    box-shadow: var(--sabri-visual-shadow-md, 0 8px 24px rgba(0,0,0,.08));
+    box-shadow: var(--sabri-visual-shadow-2, 0 8px 24px rgba(0,0,0,.08));
 }
 
 .spux-share-studio__url {
@@ -142,7 +142,7 @@
     align-items: start;
     padding: .85rem;
     border: 1px solid var(--sabri-visual-border, #d9e4de);
-    border-radius: .75rem;
+    border-radius: var(--sabri-visual-radius-control, .75rem);
     background: var(--sabri-visual-surface, #fff);
 }
 
@@ -249,14 +249,15 @@
         position: fixed;
         inset-inline: .75rem;
         inset-block-end: .75rem;
-        z-index: 9999;
         max-block-size: min(70vh, 36rem);
         overflow: auto;
         padding: 1rem;
         border: 1px solid var(--sabri-visual-border, #d9e4de);
-        border-radius: 1rem;
+        border-radius: var(--sabri-visual-radius-card, 1rem);
         background: var(--sabri-visual-surface, #fff);
-        box-shadow: 0 14px 40px rgba(0,0,0,.2);
+        box-shadow: var(--sabri-visual-shadow-2, 0 14px 40px rgba(0,0,0,.2));
+        /* File 20 owns global stacking and mount layers; File 25 intentionally
+         * does not invent a numeric z-index. Staging must verify shell placement. */
     }
 
     .spux-js .spux-hero .spux-actions.is-open {
@@ -274,11 +275,24 @@
         animation-iteration-count: 1 !important;
         transition-duration: .01ms !important;
     }
+
+    ::view-transition-group(root),
+    ::view-transition-old(root),
+    ::view-transition-new(root),
+    ::view-transition-group(spux-profile-hero),
+    ::view-transition-old(spux-profile-hero),
+    ::view-transition-new(spux-profile-hero),
+    ::view-transition-group(spux-profile-main),
+    ::view-transition-old(spux-profile-main),
+    ::view-transition-new(spux-profile-main) {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+    }
 }
 
 @media (prefers-reduced-data: reduce) {
-    .spux-hero__cover,
-    [data-spux-heavy-media] {
+    .spux-profile .spux-hero__cover,
+    .spux-profile [data-spux-heavy-media] {
         display: none !important;
     }
 }
