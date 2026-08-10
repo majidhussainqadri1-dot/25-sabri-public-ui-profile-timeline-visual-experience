@@ -25,19 +25,26 @@ final class Assets
             return;
         }
 
-        // The public canonical handle includes both stable semantic primitives
-        // and the current component-completion layer. Companion modules should
-        // depend on `sabri-visual-design-system`, never on the internal core.
+        // The public canonical handle includes semantic primitives, a one-way
+        // compatibility bridge for current companion modules, and the component
+        // completion layer. Companion modules should depend only on
+        // `sabri-visual-design-system`.
         wp_register_style(
             'sabri-visual-design-system-core',
             SABRI_PUBLIC_EXPERIENCE_URL . 'assets/css/design-system.css',
             [],
             SABRI_PUBLIC_EXPERIENCE_VERSION
         );
+        wp_register_style(
+            'sabri-visual-design-system-companion-bridge',
+            SABRI_PUBLIC_EXPERIENCE_URL . 'assets/css/companion-token-bridge.css',
+            ['sabri-visual-design-system-core'],
+            SABRI_PUBLIC_EXPERIENCE_VERSION
+        );
         wp_enqueue_style(
             'sabri-visual-design-system',
             SABRI_PUBLIC_EXPERIENCE_URL . 'assets/css/design-system-components.css',
-            ['sabri-visual-design-system-core'],
+            ['sabri-visual-design-system-companion-bridge'],
             SABRI_PUBLIC_EXPERIENCE_VERSION
         );
 
