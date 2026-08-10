@@ -17,7 +17,7 @@ $check($runtime !== '', 'Runtime version missing.');
 
 try { $payload = File25_Staging_Package_Builder::discover_payload($root); }
 catch (Throwable $e) { $payload = []; $failures[] = 'Payload discovery failed: ' . $e->getMessage(); }
-foreach (['sabri-public-experience.php','assets/css/companion-token-bridge.css','includes/class-native-integration.php','config/staging-dependencies.json','config/staging-test-plan.json'] as $required) {
+foreach (['sabri-public-experience.php','assets/css/companion-token-bridge.css','includes/class-native-integration.php','includes/class-current-companion-2026-08-10.php','config/staging-dependencies.json','config/staging-test-plan.json'] as $required) {
     $check(in_array($required, $payload, true), 'Staging payload missing ' . $required);
 }
 foreach ($payload as $path) {
@@ -45,13 +45,19 @@ $checks = [
         && ($modules[0]['reviewed_source_commit'] ?? '') === 'c37d0b101d0912bef1f26d0daf51a414d67907c0',
     3 => ($modules[3]['reviewed_source_version'] ?? '') === '1.2.0-rc2'
         && ($modules[3]['required_contract_version'] ?? '') === '1.4.0'
-        && ($modules[3]['reviewed_source_commit'] ?? '') === 'b96f74457f54341701c6cdb1a57d42baa1100081',
+        && ($modules[3]['reviewed_source_branch'] ?? '') === 'codex/file-03-second-fresh-80-review-20260810'
+        && ($modules[3]['reviewed_source_commit'] ?? '') === 'b862efb94be87980e96a5b864bc5c7aec49183d9',
     7 => ($modules[7]['reviewed_source_version'] ?? '') === '1.2.0' && ($modules[7]['required_contract_version'] ?? '') === '1.2.0',
-    8 => ($modules[8]['required_public_contract_version'] ?? '') === '1.0.0',
+    8 => ($modules[8]['reviewed_source_version'] ?? '') === '1.2.0'
+        && ($modules[8]['reviewed_schema_version'] ?? '') === '3.1.0'
+        && ($modules[8]['reviewed_source_branch'] ?? '') === 'codex/file08-new-governing-plans-completion-2026'
+        && ($modules[8]['reviewed_source_commit'] ?? '') === 'cb302617d2a2def23de1883b8d9fead10bce7ef3'
+        && ($modules[8]['required_canonical_contract_version'] ?? '') === '1.1.0'
+        && ($modules[8]['required_public_contract_version'] ?? '') === '1.0.0',
     9 => ($modules[9]['reviewed_source_version'] ?? '') === '1.3.0'
         && ($modules[9]['required_contract_version'] ?? '') === '1.1.0'
         && ($modules[9]['reviewed_source_branch'] ?? '') === 'codex/file09-1.3.0-rc6-80-round-review'
-        && ($modules[9]['reviewed_source_commit'] ?? '') === '6fa0a5cb7063b6b821bd50c105c735470f589b80',
+        && ($modules[9]['reviewed_source_commit'] ?? '') === '9103310fc93d978b6e70661f024a079fc0971003',
     14 => ($modules[14]['reviewed_source_version'] ?? '') === '1.4.2'
         && ($modules[14]['reviewed_source_commit'] ?? '') === 'b9045a4229d052103a5546477f664ac88b6ff034'
         && ($modules[14]['required_primary_color'] ?? '') === '#087A4E',
@@ -76,7 +82,7 @@ $plan = json_decode($read('config/staging-test-plan.json'), true);
 $check(is_array($plan) && ($plan['schema_version'] ?? null) === 3, 'Staging test plan schema 3 required.');
 $ids = [];
 foreach ((array) ($plan['scenarios'] ?? []) as $scenario) { if (is_array($scenario)) { $ids[] = (string) ($scenario['id'] ?? ''); } }
-foreach (['file00-assertions','file03-current-public-dto','file03-route-parity','file07-directory-visual-contract','file09-doctor-decision','file14-visual-consumer','file21-current-profile-timeline-contract','file22-create-edit-contract','file23-private-management-contract','file24-current-assurance-contract','companion-token-bridge'] as $id) {
+foreach (['file00-assertions','file03-current-public-dto','file03-future-public-experience','file03-component-provider','file03-route-parity','file08-clinic-projection','file07-directory-visual-contract','file09-doctor-decision','file14-visual-consumer','file21-current-profile-timeline-contract','file22-create-edit-contract','file23-private-management-contract','file24-current-assurance-contract','companion-token-bridge'] as $id) {
     $check(in_array($id, $ids, true), 'Staging plan missing ' . $id);
 }
 
