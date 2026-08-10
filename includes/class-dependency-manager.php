@@ -50,7 +50,11 @@ final class Dependency_Manager
                 'production_required' => true,
                 'available' => $this->native->profiles_available(),
                 'version' => defined('SPD_VERSION') ? (string) SPD_VERSION : '',
-                'contract' => 'File 03 profile master data, same-origin media, and explicit public-contact consent',
+                'minimum' => Native_Integration::FILE_03_MINIMUM_VERSION,
+                'maximum_exclusive' => Native_Integration::FILE_03_MAXIMUM_VERSION,
+                'contract_version' => defined('SPD_CONTRACT_VERSION') ? (string) SPD_CONTRACT_VERSION : '',
+                'required_contract_version' => Native_Integration::FILE_03_CONTRACT_VERSION,
+                'contract' => 'File 03 contract 1.4.0 public DTO for profile identity, stable native URL, media, professional projection and contact audience/consent; File 25 performs no File 03 table reads',
             ],
             'doctor_verification' => [
                 'required' => false,
@@ -59,7 +63,11 @@ final class Dependency_Manager
                 'version' => defined('GDO_VERSION') ? (string) GDO_VERSION : '',
                 'minimum' => Native_Integration::FILE_09_MINIMUM_VERSION,
                 'maximum_exclusive' => Native_Integration::FILE_09_MAXIMUM_VERSION,
-                'contract' => 'File 09 verification decision and immutable approved professional snapshot',
+                'contract_version' => class_exists('GDO_Integration_Contracts') && defined('GDO_Integration_Contracts::VERSION')
+                    ? (string) constant('GDO_Integration_Contracts::VERSION')
+                    : '',
+                'required_contract_version' => Native_Integration::FILE_09_CONTRACT_VERSION,
+                'contract' => 'File 09 Advanced Trust verification/eligibility projection contract 1.1.0; File 25 treats the reviewed feature branch as source candidate only until merge/staging evidence exists',
             ],
             'clinic_projection' => [
                 'required' => false,
@@ -85,7 +93,7 @@ final class Dependency_Manager
                 'production_required' => true,
                 'available' => $this->native->shell_available(),
                 'version' => defined('SABRI_SHELL_VERSION') ? (string) SABRI_SHELL_VERSION : '',
-                'contract' => 'File 20 sole structural shell, route, navigation, sidebar, drawer, and layout API; File 25 retains visual-token ownership',
+                'contract' => 'File 20 sole structural shell, route registry mounting, navigation, sidebar, drawer, and layout API; File 25 retains visual-token ownership',
             ],
             'home_news' => [
                 'required' => false,
@@ -116,6 +124,9 @@ final class Dependency_Manager
             // Integration filters may revoke availability, never fabricate a native contract.
             $statuses[$id]['available'] = ! empty($authoritative['available']) && ! empty($candidate['available'] ?? true);
             $statuses[$id]['version'] = substr(sanitize_text_field((string) ($statuses[$id]['version'] ?? '')), 0, 64);
+            if (isset($statuses[$id]['contract_version'])) {
+                $statuses[$id]['contract_version'] = substr(sanitize_text_field((string) $statuses[$id]['contract_version']), 0, 64);
+            }
         }
 
         // Additional dependencies may be registered, but are normalized and can
