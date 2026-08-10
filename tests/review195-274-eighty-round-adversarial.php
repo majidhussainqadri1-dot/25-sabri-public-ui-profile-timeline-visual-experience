@@ -30,9 +30,9 @@ $check(($ledger['review_range']['last'] ?? null) === 274, 'Review ledger must en
 $check(($ledger['review_range']['count'] ?? null) === 80, 'Review ledger must contain exactly 80 rounds.');
 $reviews = is_array($ledger['reviews'] ?? null) ? $ledger['reviews'] : [];
 $check(count($reviews) === 80, 'Review ledger review array must contain exactly 80 entries.');
-$expectedDefects = range(195, 214);
-$check(($ledger['defect_rounds'] ?? null) === $expectedDefects, 'Defect-bearing review list must be exactly Reviews 195-214.');
-$check(($ledger['clean_rounds'] ?? null) === range(215, 274), 'Clean review list must be exactly Reviews 215-274.');
+$expectedDefects = array_merge(range(195, 214), [274]);
+$check(($ledger['defect_rounds'] ?? null) === $expectedDefects, 'Defect-bearing review list must be Reviews 195-214 and 274.');
+$check(($ledger['clean_rounds'] ?? null) === range(215, 273), 'Clean review list must be exactly Reviews 215-273.');
 $seen = [];
 foreach ($reviews as $row) {
     if (! is_array($row)) {
@@ -43,7 +43,7 @@ foreach ($reviews as $row) {
     if (is_int($number)) {
         $check(! isset($seen[$number]), 'Duplicate review number: ' . $number);
         $seen[$number] = true;
-        $expected = $number <= 214 ? 'defect-found-corrected' : 'reviewed-clean';
+        $expected = ($number <= 214 || $number === 274) ? 'defect-found-corrected' : 'reviewed-clean';
         $check(($row['status'] ?? null) === $expected, 'Unexpected status for Review ' . $number . '.');
     }
     $check(is_string($row['focus'] ?? null) && trim((string) $row['focus']) !== '', 'Every review requires a focus statement.');
@@ -75,7 +75,7 @@ $check(str_contains($future, "'toolbarLabel' => __('Reading and accessibility pr
 $check(str_contains($js, 'const t = (key, fallback)'), 'Review 201 client i18n consumption correction missing.');
 $check(str_contains($js, 'code !== primaryCode && code !== secondary'), 'Review 202 exactly-two bilingual correction missing.');
 $check(str_contains($js, 'url.username || url.password'), 'Review 203 client credential URL rejection missing.');
-$check(str_contains($shell, "'overlay_stacking_owner' => 'file-20'"), 'Review 204 shell stacking ownership correction missing.');
+$check(str_contains($shell, "$base['overlay_stacking_owner'] = 'file-20';"), 'Review 204 shell stacking ownership correction missing.');
 $check(! str_contains($css, 'z-index: 9999'), 'Review 204 hard-coded overlay z-index remains.');
 $check(str_contains($renderer, '$profile[\'user_id\'] = (int) $user->ID;'), 'Review 205 internal profile identity binding correction missing.');
 $check(str_contains($repository, '$visibility = array_fill_keys(array_keys($canonical), true);'), 'Review 206 contact visibility-map correction missing.');
