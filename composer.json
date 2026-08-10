@@ -33,6 +33,7 @@
       "tests/review192-194-future-public-experience-post-review.php",
       "tests/review195-274-eighty-round-adversarial.php",
       "tests/review275-354-eighty-round-current-companions.php",
+      "tests/review355-434-third-eighty-integration.php",
       "tools/verify-source-completion.php",
       "tools/verify-structure.php",
       "tools/verify-future-structure.php",
