@@ -178,13 +178,27 @@ final class Profile_Renderer
             $provider_section = $this->sections->get_section((int) $user->ID, $profile, $requested_section);
         }
 
+        // The canonical template generates deterministic avatar alt text from the
+        // display name, and an intentionally private contact choice is not an
+        // incomplete profile. Feed those presentation facts only to the assistant;
+        // never add fake public contact data to the rendered profile itself.
+        $completion_profile = $profile;
+        if (! empty($completion_profile['avatar_url'])) {
+            $completion_profile['avatar_alt'] = (string) ($completion_profile['display_name'] ?? 'profile');
+        }
+        if (empty($completion_profile['contacts'])) {
+            $completion_profile['contacts'] = ['_privacy_state' => 'not-public'];
+        }
+        $completion_assistant = Plan_Completion::completion_assistant($completion_profile);
+        $completion_assistant['contact_privacy_state'] = empty($profile['contacts']) ? 'not-public' : 'public';
+
         $GLOBALS['sabri_public_experience_profile_user'] = $user;
         $GLOBALS['sabri_public_experience_profile'] = $profile;
         $GLOBALS['sabri_public_experience_context'] = $context;
         $GLOBALS['sabri_public_experience_timeline'] = $timeline;
         $GLOBALS['sabri_public_experience_provider_section'] = $provider_section;
         $GLOBALS['sabri_public_experience_metrics'] = Plan_Completion::public_metrics($profile);
-        $GLOBALS['sabri_public_experience_completion_assistant'] = Plan_Completion::completion_assistant($profile);
+        $GLOBALS['sabri_public_experience_completion_assistant'] = $completion_assistant;
     }
 
     /** @param array<string,string> $parts @return array<string,string> */
@@ -333,7 +347,6 @@ final class Profile_Renderer
             . '</script>' . "\n";
     }
 
-
     /** @param array<string,mixed> $profile @return array<string,string> */
     private function timeline_filters(array $profile): array
     {
@@ -393,7 +406,6 @@ final class Profile_Renderer
 
         return $this->profiles->find_by_slug($context['slug']);
     }
-
 
     /** @param array<string,mixed> $profile @param array<string,mixed> $context */
     private function page_title(array $profile, array $context): string
