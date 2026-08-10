@@ -6,7 +6,8 @@ declare(strict_types=1);
  * Independent verifier for File 25 workflow artifacts and assembled directories.
  *
  * The verifier distrusts the builder, detached files, outer archive, inner ZIP,
- * and dependency matrix independently. Verification never implies staging/live.
+ * manifest and dependency matrix independently. A successful verification is
+ * package evidence only and never implies Hostinger staging or live acceptance.
  */
 final class File25_Staging_Artifact_Verifier
 {
@@ -44,12 +45,11 @@ final class File25_Staging_Artifact_Verifier
                 throw new RuntimeException('Unable to calculate the outer artifact SHA-256.');
             }
             $expected_outer_sha256 = strtolower(trim($expected_outer_sha256));
-            if ($expected_outer_sha256 !== '') {
-                if (preg_match('/^[a-f0-9]{64}$/', $expected_outer_sha256) !== 1
-                    || ! hash_equals($expected_outer_sha256, $outer_sha256)
-                ) {
-                    throw new RuntimeException('Outer artifact SHA-256 does not match the expected digest.');
-                }
+            if ($expected_outer_sha256 !== ''
+                && (preg_match('/^[a-f0-9]{64}$/', $expected_outer_sha256) !== 1
+                    || ! hash_equals($expected_outer_sha256, $outer_sha256))
+            ) {
+                throw new RuntimeException('Outer artifact SHA-256 does not match the expected digest.');
             }
             $files = self::read_outer_zip($real);
             $mode = 'zip';
@@ -60,7 +60,6 @@ final class File25_Staging_Artifact_Verifier
         $result = self::verify_bundle(self::identify_bundle($files));
         $result['artifact_mode'] = $mode;
         $result['outer_artifact_sha256'] = $outer_sha256;
-
         return $result;
     }
 
@@ -100,7 +99,6 @@ final class File25_Staging_Artifact_Verifier
         if ($files === [] || count($files) > self::MAX_OUTER_FILES) {
             throw new RuntimeException('Artifact directory contains an invalid number of files.');
         }
-
         return $files;
     }
 
@@ -166,7 +164,6 @@ final class File25_Staging_Artifact_Verifier
         if ($actual !== $expected) {
             throw new RuntimeException('Artifact file set does not match the governed staging bundle.');
         }
-
         return [
             'version' => $version,
             'zip_name' => $zip_name,
@@ -192,13 +189,11 @@ final class File25_Staging_Artifact_Verifier
         if (! hash_equals(strtolower($match[1]), $package_sha256)) {
             throw new RuntimeException('Plugin ZIP SHA-256 does not match the detached checksum.');
         }
-
         $manifest = self::decode_json_object($bundle['manifest_bytes'], 'detached manifest');
         self::validate_manifest($manifest, $version);
         $matrix = self::decode_json_object($bundle['matrix_bytes'], 'dependency matrix');
         $contract_status = self::validate_matrix($matrix, $version);
         $inner = self::verify_inner_zip($zip_bytes, $bundle['manifest_bytes'], $manifest, $bundle['matrix_bytes']);
-
         return [
             'verified' => true,
             'version' => $version,
@@ -300,8 +295,12 @@ final class File25_Staging_Artifact_Verifier
                 && ($modules[14]['reviewed_source_commit'] ?? '') === '3c524fb3d6ee481bc222660a56f6192b994e30d0',
             18 => ($modules[18]['reviewed_source_version'] ?? '') === '1.2.0-RC1'
                 && ($modules[18]['foreign_table_reads_allowed'] ?? true) === false,
-            20 => ($modules[20]['reviewed_source_version'] ?? '') === '1.2.0'
-                && ($modules[20]['governing_plan_version'] ?? '') === '4.1',
+            20 => ($modules[20]['reviewed_source_version'] ?? '') === '1.4.12'
+                && ($modules[20]['reviewed_source_commit'] ?? '') === '291486b22c7ed94b8be041192375b6d9b077fac5'
+                && ($modules[20]['required_contract_version'] ?? '') === '1.0.0'
+                && ($modules[20]['accepted_source_range'] ?? '') === '>=1.4.12 <1.5.0'
+                && ($modules[20]['governing_plan_version'] ?? '') === '4.1'
+                && ($modules[20]['source_lifecycle'] ?? '') === 'current-main-source-reviewed-pending-hostinger-staging',
             22 => ($modules[22]['reviewed_source_version'] ?? '') === '1.0.0-rc.3'
                 && ($modules[22]['reviewed_source_commit'] ?? '') === 'c3b775b66fbbda4a9dd9891d63c08c74e2178741'
                 && ($modules[22]['required_contract_versions']['rest_api'] ?? '') === '1.2.0',
@@ -322,7 +321,6 @@ final class File25_Staging_Artifact_Verifier
                 throw new RuntimeException('File ' . $file . ' reviewed contract or lifecycle truth is inaccurate.');
             }
         }
-
         return 'reviewed-source-contracts-pending-hostinger-staging';
     }
 
