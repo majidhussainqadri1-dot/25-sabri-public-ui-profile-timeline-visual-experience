@@ -52,6 +52,7 @@ $sections = $read('includes/class-section-service.php');
 $rest = $read('includes/class-rest-controller.php');
 $cards = $read('includes/class-content-cards.php');
 $future = $read('includes/class-future-public-experience.php');
+$file24 = $read('includes/class-file-24-integration.php');
 $bridge = $read('assets/css/companion-token-bridge.css');
 $publicCss = $read('assets/css/public.css');
 $futureCss = $read('assets/css/future-public-experience.css');
@@ -66,7 +67,7 @@ $workflow = $read('.github/workflows/ci.yml');
 $matrix = json_decode($read('config/staging-dependencies.json'), true);
 $plan = json_decode($read('config/staging-test-plan.json'), true);
 
-foreach (["FILE_00_MINIMUM_VERSION = '1.2.4'","FILE_00_CONTRACT_VERSION = '1.1.2'",'SMC_Contracts::assertions'] as $m) { $check(str_contains($native, $m), 'Review 317 marker missing: ' . $m); }
+foreach (["FILE_00_MINIMUM_VERSION = '1.2.38'","FILE_00_CONTRACT_VERSION = '1.2.2'",'SMC_Contracts::assertions'] as $m) { $check(str_contains($native, $m), 'Current File 00 marker missing: ' . $m); }
 foreach (["FILE_03_MINIMUM_VERSION = '1.2.0-rc2'","FILE_03_CONTRACT_VERSION = '1.4.0'",'spd_get_public_profile','spd_get_profile_contract_manifest'] as $m) { $check(str_contains($native, $m), 'Review 318 marker missing: ' . $m); }
 $check(str_contains($visibility, 'profile_contact($user_id, $field)') && str_contains($visibility, 'return $authoritative && $filtered === true;'), 'Review 319 File 03 contact revoke-only authority missing.');
 foreach (["profile_media_attachment_id(\$user_id, 'avatar')","profile_media_attachment_id(\$user_id, 'cover')",'monotonic_media_filter'] as $m) { $check(str_contains($repository, $m), 'Review 320 media marker missing: ' . $m); }
@@ -77,8 +78,9 @@ foreach (['swc_get_public_clinic_projection',"['name', 'address', 'country', 'ci
 $check(is_array($matrix) && ($matrix['schema_version'] ?? null) === 3, 'Current staging dependency matrix schema3 required.');
 $modules = [];
 foreach ((array) ($matrix['modules'] ?? []) as $module) { if (is_array($module) && isset($module['file'])) { $modules[(int) $module['file']] = $module; } }
+$check(($modules[0]['reviewed_source_commit'] ?? '') === 'c37d0b101d0912bef1f26d0daf51a414d67907c0' && ($modules[0]['required_contract_version'] ?? '') === '1.2.2', 'Current File 00 source/contract mismatch.');
 $check(($modules[7]['reviewed_source_commit'] ?? '') === '67c32ec4af45a7de6e3d9c1dbf0f8614d6b5a844', 'Review 323 File 07 exact head mismatch.');
-$check(($modules[14]['reviewed_source_commit'] ?? '') === '3c524fb3d6ee481bc222660a56f6192b994e30d0' && ($modules[14]['required_primary_color'] ?? '') === '#087A4E', 'Review 324 File 14 visual consumer mismatch.');
+$check(($modules[14]['reviewed_source_commit'] ?? '') === 'b9045a4229d052103a5546477f664ac88b6ff034' && ($modules[14]['reviewed_source_version'] ?? '') === '1.4.2' && ($modules[14]['required_primary_color'] ?? '') === '#087A4E', 'Current File 14 visual consumer mismatch.');
 $marketplace = $read('includes/providers/class-file-18-marketplace-provider.php');
 $check(str_contains($marketplace, 'smp_get_public_profile_listings'), 'Review 325 File 18 owner API missing.');
 foreach (['$wpdb','SELECT ','INSERT ','UPDATE ','DELETE '] as $forbidden) { $check(! str_contains($marketplace, $forbidden), 'Review 325 direct Marketplace storage coupling: ' . $forbidden); }
@@ -86,7 +88,9 @@ $check(str_contains((string) ($modules[20]['role'] ?? ''), 'sole global shell') 
 $check(str_contains((string) ($modules[21]['role'] ?? ''), 'canonical Home, News, publication'), 'Review 327 File 21 authority missing.');
 $check(($modules[22]['reviewed_source_commit'] ?? '') === 'c3b775b66fbbda4a9dd9891d63c08c74e2178741' && ($modules[22]['canonical_public_create_route'] ?? '') === '/create/', 'Review 328 File 22 current contract mismatch.');
 $check(($modules[23]['reviewed_source_commit'] ?? '') === 'a8a8c805f4730998ccb44bd95c87591836561759' && ($modules[23]['canonical_private_management_route'] ?? '') === '/publishing-dashboard/' && ($modules[23]['future_intelligence_branch']['head'] ?? '') === '50b9489a4a058d4628ef5dda220837393dd32010', 'Review 329 File 23 stable/FPI truth mismatch.');
-$check(($modules[24]['accepted_runtime_contract'] ?? '') === 'reviewed-source-contract-pending-staging', 'Review 330 File 24 source/staging separation missing.');
+$check(($modules[24]['reviewed_source_version'] ?? '') === '0.99.0' && ($modules[24]['reviewed_source_commit'] ?? '') === '0be43b3f424d7b53865587b2770479ca33f51a0b', 'Current File 24 source truth mismatch.');
+$check(str_contains($file24, "REVIEWED_MINIMUM_VERSION = '0.99.0'") && ! str_contains($file24, "'wp-cli:sabri file25 staging-probe'"), 'Current File 24 manifest compatibility missing.');
+$check(($modules[9]['reviewed_source_branch'] ?? '') === 'codex/file09-1.3.0-rc6-80-round-review' && ($modules[9]['reviewed_source_commit'] ?? '') === '58313a67e1d21ad17c9a066e9a29c34245a0763e', 'Current File 09 RC6 source truth mismatch.');
 $check(str_contains($future, "'global_search_discovery_ranking_owner' => 'file-26'"), 'Review 331 File 26 ownership missing.');
 
 $check(str_contains($router, '$non_file03_public_id'), 'Review 332 UUID route reservation missing.');
@@ -94,6 +98,7 @@ $check(is_array($plan) && ($plan['schema_version'] ?? null) === 3, 'Staging plan
 $scenarioIds = [];
 foreach ((array) ($plan['scenarios'] ?? []) as $scenario) { if (is_array($scenario)) { $scenarioIds[] = (string) ($scenario['id'] ?? ''); } }
 $check(in_array('file03-route-parity', $scenarioIds, true), 'Review 333 canonical route parity must remain external.');
+$check(in_array('file24-current-assurance-contract', $scenarioIds, true), 'Current File 24 staging scenario must remain explicit.');
 $slugTest = $read('tests/review35-profile-slug-exactness.php') . $read('tests/review42-rest-slug-exactness.php');
 $check($slugTest !== '', 'Review 334 exact slug regression evidence missing.');
 $check(str_contains($repository, "FOUNDER_DISPLAY_NAME = 'Dr. Allamah Majid Hussain Sabri Muhaddith Mursheed'"), 'Review 335 Founder spelling freeze missing.');
@@ -135,4 +140,4 @@ if ($failures !== []) {
     fwrite(STDERR, "FAILED Reviews 275-354\n- " . implode("\n- ", $failures) . "\n");
     exit(1);
 }
-echo "PASS: File 25 Reviews 275-354 — second eighty-round current-companion corrective closure\n";
+echo "PASS: File 25 Reviews 275-354 — prior eighty-round gate remains current after fourth-cycle companion reconciliation\n";
