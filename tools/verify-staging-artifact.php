@@ -274,8 +274,11 @@ final class File25_Staging_Artifact_Verifier
         }
 
         $checks = [
-            0 => ($modules[0]['reviewed_package_version'] ?? '') === '1.2.4'
-                && ($modules[0]['required_contract_version'] ?? '') === '1.1.2'
+            0 => ($modules[0]['reviewed_package_version'] ?? '') === '1.2.38'
+                && ($modules[0]['reviewed_source_version'] ?? '') === '1.2.38'
+                && ($modules[0]['reviewed_db_version'] ?? '') === '1.4.4'
+                && ($modules[0]['required_contract_version'] ?? '') === '1.2.2'
+                && ($modules[0]['reviewed_source_commit'] ?? '') === 'c37d0b101d0912bef1f26d0daf51a414d67907c0'
                 && ($modules[0]['foreign_table_reads_allowed'] ?? true) === false,
             3 => ($modules[3]['reviewed_source_version'] ?? '') === '1.2.0-rc2'
                 && ($modules[3]['required_contract_version'] ?? '') === '1.4.0'
@@ -288,11 +291,12 @@ final class File25_Staging_Artifact_Verifier
                 && ($modules[8]['foreign_table_reads_allowed'] ?? true) === false,
             9 => ($modules[9]['reviewed_source_version'] ?? '') === '1.3.0'
                 && ($modules[9]['required_contract_version'] ?? '') === '1.1.0'
-                && ($modules[9]['reviewed_source_commit'] ?? '') === '6d5c2850dbf86ce954e0c2fdef8adf36d2dbf1f1'
+                && ($modules[9]['reviewed_source_branch'] ?? '') === 'codex/file09-1.3.0-rc6-80-round-review'
+                && ($modules[9]['reviewed_source_commit'] ?? '') === '58313a67e1d21ad17c9a066e9a29c34245a0763e'
                 && ($modules[9]['foreign_table_reads_allowed'] ?? true) === false,
-            14 => ($modules[14]['reviewed_source_version'] ?? '') === '1.4.1'
+            14 => ($modules[14]['reviewed_source_version'] ?? '') === '1.4.2'
                 && ($modules[14]['required_primary_color'] ?? '') === '#087A4E'
-                && ($modules[14]['reviewed_source_commit'] ?? '') === '3c524fb3d6ee481bc222660a56f6192b994e30d0',
+                && ($modules[14]['reviewed_source_commit'] ?? '') === 'b9045a4229d052103a5546477f664ac88b6ff034',
             18 => ($modules[18]['reviewed_source_version'] ?? '') === '1.2.0-RC1'
                 && ($modules[18]['foreign_table_reads_allowed'] ?? true) === false,
             20 => ($modules[20]['reviewed_source_version'] ?? '') === '1.4.12'
@@ -307,8 +311,10 @@ final class File25_Staging_Artifact_Verifier
             23 => ($modules[23]['reviewed_source_version'] ?? '') === '1.2.0'
                 && ($modules[23]['reviewed_source_commit'] ?? '') === 'a8a8c805f4730998ccb44bd95c87591836561759'
                 && ($modules[23]['future_intelligence_branch']['head'] ?? '') === '50b9489a4a058d4628ef5dda220837393dd32010',
-            24 => ($modules[24]['reviewed_package_version'] ?? '') === '0.25.3'
-                && ($modules[24]['accepted_runtime_contract'] ?? '') === 'reviewed-source-contract-pending-staging',
+            24 => ($modules[24]['reviewed_package_version'] ?? '') === '0.99.0'
+                && ($modules[24]['reviewed_source_version'] ?? '') === '0.99.0'
+                && ($modules[24]['reviewed_source_commit'] ?? '') === '0be43b3f424d7b53865587b2770479ca33f51a0b'
+                && ($modules[24]['accepted_runtime_contract'] ?? '') === 'reviewed-current-0.99.0-source-contract-pending-staging',
             25 => ($modules[25]['candidate_version'] ?? '') === $version
                 && ($modules[25]['canonical_primary_color'] ?? '') === '#087A4E'
                 && ($modules[25]['design_token_owner'] ?? '') === 'file-25'
