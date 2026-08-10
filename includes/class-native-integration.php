@@ -18,9 +18,9 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
  */
 final class Native_Integration
 {
-    public const FILE_00_MINIMUM_VERSION = '1.2.4';
+    public const FILE_00_MINIMUM_VERSION = '1.2.38';
     public const FILE_00_MAXIMUM_VERSION = '1.3.0';
-    public const FILE_00_CONTRACT_VERSION = '1.1.2';
+    public const FILE_00_CONTRACT_VERSION = '1.2.2';
 
     /** Current File 03 public profile contract — exact reviewed 2026-08-10 family. */
     public const FILE_03_MINIMUM_VERSION = '1.2.0-rc2';
