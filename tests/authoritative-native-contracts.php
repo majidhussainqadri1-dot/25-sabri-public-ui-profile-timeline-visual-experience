@@ -9,8 +9,9 @@ namespace {
     define('SPD_VERSION', '1.2.0-rc2');
     define('SPD_CONTRACT_VERSION', '1.4.0');
     define('GDO_VERSION', '1.3.0');
-    define('SWC_VERSION', '0.2.1');
-    define('SWC_PUBLIC_CLINIC_CONTRACT_VERSION', '1.0.0');
+    define('WCA_VERSION', '1.2.0');
+    define('SWC_VERSION', '1.2.0');
+    define('SWC_PUBLIC_CLINIC_CONTRACT_VERSION', '1.1.0');
 
     final class WP_User
     {
@@ -32,6 +33,7 @@ namespace {
     }
 
     final class GDO_Integration_Contracts { public const VERSION = '1.1.0'; }
+    final class WCA_Contracts { public const PUBLIC_CLINIC_CONTRACT_VERSION = '1.1.0'; }
 
     /** @var array<int,array<string,mixed>> */
     $spd_profiles = [];
@@ -58,7 +60,7 @@ namespace {
         return [
             'owner_key' => 'file03',
             'contract_version' => '1.4.0',
-            'queries' => ['get_public_profile' => 'spd_get_public_profile'],
+            'queries' => ['get_public_profile' => 'spd_get_public_profile', 'get_personal_site_profile' => 'spd_get_personal_site_profile'],
         ];
     }
     function spd_get_public_profile(int $user_id, int $viewer_id = 0): array
@@ -66,6 +68,15 @@ namespace {
         global $spd_profiles;
         unset($viewer_id);
         return $spd_profiles[$user_id] ?? [];
+    }
+    function spd_get_personal_site_profile(int $user_id, int $viewer_id = 0): array
+    {
+        global $spd_profiles;
+        unset($viewer_id);
+        $profile = $spd_profiles[$user_id] ?? [];
+        if ($profile === []) { return []; }
+        $profile['future'] = ['lifecycle' => ['status' => 'active', 'active_professional' => true], 'multilingual_editions' => [], 'freshness' => []];
+        return $profile;
     }
     function gdo_file03_doctor_eligibility(int $user_id): array
     {
@@ -182,7 +193,7 @@ namespace {
     $check(! $native->is_verified_doctor(14), 'Expired verification must fail closed.');
     $check(! $native->is_verified_doctor(15), 'Invalid verification date must fail closed.');
     $check($native->membership_assertions(12) === [], 'Mismatched File 00 assertion contract must fail closed.');
-    $check($native->clinic_available(), 'Exact File 08 0.2.1 owner projection must be available.');
+    $check($native->clinic_available(), 'Current File 08 1.2.0 / canonical contract 1.1.0 with bounded public projection 1.0.0 must be available.');
 
     $credentials = $native->professional_credentials(7);
     $check(($credentials['qualification'] ?? '') === 'DHMS', 'Qualification must come from the current public professional projection.');
@@ -190,8 +201,11 @@ namespace {
     $check(! array_key_exists('license_number', $credentials), 'Sensitive license number must not enter File 25 public credentials.');
     $check($native->profile_value(7, 'phone', '') === '', 'Contact must not bypass File 03 public-contact projection.');
 
+    $contract = $native->clinic_contract();
+    $check(($contract['canonical_contract_version'] ?? '') === '1.1.0', 'File 08 current canonical public-clinic contract must be 1.1.0.');
+    $check(($contract['compatibility_projection_contract_version'] ?? '') === '1.0.0', 'File 25 must retain the bounded compatibility DTO contract 1.0.0.');
     $clinic = $native->clinic(7);
-    $check(($clinic['name'] ?? '') === 'Global Clinic', 'Clinic must come from File 08 public projection.');
+    $check(($clinic['name'] ?? '') === 'Global Clinic', 'Clinic must come from File 08 bounded public projection.');
     $check(! array_key_exists('phone', $clinic), 'File 08 contact must not bypass File 03 contact consent.');
     $check($native->public_visibility(7) === 'public', 'File 00 + File 03 must jointly control public visibility.');
 
