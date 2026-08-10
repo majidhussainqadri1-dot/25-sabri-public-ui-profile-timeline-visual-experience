@@ -35,6 +35,7 @@
       "tests/review275-354-eighty-round-current-companions.php",
       "tests/review355-434-third-eighty-integration.php",
       "tests/review435-514-fourth-eighty-current-truth.php",
+      "tests/review515-594-fifth-eighty-current-truth.php",
       "tools/verify-source-completion.php",
       "tools/verify-structure.php",
       "tools/verify-future-structure.php",
