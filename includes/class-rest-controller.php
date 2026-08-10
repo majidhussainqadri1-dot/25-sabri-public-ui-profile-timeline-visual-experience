@@ -119,7 +119,12 @@ final class Rest_Controller
         $limit = max(1, min(10000, $limit));
         $window = max(10, min(3600, $window));
 
-        if (! function_exists('wp_cache_get') && ! function_exists('get_transient')) {
+        $has_persistent_cache = function_exists('wp_using_ext_object_cache')
+            && wp_using_ext_object_cache()
+            && function_exists('wp_cache_add')
+            && function_exists('wp_cache_incr');
+        $has_transients = function_exists('get_transient') && function_exists('set_transient');
+        if (! $has_persistent_cache && ! $has_transients) {
             return true;
         }
 
@@ -130,7 +135,7 @@ final class Rest_Controller
         $key = 'sabri_f25_rl_' . $bucket;
         $count = null;
 
-        if (function_exists('wp_cache_add') && function_exists('wp_cache_incr')) {
+        if ($has_persistent_cache) {
             if (wp_cache_add($key, 1, 'sabri-file25-rate', $window)) {
                 $count = 1;
             } else {
@@ -141,7 +146,7 @@ final class Rest_Controller
             }
         }
 
-        if ($count === null && function_exists('get_transient') && function_exists('set_transient')) {
+        if ($count === null && $has_transients) {
             $stored = get_transient($key);
             $count = is_int($stored) && $stored > 0 ? $stored + 1 : 1;
             set_transient($key, $count, $window);
