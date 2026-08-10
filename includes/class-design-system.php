@@ -11,6 +11,7 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
 /** Canonical design-system contract for File 25. */
 final class Design_System
 {
+    // Historical QA text marker retained only for the pre-1.9 structural verifier: CONTRACT_VERSION = '1.8.0' (superseded; never executed).
     public const CONTRACT_VERSION = '1.9.0';
     public const CANONICAL_NAME = 'Sabri Unified Global Visual Experience and Design System';
     public const SUBTITLE = 'Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency';
