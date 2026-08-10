@@ -3,8 +3,8 @@
   "file": 25,
   "review_range": {"first": 515, "last": 594, "count": 80},
   "method": "Fifth fresh eighty-round repository/source review against current governing File 25 material and current companion source truth. Defects are corrected before the next review lens. Repository, staging and live remain separate realities.",
-  "defect_rounds": [515,516,517,518,519],
-  "clean_rounds": [520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,535,536,537,538,539,540,541,542,543,544,545,546,547,548,549,550,551,552,553,554,555,556,557,558,559,560,561,562,563,564,565,566,567,568,569,570,571,572,573,574,575,576,577,578,579,580,581,582,583,584,585,586,587,588,589,590,591,592,593,594],
+  "defect_rounds": [515,516,517,518,519,594],
+  "clean_rounds": [520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,535,536,537,538,539,540,541,542,543,544,545,546,547,548,549,550,551,552,553,554,555,556,557,558,559,560,561,562,563,564,565,566,567,568,569,570,571,572,573,574,575,576,577,578,579,580,581,582,583,584,585,586,587,588,589,590,591,592,593],
   "external_truth": {
     "hostinger_staging_accepted": false,
     "founder_staging_acceptance": false,
@@ -99,6 +99,6 @@
     {"review":591,"focus":"Manifest/checksum/exact-head binding","status":"reviewed-clean"},
     {"review":592,"focus":"Source-completion 25 base groups plus 24 Future requirements","status":"reviewed-clean"},
     {"review":593,"focus":"PR lifecycle and external truth flags","status":"reviewed-clean"},
-    {"review":594,"focus":"Fifth-cycle final exact-head closure gate","status":"reviewed-clean","evidence":"Review 594 is valid as clean only after the final post-ledger exact branch HEAD passes PHP 8.0, PHP 8.3, JavaScript, the complete governed suite and deterministic package verification. Any later failure reopens Review 594 as defect-bearing."}
+    {"review":594,"focus":"Fifth-cycle final exact-head closure gate","status":"defect-found-corrected","finding":"The new fifth-cycle executable closure gate itself interpolated literal PHP source markers in a double-quoted assertion and required a non-existent word 'stale' in Upgrade_Manager, causing the first full closure CI to fail even though the underlying production paths had already passed their dedicated regressions.","correction":"Reopened Review 594, changed the source marker to a non-interpolating literal, bound the upgrade assertion to the actual LOCK_TTL stale-lock expression, updated the machine/human ledger, and required a completely new exact-head PHP 8.0/8.3 + JavaScript + governed-suite + deterministic-package CI run before closure."}
   ]
 }
