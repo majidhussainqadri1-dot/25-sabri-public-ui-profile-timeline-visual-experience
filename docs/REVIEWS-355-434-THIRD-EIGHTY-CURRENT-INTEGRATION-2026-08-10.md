@@ -36,18 +36,17 @@ Executable gate: `tests/review355-434-third-eighty-integration.php`
 - 371 — deterministic artifact verifier independently retained stale File 20 1.2.0 evidence; reconciled without weakening archive/checksum/manifest defenses.
 - 372 — isolated design-system QA fatally referenced File 20 integration before that class was loaded; made contract inspection safely degradable in isolated test contexts.
 - 433 — third-cycle executable audit evidence and PR/release narrative had not yet been incorporated into the governed suite; added this record, the executable gate and governed-test manifest entry, and refreshed PR metadata for the third cycle.
+- 434 — final exact-head CI exposed an Array-to-string warning/failure inside the new third-cycle audit gate because a double-quoted source-evidence needle interpolated `$modules`; the assertion was rewritten as a non-interpolating literal marker and the ledger was corrected to classify Review 434 as defect-bearing.
 
 ## Clean reviews
 
-Review 369 independently rechecked current File 20 main after the first integration corrections. Reviews 373–432 and Review 434 cover runtime/bootstrap, Files 00/03/07/08/09/14/18/20/21/22/23/24/26 ownership boundaries, visual tokens, typography, RTL, reduced motion, forced colors, responsive preparation, public URLs/media, Founder/Doctor/minor/contact privacy, routes and SEO, timeline identity/chronology/pagination/filtering/deduplication, provider transactionality/maturity, content/profile cards, component bounds, REST minimization, admin permissions, idempotency/rate limiting, non-destructive reconciliation, metrics, completion assistant, Safe Mode, diagnostics, repair/migration/uninstall, deterministic packaging and final cross-plan closure.
-
-Review 434 is valid as clean only after the final exact branch HEAD passes the complete governed suite and deterministic package job. If final exact-head evidence exposes a new defect, Review 434 must be reopened as defect-bearing and corrected before this record is treated as closed.
+Review 369 independently rechecked current File 20 main after the first integration corrections. Reviews 373–432 are 61 clean reviews covering runtime/bootstrap, Files 00/03/07/08/09/14/18/20/21/22/23/24/26 ownership boundaries, visual tokens, typography, RTL, reduced motion, forced colors, responsive preparation, public URLs/media, Founder/Doctor/minor/contact privacy, routes and SEO, timeline identity/chronology/pagination/filtering/deduplication, provider transactionality/maturity, content/profile cards, component bounds, REST minimization, admin permissions, idempotency/rate limiting, non-destructive reconciliation, metrics, completion assistant, Safe Mode, diagnostics, repair/migration/uninstall and deterministic packaging.
 
 ## External acceptance blocker retained
 
 File 03 exposes its native public-ID profile route family while File 25's governing plan specifies public slug presentation routes. File 25 now reserves File 03 UUID-shaped paths and does not invent a third route family. One canonical indexable URL, permanent alias redirects, no redirect loops/chains and no duplicate SEO entity still require exact multi-plugin Hostinger staging evidence.
 
-## Status before final exact-head evidence
+## Status before final corrected exact-head evidence
 
 - Repository branch: `feature/25a-25b-foundation`
 - Runtime: `0.14.0`
@@ -58,4 +57,4 @@ File 03 exposes its native public-ID profile route family while File 25's govern
 - Operational: false
 - Exact deployed code verified: false
 
-The exact final HEAD, CI run and artifact evidence are intentionally not frozen in this document before the final post-documentation commit exists. The pull request and GitHub Actions run are the exact-head evidence source for that final state.
+The exact final corrected HEAD, CI run and artifact evidence are intentionally sourced from GitHub Actions/PR metadata after the final corrective commit. They are not predeclared here because this document itself is part of that final source candidate.
