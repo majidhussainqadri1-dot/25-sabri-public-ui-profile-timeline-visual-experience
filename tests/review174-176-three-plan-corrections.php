@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace {
     if (! defined('ABSPATH')) { define('ABSPATH', __DIR__ . '/'); }
-    define('SMC_VERSION', '1.2.4');
-    define('SMC_CONTRACT_VERSION', '1.1.2');
+    define('SMC_VERSION', '1.2.38');
+    define('SMC_CONTRACT_VERSION', '1.2.2');
     define('SPD_VERSION', '1.2.0-rc2');
     define('SPD_CONTRACT_VERSION', '1.4.0');
     define('GDO_VERSION', '1.3.0');
@@ -53,7 +53,7 @@ namespace {
     {
         public static function assertions(int $userId): array
         {
-            return ['contract_version'=>'1.1.2','user_id'=>$userId,'account_class'=>'institutional','membership_type'=>'','status'=>'approved','approved'=>true,'suspended'=>false,'eligible'=>true,'public_profile_allowed'=>true,'minor'=>false,'guardian_required'=>false];
+            return ['contract_version'=>'1.2.2','user_id'=>$userId,'account_class'=>'institutional','membership_type'=>'','status'=>'approved','approved'=>true,'suspended'=>false,'eligible'=>true,'public_profile_allowed'=>true,'minor'=>false,'guardian_required'=>false];
         }
     }
     final class GDO_Integration_Contracts { public const VERSION = '1.1.0'; }
