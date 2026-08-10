@@ -39,7 +39,7 @@ $runtime = (string) ($constant[1] ?? '');
 
 $native = $read('includes/class-native-integration.php');
 $contains($native, [
-    "FILE_00_MINIMUM_VERSION = '1.2.4'", "FILE_00_CONTRACT_VERSION = '1.1.2'", 'SMC_Contracts::assertions', 'smc_founder_user_id',
+    "FILE_00_MINIMUM_VERSION = '1.2.38'", "FILE_00_CONTRACT_VERSION = '1.2.2'", 'SMC_Contracts::assertions', 'smc_founder_user_id',
     "FILE_03_MINIMUM_VERSION = '1.2.0-rc2'", "FILE_03_CONTRACT_VERSION = '1.4.0'", 'spd_get_public_profile', 'spd_get_profile_contract_manifest',
     "FILE_09_MINIMUM_VERSION = '1.3.0'", "FILE_09_CONTRACT_VERSION = '1.1.0'", 'GDO_Integration_Contracts::VERSION', 'gdo_file03_doctor_eligibility',
     "FILE_08_PUBLIC_PROJECTION_CONTRACT = '1.0.0'", 'swc_get_public_clinic_projection',
@@ -54,6 +54,13 @@ $contains($file20, [
     'Sabri\\\\UnifiedShell\\\\CentralPlanContract::CONTRACT_VERSION', 'sabri_shell_contract_registry',
     'sabri_public_experience/dependency/application_shell',
 ], 'File 20 integration');
+
+$file24 = $read('includes/class-file-24-integration.php');
+$contains($file24, [
+    "CONTRACT_VERSION = '1.1.0'", "REVIEWED_MINIMUM_VERSION = '0.99.0'", "REVIEWED_MAXIMUM_VERSION = '1.0.0'",
+    "REVIEWED_SOURCE_COMMIT = '0be43b3f424d7b53865587b2770479ca33f51a0b'", 'spcrc/module_manifests', 'spcrc/request_security_state',
+], 'File 24 integration');
+$forbids($file24, ["'wp-cli:sabri file25 staging-probe'"], 'File 24 module manifest');
 
 $visibility = $read('includes/class-visibility-policy.php');
 $contains($visibility, ['profile_contact($user_id, $field)','return $authoritative && $filtered === true;'], 'Contact visibility');
@@ -112,21 +119,32 @@ $modules = [];
 foreach ((array) ($matrix['modules'] ?? []) as $module) { if (is_array($module) && isset($module['file'])) { $modules[(int) $module['file']] = $module; } }
 foreach ([0,3,6,7,8,9,10,11,12,14,18,20,21,22,23,24,25] as $file) { if (! isset($modules[$file])) { $errors[] = 'Staging matrix missing File ' . $file . '.'; } }
 $module_checks = [
-    0 => ($modules[0]['reviewed_package_version'] ?? '') === '1.2.4' && ($modules[0]['required_contract_version'] ?? '') === '1.1.2',
+    0 => ($modules[0]['reviewed_package_version'] ?? '') === '1.2.38'
+        && ($modules[0]['reviewed_source_version'] ?? '') === '1.2.38'
+        && ($modules[0]['reviewed_db_version'] ?? '') === '1.4.4'
+        && ($modules[0]['required_contract_version'] ?? '') === '1.2.2'
+        && ($modules[0]['reviewed_source_commit'] ?? '') === 'c37d0b101d0912bef1f26d0daf51a414d67907c0',
     3 => ($modules[3]['reviewed_source_version'] ?? '') === '1.2.0-rc2' && ($modules[3]['required_contract_version'] ?? '') === '1.4.0' && ($modules[3]['reviewed_source_commit'] ?? '') === 'b96f74457f54341701c6cdb1a57d42baa1100081',
-    7 => ($modules[7]['reviewed_source_version'] ?? '') === '1.2.0' && ($modules[7]['required_contract_version'] ?? '') === '1.2.0',
+    7 => ($modules[7]['reviewed_source_version'] ?? '') === '1.2.0' && ($modules[7]['required_contract_version'] ?? '') === '1.2.0' && ($modules[7]['reviewed_source_commit'] ?? '') === '67c32ec4af45a7de6e3d9c1dbf0f8614d6b5a844',
     8 => ($modules[8]['required_public_contract_version'] ?? '') === '1.0.0',
-    9 => ($modules[9]['reviewed_source_version'] ?? '') === '1.3.0' && ($modules[9]['required_contract_version'] ?? '') === '1.1.0',
-    14 => ($modules[14]['reviewed_source_version'] ?? '') === '1.4.1' && ($modules[14]['required_primary_color'] ?? '') === '#087A4E',
+    9 => ($modules[9]['reviewed_source_version'] ?? '') === '1.3.0'
+        && ($modules[9]['required_contract_version'] ?? '') === '1.1.0'
+        && ($modules[9]['reviewed_source_branch'] ?? '') === 'codex/file09-1.3.0-rc6-80-round-review'
+        && ($modules[9]['reviewed_source_commit'] ?? '') === '58313a67e1d21ad17c9a066e9a29c34245a0763e',
+    14 => ($modules[14]['reviewed_source_version'] ?? '') === '1.4.2'
+        && ($modules[14]['reviewed_source_commit'] ?? '') === 'b9045a4229d052103a5546477f664ac88b6ff034'
+        && ($modules[14]['required_primary_color'] ?? '') === '#087A4E',
     18 => ($modules[18]['reviewed_source_version'] ?? '') === '1.2.0-RC1',
     20 => ($modules[20]['reviewed_source_version'] ?? '') === '1.4.12'
         && ($modules[20]['reviewed_source_commit'] ?? '') === '291486b22c7ed94b8be041192375b6d9b077fac5'
         && ($modules[20]['required_contract_version'] ?? '') === '1.0.0'
         && ($modules[20]['accepted_source_range'] ?? '') === '>=1.4.12 <1.5.0'
         && ($modules[20]['governing_plan_version'] ?? '') === '4.1',
-    22 => ($modules[22]['reviewed_source_version'] ?? '') === '1.0.0-rc.3' && ($modules[22]['required_contract_versions']['rest_api'] ?? '') === '1.2.0',
+    22 => ($modules[22]['reviewed_source_version'] ?? '') === '1.0.0-rc.3' && ($modules[22]['required_contract_versions']['rest_api'] ?? '') === '1.2.0' && ($modules[22]['reviewed_source_commit'] ?? '') === 'c3b775b66fbbda4a9dd9891d63c08c74e2178741',
     23 => ($modules[23]['reviewed_source_commit'] ?? '') === 'a8a8c805f4730998ccb44bd95c87591836561759' && ($modules[23]['future_intelligence_branch']['head'] ?? '') === '50b9489a4a058d4628ef5dda220837393dd32010',
-    24 => ($modules[24]['reviewed_package_version'] ?? '') === '0.25.3',
+    24 => ($modules[24]['reviewed_source_version'] ?? '') === '0.99.0'
+        && ($modules[24]['reviewed_source_commit'] ?? '') === '0be43b3f424d7b53865587b2770479ca33f51a0b'
+        && ($modules[24]['accepted_runtime_contract'] ?? '') === 'reviewed-current-0.99.0-source-contract-pending-staging',
     25 => ($modules[25]['candidate_version'] ?? '') === $runtime && ($modules[25]['canonical_primary_color'] ?? '') === '#087A4E' && ($modules[25]['design_token_owner'] ?? '') === 'file-25' && ($modules[25]['structural_shell_owner'] ?? '') === 'file-20',
 ];
 foreach ($module_checks as $file => $ok) { if (! $ok) { $errors[] = 'Stale or unsafe reviewed contract for File ' . $file . '.'; } }
@@ -137,9 +155,9 @@ if (! is_array($plan) || ($plan['schema_version'] ?? null) !== 3) { $errors[] = 
 $ids = [];
 foreach ((array) ($plan['scenarios'] ?? []) as $scenario) { if (is_array($scenario)) { $ids[] = (string) ($scenario['id'] ?? ''); } }
 foreach ([
-    'file03-current-public-dto','file03-route-parity','file07-directory-visual-contract','file09-doctor-decision','file14-visual-consumer',
-    'file20-current-shell-contract','file20-admin-parent','component-api-runtime',
-    'file22-create-edit-contract','file23-private-management-contract','companion-token-bridge'
+    'file00-assertions','file03-current-public-dto','file03-route-parity','file07-directory-visual-contract','file09-doctor-decision','file14-visual-consumer',
+    'file20-current-shell-contract','file20-admin-parent','component-api-runtime','file22-create-edit-contract','file23-private-management-contract',
+    'file24-current-assurance-contract','companion-token-bridge'
 ] as $id) { if (! in_array($id, $ids, true)) { $errors[] = 'Staging test scenario missing: ' . $id; } }
 
 $verifier = $read('tools/verify-staging-artifact.php');
