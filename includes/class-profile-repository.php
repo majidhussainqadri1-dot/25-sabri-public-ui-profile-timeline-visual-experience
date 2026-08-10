@@ -28,7 +28,6 @@ final class Profile_Repository
     public function get_founder(): ?WP_User
     {
         $user_id = $this->native->founder_user_id();
-
         return $user_id > 0 ? get_user_by('id', $user_id) ?: null : null;
     }
 
@@ -57,7 +56,6 @@ final class Profile_Repository
         if (! $user instanceof WP_User) {
             return null;
         }
-
         $canonical_slug = (string) $user->user_nicename;
 
         return $canonical_slug !== '' && hash_equals($slug, $canonical_slug) ? $user : null;
@@ -71,37 +69,35 @@ final class Profile_Repository
         }
 
         $user_id = (int) $user->ID;
+        $source_projection = $this->native->public_profile_projection($user_id, 0);
+        if ($source_projection === []) {
+            return null;
+        }
+
         $profile_class = $this->visibility->profile_class($user);
         $credentials = $this->native->professional_credentials($user_id);
         $clinic_source = $this->native->clinic($user_id);
         $founder_source = $profile_class === 'founder' ? $this->native->founder_profile() : [];
-        $founder_details = $profile_class === 'founder'
-            ? Profile_Data::founder_details($founder_source)
-            : [];
-        $professional = $profile_class === 'doctor'
-            ? Profile_Data::professional_details($credentials)
-            : [];
+        $founder_details = $profile_class === 'founder' ? Profile_Data::founder_details($founder_source) : [];
+        $professional = $profile_class === 'doctor' ? Profile_Data::professional_details($credentials) : [];
         $clinic = Profile_Data::clinic($clinic_source);
 
-        $photo_id = (int) get_user_meta($user_id, '_spd_profile_photo_id', true);
-        $cover_id = (int) get_user_meta($user_id, '_spd_cover_photo_id', true);
-        if ($profile_class === 'founder') {
-            $photo_id = (int) ($founder_source['photo_id'] ?? $photo_id);
-            $cover_id = (int) ($founder_source['cover_id'] ?? $cover_id);
-        }
+        // File 03 1.4.0 owns profile media identity. Consume attachment IDs only
+        // from its authorized public DTO; legacy File 25 user-meta aliases are no
+        // longer a source of truth.
+        $photo_id = $this->native->profile_media_attachment_id($user_id, 'avatar');
+        $cover_id = $this->native->profile_media_attachment_id($user_id, 'cover');
 
-        // File 03 owns presentation media. File 25 projects a local image only
-        // when File 03 ownership, purpose, attachment type, MIME, dimensions,
-        // and same-site delivery all agree. Every mismatch fails closed.
-        // Empty media deliberately leaves the template's privacy-safe initials;
-        // File 25 never falls back to an external avatar service.
-        $avatar = $this->owned_media_url($photo_id, $user_id, 'profile', 'medium');
+        // File 03 media ownership/purpose metadata are revalidated locally before
+        // rendering the same-site URL. File 25 never falls back to Gravatar or a
+        // third-party avatar service.
+        $avatar = $this->owned_media_url($photo_id, $user_id, 'avatar', 'medium');
         $cover = $this->owned_media_url($cover_id, $user_id, 'cover', 'large');
         $headline = $profile_class === 'founder'
             ? (string) ($founder_source['title'] ?? '')
             : (string) ($professional['specialization'] ?? $this->native->profile_value($user_id, 'specialty'));
         $bio = $profile_class === 'founder'
-            ? (string) ($founder_source['introduction'] ?? '')
+            ? (string) ($founder_source['introduction'] ?? $this->native->profile_value($user_id, 'bio', ''))
             : $this->native->profile_value($user_id, 'bio', $user->description);
 
         $show_professional_location = in_array($profile_class, ['founder', 'doctor', 'institution'], true);
@@ -111,10 +107,8 @@ final class Profile_Repository
         $city = $show_professional_location
             ? $this->native->profile_value($user_id, 'city', (string) ($clinic['city'] ?? ''))
             : '';
-        $location_text = $profile_class === 'founder'
-            ? (string) ($founder_details['location'] ?? '')
-            : '';
-        $contacts = $this->public_contacts($user_id, $clinic_source, $founder_source);
+        $location_text = $profile_class === 'founder' ? (string) ($founder_details['location'] ?? '') : '';
+        $contacts = $this->public_contacts($user_id);
         $available_sections = $this->available_sections(
             $profile_class,
             $bio,
@@ -125,16 +119,20 @@ final class Profile_Repository
         );
         $all_labels = $this->section_labels($profile_class);
         $section_labels = array_intersect_key($all_labels, array_flip($available_sections));
+        $projected_name = is_scalar($source_projection['display_name'] ?? null)
+            ? (string) $source_projection['display_name']
+            : '';
         $default_name = $profile_class === 'founder'
             ? self::FOUNDER_DISPLAY_NAME
-            : (string) $user->display_name;
+            : ($projected_name !== '' ? $projected_name : (string) $user->display_name);
+        $badge = is_array($source_projection['badge'] ?? null) ? $source_projection['badge'] : [];
 
         $profile = [
             'slug' => sanitize_title((string) $user->user_nicename),
             'display_name' => $default_name,
             'class' => $profile_class,
             'role_label' => $this->role_label($profile_class),
-            'verified' => in_array($profile_class, ['founder', 'doctor'], true),
+            'verified' => in_array($profile_class, ['founder', 'doctor'], true) && ($badge['verified'] ?? false) === true,
             'avatar_url' => $avatar,
             'cover_url' => $cover,
             'headline' => $headline,
@@ -149,14 +147,16 @@ final class Profile_Repository
             'founder_details' => $founder_details,
             'professional' => $professional,
             'clinic' => $clinic,
+            'file03_contract_version' => (string) ($source_projection['contract_version'] ?? ''),
+            'file03_public_id' => (string) ($source_projection['public_id'] ?? ''),
         ];
 
         /** @var array<string,mixed> $filtered */
         $filtered = (array) apply_filters('sabri_public_experience/public_profile_data', $profile, $user);
 
-        // Canonical identity and validated File 03 media are immutable. Filters
-        // may change bounded headline/bio presentation and may revoke existing
-        // media, but they cannot rename an account or substitute another URL.
+        // Canonical identity and File 03 media are immutable. Presentation hooks
+        // may alter bounded text and revoke media, but cannot substitute another
+        // identity, contact destination or media URL.
         $profile['display_name'] = $profile_class === 'founder'
             ? self::FOUNDER_DISPLAY_NAME
             : $this->plain_text($default_name, 190);
@@ -237,38 +237,26 @@ final class Profile_Repository
         };
     }
 
-    /**
-     * @param array<string,mixed> $clinic
-     * @param array<string,mixed> $founder
-     * @return array<string,string>
-     */
-    private function public_contacts(int $user_id, array $clinic, array $founder): array
+    /** @return array<string,string> */
+    private function public_contacts(int $user_id): array
     {
-        unset($clinic);
-        // File 03 owns contact values and consent. File 08 explicitly excludes
-        // contact data, so clinic projections can never become a contact source.
-        $values = [
-            'phone' => (string) ($founder['phone'] ?? $this->native->profile_value($user_id, 'phone')),
-            'whatsapp' => (string) ($founder['whatsapp'] ?? $this->native->profile_value($user_id, 'whatsapp')),
-        ];
-        $canonical = $this->sanitize_contacts($values, $user_id);
+        // File 03 public DTO already performed audience/consent/minor checks. File
+        // 25 accepts only canonical phone-like fields and its privacy hooks may
+        // revoke them, never substitute another destination.
+        $canonical = [];
+        foreach (['phone', 'whatsapp'] as $field) {
+            $value = self::canonical_contact($this->native->profile_contact($user_id, $field));
+            if ($value !== '' && $this->visibility->can_show_contact($user_id, $field)) {
+                $canonical[$field] = $value;
+            }
+        }
         if ($canonical === []) {
             return [];
         }
 
-        // File 03 has already made the authoritative consent decision above.
-        // Extension filters receive a boolean visibility map and may only revoke
-        // a field by changing true to false/removing it. They never receive the
-        // authority to replace a canonical contact destination.
         $visibility = array_fill_keys(array_keys($canonical), true);
-        $filtered = apply_filters(
-            'sabri_public_experience/public_contacts',
-            $visibility,
-            $user_id,
-            $canonical
-        );
+        $filtered = apply_filters('sabri_public_experience/public_contacts', $visibility, $user_id, $canonical);
         $filtered = is_array($filtered) ? $filtered : [];
-
         $public = [];
         foreach ($canonical as $field => $value) {
             if (array_key_exists($field, $filtered) && $filtered[$field] === true) {
@@ -279,37 +267,15 @@ final class Profile_Repository
         return $public;
     }
 
-    /** @param array<string,mixed> $values @return array<string,string> */
-    private function sanitize_contacts(array $values, int $user_id): array
-    {
-        $contacts = [];
-        foreach (['phone', 'whatsapp'] as $field) {
-            $clean = self::canonical_contact($values[$field] ?? null);
-            if ($clean === '') {
-                continue;
-            }
-            if ($this->visibility->can_show_contact($user_id, $field)) {
-                $contacts[$field] = $clean;
-            }
-        }
-
-        return $contacts;
-    }
-
     private static function canonical_contact(mixed $value): string
     {
         if (! is_scalar($value)) {
             return '';
         }
-
         $raw = trim((string) $value);
         if ($raw === '' || preg_match('/[\x00-\x1F\x7F]/', $raw) === 1) {
             return '';
         }
-
-        // Preserve only conventional human-readable separators. Any other
-        // character, repeated plus sign, or overlong value fails closed rather
-        // than being silently transformed into a different destination.
         $clean = preg_replace('/[\s().-]+/u', '', $raw) ?? '';
         if (preg_match('/^\+?[0-9]{7,15}$/', $clean) !== 1) {
             return '';
@@ -347,10 +313,7 @@ final class Profile_Repository
         ) {
             $sections[] = 'about';
         }
-        if (
-            $profile_class === 'founder'
-            && (! empty($founder_details['publications']) || ! empty($founder_details['research']))
-        ) {
+        if ($profile_class === 'founder' && (! empty($founder_details['publications']) || ! empty($founder_details['research']))) {
             $sections[] = 'books-research';
         }
         if ($profile_class === 'founder' && ($contacts !== [] || $clinic !== [])) {
@@ -360,20 +323,14 @@ final class Profile_Repository
             $sections[] = 'clinic';
         }
 
-        $filtered = (array) apply_filters(
-            'sabri_public_experience/available_profile_sections',
-            $sections,
-            $profile_class
-        );
+        $filtered = (array) apply_filters('sabri_public_experience/available_profile_sections', $sections, $profile_class);
         $clean = [];
         foreach ($filtered as $section) {
             if (! is_scalar($section)) {
                 continue;
             }
             $raw_section = (string) $section;
-            if (preg_match('/^[a-z0-9][a-z0-9_-]{0,63}$/', $raw_section) === 1
-                && in_array($raw_section, $sections, true)
-            ) {
+            if (preg_match('/^[a-z0-9][a-z0-9_-]{0,63}$/', $raw_section) === 1 && in_array($raw_section, $sections, true)) {
                 $clean[] = $raw_section;
             }
         }
@@ -386,7 +343,7 @@ final class Profile_Repository
 
     private function owned_media_url(int $attachment_id, int $user_id, string $purpose, string $size): string
     {
-        if ($attachment_id <= 0 || $user_id <= 0) {
+        if ($attachment_id <= 0 || $user_id <= 0 || ! in_array($purpose, ['avatar', 'cover'], true)) {
             return '';
         }
         if (get_post_type($attachment_id) !== 'attachment'
@@ -401,7 +358,6 @@ final class Profile_Repository
         if (! in_array($mime, self::ALLOWED_IMAGE_MIMES, true)) {
             return '';
         }
-
         $metadata = wp_get_attachment_metadata($attachment_id);
         if (! is_array($metadata)) {
             return '';
@@ -413,7 +369,6 @@ final class Profile_Repository
         }
 
         $url = wp_get_attachment_image_url($attachment_id, $size);
-
         return Public_URL::sanitize_same_site(is_string($url) ? $url : '', false);
     }
 
@@ -423,7 +378,6 @@ final class Profile_Repository
             return '';
         }
         $candidate = Public_URL::sanitize_same_site((string) $filtered, false);
-
         return $candidate !== '' && hash_equals($canonical, $candidate) ? $canonical : '';
     }
 
