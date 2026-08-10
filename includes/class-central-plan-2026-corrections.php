@@ -30,6 +30,10 @@ final class Central_Plan_2026_Corrections
 
     public static function register(): void
     {
+        if (! class_exists(Future_Public_Experience::class)) {
+            require_once __DIR__ . '/class-future-public-experience.php';
+        }
+        (new Future_Public_Experience())->register();
         add_filter('sabri_visual_experience/tokens', [self::class, 'filter_tokens'], 200);
         add_filter('sabri_visual_experience/contract', [self::class, 'filter_contract'], 200);
         add_filter('sabri_public_experience/design_system_contract', [self::class, 'filter_contract'], 200);
@@ -115,6 +119,7 @@ final class Central_Plan_2026_Corrections
             'live_deployed' => false,
             'operational' => false,
         ];
+        $base['future_public_experience'] = Future_Public_Experience::contract();
 
         $base['tokens'] = self::filter_tokens($base['tokens'] ?? []);
 
