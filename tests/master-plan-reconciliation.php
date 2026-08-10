@@ -18,6 +18,7 @@ $sections = $read('includes/class-section-service.php');
 $rest = $read('includes/class-rest-controller.php');
 $design = $read('includes/class-design-system.php');
 $file20 = $read('includes/class-file-20-integration.php');
+$file24 = $read('includes/class-file-24-integration.php');
 $admin = $read('includes/class-admin-integration.php');
 $component = $read('includes/class-component-api.php');
 $assets = $read('includes/class-assets.php');
@@ -30,7 +31,7 @@ $plan = json_decode($read('config/staging-test-plan.json'), true);
 $check(str_contains($main, "SABRI_PUBLIC_EXPERIENCE_VERSION', '0.14.0'"), 'Runtime must remain 0.14.0 during current corrective cycle.');
 
 foreach ([
-    "FILE_00_MINIMUM_VERSION = '1.2.4'", "FILE_00_CONTRACT_VERSION = '1.1.2'",
+    "FILE_00_MINIMUM_VERSION = '1.2.38'", "FILE_00_CONTRACT_VERSION = '1.2.2'",
     'SMC_Contracts::assertions', 'SMC_CONTRACT_VERSION', 'smc_founder_user_id',
 ] as $marker) {
     $check(str_contains($native, $marker), 'File 00 authoritative marker missing: ' . $marker);
@@ -97,6 +98,9 @@ foreach (['native-contact-consent','same-origin-profile-media','conditional-prof
 $check(str_contains($file20, "REVIEWED_MINIMUM_VERSION = '1.4.12'"), 'File 20 current compatibility floor missing.');
 $check(str_contains($file20, "REVIEWED_CONTRACT_VERSION = '1.0.0'"), 'File 20 current contract version missing.');
 $check(str_contains($file20, "REVIEWED_SOURCE_COMMIT = '291486b22c7ed94b8be041192375b6d9b077fac5'"), 'File 20 exact reviewed source evidence missing.');
+$check(str_contains($file24, "REVIEWED_MINIMUM_VERSION = '0.99.0'"), 'File 24 current compatibility floor missing.');
+$check(str_contains($file24, "REVIEWED_SOURCE_COMMIT = '0be43b3f424d7b53865587b2770479ca33f51a0b'"), 'File 24 exact reviewed current-main evidence missing.');
+$check(! str_contains($file24, "'wp-cli:sabri file25 staging-probe'"), 'File 24 module manifest must not contain a CLI pseudo-route.');
 $check(str_contains($design, 'sabri_shell_file25_visual_contract') && str_contains($design, "'primary_color' => '#087A4E'"), 'File 20 visual consumer bridge must publish File 25 canonical green.');
 $check(str_contains($admin, "SHELL_PARENT_SLUG = 'sabri-shell'"), 'File 25 admin must attach to File 20 when compatible.');
 $check(str_contains($component, 'Component API cannot bind a second timeline registry'), 'Component API must preserve one canonical request registry.');
@@ -114,6 +118,10 @@ foreach ((array) ($matrix['modules'] ?? []) as $module) { if (is_array($module) 
 foreach ([0,3,6,7,8,9,10,11,12,14,18,20,21,22,23,24,25] as $file_number) {
     $check(isset($modules[$file_number]), 'Dependency/acceptance matrix missing File ' . $file_number . '.');
 }
+$check(($modules[0]['reviewed_source_version'] ?? '') === '1.2.38', 'File 00 current source version mismatch.');
+$check(($modules[0]['reviewed_db_version'] ?? '') === '1.4.4', 'File 00 current DB version mismatch.');
+$check(($modules[0]['required_contract_version'] ?? '') === '1.2.2', 'File 00 current contract mismatch.');
+$check(($modules[0]['reviewed_source_commit'] ?? '') === 'c37d0b101d0912bef1f26d0daf51a414d67907c0', 'File 00 exact current main mismatch.');
 $check(($modules[3]['reviewed_source_version'] ?? '') === '1.2.0-rc2', 'File 03 current reviewed source mismatch.');
 $check(($modules[3]['required_contract_version'] ?? '') === '1.4.0', 'File 03 contract must be 1.4.0.');
 $check(($modules[3]['reviewed_source_commit'] ?? '') === 'b96f74457f54341701c6cdb1a57d42baa1100081', 'File 03 exact reviewed head mismatch.');
@@ -122,8 +130,10 @@ $check(($modules[7]['reviewed_source_commit'] ?? '') === '67c32ec4af45a7de6e3d9c
 $check(($modules[8]['required_public_contract_version'] ?? '') === '1.0.0', 'File 08 public contract must remain explicit.');
 $check(($modules[9]['reviewed_source_version'] ?? '') === '1.3.0', 'File 09 current candidate must be 1.3.0.');
 $check(($modules[9]['required_contract_version'] ?? '') === '1.1.0', 'File 09 integration contract must be 1.1.0.');
-$check(($modules[9]['reviewed_source_commit'] ?? '') === '6d5c2850dbf86ce954e0c2fdef8adf36d2dbf1f1', 'File 09 exact reviewed candidate mismatch.');
-$check(($modules[14]['reviewed_source_version'] ?? '') === '1.4.1' && ($modules[14]['required_primary_color'] ?? '') === '#087A4E', 'File 14 visual consumer baseline mismatch.');
+$check(($modules[9]['reviewed_source_branch'] ?? '') === 'codex/file09-1.3.0-rc6-80-round-review', 'File 09 reviewed branch must be the current RC6 review branch.');
+$check(($modules[9]['reviewed_source_commit'] ?? '') === '58313a67e1d21ad17c9a066e9a29c34245a0763e', 'File 09 exact reviewed RC6 candidate mismatch.');
+$check(($modules[14]['reviewed_source_version'] ?? '') === '1.4.2' && ($modules[14]['required_primary_color'] ?? '') === '#087A4E', 'File 14 visual consumer baseline mismatch.');
+$check(($modules[14]['reviewed_source_commit'] ?? '') === 'b9045a4229d052103a5546477f664ac88b6ff034', 'File 14 exact current main mismatch.');
 $check(($modules[18]['reviewed_source_version'] ?? '') === '1.2.0-RC1', 'File 18 reviewed source mismatch.');
 $check(($modules[20]['reviewed_source_version'] ?? '') === '1.4.12', 'File 20 current reviewed source mismatch.');
 $check(($modules[20]['required_contract_version'] ?? '') === '1.0.0', 'File 20 central-plan contract must be 1.0.0.');
@@ -134,6 +144,8 @@ $check(($modules[22]['reviewed_source_commit'] ?? '') === 'c3b775b66fbbda4a9dd98
 $check(($modules[22]['required_contract_versions']['rest_api'] ?? '') === '1.2.0', 'File 22 REST contract must be 1.2.0.');
 $check(($modules[23]['reviewed_source_commit'] ?? '') === 'a8a8c805f4730998ccb44bd95c87591836561759', 'File 23 stable main baseline mismatch.');
 $check(($modules[23]['future_intelligence_branch']['head'] ?? '') === '50b9489a4a058d4628ef5dda220837393dd32010', 'File 23 FPI24 feature head truth missing.');
+$check(($modules[24]['reviewed_source_version'] ?? '') === '0.99.0', 'File 24 current runtime source mismatch.');
+$check(($modules[24]['reviewed_source_commit'] ?? '') === '0be43b3f424d7b53865587b2770479ca33f51a0b', 'File 24 exact current main mismatch.');
 $check(($modules[25]['candidate_version'] ?? '') === '0.14.0', 'File 25 candidate version mismatch.');
 foreach ($modules as $module) {
     if (isset($module['staging_status'])) { $check($module['staging_status'] === 'pending', 'No dependency may be promoted to staging-accepted by source evidence.'); }
@@ -142,7 +154,7 @@ foreach ($modules as $module) {
 $check(is_array($plan) && ($plan['schema_version'] ?? null) === 3, 'Staging test plan schema must be 3.');
 $scenario_ids = [];
 foreach ((array) ($plan['scenarios'] ?? []) as $scenario) { if (is_array($scenario)) { $scenario_ids[] = (string) ($scenario['id'] ?? ''); } }
-foreach (['file03-current-public-dto','file03-route-parity','file09-doctor-decision','file07-directory-visual-contract','file14-visual-consumer','file20-current-shell-contract','file20-admin-parent','component-api-runtime','file22-create-edit-contract','file23-private-management-contract','companion-token-bridge'] as $scenario) {
+foreach (['file00-assertions','file03-current-public-dto','file03-route-parity','file09-doctor-decision','file07-directory-visual-contract','file14-visual-consumer','file20-current-shell-contract','file20-admin-parent','component-api-runtime','file22-create-edit-contract','file23-private-management-contract','file24-current-assurance-contract','companion-token-bridge'] as $scenario) {
     $check(in_array($scenario, $scenario_ids, true), 'Current staging scenario missing: ' . $scenario);
 }
 $check(str_contains($dependencies, "'visual_token_owner'" ) === false || str_contains($dependencies, 'File 20 current 1.4.12 structural-shell/central-plan contract'), 'Dependency status must preserve File 20 structural/File 25 visual ownership boundary.');
