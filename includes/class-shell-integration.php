@@ -81,6 +81,9 @@ final class Shell_Integration
         ];
         $base['visual_tokens_inherited_from_shell'] = false;
         $base['structural_geometry_owner'] = 'file-20';
+        $base['overlay_stacking_owner'] = 'file-20';
+        $base['file25_owns_overlay_z_index'] = false;
+        $base['file25_requires_shell_stacking_acceptance'] = true;
         $base['visual_token_owner'] = 'file-25';
         $base['owns_global_shell'] = false;
         $base['owns_global_visual_system'] = true;
