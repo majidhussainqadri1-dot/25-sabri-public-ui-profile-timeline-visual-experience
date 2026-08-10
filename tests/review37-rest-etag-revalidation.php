@@ -60,6 +60,30 @@ namespace {
         }
     }
 
+    $dated = $method->invoke($controller, [
+        'profile' => ['updated_at' => '2026-08-10T12:30:00Z'],
+        'items' => [['date_gmt' => '2026-08-10T12:00:00Z']],
+    ], 200, new WP_REST_Request());
+    $lastModified = (string) ($dated->headers['Last-Modified'] ?? '');
+    if ($lastModified !== 'Mon, 10 Aug 2026 12:30:00 GMT') {
+        fwrite(STDERR, "Review 517 failed: deterministic Last-Modified header missing or incorrect.\n");
+        exit(1);
+    }
+    $date304 = $method->invoke($controller, [
+        'profile' => ['updated_at' => '2026-08-10T12:30:00Z'],
+    ], 200, new WP_REST_Request(['if-modified-since' => $lastModified]));
+    if ($date304->status !== 304 || $date304->data !== null) {
+        fwrite(STDERR, "Review 517 failed: If-Modified-Since did not produce 304.\n");
+        exit(1);
+    }
+    $precedence = $method->invoke($controller, [
+        'profile' => ['updated_at' => '2026-08-10T12:30:00Z'],
+    ], 200, new WP_REST_Request(['if-none-match' => '"miss"', 'if-modified-since' => $lastModified]));
+    if ($precedence->status !== 200) {
+        fwrite(STDERR, "Review 517 failed: If-None-Match precedence was not preserved.\n");
+        exit(1);
+    }
+
     $miss = $method->invoke($controller, ['value' => 1], 200, new WP_REST_Request(['if-none-match' => '"not-this"']));
     if ($miss->status !== 200 || $miss->data !== ['value' => 1]) {
         fwrite(STDERR, "Review 37 failed: nonmatching ETag incorrectly suppressed a response.\n");
@@ -72,5 +96,13 @@ namespace {
         exit(1);
     }
 
-    echo "Review 37 deterministic REST ETag revalidation checks passed.\n";
+    $source = (string) file_get_contents(dirname(__DIR__) . '/includes/class-rest-controller.php');
+    foreach (['allow_public_request', 'sabri_public_experience/rest_rate_limit', 'wp_cache_incr', "'status' => 429", "'retry_after' => \$window"] as $marker) {
+        if (! str_contains($source, $marker)) {
+            fwrite(STDERR, "Review 518 failed: REST rate-limit contract marker missing: {$marker}.\n");
+            exit(1);
+        }
+    }
+
+    echo "Review 37/517/518 deterministic REST ETag, Last-Modified and rate-limit contract checks passed.\n";
 }
