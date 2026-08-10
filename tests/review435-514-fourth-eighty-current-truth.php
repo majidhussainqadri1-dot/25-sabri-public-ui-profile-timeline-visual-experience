@@ -94,10 +94,10 @@ foreach (['file00-assertions','file09-doctor-decision','file14-visual-consumer',
 
 $verifier = $read('tools/verify-staging-artifact.php');
 foreach ([
-    "($modules[0]['reviewed_source_version'] ?? '') === '1.2.38'",
-    "($modules[9]['reviewed_source_commit'] ?? '') === '58313a67e1d21ad17c9a066e9a29c34245a0763e'",
-    "($modules[14]['reviewed_source_version'] ?? '') === '1.4.2'",
-    "($modules[24]['reviewed_source_version'] ?? '') === '0.99.0'",
+    '(\$modules[0][\'reviewed_source_version\'] ?? \'\') === \'1.2.38\'',
+    '(\$modules[9][\'reviewed_source_commit\'] ?? \'\') === \'58313a67e1d21ad17c9a066e9a29c34245a0763e\'',
+    '(\$modules[14][\'reviewed_source_version\'] ?? \'\') === \'1.4.2\'',
+    '(\$modules[24][\'reviewed_source_version\'] ?? \'\') === \'0.99.0\'',
     'MAX_INNER_TOTAL_BYTES',
     'Embedded manifest or dependency matrix differs from detached evidence.',
 ] as $marker) {
@@ -107,8 +107,8 @@ foreach ([
 $structure = $read('tools/verify-structure.php');
 foreach ([
     "FILE_00_MINIMUM_VERSION = '1.2.38'",
-    "($modules[14]['reviewed_source_version'] ?? '') === '1.4.2'",
-    "($modules[24]['reviewed_source_version'] ?? '') === '0.99.0'",
+    '(\$modules[14][\'reviewed_source_version\'] ?? \'\') === \'1.4.2\'',
+    '(\$modules[24][\'reviewed_source_version\'] ?? \'\') === \'0.99.0\'',
     'file24-current-assurance-contract',
 ] as $marker) {
     $check(str_contains($structure, $marker), 'Fourth-cycle structural verifier marker missing: ' . $marker);
