@@ -20,21 +20,33 @@ $check = static function (bool $condition, string $message) use (&$failures): vo
 $contract = Visual_Acceptance::contract();
 $check(($contract['owner'] ?? '') === 'file-25', 'File 25 must own visual acceptance.');
 $check(($contract['shell_owner'] ?? '') === 'file-20', 'File 20 must remain the shell owner.');
-$check(($contract['contract_version'] ?? '') === '1.3.0', 'Visual acceptance contract version must be current.');
+$check(($contract['contract_version'] ?? '') === '1.4.0', 'Visual acceptance contract version must be current.');
 $check(($contract['green_ci_is_acceptance'] ?? true) === false, 'Green CI must not be treated as visual acceptance.');
+$check(($contract['source_contract_is_acceptance'] ?? true) === false, 'Source contracts must not be treated as visual acceptance.');
 $check(($contract['target_commit_sha_required'] ?? false) === true, 'All evidence must be bound to one target commit.');
 $check(($contract['artifact_root'] ?? '') === 'artifacts/', 'Evidence references must use the governed artifacts root.');
 $check(in_array('byte_size', (array) ($contract['evidence_record_required_fields'] ?? []), true), 'Artifact byte size must be mandatory.');
 $check(in_array('media_type', (array) ($contract['evidence_record_required_fields'] ?? []), true), 'Artifact media type must be mandatory.');
 $check(($contract['staging_required'] ?? false) === true, 'Staging evidence must remain mandatory.');
 $check(($contract['founder_signoff_required'] ?? false) === true, 'Founder sign-off must remain mandatory.');
+$check(($contract['shell_screenshot_regression_required'] ?? false) === true, 'File 20 shell screenshot regression must remain mandatory.');
+$check(($contract['slow_network_evidence_required'] ?? false) === true, 'Slow-network evidence must remain mandatory.');
 $check(count((array) ($contract['viewports'] ?? [])) === 6, 'Six canonical viewport classes are required.');
+$check(in_array('file20-shell-integration', (array) ($contract['required_surfaces'] ?? []), true), 'File 20 shell integration evidence is required.');
+$check(in_array('profile-hero-actions', (array) ($contract['required_surfaces'] ?? []), true), 'Profile hero/action evidence is required.');
+$check(in_array('qr-share-state', (array) ($contract['required_surfaces'] ?? []), true), 'QR/share state evidence is required.');
 $check(in_array('media-section', (array) ($contract['required_surfaces'] ?? []), true), 'Media-section evidence is required.');
 $check(in_array('marketplace-section', (array) ($contract['required_surfaces'] ?? []), true), 'Marketplace-section evidence is required.');
 $check(in_array('rtl', (array) ($contract['directions'] ?? []), true), 'RTL evidence is required.');
 $check(in_array('forced-colors', (array) ($contract['color_modes'] ?? []), true), 'Forced-colors evidence is required.');
 $check(in_array(400, (array) ($contract['zoom_levels'] ?? []), true), 'Four-hundred-percent zoom evidence is required.');
 $check(in_array('screen-reader', (array) ($contract['input_modes'] ?? []), true), 'Screen-reader evidence is required.');
+foreach (['AJ-04', 'AJ-31', 'AJ-32', 'AJ-33', 'AJ-39', 'AJ-40'] as $journey) {
+    $check(in_array($journey, (array) ($contract['governing_acceptance_journeys'] ?? []), true), 'Missing governing acceptance journey: ' . $journey);
+}
+foreach (['F25-CEN-01', 'F25-CEN-02'] as $requirementId) {
+    $check(in_array($requirementId, (array) ($contract['file_specific_requirements'] ?? []), true), 'Missing File 25 governing requirement: ' . $requirementId);
+}
 
 $empty_errors = Visual_Acceptance::validate_evidence([]);
 $check(count($empty_errors) >= 10, 'Empty evidence must fail every required evidence group and target commit.');
@@ -129,4 +141,4 @@ if ($failures !== []) {
     exit(1);
 }
 
-echo "PASS: File 25 commit-bound artifact-integrity visual acceptance contract\n";
+echo "PASS: File 25 newest commit-bound artifact-integrity visual acceptance contract\n";
