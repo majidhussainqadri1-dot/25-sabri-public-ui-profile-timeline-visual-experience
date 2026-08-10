@@ -82,6 +82,7 @@ $spux_files = [
     'includes/contracts/interface-profile-section-provider.php',
     'includes/class-normalized-timeline-item.php',
     'includes/class-file-24-integration.php',
+    'includes/class-file-20-integration.php',
     'includes/class-native-integration.php',
     'includes/class-dependency-manager.php',
     'includes/class-visibility-policy.php',
