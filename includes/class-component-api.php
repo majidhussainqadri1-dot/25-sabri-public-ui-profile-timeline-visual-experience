@@ -27,6 +27,12 @@ final class Component_API
     /** @var array<int,Timeline_Provider> */
     private static array $pending_timeline_providers = [];
 
+    public static function register(): void
+    {
+        add_filter('sabri_visual_experience/contract', [self::class, 'filter_contract'], 50);
+        add_filter('sabri_public_experience/design_system_contract', [self::class, 'filter_contract'], 50);
+    }
+
     public static function register_timeline_provider(mixed $provider): bool
     {
         if (! $provider instanceof Timeline_Provider) {
@@ -87,6 +93,14 @@ final class Component_API
                 'sabri_public_register_card_variant',
             ],
         ];
+    }
+
+    /** @param mixed $contract @return array<string,mixed> */
+    public static function filter_contract(mixed $contract): array
+    {
+        $base = is_array($contract) ? $contract : [];
+        $base['component_api'] = self::contract();
+        return $base;
     }
 
     private static function register_into_registry(Timeline_Registry $registry, Timeline_Provider $provider): bool
