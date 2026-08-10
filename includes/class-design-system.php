@@ -77,7 +77,7 @@ final class Design_System
                 'global-design-system','public-ui','profile-timeline','responsive-refinement','visual-consistency','accessibility','visual-regression',
                 'reusable-content-cards','optional-profile-sections','visual-acceptance-evidence','deterministic-staging-packaging','installed-staging-preflight',
                 'file-24-module-manifest','no-store-profile-boundary','native-contact-consent','same-origin-profile-media','conditional-profile-layout',
-                'profile-breadcrumbs','structured-profile-section-rest','latest-central-requirement-ledger','file20-shell-screenshot-regression',
+                'profile-breadcrumbs','structured-profile-section-rest','rest-etag-last-modified-rate-limit','latest-central-requirement-ledger','file20-shell-screenshot-regression',
                 'tracking-free-profile-deep-link-qr-presentation',
             ],
             'tokens' => self::tokens(),
@@ -101,7 +101,9 @@ final class Design_System
             'public_rest' => [
                 'namespace' => 'sabri-public/v1','profile' => '/profiles/{public-slug}','timeline' => '/profiles/{public-slug}/timeline',
                 'knowledge' => '/profiles/{public-slug}/knowledge','media' => '/profiles/{public-slug}/media','provider_health' => '/providers/health',
-                'structured_cards' => true,'provider_ids_public' => false,'native_ids_public' => false,'no_store' => true,'etag' => true,
+                'structured_cards' => true,'provider_ids_public' => false,'native_ids_public' => false,'no_store' => true,
+                'etag' => true,'last_modified' => true,'conditional_get' => true,'rate_limited' => true,
+                'default_rate_limit_per_window' => 120,'default_rate_window_seconds' => 60,'rate_limit_identity_persisted_raw' => false,
             ],
             'profile_presentation' => [
                 'founder_display_name' => Profile_Repository::FOUNDER_DISPLAY_NAME,'external_avatar_fallback' => false,'same_origin_media_only' => true,
