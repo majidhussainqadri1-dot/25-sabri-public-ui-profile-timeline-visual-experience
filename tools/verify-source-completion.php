@@ -48,6 +48,16 @@ $assert(is_string($plugin), 'Main plugin file must be readable.');
 if (is_string($plugin)) {
     $assert(preg_match('/^\s*\* Version:\s*0\.14\.0\s*$/m', $plugin) === 1, 'Plugin header version must match matrix runtime.');
     $assert(str_contains($plugin, "define('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.14.0');"), 'Runtime constant must match matrix runtime.');
+    $assert(str_contains($plugin, "'includes/class-future-public-experience.php'"), 'Future Public Experience class must be loaded by the production bootstrap.');
+}
+
+$runtime = file_get_contents($root . '/includes/class-plugin.php');
+$assert(is_string($runtime), 'Plugin runtime coordinator must be readable.');
+if (is_string($runtime)) {
+    $assert(str_contains($runtime, '(new Future_Public_Experience())->register();'), 'Future Public Experience must be registered by the production runtime coordinator.');
+    $safeMode = strpos($runtime, 'if (Safe_Mode::is_active())');
+    $futureRegister = strpos($runtime, '(new Future_Public_Experience())->register();');
+    $assert($safeMode !== false && $futureRegister !== false && $futureRegister > $safeMode, 'Future Public Experience must remain behind the Safe Mode bootstrap gate.');
 }
 
 $requirements = $matrix['requirements'] ?? null;
@@ -172,6 +182,7 @@ foreach ([
     'includes/class-future-public-experience.php',
     'assets/css/future-public-experience.css',
     'assets/js/future-public-experience.js',
+    'config/future-public-experience-24.json',
     'docs/FUTURE-PUBLIC-EXPERIENCE-24-ENHANCEMENTS-2026-08-10.md',
     'tests/future-public-experience.php',
     'tests/review189-191-future-public-experience.php',
@@ -196,7 +207,7 @@ if ($failures !== []) {
 }
 
 echo sprintf(
-    "File 25 source completion verified: %d base groups + %d approved future requirements; zero known source defects, external acceptance deferred.\n",
+    "File 25 source completion verified: %d base groups + %d approved future requirements; production bootstrap binding verified; external acceptance deferred.\n",
     count($seen),
     count($futureSeen)
 );
