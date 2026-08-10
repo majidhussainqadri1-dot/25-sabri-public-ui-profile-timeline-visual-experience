@@ -75,7 +75,7 @@ $check(str_contains($future, "'toolbarLabel' => __('Reading and accessibility pr
 $check(str_contains($js, 'const t = (key, fallback)'), 'Review 201 client i18n consumption correction missing.');
 $check(str_contains($js, 'code !== primaryCode && code !== secondary'), 'Review 202 exactly-two bilingual correction missing.');
 $check(str_contains($js, 'url.username || url.password'), 'Review 203 client credential URL rejection missing.');
-$check(str_contains($shell, "$base['overlay_stacking_owner'] = 'file-20';"), 'Review 204 shell stacking ownership correction missing.');
+$check(str_contains($shell, '$base[\'overlay_stacking_owner\'] = \'file-20\';'), 'Review 204 shell stacking ownership correction missing.');
 $check(! str_contains($css, 'z-index: 9999'), 'Review 204 hard-coded overlay z-index remains.');
 $check(str_contains($renderer, '$profile[\'user_id\'] = (int) $user->ID;'), 'Review 205 internal profile identity binding correction missing.');
 $check(str_contains($repository, '$visibility = array_fill_keys(array_keys($canonical), true);'), 'Review 206 contact visibility-map correction missing.');
