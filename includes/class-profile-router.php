@@ -41,8 +41,14 @@ final class Profile_Router
             'index.php?spux_profile_type=doctor&spux_profile_slug=$matches[1]&spux_profile_section=$matches[2]',
             'top'
         );
+
+        // File 03 currently owns a UUID-like /profile/{public_id}/ route family.
+        // File 25's plan-approved public-slug family must never shadow it. The
+        // negative look-ahead deliberately reserves UUID-shaped first segments
+        // for File 03 while staging proves the final canonical/redirect parity.
+        $non_file03_public_id = '(?![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?:/|$))';
         add_rewrite_rule(
-            '^profile/([^/]+)(?:/(' . $pattern . '))?/?$',
+            '^profile/' . $non_file03_public_id . '([^/]+)(?:/(' . $pattern . '))?/?$',
             'index.php?spux_profile_type=member&spux_profile_slug=$matches[1]&spux_profile_section=$matches[2]',
             'top'
         );
@@ -66,10 +72,6 @@ final class Profile_Router
             return $mode;
         }
 
-        // File 20 remains the sole shell/sidebar owner. File 25 requests the
-        // two-column public profile layout by default and may use a third column
-        // only when an integration explicitly confirms that real sidebar content
-        // exists. This prevents an empty right rail on every Doctor profile.
         $right_sidebar_available = apply_filters(
             'sabri_public_experience/profile_right_sidebar_available',
             false,
@@ -80,7 +82,7 @@ final class Profile_Router
             return 'two';
         }
 
-        return $right_sidebar_available ? 'three' : 'two';
+        return 'three';
     }
 
     public function is_profile_request(): bool
@@ -109,8 +111,6 @@ final class Profile_Router
         $raw_section = (string) get_query_var('spux_profile_section');
         $raw_slug = (string) get_query_var('spux_profile_slug');
 
-        // Preserve every routed identity exactly. Validation rejects aliases;
-        // routing must never repair one request into another public identity.
         return [
             'type' => self::exact_key($raw_type) ? $raw_type : '',
             'slug' => $raw_slug,
@@ -118,13 +118,7 @@ final class Profile_Router
         ];
     }
 
-    /**
-     * Keep profile routing in exact parity with every approved optional section.
-     * A provider may still expose a tab only when it supplies accepted public
-     * cards; route capability alone never creates a dead tab.
-     *
-     * @return list<string>
-     */
+    /** @return list<string> */
     public static function route_sections(): array
     {
         $sections = array_merge(self::CORE_SECTIONS, Section_Registry::approved_sections());
