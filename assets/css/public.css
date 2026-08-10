@@ -1,15 +1,18 @@
 :root {
-    --spux-primary: var(--sabri-shell-primary, #ff8a1f);
-    --spux-primary-strong: var(--sabri-shell-primary-strong, #b94700);
-    --spux-text: var(--sabri-shell-text, #111111);
-    --spux-muted: var(--sabri-shell-muted, #5f6368);
-    --spux-surface: var(--sabri-shell-surface, #ffffff);
-    --spux-page: var(--sabri-shell-bg, #f7f5f1);
-    --spux-border: var(--sabri-shell-border, #e2e4e8);
-    --spux-focus: var(--sabri-shell-focus, #0b57d0);
-    --spux-danger: var(--sabri-shell-danger, #b42318);
-    --spux-warning: var(--sabri-shell-warning, #8a4b08);
-    --spux-radius: 1rem;
+    --spux-primary: var(--sabri-visual-primary, #087A4E);
+    --spux-primary-strong: var(--sabri-visual-primary-strong, #065C3B);
+    --spux-primary-soft: var(--sabri-visual-primary-soft, #E7F5EE);
+    --spux-on-primary: var(--sabri-visual-on-primary, #FFFFFF);
+    --spux-text: var(--sabri-visual-text, #171717);
+    --spux-muted: var(--sabri-visual-muted, #5f6368);
+    --spux-surface: var(--sabri-visual-surface, #ffffff);
+    --spux-page: var(--sabri-visual-page, #f7f5f1);
+    --spux-border: var(--sabri-visual-border, #dfe2e6);
+    --spux-focus: var(--sabri-visual-focus, #0b57d0);
+    --spux-danger: var(--sabri-visual-danger, #b42318);
+    --spux-warning: var(--sabri-visual-warning, #8a4b08);
+    --spux-radius: var(--sabri-visual-radius-card, 1rem);
+    --spux-radius-sm: var(--sabri-visual-radius-control, 0.75rem);
     --spux-shadow: 0 0.25rem 1.25rem rgb(17 17 17 / 8%);
 }
 
@@ -45,7 +48,7 @@
 }
 
 .spux-hero__cover {
-    background: #fff3e8;
+    background: var(--spux-primary-soft);
     background: linear-gradient(135deg, color-mix(in srgb, var(--spux-primary) 28%, white), var(--spux-surface));
     block-size: clamp(9rem, 25vw, 18rem);
     overflow: hidden;
@@ -78,7 +81,7 @@
 
 .spux-avatar--initials {
     align-items: center;
-    background: #fff3e8;
+    background: var(--spux-primary-soft);
     color: var(--spux-primary-strong);
     display: inline-flex;
     font-size: clamp(1.75rem, 6vw, 3rem);
@@ -112,9 +115,9 @@
 }
 
 .spux-badge {
-    background: #fff3e8;
+    background: var(--spux-primary-soft);
     background: color-mix(in srgb, var(--spux-primary) 14%, var(--spux-surface));
-    border: 1px solid #ffc48c;
+    border: 1px solid color-mix(in srgb, var(--spux-primary) 42%, var(--spux-surface));
     border-color: color-mix(in srgb, var(--spux-primary) 42%, var(--spux-surface));
     border-radius: 999px;
     color: var(--spux-primary-strong);
@@ -140,7 +143,7 @@
     background: var(--spux-primary);
     border: 2px solid transparent;
     border-radius: 0.75rem;
-    color: #111111;
+    color: var(--spux-on-primary);
     cursor: pointer;
     display: inline-flex;
     font: inherit;
@@ -199,7 +202,7 @@
 }
 
 .spux-tabs__item.is-active {
-    background: #fff3e8;
+    background: var(--spux-primary-soft);
     background: color-mix(in srgb, var(--spux-primary) 18%, var(--spux-surface));
     color: var(--spux-primary-strong);
 }
@@ -384,5 +387,36 @@
     .spux-public-metrics__item,
     .spux-completion-assistant {
         border: 1px solid CanvasText;
+    }
+}
+
+
+.spux-profile-qr {
+    align-items: center;
+    display: inline-grid;
+    gap: 0.5rem;
+}
+
+.spux-profile-qr > summary {
+    list-style: none;
+}
+
+.spux-profile-qr > summary::-webkit-details-marker {
+    display: none;
+}
+
+.spux-profile-qr__image {
+    background: #ffffff;
+    block-size: 10rem;
+    border: 1px solid var(--spux-border);
+    border-radius: var(--spux-radius-sm);
+    inline-size: 10rem;
+    object-fit: contain;
+    padding: 0.5rem;
+}
+
+@media (forced-colors: active) {
+    .spux-profile-qr__image {
+        border-color: CanvasText;
     }
 }

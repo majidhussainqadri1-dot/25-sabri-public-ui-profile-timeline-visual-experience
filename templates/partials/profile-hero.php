@@ -13,6 +13,12 @@ $location = implode(', ', array_filter([(string) ($profile['city'] ?? ''), (stri
 if ($location === '') {
     $location = trim((string) ($profile['location_text'] ?? ''));
 }
+$canonical_url = \Sabri\PublicExperience\Public_URL::sanitize_same_site($profile['canonical_url'] ?? '', false);
+$qr_image_url = '';
+if ($canonical_url !== '' && function_exists('apply_filters')) {
+    $qr_candidate = apply_filters('sabri_public_experience/profile_qr_image_url', '', $canonical_url, $profile);
+    $qr_image_url = \Sabri\PublicExperience\Public_URL::sanitize_same_site($qr_candidate, false);
+}
 ?>
 <header class="spux-hero">
     <div class="spux-hero__cover" aria-hidden="true">
@@ -53,8 +59,14 @@ if ($location === '') {
                 <a class="spux-button spux-button--secondary" href="<?php echo esc_url($href); ?>" rel="noopener noreferrer"><?php echo esc_html($label); ?></a>
             <?php endforeach; ?>
             <?php echo \Sabri\PublicExperience\Plan_Completion::render_profile_actions($profile); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-            <button class="spux-button spux-share" type="button" data-spux-share data-title="<?php echo esc_attr($display_name); ?>" data-url="<?php echo esc_url((string) ($profile['canonical_url'] ?? '')); ?>" aria-describedby="spux-share-status"><?php esc_html_e('Share', 'sabri-public-experience'); ?></button>
+            <button class="spux-button spux-share" type="button" data-spux-share data-title="<?php echo esc_attr($display_name); ?>" data-url="<?php echo esc_url($canonical_url); ?>" aria-describedby="spux-share-status"><?php esc_html_e('Share', 'sabri-public-experience'); ?></button>
             <span id="spux-share-status" class="spux-sr-only" role="status" aria-live="polite"></span>
+            <?php if ($qr_image_url !== '') : ?>
+                <details class="spux-profile-qr">
+                    <summary class="spux-button spux-button--secondary"><?php esc_html_e('QR', 'sabri-public-experience'); ?></summary>
+                    <img class="spux-profile-qr__image" src="<?php echo esc_url($qr_image_url); ?>" alt="<?php echo esc_attr(sprintf(__('QR code for %s public profile', 'sabri-public-experience'), $display_name)); ?>" width="160" height="160" loading="lazy">
+                </details>
+            <?php endif; ?>
         </div>
     </div>
 </header>

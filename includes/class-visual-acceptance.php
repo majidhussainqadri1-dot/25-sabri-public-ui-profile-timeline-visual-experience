@@ -11,7 +11,7 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
 /** Machine-readable Definition-of-Done matrix and evidence validator. */
 final class Visual_Acceptance
 {
-    public const CONTRACT_VERSION = '1.3.0';
+    public const CONTRACT_VERSION = '1.4.0';
 
     private const VIEWPORTS = [
         'mobile-small' => ['width' => 320, 'height' => 568],
@@ -38,6 +38,9 @@ final class Visual_Acceptance
         'text/plain',
     ];
     private const REQUIRED_SURFACES = [
+        'file20-shell-integration',
+        'profile-hero-actions',
+        'qr-share-state',
         'founder-overview',
         'doctor-overview',
         'member-overview',
@@ -70,6 +73,10 @@ final class Visual_Acceptance
             'zoom_levels' => self::ZOOM_LEVELS,
             'input_modes' => self::INPUT_MODES,
             'required_surfaces' => self::REQUIRED_SURFACES,
+            'governing_acceptance_journeys' => ['AJ-04', 'AJ-31', 'AJ-32', 'AJ-33', 'AJ-39', 'AJ-40'],
+            'file_specific_requirements' => ['F25-CEN-01', 'F25-CEN-02'],
+            'shell_screenshot_regression_required' => true,
+            'slow_network_evidence_required' => true,
             'target_commit_sha_required' => true,
             'artifact_root' => 'artifacts/',
             'artifact_media_types' => self::MEDIA_TYPES,

@@ -26,6 +26,8 @@
       "tests/review174-176-three-plan-corrections.php",
       "tests/review177-179-central-plan-reconciliation.php",
       "tests/review180-182-post-correction-reconciliation.php",
+      "tests/review183-185-new-governing-plans.php",
+      "tests/review186-188-post-correction-fresh-review.php",
       "tools/verify-source-completion.php",
       "tools/verify-structure.php",
       "tools/verify-file06-and-components.php",

@@ -18,10 +18,10 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
  */
 final class Central_Plan_2026_Corrections
 {
-    public const CONTRACT_VERSION = '1.0.0';
+    public const CONTRACT_VERSION = '1.1.0';
     public const PRIMARY_GREEN = '#087A4E';
-    public const PRIMARY_GREEN_STRONG = '#065F46';
-    public const PRIMARY_GREEN_SOFT = '#E7F5EF';
+    public const PRIMARY_GREEN_STRONG = '#065C3B';
+    public const PRIMARY_GREEN_SOFT = '#E7F5EE';
     public const PRIMARY_ON_GREEN = '#FFFFFF';
     public const FILE_22_REVIEWED_VERSION = '0.4.0';
     public const FILE_22_REVIEWED_COMMIT = '9d749a8e74910aa192c69a3727f5bf2f920af763';
@@ -108,6 +108,9 @@ final class Central_Plan_2026_Corrections
             'file_20_shell_ownership_preserved' => true,
             'file_25_visual_token_ownership_preserved' => true,
             'file_22_and_23_full_publishing_experience_traced' => true,
+            'file_26_global_search_owner_preserved' => true,
+            'file_specific_requirements' => ['F25-CEN-01', 'F25-CEN-02'],
+            'new_plan_matrix' => 'config/central-2026-file25-requirements.json',
             'hostinger_staging_accepted' => false,
             'live_deployed' => false,
             'operational' => false,
@@ -133,8 +136,8 @@ final class Central_Plan_2026_Corrections
 :root,
 body.sabri-primary-green {
     --sabri-visual-primary: #087A4E;
-    --sabri-visual-primary-strong: #065F46;
-    --sabri-visual-primary-soft: #E7F5EF;
+    --sabri-visual-primary-strong: #065C3B;
+    --sabri-visual-primary-soft: #E7F5EE;
     --sabri-visual-on-primary: #FFFFFF;
     accent-color: var(--sabri-visual-primary);
 }

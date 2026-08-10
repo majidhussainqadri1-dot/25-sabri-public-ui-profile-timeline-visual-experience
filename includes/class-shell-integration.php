@@ -77,19 +77,11 @@ final class Shell_Integration
         $base['shell_detected'] = $this->native->shell_available();
         $base['layout_filter'] = 'sabri_shell_layout_mode';
         $base['inherited_tokens'] = [
-            '--sabri-shell-primary',
-            '--sabri-shell-primary-strong',
-            '--sabri-shell-text',
-            '--sabri-shell-muted',
-            '--sabri-shell-surface',
-            '--sabri-shell-bg',
-            '--sabri-shell-border',
-            '--sabri-shell-focus',
-            '--sabri-shell-radius',
-            '--sabri-shell-font-scale',
-            '--sabri-shell-gap',
             '--sabri-shell-max-width',
         ];
+        $base['visual_tokens_inherited_from_shell'] = false;
+        $base['structural_geometry_owner'] = 'file-20';
+        $base['visual_token_owner'] = 'file-25';
         $base['owns_global_shell'] = false;
         $base['owns_global_visual_system'] = true;
         $base['inline_token_bridge'] = false;

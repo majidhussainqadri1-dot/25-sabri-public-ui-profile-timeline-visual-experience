@@ -1,22 +1,24 @@
+/* File 25 owns canonical visual tokens. File 20 supplies structural shell
+ * geometry only; --sabri-shell-max-width is the sole inherited token here. */
 :root {
-    --sabri-visual-primary: var(--sabri-shell-primary, #ff8a1f);
-    --sabri-visual-primary-strong: var(--sabri-shell-primary-strong, #9a3d00);
-    --sabri-visual-primary-soft: #fff3e8;
-    --sabri-visual-on-primary: #171717;
-    --sabri-visual-text: var(--sabri-shell-text, #171717);
-    --sabri-visual-muted: var(--sabri-shell-muted, #5f6368);
-    --sabri-visual-surface: var(--sabri-shell-surface, #ffffff);
-    --sabri-visual-page: var(--sabri-shell-bg, #f7f5f1);
-    --sabri-visual-border: var(--sabri-shell-border, #dfe2e6);
-    --sabri-visual-focus: var(--sabri-shell-focus, #0b57d0);
-    --sabri-visual-success: var(--sabri-shell-success, #137333);
-    --sabri-visual-warning: var(--sabri-shell-warning, #8a4b08);
-    --sabri-visual-danger: var(--sabri-shell-danger, #b42318);
+    --sabri-visual-primary: #087A4E;
+    --sabri-visual-primary-strong: #065C3B;
+    --sabri-visual-primary-soft: #E7F5EE;
+    --sabri-visual-on-primary: #FFFFFF;
+    --sabri-visual-text: #171717;
+    --sabri-visual-muted: #5f6368;
+    --sabri-visual-surface: #ffffff;
+    --sabri-visual-page: #f7f5f1;
+    --sabri-visual-border: #dfe2e6;
+    --sabri-visual-focus: #0b57d0;
+    --sabri-visual-success: #137333;
+    --sabri-visual-warning: #8a4b08;
+    --sabri-visual-danger: #b42318;
     --sabri-visual-on-danger: #ffffff;
-    --sabri-visual-radius-control: var(--sabri-shell-radius, 0.75rem);
-    --sabri-visual-radius-card: var(--sabri-shell-radius, 1rem);
-    --sabri-visual-layout-gap: var(--sabri-shell-gap, 1.5rem);
-    --sabri-visual-font-scale: var(--sabri-shell-font-scale, 1);
+    --sabri-visual-radius-control: 0.75rem;
+    --sabri-visual-radius-card: 1rem;
+    --sabri-visual-layout-gap: 1.5rem;
+    --sabri-visual-font-scale: 1;
     --sabri-visual-content-wide: var(--sabri-shell-max-width, 100rem);
     --sabri-visual-content-reading: 48rem;
     --sabri-visual-touch-target: 2.75rem;
@@ -45,15 +47,20 @@ body.sabri-visual-system {
     --spux-radius: var(--sabri-visual-radius-card);
     --spux-layout-gap: var(--sabri-visual-layout-gap);
     --spux-shadow: var(--sabri-visual-shadow-2);
-    --sabri-visual-primary-soft: color-mix(in srgb, var(--sabri-visual-primary) 14%, var(--sabri-visual-surface));
     accent-color: var(--sabri-visual-primary);
     text-rendering: optimizeLegibility;
 }
 
-/* File 20 remains authoritative for surface/text/theme tokens. File 25 only
- * supplies contrast-safe semantic derivatives that File 20 does not expose. */
+/* File 25 also owns dark visual values; these are contextual display overrides,
+ * while the canonical F25-CEN-01 green triplet remains frozen at :root. */
 body.sabri-visual-system.sabri-shell-theme-dark {
-    --sabri-visual-primary-strong: #ffbd80;
+    --sabri-visual-primary-strong: #E7F5EE;
+    --sabri-visual-text: #f3f4f6;
+    --sabri-visual-muted: #b7bec7;
+    --sabri-visual-surface: #181b1f;
+    --sabri-visual-page: #111315;
+    --sabri-visual-border: #30363d;
+    --sabri-visual-focus: #8ab4f8;
     --sabri-visual-success: #81c995;
     --sabri-visual-warning: #fdd663;
     --sabri-visual-danger: #f28b82;
@@ -61,17 +68,10 @@ body.sabri-visual-system.sabri-shell-theme-dark {
 }
 
 @media (prefers-color-scheme: dark) {
-    body.sabri-visual-system.sabri-shell-theme-system {
-        --sabri-visual-primary-strong: #ffbd80;
-        --sabri-visual-success: #81c995;
-        --sabri-visual-warning: #fdd663;
-        --sabri-visual-danger: #f28b82;
-        --sabri-visual-on-danger: #171717;
-    }
-
+    body.sabri-visual-system.sabri-shell-theme-system,
     body.sabri-visual-system.sabri-visual-shell-degraded {
         color-scheme: dark;
-        --sabri-visual-primary-strong: #ffbd80;
+        --sabri-visual-primary-strong: #E7F5EE;
         --sabri-visual-text: #f3f4f6;
         --sabri-visual-muted: #b7bec7;
         --sabri-visual-surface: #181b1f;

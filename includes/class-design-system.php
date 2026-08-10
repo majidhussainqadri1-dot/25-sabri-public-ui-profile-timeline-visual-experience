@@ -11,7 +11,7 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
 /** Canonical design-system contract for File 25. */
 final class Design_System
 {
-    public const CONTRACT_VERSION = '1.8.0';
+    public const CONTRACT_VERSION = '1.9.0';
     public const CANONICAL_NAME = 'Sabri Unified Global Visual Experience and Design System';
     public const SUBTITLE = 'Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency';
 
@@ -111,6 +111,9 @@ final class Design_System
                 'conditional-profile-layout',
                 'profile-breadcrumbs',
                 'structured-profile-section-rest',
+                'latest-central-requirement-ledger',
+                'file20-shell-screenshot-regression',
+                'tracking-free-profile-deep-link-qr-presentation',
             ],
             'tokens' => self::tokens(),
             'components' => Components::contract(),
@@ -155,6 +158,18 @@ final class Design_System
                 'breadcrumb_schema' => true,
                 'missing_profile_default_status' => 404,
                 'explicit_tombstone_status' => 410,
+                'doctor_structured_data_type' => 'Physician',
+                'profile_qr_image_filter' => 'sabri_public_experience/profile_qr_image_url',
+                'profile_qr_same_site_only' => true,
+                'profile_qr_tracking_free_required' => true,
+                'profile_qr_hidden_when_unavailable' => true,
+            ],
+            'latest_governing_requirements' => [
+                'file_specific' => ['F25-CEN-01', 'F25-CEN-02'],
+                'acceptance_journeys' => ['AJ-04', 'AJ-31', 'AJ-32', 'AJ-33', 'AJ-39', 'AJ-40'],
+                'global_search_discovery_ranking_owner' => 'file-26',
+                'matrix' => 'config/central-2026-file25-requirements.json',
+                'source_complete_is_external_acceptance' => false,
             ],
             'file_24_integration' => File_24_Integration::contract(),
             'staging_probe' => Staging_Probe::contract(),
@@ -185,8 +200,8 @@ final class Design_System
             // these values, but must not supply competing color/typography/
             // spacing/radius settings. Only structural width inherits File 20.
             'color-primary' => self::token('--sabri-visual-primary', '', '#087A4E'),
-            'color-primary-strong' => self::token('--sabri-visual-primary-strong', '', '#065F46'),
-            'color-primary-soft' => self::token('--sabri-visual-primary-soft', '', '#E7F5EF'),
+            'color-primary-strong' => self::token('--sabri-visual-primary-strong', '', '#065C3B'),
+            'color-primary-soft' => self::token('--sabri-visual-primary-soft', '', '#E7F5EE'),
             'color-on-primary' => self::token('--sabri-visual-on-primary', '', '#ffffff'),
             'color-text' => self::token('--sabri-visual-text', '', '#171717'),
             'color-muted' => self::token('--sabri-visual-muted', '', '#5f6368'),
