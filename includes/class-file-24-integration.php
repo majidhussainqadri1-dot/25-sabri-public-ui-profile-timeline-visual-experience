@@ -19,10 +19,11 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
  */
 final class File_24_Integration
 {
-    public const CONTRACT_VERSION = '1.0.0';
+    public const CONTRACT_VERSION = '1.1.0';
     public const MODULE_KEY = 'file-25-public-experience';
-    public const REVIEWED_MINIMUM_VERSION = '0.25.3';
-    public const REVIEWED_MAXIMUM_VERSION = '0.26.0';
+    public const REVIEWED_MINIMUM_VERSION = '0.99.0';
+    public const REVIEWED_MAXIMUM_VERSION = '1.0.0';
+    public const REVIEWED_SOURCE_COMMIT = '0be43b3f424d7b53865587b2770479ca33f51a0b';
 
     private static bool $pending_safe_mode_request = false;
 
@@ -32,8 +33,9 @@ final class File_24_Integration
 
     public function register(): void
     {
-        // File 24 collects manifests at init:50. A late filter priority keeps
-        // File 25's canonical self-description after ordinary extensions.
+        // Current File 24 0.99.0 collects manifests at init:50. A late filter
+        // priority keeps File 25's canonical self-description after ordinary
+        // extensions without taking over File 24's registry or enforcement.
         add_filter('spcrc/module_manifests', [self::class, 'filter_manifests'], 999, 1);
         add_action('init', [self::class, 'dispatch_pending_safe_mode_request'], 60);
         add_action('sabri_public_experience/safe_mode_changed', [self::class, 'safe_mode_changed'], 10, 2);
@@ -47,9 +49,12 @@ final class File_24_Integration
             'contract_version' => self::CONTRACT_VERSION,
             'file_24_constant' => 'SPCRC_VERSION',
             'reviewed_version_range' => '>=' . self::REVIEWED_MINIMUM_VERSION . ' <' . self::REVIEWED_MAXIMUM_VERSION,
+            'reviewed_source_commit' => self::REVIEWED_SOURCE_COMMIT,
+            'module_manifest_contract' => '1.0.0',
             'module_key' => self::MODULE_KEY,
             'manifest_filter' => 'spcrc/module_manifests',
             'security_state_action' => 'spcrc/request_security_state',
+            'staging_probe_cli' => 'wp sabri file25 staging-probe --expected-commit=<sha>',
             'cache_mode' => 'no-store-until-versioned-partition-contract',
             'owns_security_governance' => false,
             'owns_privacy_orchestration' => false,
@@ -98,9 +103,9 @@ final class File_24_Integration
             $filtered[] = $manifest;
         }
 
-        // File 24 accepts at most 99 external manifests after its own manifest.
-        // Keep File 25 inside that bounded collection without inventing data for
-        // or mutating any other module.
+        // Current File 24 accepts at most 99 external manifests after its own
+        // self-manifest. Keep File 25 inside that bounded collection without
+        // inventing data for or mutating any other module.
         $filtered = array_slice($filtered, 0, 98);
         array_unshift($filtered, self::manifest());
 
@@ -118,6 +123,12 @@ final class File_24_Integration
                 : '',
             'owner' => 'File 25',
             'posture' => 'foundation',
+            'contract_version' => '1.0.0',
+            'canonical_data_owner' => 'File 25',
+            'canonical_action_owner' => 'File 25 presentation; native domain owners execute domain actions',
+            'evidence_source' => 'file25-source-contract',
+            'degraded_behavior' => 'Public presentation remains read-only or degraded; native security ownership is unchanged.',
+            'release_gate' => 'Hostinger staging and Founder acceptance are required; source and CI evidence alone are insufficient.',
             'data_classes' => [
                 'C0 Public Presentation Metadata',
                 'C1 Internal Package and Visual Evidence References',
@@ -129,9 +140,10 @@ final class File_24_Integration
                 '/wp-json/sabri-public/v1/founder',
                 '/wp-json/sabri-public/v1/profiles/{slug}',
             ],
+            // File 24 0.99.0 accepts only same-origin absolute path routes in
+            // the manifest. CLI probes are published separately in contract().
             'private_routes' => [
                 '/wp-admin/site-health.php',
-                'wp-cli:sabri file25 staging-probe',
             ],
             'capabilities' => [],
             'external_vendors' => [],
@@ -162,6 +174,9 @@ final class File_24_Integration
         }
 
         self::$pending_safe_mode_request = false;
+        // This is an advisory request only. File 24 0.99.0 independently
+        // authorizes/denies the actor and state; File 25 never grants itself a
+        // security capability by firing the action.
         do_action('spcrc/request_security_state', self::MODULE_KEY, 'elevated-monitoring', [
             'reason' => 'file-25-safe-mode',
             'expires_at' => gmdate('c', time() + HOUR_IN_SECONDS),
