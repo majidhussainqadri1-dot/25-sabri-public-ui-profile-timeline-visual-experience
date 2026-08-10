@@ -39,17 +39,29 @@ foreach ([0,3,6,7,8,9,10,11,12,14,18,20,21,22,23,24,25] as $file) {
     $check(isset($modules[$file]), 'Dependency matrix missing File ' . $file);
 }
 $checks = [
-    0 => ($modules[0]['reviewed_package_version'] ?? '') === '1.2.4' && ($modules[0]['required_contract_version'] ?? '') === '1.1.2',
-    3 => ($modules[3]['reviewed_source_version'] ?? '') === '1.2.0-rc2' && ($modules[3]['required_contract_version'] ?? '') === '1.4.0' && ($modules[3]['reviewed_source_commit'] ?? '') === 'b96f74457f54341701c6cdb1a57d42baa1100081',
+    0 => ($modules[0]['reviewed_source_version'] ?? '') === '1.2.38'
+        && ($modules[0]['reviewed_db_version'] ?? '') === '1.4.4'
+        && ($modules[0]['required_contract_version'] ?? '') === '1.2.2'
+        && ($modules[0]['reviewed_source_commit'] ?? '') === 'c37d0b101d0912bef1f26d0daf51a414d67907c0',
+    3 => ($modules[3]['reviewed_source_version'] ?? '') === '1.2.0-rc2'
+        && ($modules[3]['required_contract_version'] ?? '') === '1.4.0'
+        && ($modules[3]['reviewed_source_commit'] ?? '') === 'b96f74457f54341701c6cdb1a57d42baa1100081',
     7 => ($modules[7]['reviewed_source_version'] ?? '') === '1.2.0' && ($modules[7]['required_contract_version'] ?? '') === '1.2.0',
     8 => ($modules[8]['required_public_contract_version'] ?? '') === '1.0.0',
-    9 => ($modules[9]['reviewed_source_version'] ?? '') === '1.3.0' && ($modules[9]['required_contract_version'] ?? '') === '1.1.0' && ($modules[9]['reviewed_source_commit'] ?? '') === '6d5c2850dbf86ce954e0c2fdef8adf36d2dbf1f1',
-    14 => ($modules[14]['reviewed_source_version'] ?? '') === '1.4.1' && ($modules[14]['required_primary_color'] ?? '') === '#087A4E',
+    9 => ($modules[9]['reviewed_source_version'] ?? '') === '1.3.0'
+        && ($modules[9]['required_contract_version'] ?? '') === '1.1.0'
+        && ($modules[9]['reviewed_source_branch'] ?? '') === 'codex/file09-1.3.0-rc6-80-round-review'
+        && ($modules[9]['reviewed_source_commit'] ?? '') === '58313a67e1d21ad17c9a066e9a29c34245a0763e',
+    14 => ($modules[14]['reviewed_source_version'] ?? '') === '1.4.2'
+        && ($modules[14]['reviewed_source_commit'] ?? '') === 'b9045a4229d052103a5546477f664ac88b6ff034'
+        && ($modules[14]['required_primary_color'] ?? '') === '#087A4E',
     18 => ($modules[18]['reviewed_source_version'] ?? '') === '1.2.0-RC1',
     20 => ($modules[20]['governing_plan_version'] ?? '') === '4.1',
     22 => ($modules[22]['reviewed_source_version'] ?? '') === '1.0.0-rc.3' && ($modules[22]['required_contract_versions']['rest_api'] ?? '') === '1.2.0',
     23 => ($modules[23]['reviewed_source_commit'] ?? '') === 'a8a8c805f4730998ccb44bd95c87591836561759' && ($modules[23]['future_intelligence_branch']['head'] ?? '') === '50b9489a4a058d4628ef5dda220837393dd32010',
-    24 => ($modules[24]['reviewed_package_version'] ?? '') === '0.25.3',
+    24 => ($modules[24]['reviewed_source_version'] ?? '') === '0.99.0'
+        && ($modules[24]['reviewed_source_commit'] ?? '') === '0be43b3f424d7b53865587b2770479ca33f51a0b'
+        && ($modules[24]['accepted_runtime_contract'] ?? '') === 'reviewed-current-0.99.0-source-contract-pending-staging',
     25 => ($modules[25]['candidate_version'] ?? '') === $runtime && ($modules[25]['canonical_primary_color'] ?? '') === '#087A4E' && ($modules[25]['design_token_owner'] ?? '') === 'file-25' && ($modules[25]['structural_shell_owner'] ?? '') === 'file-20',
 ];
 foreach ($checks as $file => $ok) { $check($ok, 'Current reviewed contract mismatch for File ' . $file); }
@@ -59,7 +71,7 @@ $plan = json_decode($read('config/staging-test-plan.json'), true);
 $check(is_array($plan) && ($plan['schema_version'] ?? null) === 3, 'Staging test plan schema 3 required.');
 $ids = [];
 foreach ((array) ($plan['scenarios'] ?? []) as $scenario) { if (is_array($scenario)) { $ids[] = (string) ($scenario['id'] ?? ''); } }
-foreach (['file03-current-public-dto','file03-route-parity','file07-directory-visual-contract','file09-doctor-decision','file14-visual-consumer','file22-create-edit-contract','file23-private-management-contract','companion-token-bridge'] as $id) {
+foreach (['file00-assertions','file03-current-public-dto','file03-route-parity','file07-directory-visual-contract','file09-doctor-decision','file14-visual-consumer','file22-create-edit-contract','file23-private-management-contract','file24-current-assurance-contract','companion-token-bridge'] as $id) {
     $check(in_array($id, $ids, true), 'Staging plan missing ' . $id);
 }
 
