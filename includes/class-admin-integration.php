@@ -41,6 +41,7 @@ final class Admin_Integration
     {
         add_action('admin_menu', [self::class, 'rehome'], 100);
         add_filter('sabri_public_experience/admin_integration_contract', [self::class, 'filter_contract']);
+        add_filter('sabri_visual_experience/contract', [self::class, 'filter_design_contract'], 55);
     }
 
     public static function rehome(): void
@@ -95,5 +96,13 @@ final class Admin_Integration
     public static function filter_contract(mixed $contract): array
     {
         return array_merge(is_array($contract) ? $contract : [], self::contract());
+    }
+
+    /** @param mixed $contract @return array<string,mixed> */
+    public static function filter_design_contract(mixed $contract): array
+    {
+        $base = is_array($contract) ? $contract : [];
+        $base['admin_integration'] = self::contract();
+        return $base;
     }
 }
