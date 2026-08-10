@@ -78,6 +78,7 @@ final class Future_Public_Experience
     public function register(): void
     {
         add_filter('sabri_visual_experience/contract', [self::class, 'filter_contract'], 40);
+        add_filter('sabri_public_experience/design_system_contract', [self::class, 'filter_contract'], 40);
         add_filter('body_class', [$this, 'body_classes'], 40);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_assets'], 220);
         add_action('admin_menu', [$this, 'register_component_lab'], 40);
@@ -123,6 +124,45 @@ final class Future_Public_Experience
             'sourceVerified' => __('Verified source projection', 'sabri-public-experience'),
             'updatedLabel' => __('Updated', 'sabri-public-experience'),
             'actionsLabel' => __('Profile actions', 'sabri-public-experience'),
+            'toolbarLabel' => __('Reading and accessibility preferences', 'sabri-public-experience'),
+            'readingMode' => __('Reading mode', 'sabri-public-experience'),
+            'largerText' => __('Larger text', 'sabri-public-experience'),
+            'highContrast' => __('High contrast', 'sabri-public-experience'),
+            'moreSpacing' => __('More spacing', 'sabri-public-experience'),
+            'simplifiedView' => __('Simplified view', 'sabri-public-experience'),
+            'lowData' => __('Low data', 'sabri-public-experience'),
+            'reset' => __('Reset', 'sabri-public-experience'),
+            'privacyPreview' => __('Privacy preview simulator', 'sabri-public-experience'),
+            'publicVisitor' => __('Public visitor', 'sabri-public-experience'),
+            'loggedInMember' => __('Logged-in member', 'sabri-public-experience'),
+            'contactPresentation' => __('Contact presentation', 'sabri-public-experience'),
+            'searchPresentation' => __('Search-result presentation', 'sabri-public-experience'),
+            'socialPresentation' => __('Social-preview presentation', 'sabri-public-experience'),
+            'mobilePresentation' => __('Mobile presentation', 'sabri-public-experience'),
+            'desktopPresentation' => __('Desktop presentation', 'sabri-public-experience'),
+            'previewDisclaimer' => __('Presentation simulation only; it never grants another role or bypasses authorization.', 'sabri-public-experience'),
+            'qualityLabel' => __('Public Experience Quality', 'sabri-public-experience'),
+            'passLabel' => __('Pass', 'sabri-public-experience'),
+            'reviewLabel' => __('Review', 'sabri-public-experience'),
+            'qualityDisclaimer' => __('Internal quality aid only; it has no public ranking, donation, verification, or visibility effect.', 'sabri-public-experience'),
+            'trustAriaLabel' => __('Profile trust information', 'sabri-public-experience'),
+            'verifiedPrefix' => __('Verified', 'sabri-public-experience'),
+            'shareStudio' => __('Share Studio', 'sabri-public-experience'),
+            'copyCleanLink' => __('Copy clean link', 'sabri-public-experience'),
+            'printProfileCard' => __('Print profile card', 'sabri-public-experience'),
+            'translations' => __('Translations', 'sabri-public-experience'),
+            'sideBySide' => __('Side by side', 'sabri-public-experience'),
+            'translationNote' => __('Translations are provider-supplied presentation; the original profile remains authoritative.', 'sabri-public-experience'),
+            'knowledgeRelationships' => __('Knowledge Relationships', 'sabri-public-experience'),
+            'relatedItem' => __('Related item', 'sabri-public-experience'),
+            'referencesCitations' => __('References and citations', 'sabri-public-experience'),
+            'reference' => __('Reference', 'sabri-public-experience'),
+            'publicInformationUpdated' => __('Public information updated', 'sabri-public-experience'),
+            'itemsShownForYear' => __('public items shown for', 'sabri-public-experience'),
+            'itemsShownOnPage' => __('public items shown on this page.', 'sabri-public-experience'),
+            'itemsOnThisPage' => __('public items on this page', 'sabri-public-experience'),
+            'linkCopied' => __('Link copied.', 'sabri-public-experience'),
+            'copyFailed' => __('Unable to copy the clean profile link.', 'sabri-public-experience'),
         ]);
     }
 
@@ -234,11 +274,15 @@ final class Future_Public_Experience
         if (! in_array($state, ['none', 'corrected', 'retracted', 'archived'], true)) {
             $state = 'none';
         }
+        $verified = $default['verified'] === true;
+        if (array_key_exists('verified', $data)) {
+            $verified = $verified && $data['verified'] === true;
+        }
         return [
-            'verified' => ($data['verified'] ?? null) === true,
+            'verified' => $verified,
             'label' => self::plain($data['label'] ?? $default['label'], 190),
             'source_label' => self::plain($data['source_label'] ?? $default['source_label'], 190),
-            'verified_at' => self::iso_time((string) ($data['verified_at'] ?? '')),
+            'verified_at' => $verified ? self::iso_time((string) ($data['verified_at'] ?? '')) : '',
             'freshness' => self::plain($data['freshness'] ?? '', 190),
             'correction_state' => $state,
         ];
@@ -358,6 +402,7 @@ final class Future_Public_Experience
     /** @param array<string,mixed> $profile @param array<string,mixed> $context @return array<string,string> */
     private static function preview_links(array $profile, array $context): array
     {
+        unset($context);
         $canonical = Public_URL::sanitize_same_site($profile['canonical_url'] ?? '', false);
         if ($canonical === '') {
             return [];
@@ -391,7 +436,7 @@ final class Future_Public_Experience
         if (is_array($extra)) {
             foreach (array_slice($extra, 0, 20, true) as $key => $pass) {
                 $key = is_string($key) ? sanitize_key($key) : '';
-                if ($key !== '' && is_bool($pass)) {
+                if ($key !== '' && is_bool($pass) && ! array_key_exists($key, $checks)) {
                     $checks[$key] = $pass;
                 }
             }
@@ -490,7 +535,11 @@ final class Future_Public_Experience
         if (is_int($value)) {
             return $value > 0 ? $value : 0;
         }
-        return is_string($value) && preg_match('/^[1-9][0-9]{0,18}$/', $value) === 1 ? max(0, (int) $value) : 0;
+        if (! is_string($value) || preg_match('/^[1-9][0-9]{0,18}$/', $value) !== 1) {
+            return 0;
+        }
+        $integer = (int) $value;
+        return $integer > 0 && (string) $integer === $value ? $integer : 0;
     }
 
     private static function plain(mixed $value, int $limit): string
@@ -513,10 +562,24 @@ final class Future_Public_Experience
         if ($value === '' || strlen($value) > 40) {
             return '';
         }
-        try {
-            return (new \DateTimeImmutable($value))->format('c');
-        } catch (\Throwable) {
-            return '';
+        $utc = new \DateTimeZone('UTC');
+        $formats = [
+            ['!Y-m-d\TH:i:s\Z', 'Y-m-d\TH:i:s\Z', $utc],
+            ['!Y-m-d\TH:i:s.uP', 'Y-m-d\TH:i:s.uP', null],
+            ['!Y-m-d\TH:i:sP', 'Y-m-d\TH:i:sP', null],
+            ['!Y-m-d H:i:s', 'Y-m-d H:i:s', $utc],
+        ];
+        foreach ($formats as [$parse, $round_trip, $timezone]) {
+            $date = \DateTimeImmutable::createFromFormat($parse, $value, $timezone);
+            $errors = \DateTimeImmutable::getLastErrors();
+            if (! $date instanceof \DateTimeImmutable
+                || (is_array($errors) && ((int) ($errors['warning_count'] ?? 0) > 0 || (int) ($errors['error_count'] ?? 0) > 0))
+                || $date->format($round_trip) !== $value
+            ) {
+                continue;
+            }
+            return $date->format('c');
         }
+        return '';
     }
 }
