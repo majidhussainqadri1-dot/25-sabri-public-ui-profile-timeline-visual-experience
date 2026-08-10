@@ -292,7 +292,7 @@ final class File25_Staging_Artifact_Verifier
             9 => ($modules[9]['reviewed_source_version'] ?? '') === '1.3.0'
                 && ($modules[9]['required_contract_version'] ?? '') === '1.1.0'
                 && ($modules[9]['reviewed_source_branch'] ?? '') === 'codex/file09-1.3.0-rc6-80-round-review'
-                && ($modules[9]['reviewed_source_commit'] ?? '') === '58313a67e1d21ad17c9a066e9a29c34245a0763e'
+                && ($modules[9]['reviewed_source_commit'] ?? '') === '6fa0a5cb7063b6b821bd50c105c735470f589b80'
                 && ($modules[9]['foreign_table_reads_allowed'] ?? true) === false,
             14 => ($modules[14]['reviewed_source_version'] ?? '') === '1.4.2'
                 && ($modules[14]['required_primary_color'] ?? '') === '#087A4E'
@@ -305,6 +305,12 @@ final class File25_Staging_Artifact_Verifier
                 && ($modules[20]['accepted_source_range'] ?? '') === '>=1.4.12 <1.5.0'
                 && ($modules[20]['governing_plan_version'] ?? '') === '4.1'
                 && ($modules[20]['source_lifecycle'] ?? '') === 'current-main-source-reviewed-pending-hostinger-staging',
+            21 => ($modules[21]['reviewed_package_version'] ?? '') === '1.0.5'
+                && ($modules[21]['reviewed_runtime_version'] ?? '') === '1.0.3'
+                && ($modules[21]['reviewed_schema_version'] ?? '') === '1.0.0'
+                && ($modules[21]['reviewed_source_commit'] ?? '') === 'afeda8742d8e1ea62254823291a66f502058989c'
+                && ($modules[21]['required_profile_timeline_api'] ?? '') === 'Sabri\\HomeNewsFeed\\ProfileTimeline::query'
+                && ($modules[21]['source_lifecycle'] ?? '') === 'current-main-source-reviewed-pending-hostinger-staging',
             22 => ($modules[22]['reviewed_source_version'] ?? '') === '1.0.0-rc.3'
                 && ($modules[22]['reviewed_source_commit'] ?? '') === 'c3b775b66fbbda4a9dd9891d63c08c74e2178741'
                 && ($modules[22]['required_contract_versions']['rest_api'] ?? '') === '1.2.0',
