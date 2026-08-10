@@ -109,7 +109,7 @@ final class Component_API
             if (! $provider->is_available()) {
                 return false;
             }
-            $id = $provider->get_id();
+            $id = $provider->get_provider_id();
             if ($registry->get($id) === $provider) {
                 return true;
             }
