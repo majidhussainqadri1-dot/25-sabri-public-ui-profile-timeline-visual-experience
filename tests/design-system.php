@@ -53,11 +53,13 @@ namespace {
     $contract = Design_System::contract();
     $check(($contract['file'] ?? null) === 25, 'Design system contract must remain owned by File 25.');
     $check(($contract['canonical_name'] ?? '') === 'Sabri Unified Global Visual Experience and Design System', 'Canonical File 25 name must remain exact.');
-    $check(($contract['contract_version'] ?? '') === '1.8.0', 'Design-system contract version must include the master-plan profile reconciliation.');
+    $check(($contract['contract_version'] ?? '') === '1.9.0', 'Design-system contract version must include the newest governing-plan reconciliation.');
     $check(($contract['runtime_version'] ?? '') === '0.13.0', 'Design-system runtime version must match File 25 0.13.0.');
     $check(($contract['creates_file_26'] ?? true) === false, 'Design system must reject a duplicate File 26.');
     $check(($contract['global_shell_owner'] ?? '') === 'file-20', 'File 20 must remain the global shell owner.');
     $check(($contract['visual_system_owner'] ?? '') === 'file-25', 'File 25 must remain the visual-system owner.');
+    $check(($contract['design_token_owner'] ?? '') === 'file-25', 'File 25 must remain the canonical visual-token owner.');
+    $check(($contract['structural_layout_owner'] ?? '') === 'file-20', 'File 20 must remain the structural layout owner.');
     $check(($contract['security_governance_owner'] ?? '') === 'file-24', 'File 24 must remain the security-governance owner.');
     $check(($contract['public_contact_consent_owner'] ?? '') === 'file-03', 'File 03 must remain the public-contact consent owner.');
     foreach ([
@@ -71,6 +73,9 @@ namespace {
         'conditional-profile-layout',
         'profile-breadcrumbs',
         'structured-profile-section-rest',
+        'latest-central-requirement-ledger',
+        'file20-shell-screenshot-regression',
+        'tracking-free-profile-deep-link-qr-presentation',
     ] as $scope) {
         $check(in_array($scope, (array) ($contract['scope'] ?? []), true), 'Missing design-system scope: ' . $scope);
     }
@@ -86,6 +91,8 @@ namespace {
     $check(($acceptance['green_ci_is_acceptance'] ?? true) === false, 'Green CI must not become visual acceptance.');
     $check(($acceptance['target_commit_sha_required'] ?? false) === true, 'Visual evidence must remain exact-commit bound.');
     $check(($acceptance['artifact_root'] ?? '') === 'artifacts/', 'Visual evidence must use the governed artifact root.');
+    $check(in_array('file20-shell-integration', (array) ($acceptance['required_surfaces'] ?? []), true), 'Visual acceptance must include File 20 shell integration.');
+    $check(in_array('qr-share-state', (array) ($acceptance['required_surfaces'] ?? []), true), 'Visual acceptance must include the provider-owned QR/share state.');
 
     $cards = (array) ($contract['content_cards'] ?? []);
     $check(($cards['contract_version'] ?? '') === '1.2.0', 'Content-card contract must expose the shared public normalizer.');
@@ -114,6 +121,15 @@ namespace {
     $check(($presentation['doctor_contact_requires_file_03_consent'] ?? false) === true, 'Doctor contact must require File 03 consent.');
     $check(($presentation['right_sidebar_requires_real_content'] ?? false) === true, 'Profile right sidebar must require real content.');
     $check(($presentation['explicit_tombstone_status'] ?? 0) === 410, 'Explicit deleted-profile tombstones must use 410.');
+    $check(($presentation['profile_qr_image_filter'] ?? '') === 'sabri_public_experience/profile_qr_image_url', 'Profile QR presentation must use the native/provider filter contract.');
+    $check(($presentation['profile_qr_same_site_only'] ?? false) === true, 'Profile QR image must remain same-site only.');
+    $check(($presentation['profile_qr_tracking_free_required'] ?? false) === true, 'Profile QR presentation must remain tracking-free.');
+
+    $latest = (array) ($contract['latest_governing_requirements'] ?? []);
+    $check(($latest['global_search_discovery_ranking_owner'] ?? '') === 'file-26', 'File 26 must remain the global search/discovery/ranking owner.');
+    foreach (['F25-CEN-01', 'F25-CEN-02'] as $requirementId) {
+        $check(in_array($requirementId, (array) ($latest['file_specific'] ?? []), true), 'Missing latest File 25 requirement: ' . $requirementId);
+    }
 
     $package = (array) ($contract['staging_package'] ?? []);
     $check(($package['contract_version'] ?? '') === '1.0.0', 'Staging package contract must remain declared.');
@@ -150,5 +166,5 @@ namespace {
         exit(1);
     }
 
-    echo "PASS: File 25 global design system and master-plan profile contracts\n";
+    echo "PASS: File 25 global design system and newest governing-plan profile contracts\n";
 }
