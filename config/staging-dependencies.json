@@ -3,9 +3,14 @@
   "file": 25,
   "runtime_version": "0.14.0",
   "governing_sources": {
-    "platform_master_plan": "Sabri Social Homeopathy Platform Definitive Master Plan 2026 v3.0 plus 6–7 August 2026 governing addenda",
-    "file_20_plan": "File 20 Harmonized Master Plan 2026 v4.1 plus current central-plan corrections",
-    "file_25_plan": "Complete Public UI, Profile Timeline and Visual Experience — Final Harmonized Specification 2.0 plus current governing completion addendum"
+    "platform_master_plan": "Sabri Social Homeopathy Platform Definitive Master Plan 2026 v3.0",
+    "file_20_plan": "File 20 Harmonized Master Plan 2026 v4.1",
+    "file_25_plan": "Complete Public UI, Profile Timeline and Visual Experience — Final Harmonized Specification"
+  },
+  "governing_addenda": {
+    "central": "6–7 August 2026 current governing addenda",
+    "file_25": "current governing completion addendum",
+    "rule": "Later explicit approved clauses supersede contradictory historical clauses without rewriting the verified baseline document identities."
   },
   "purpose": "Exact multi-plugin staging candidate matrix. It records reviewed source expectations and mandatory ownership boundaries; it does not claim Hostinger staging, production, merge or Founder acceptance.",
   "environment": {
