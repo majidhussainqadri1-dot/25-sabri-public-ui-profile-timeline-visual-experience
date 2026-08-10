@@ -85,6 +85,8 @@ final class Design_System
                 : '',
             'global_shell_owner' => 'file-20',
             'visual_system_owner' => 'file-25',
+            'design_token_owner' => 'file-25',
+            'structural_layout_owner' => 'file-20',
             'security_governance_owner' => 'file-24',
             'profile_master_owner' => 'file-00-file-03',
             'public_contact_consent_owner' => 'file-03',
@@ -179,24 +181,27 @@ final class Design_System
     public static function tokens(): array
     {
         return [
-            'color-primary' => self::token('--sabri-visual-primary', '--sabri-shell-primary', '#ff8a1f'),
-            'color-primary-strong' => self::token('--sabri-visual-primary-strong', '--sabri-shell-primary-strong', '#9a3d00'),
-            'color-primary-soft' => self::token('--sabri-visual-primary-soft', '', '#fff3e8'),
-            'color-on-primary' => self::token('--sabri-visual-on-primary', '', '#171717'),
-            'color-text' => self::token('--sabri-visual-text', '--sabri-shell-text', '#171717'),
-            'color-muted' => self::token('--sabri-visual-muted', '--sabri-shell-muted', '#5f6368'),
-            'color-surface' => self::token('--sabri-visual-surface', '--sabri-shell-surface', '#ffffff'),
-            'color-page' => self::token('--sabri-visual-page', '--sabri-shell-bg', '#f7f5f1'),
-            'color-border' => self::token('--sabri-visual-border', '--sabri-shell-border', '#dfe2e6'),
-            'color-focus' => self::token('--sabri-visual-focus', '--sabri-shell-focus', '#0b57d0'),
-            'color-success' => self::token('--sabri-visual-success', '--sabri-shell-success', '#137333'),
-            'color-warning' => self::token('--sabri-visual-warning', '--sabri-shell-warning', '#8a4b08'),
-            'color-danger' => self::token('--sabri-visual-danger', '--sabri-shell-danger', '#b42318'),
+            // File 25 is the canonical visual-token owner. File 20 may consume
+            // these values, but must not supply competing color/typography/
+            // spacing/radius settings. Only structural width inherits File 20.
+            'color-primary' => self::token('--sabri-visual-primary', '', '#087A4E'),
+            'color-primary-strong' => self::token('--sabri-visual-primary-strong', '', '#065F46'),
+            'color-primary-soft' => self::token('--sabri-visual-primary-soft', '', '#E7F5EF'),
+            'color-on-primary' => self::token('--sabri-visual-on-primary', '', '#ffffff'),
+            'color-text' => self::token('--sabri-visual-text', '', '#171717'),
+            'color-muted' => self::token('--sabri-visual-muted', '', '#5f6368'),
+            'color-surface' => self::token('--sabri-visual-surface', '', '#ffffff'),
+            'color-page' => self::token('--sabri-visual-page', '', '#f7f5f1'),
+            'color-border' => self::token('--sabri-visual-border', '', '#dfe2e6'),
+            'color-focus' => self::token('--sabri-visual-focus', '', '#0b57d0'),
+            'color-success' => self::token('--sabri-visual-success', '', '#137333'),
+            'color-warning' => self::token('--sabri-visual-warning', '', '#8a4b08'),
+            'color-danger' => self::token('--sabri-visual-danger', '', '#b42318'),
             'color-on-danger' => self::token('--sabri-visual-on-danger', '', '#ffffff'),
-            'radius-control' => self::token('--sabri-visual-radius-control', '--sabri-shell-radius', '0.75rem'),
-            'radius-card' => self::token('--sabri-visual-radius-card', '--sabri-shell-radius', '1rem'),
-            'space-layout' => self::token('--sabri-visual-layout-gap', '--sabri-shell-gap', '1.5rem'),
-            'font-scale' => self::token('--sabri-visual-font-scale', '--sabri-shell-font-scale', '1'),
+            'radius-control' => self::token('--sabri-visual-radius-control', '', '0.75rem'),
+            'radius-card' => self::token('--sabri-visual-radius-card', '', '1rem'),
+            'space-layout' => self::token('--sabri-visual-layout-gap', '', '1.5rem'),
+            'font-scale' => self::token('--sabri-visual-font-scale', '', '1'),
             'content-wide' => self::token('--sabri-visual-content-wide', '--sabri-shell-max-width', '100rem'),
         ];
     }
