@@ -107,6 +107,7 @@ $spux_files = [
     'includes/class-plan-completion.php',
     'includes/class-forty-round-hardening.php',
     'includes/class-three-plan-corrections.php',
+    'includes/class-central-plan-2026-corrections.php',
     'includes/class-plugin.php',
 ];
 
@@ -120,6 +121,7 @@ try {
         require_once $path;
     }
     \Sabri\PublicExperience\Three_Plan_Corrections::register();
+    \Sabri\PublicExperience\Central_Plan_2026_Corrections::register();
     \Sabri\PublicExperience\Safe_Mode::end();
 } catch (Throwable $exception) {
     \Sabri\PublicExperience\Safe_Mode::enable('file-loading-exception', $exception);
@@ -130,7 +132,11 @@ try {
 if (! function_exists('sabri_visual_experience_contract')) {
     function sabri_visual_experience_contract(): array
     {
-        return \Sabri\PublicExperience\Design_System::contract();
+        $contract = \Sabri\PublicExperience\Design_System::contract();
+
+        return function_exists('apply_filters')
+            ? (array) apply_filters('sabri_visual_experience/contract', $contract)
+            : \Sabri\PublicExperience\Central_Plan_2026_Corrections::filter_contract($contract);
     }
 }
 
