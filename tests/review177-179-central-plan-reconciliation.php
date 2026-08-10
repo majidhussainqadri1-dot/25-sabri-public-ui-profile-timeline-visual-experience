@@ -29,8 +29,8 @@ if (is_string($design)) {
 
 if (is_string($central)) {
     $check(str_contains($central, "public const PRIMARY_GREEN = '#087A4E';"), 'Review 177: latest correction layer must freeze #087A4E.');
-    $check(str_contains($central, "$base['design_token_owner'] = 'file-25';"), 'Review 178: contract must declare File 25 as canonical design-token owner.');
-    $check(str_contains($central, "$base['structural_layout_owner'] = 'file-20';"), 'Review 178: File 20 structural shell ownership must remain explicit.');
+    $check(str_contains($central, "\$base['design_token_owner'] = 'file-25';"), 'Review 178: contract must declare File 25 as canonical design-token owner.');
+    $check(str_contains($central, "\$base['structural_layout_owner'] = 'file-20';"), 'Review 178: File 20 structural shell ownership must remain explicit.');
     $check(str_contains($central, "'duplicate_visual_settings_allowed' => false"), 'Review 178: duplicate canonical visual settings must be prohibited.');
 }
 
