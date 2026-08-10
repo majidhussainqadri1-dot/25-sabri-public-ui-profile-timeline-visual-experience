@@ -25,8 +25,9 @@ $check(($ledger['file'] ?? null) === 25, 'Fifth-cycle ledger must govern File 25
 $check(($ledger['review_range']['first'] ?? null) === 515, 'Fifth cycle must start at Review 515.');
 $check(($ledger['review_range']['last'] ?? null) === 594, 'Fifth cycle must end at Review 594.');
 $check(($ledger['review_range']['count'] ?? null) === 80, 'Fifth cycle must contain exactly 80 reviews.');
-$check(($ledger['defect_rounds'] ?? null) === range(515, 519), 'Fifth-cycle defect rounds must currently be exactly Reviews 515-519.');
-$check(($ledger['clean_rounds'] ?? null) === range(520, 594), 'Fifth-cycle clean rounds must currently be exactly Reviews 520-594.');
+$expectedDefects = array_merge(range(515, 519), [594]);
+$check(($ledger['defect_rounds'] ?? null) === $expectedDefects, 'Fifth-cycle defect rounds must be Reviews 515-519 plus reopened Review 594.');
+$check(($ledger['clean_rounds'] ?? null) === range(520, 593), 'Fifth-cycle clean rounds must be exactly Reviews 520-593.');
 
 $numbers = [];
 foreach ((array) ($ledger['reviews'] ?? []) as $row) {
@@ -36,7 +37,7 @@ foreach ((array) ($ledger['reviews'] ?? []) as $row) {
     }
     $number = $row['review'];
     $numbers[] = $number;
-    $defect = $number >= 515 && $number <= 519;
+    $defect = ($number >= 515 && $number <= 519) || $number === 594;
     $expected = $defect ? 'defect-found-corrected' : 'reviewed-clean';
     $check(($row['status'] ?? '') === $expected, 'Unexpected fifth-cycle status at Review ' . $number . '.');
     $check(is_string($row['focus'] ?? null) && trim((string) $row['focus']) !== '', 'Every fifth-cycle review requires a focus: ' . $number . '.');
@@ -58,22 +59,19 @@ foreach ((array) ($matrix['modules'] ?? []) as $module) {
     if (is_array($module) && isset($module['file'])) { $modules[(int) $module['file']] = $module; }
 }
 $expectedCompanions = [
-    0 => ['reviewed_source_commit' => 'c37d0b101d0912bef1f26d0daf51a414d67907c0'],
-    3 => ['reviewed_source_commit' => 'b96f74457f54341701c6cdb1a57d42baa1100081'],
-    7 => ['reviewed_source_commit' => '67c32ec4af45a7de6e3d9c1dbf0f8614d6b5a844'],
-    9 => ['reviewed_source_commit' => '6fa0a5cb7063b6b821bd50c105c735470f589b80'],
-    14 => ['reviewed_source_commit' => 'b9045a4229d052103a5546477f664ac88b6ff034'],
-    20 => ['reviewed_source_commit' => '291486b22c7ed94b8be041192375b6d9b077fac5'],
-    21 => ['reviewed_source_commit' => 'afeda8742d8e1ea62254823291a66f502058989c'],
-    22 => ['reviewed_source_commit' => 'c3b775b66fbbda4a9dd9891d63c08c74e2178741'],
-    23 => ['reviewed_source_commit' => 'a8a8c805f4730998ccb44bd95c87591836561759'],
-    24 => ['reviewed_source_commit' => '0be43b3f424d7b53865587b2770479ca33f51a0b'],
+    0 => 'c37d0b101d0912bef1f26d0daf51a414d67907c0',
+    3 => 'b96f74457f54341701c6cdb1a57d42baa1100081',
+    7 => '67c32ec4af45a7de6e3d9c1dbf0f8614d6b5a844',
+    9 => '6fa0a5cb7063b6b821bd50c105c735470f589b80',
+    14 => 'b9045a4229d052103a5546477f664ac88b6ff034',
+    20 => '291486b22c7ed94b8be041192375b6d9b077fac5',
+    21 => 'afeda8742d8e1ea62254823291a66f502058989c',
+    22 => 'c3b775b66fbbda4a9dd9891d63c08c74e2178741',
+    23 => 'a8a8c805f4730998ccb44bd95c87591836561759',
+    24 => '0be43b3f424d7b53865587b2770479ca33f51a0b',
 ];
-foreach ($expectedCompanions as $file => $expectations) {
-    $check(isset($modules[$file]), 'Current dependency matrix missing File ' . $file . '.');
-    foreach ($expectations as $key => $expected) {
-        $check(($modules[$file][$key] ?? '') === $expected, 'Current exact source mismatch for File ' . $file . ' key ' . $key . '.');
-    }
+foreach ($expectedCompanions as $file => $commit) {
+    $check(($modules[$file]['reviewed_source_commit'] ?? '') === $commit, 'Current exact source mismatch for File ' . $file . '.');
 }
 $check(($modules[0]['reviewed_source_version'] ?? '') === '1.2.38' && ($modules[0]['reviewed_db_version'] ?? '') === '1.4.4' && ($modules[0]['required_contract_version'] ?? '') === '1.2.2', 'File 00 current version/DB/contract truth mismatch.');
 $check(($modules[9]['reviewed_source_branch'] ?? '') === 'codex/file09-1.3.0-rc6-80-round-review' && ($modules[9]['required_contract_version'] ?? '') === '1.1.0', 'File 09 current branch/contract truth mismatch.');
@@ -87,7 +85,7 @@ $rest = $read('includes/class-rest-controller.php');
 foreach (['allow_public_request', "'Last-Modified'", 'request_matches_last_modified', 'request_has_if_none_match', 'wp_using_ext_object_cache', 'get_transient', 'set_transient', "'status' => 429", "'retry_after' => \$window", 'hash_hmac'] as $marker) {
     $check(str_contains($rest, $marker), 'Current REST contract marker missing: ' . $marker . '.');
 }
-$check(str_contains($rest, "if ($status === 200 && $last_modified !== '' && ! self::request_has_if_none_match($request)"), 'If-None-Match must retain precedence over If-Modified-Since.');
+$check(str_contains($rest, 'if ($status === 200 && $last_modified !== \'\' && ! self::request_has_if_none_match($request)'), 'If-None-Match must retain precedence over If-Modified-Since.');
 
 $design = $read('includes/class-design-system.php');
 foreach (["'design_token_owner' => 'file-25'", "'structural_layout_owner' => 'file-20'", "'last_modified' => true", "'conditional_get' => true", "'rate_limited' => true", "'rate_limit_identity_persisted_raw' => false", '#087A4E'] as $marker) {
@@ -99,7 +97,7 @@ $check(str_contains($publicUrl, 'for ($depth = 0; $depth < 6; $depth++)') && str
 $safeMode = $read('includes/class-safe-mode.php');
 $check(str_contains($safeMode, 'public static function enable') && str_contains($safeMode, 'public static function is_active'), 'Safe Mode source contract missing.');
 $upgrade = $read('includes/class-upgrade-manager.php');
-$check(str_contains($upgrade, 'SCHEMA_VERSION') && str_contains($upgrade, 'stale'), 'Upgrade/stale-lock recovery contract missing.');
+$check(str_contains($upgrade, 'private const LOCK_TTL = 300;') && str_contains($upgrade, '(time() - $created_at) <= self::LOCK_TTL'), 'Upgrade stale-lock recovery contract missing.');
 $uninstall = $read('uninstall.php');
 $check(str_contains($uninstall, 'WP_UNINSTALL_PLUGIN') && ! str_contains($uninstall, 'DROP TABLE'), 'Uninstall must remain non-destructive.');
 
