@@ -31,9 +31,6 @@ final class Rest_Controller
         $public = ['permission_callback' => '__return_true'];
         $slug = [
             'required' => true,
-            // Preserve the exact route identity. Validation may reject aliases,
-            // but sanitization must never transform one public account slug into
-            // another valid account before Profile_Repository checks equality.
             'sanitize_callback' => static fn ($value): string => is_string($value) ? $value : '',
             'validate_callback' => static function ($value): bool {
                 if (! is_string($value) || $value === '' || strlen($value) > 200 || ctype_digit($value)) {
@@ -134,28 +131,17 @@ final class Rest_Controller
 
     public function get_timeline(WP_REST_Request $request): WP_REST_Response
     {
-        return $this->timeline_response(
-            $this->profiles->find_by_slug((string) $request['slug']),
-            $request
-        );
+        return $this->timeline_response($this->profiles->find_by_slug((string) $request['slug']), $request);
     }
 
     public function get_knowledge(WP_REST_Request $request): WP_REST_Response
     {
-        return $this->section_response(
-            $this->profiles->find_by_slug((string) $request['slug']),
-            'knowledge',
-            $request
-        );
+        return $this->section_response($this->profiles->find_by_slug((string) $request['slug']), 'knowledge', $request);
     }
 
     public function get_media(WP_REST_Request $request): WP_REST_Response
     {
-        return $this->section_response(
-            $this->profiles->find_by_slug((string) $request['slug']),
-            'media',
-            $request
-        );
+        return $this->section_response($this->profiles->find_by_slug((string) $request['slug']), 'media', $request);
     }
 
     public function get_provider_health(?WP_REST_Request $request = null): WP_REST_Response
@@ -194,7 +180,6 @@ final class Rest_Controller
             'partial' => $result['provider_errors'] !== [],
         ];
 
-        // Provider identifiers and exception details remain server-side diagnostics.
         return $this->response($public_result, 200, $request);
     }
 
@@ -256,7 +241,7 @@ final class Rest_Controller
         $header = trim((string) $request->get_header('if-none-match'));
         if ($header === ''
             || strlen($header) > 4096
-            || preg_match('/[ -]/', $header) === 1
+            || preg_match('/[\x00-\x1F\x7F]/', $header) === 1
         ) {
             return false;
         }
