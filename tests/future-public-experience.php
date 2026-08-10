@@ -12,6 +12,12 @@ if (! function_exists('apply_filters')) {
         return $value;
     }
 }
+if (! function_exists('wp_unslash')) {
+    function wp_unslash(mixed $value): mixed
+    {
+        return $value;
+    }
+}
 
 require_once dirname(__DIR__) . '/includes/class-public-url.php';
 require_once dirname(__DIR__) . '/includes/class-future-public-experience.php';
