@@ -45,8 +45,7 @@ final class Visibility_Policy
             $user
         );
 
-        // The extension hook may make a profile more restrictive, never publicize
-        // a profile denied by File 00 or the minor/suspension rules.
+        // Extension hooks may only revoke File 00 + File 03 public eligibility.
         return $authoritative && $filtered === true;
     }
 
@@ -60,22 +59,11 @@ final class Visibility_Policy
             return false;
         }
 
-        // File 03 is the canonical public-contact consent owner. A verified Doctor
-        // does not become contact-public merely by being verified. File 25 consumes
-        // the exact File 03 helper and fails closed when that contract is absent or
-        // throws. The Founder flag is accepted only for the canonical File 00 Founder.
-        $authoritative = false;
-        if (class_exists('SPD_Helpers') && method_exists('SPD_Helpers', 'can_show_contact')) {
-            try {
-                $decision = \SPD_Helpers::can_show_contact(
-                    $user_id,
-                    $this->is_founder($user_id)
-                );
-                $authoritative = $decision === true;
-            } catch (\Throwable) {
-                $authoritative = false;
-            }
-        }
+        // File 03 is the canonical contact-value + audience/consent owner. Its
+        // current 1.4.0 public DTO exposes a value only when display is allowed;
+        // File 25 never reads File 03 tables or repeats its consent calculation.
+        $canonical = $this->native->profile_contact($user_id, $field);
+        $authoritative = $canonical !== '';
 
         $filtered = apply_filters(
             'sabri_public_experience/can_show_contact',
@@ -84,8 +72,7 @@ final class Visibility_Policy
             $field
         );
 
-        // Privacy filters may revoke contact display but may never grant it after
-        // File 03 or the minor/public-profile authority denied the projection.
+        // Presentation filters may revoke, never grant or replace owner truth.
         return $authoritative && $filtered === true;
     }
 }
