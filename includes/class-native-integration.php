@@ -21,10 +21,17 @@ final class Native_Integration
     public const FILE_00_MINIMUM_VERSION = '1.2.4';
     public const FILE_00_MAXIMUM_VERSION = '1.3.0';
     public const FILE_00_CONTRACT_VERSION = '1.1.2';
-    public const FILE_03_MINIMUM_VERSION = '0.2.0';
-    public const FILE_03_MAXIMUM_VERSION = '0.3.0';
-    public const FILE_09_MINIMUM_VERSION = '1.1.0';
-    public const FILE_09_MAXIMUM_VERSION = '1.2.0';
+
+    /** Current File 03 public profile contract — exact reviewed 2026-08-10 family. */
+    public const FILE_03_MINIMUM_VERSION = '1.2.0-rc2';
+    public const FILE_03_MAXIMUM_VERSION = '1.3.0';
+    public const FILE_03_CONTRACT_VERSION = '1.4.0';
+
+    /** Current File 09 public verification projection family. */
+    public const FILE_09_MINIMUM_VERSION = '1.3.0';
+    public const FILE_09_MAXIMUM_VERSION = '1.4.0';
+    public const FILE_09_CONTRACT_VERSION = '1.1.0';
+
     public const FILE_08_MINIMUM_VERSION = '0.2.1';
     public const FILE_08_MAXIMUM_VERSION = '0.3.0';
     public const FILE_08_PUBLIC_PROJECTION_CONTRACT = '1.0.0';
@@ -33,6 +40,9 @@ final class Native_Integration
 
     /** @var array<int,array<string,mixed>> */
     private array $assertion_cache = [];
+
+    /** @var array<string,array<string,mixed>> */
+    private array $profile_projection_cache = [];
 
     /** @var array<int,array<string,mixed>> */
     private array $doctor_decision_cache = [];
@@ -67,33 +77,147 @@ final class Native_Integration
 
     public function profiles_available(): bool
     {
-        $detected = defined('SPD_VERSION')
-            && $this->version_in_range((string) SPD_VERSION, self::FILE_03_MINIMUM_VERSION, self::FILE_03_MAXIMUM_VERSION)
-            && class_exists('SPD_Helpers')
-            && method_exists('SPD_Helpers', 'get')
-            && method_exists('SPD_Helpers', 'founder')
-            && method_exists('SPD_Helpers', 'can_show_contact')
-            && method_exists('SPD_Helpers', 'verification_status');
+        if (! defined('SPD_VERSION')
+            || ! defined('SPD_CONTRACT_VERSION')
+            || ! $this->version_in_range((string) SPD_VERSION, self::FILE_03_MINIMUM_VERSION, self::FILE_03_MAXIMUM_VERSION)
+            || ! hash_equals(self::FILE_03_CONTRACT_VERSION, trim((string) SPD_CONTRACT_VERSION))
+            || ! function_exists('spd_get_public_profile')
+            || ! function_exists('spd_get_profile_contract_manifest')
+        ) {
+            return false;
+        }
+
+        try {
+            $manifest = spd_get_profile_contract_manifest();
+        } catch (\Throwable) {
+            return false;
+        }
+        $queries = is_array($manifest['queries'] ?? null) ? $manifest['queries'] : [];
+        $detected = is_array($manifest)
+            && sanitize_key((string) ($manifest['owner_key'] ?? '')) === 'file03'
+            && hash_equals(self::FILE_03_CONTRACT_VERSION, trim((string) ($manifest['contract_version'] ?? '')))
+            && ($queries['get_public_profile'] ?? '') === 'spd_get_public_profile';
 
         return $detected && self::strict_boolean_filter(apply_filters(
             'sabri_public_experience/dependency/profiles',
             $detected,
-            defined('SPD_VERSION') ? (string) SPD_VERSION : ''
+            (string) SPD_VERSION,
+            (string) SPD_CONTRACT_VERSION
         ));
+    }
+
+    /**
+     * Consume only File 03's public DTO. No File 03 table, private repository row,
+     * evidence object or private contact value may cross this boundary.
+     *
+     * @return array<string,mixed>
+     */
+    public function public_profile_projection(int $user_id, int $viewer_id = 0): array
+    {
+        $viewer_id = max(0, $viewer_id);
+        $cache_key = $user_id . ':' . $viewer_id;
+        if (array_key_exists($cache_key, $this->profile_projection_cache)) {
+            return $this->profile_projection_cache[$cache_key];
+        }
+        if ($user_id <= 0 || ! $this->profiles_available()) {
+            return $this->profile_projection_cache[$cache_key] = [];
+        }
+
+        try {
+            $source = spd_get_public_profile($user_id, $viewer_id);
+        } catch (\Throwable) {
+            return $this->profile_projection_cache[$cache_key] = [];
+        }
+        if ((function_exists('is_wp_error') && is_wp_error($source)) || ! is_array($source)) {
+            return $this->profile_projection_cache[$cache_key] = [];
+        }
+        if (! hash_equals(self::FILE_03_CONTRACT_VERSION, trim((string) ($source['contract_version'] ?? '')))) {
+            return $this->profile_projection_cache[$cache_key] = [];
+        }
+
+        $profile_type = sanitize_key((string) ($source['profile_type'] ?? ''));
+        $state = sanitize_key((string) ($source['state'] ?? ''));
+        $canonical = Public_URL::sanitize_same_site($source['canonical_url'] ?? '', false);
+        if (! in_array($profile_type, ['founder', 'doctor', 'teacher', 'researcher', 'student', 'patient', 'pharmacy', 'institution', 'publisher', 'member'], true)
+            || $state === ''
+            || $canonical === ''
+        ) {
+            return $this->profile_projection_cache[$cache_key] = [];
+        }
+
+        $projection = [
+            'contract_version' => self::FILE_03_CONTRACT_VERSION,
+            'public_id' => $this->plain_text((string) ($source['public_id'] ?? ''), 80),
+            'canonical_url' => $canonical,
+            'timeline_url' => Public_URL::sanitize_same_site($source['timeline_url'] ?? '', false),
+            'report_url' => Public_URL::sanitize_same_site($source['report_url'] ?? '', false),
+            'profile_type' => $profile_type,
+            'state' => $state,
+            'version' => max(0, (int) ($source['version'] ?? 0)),
+            'display_name' => $this->plain_text((string) ($source['display_name'] ?? ''), 190),
+            'locale' => $this->plain_text((string) ($source['locale'] ?? ''), 40),
+            'badge' => is_array($source['badge'] ?? null) ? $source['badge'] : [],
+            'fields' => is_array($source['fields'] ?? null) ? $source['fields'] : [],
+            'media' => is_array($source['media'] ?? null) ? $source['media'] : [],
+            'contacts' => is_array($source['contacts'] ?? null) ? $source['contacts'] : [],
+            'professional' => is_array($source['professional'] ?? null) ? $source['professional'] : [],
+            'founder' => is_array($source['founder'] ?? null) ? $source['founder'] : [],
+            'clinic' => is_array($source['clinic'] ?? null) ? $source['clinic'] : [],
+        ];
+
+        return $this->profile_projection_cache[$cache_key] = $projection;
+    }
+
+    public function profile_canonical_url(int $user_id): string
+    {
+        return (string) ($this->public_profile_projection($user_id, 0)['canonical_url'] ?? '');
+    }
+
+    public function profile_media_attachment_id(int $user_id, string $purpose): int
+    {
+        $purpose = sanitize_key($purpose);
+        if (! in_array($purpose, ['avatar', 'cover'], true)) {
+            return 0;
+        }
+        $row = $this->public_profile_projection($user_id, 0)['media'][$purpose] ?? null;
+        if (! is_array($row)) {
+            return 0;
+        }
+        $attachment_id = (int) ($row['attachment_id'] ?? 0);
+        $url = Public_URL::sanitize_same_site($row['url'] ?? '', false);
+
+        return $attachment_id > 0 && $url !== '' ? $attachment_id : 0;
+    }
+
+    public function profile_contact(int $user_id, string $field): string
+    {
+        $field = sanitize_key($field);
+        if (! in_array($field, ['phone', 'whatsapp'], true)) {
+            return '';
+        }
+        $value = $this->public_profile_projection($user_id, 0)['contacts'][$field] ?? '';
+
+        return self::canonical_contact($value);
     }
 
     public function doctor_verification_available(): bool
     {
-        $detected = defined('GDO_VERSION')
-            && $this->version_in_range((string) GDO_VERSION, self::FILE_09_MINIMUM_VERSION, self::FILE_09_MAXIMUM_VERSION)
-            && function_exists('gdo_get_verification_decision')
-            && function_exists('gdo_get_approved_snapshot')
-            && function_exists('gdo_user_is_verified');
+        if (! defined('GDO_VERSION')
+            || ! $this->version_in_range((string) GDO_VERSION, self::FILE_09_MINIMUM_VERSION, self::FILE_09_MAXIMUM_VERSION)
+            || ! class_exists('GDO_Integration_Contracts')
+            || ! defined('GDO_Integration_Contracts::VERSION')
+            || ! hash_equals(self::FILE_09_CONTRACT_VERSION, trim((string) constant('GDO_Integration_Contracts::VERSION')))
+            || ! function_exists('gdo_file03_doctor_eligibility')
+        ) {
+            return false;
+        }
 
-        return $detected && self::strict_boolean_filter(apply_filters(
+        $detected = true;
+        return self::strict_boolean_filter(apply_filters(
             'sabri_public_experience/dependency/doctor_verification',
             $detected,
-            defined('GDO_VERSION') ? (string) GDO_VERSION : ''
+            (string) GDO_VERSION,
+            self::FILE_09_CONTRACT_VERSION
         ));
     }
 
@@ -181,21 +305,18 @@ final class Native_Integration
     public function shell_available(): bool
     {
         $detected = defined('SABRI_SHELL_VERSION');
-
         return $detected && self::strict_boolean_filter(apply_filters('sabri_public_experience/dependency/application_shell', $detected));
     }
 
     public function home_news_available(): bool
     {
         $detected = defined('SABRI_HNF_VERSION') && function_exists('sabri_hnf_bootstrap');
-
         return $detected && self::strict_boolean_filter(apply_filters('sabri_public_experience/dependency/home_news', $detected));
     }
 
     public function security_center_available(): bool
     {
         $detected = File_24_Integration::is_compatible();
-
         return $detected && self::strict_boolean_filter(apply_filters(
             'sabri_public_experience/dependency/security_center',
             $detected,
@@ -208,7 +329,6 @@ final class Native_Integration
         if (! $this->membership_available()) {
             return 0;
         }
-
         try {
             $user_id = (int) smc_founder_user_id();
             $founder = $user_id > 0 && (bool) smc_is_founder($user_id);
@@ -228,7 +348,6 @@ final class Native_Integration
         if ($user_id <= 0 || ! $this->membership_available()) {
             return $this->assertion_cache[$user_id] = [];
         }
-
         try {
             $source = \SMC_Contracts::assertions($user_id);
         } catch (\Throwable) {
@@ -247,10 +366,7 @@ final class Native_Integration
         foreach ([$account_class, $membership_type, $status] as $index => $raw_key) {
             $canonical = sanitize_key($raw_key);
             $may_be_empty = $index === 1;
-            if ((! $may_be_empty && $canonical === '')
-                || strlen($raw_key) > 64
-                || ! hash_equals($canonical, $raw_key)
-            ) {
+            if ((! $may_be_empty && $canonical === '') || strlen($raw_key) > 64 || ! hash_equals($canonical, $raw_key)) {
                 return $this->assertion_cache[$user_id] = [];
             }
         }
@@ -263,9 +379,9 @@ final class Native_Integration
             'status' => $status,
         ];
         foreach ([
-            'application_exists', 'institutional_account', 'approved', 'suspended',
-            'eligible', 'guardian_verified', 'professional_verified', 'can_practice',
-            'public_profile_allowed', 'minor', 'guardian_required',
+            'application_exists', 'institutional_account', 'approved', 'suspended', 'eligible',
+            'guardian_verified', 'professional_verified', 'can_practice', 'public_profile_allowed',
+            'minor', 'guardian_required',
         ] as $field) {
             if (! array_key_exists($field, $source)) {
                 continue;
@@ -287,7 +403,6 @@ final class Native_Integration
     public function membership_is_approved(int $user_id): bool
     {
         $assertions = $this->membership_assertions($user_id);
-
         return $assertions !== [] && ! empty($assertions['approved']) && empty($assertions['suspended']);
     }
 
@@ -296,7 +411,6 @@ final class Native_Integration
         if ($user_id <= 0 || ! $this->membership_available()) {
             return false;
         }
-
         try {
             $detected = (bool) smc_is_founder($user_id);
         } catch (\Throwable) {
@@ -309,24 +423,20 @@ final class Native_Integration
     public function is_minor(int $user_id): bool
     {
         $assertions = $this->membership_assertions($user_id);
-        // Explicit File 00 age/guardian truth always outranks a presentation
-        // class. A contradictory Doctor claim must never unlock public contact.
         if (! empty($assertions['minor']) || ! empty($assertions['guardian_required'])) {
             return true;
         }
-        if ($this->is_founder($user_id) || $this->is_verified_doctor($user_id)) {
-            return false;
-        }
-
         if (array_key_exists('minor', $assertions)) {
             return (bool) $assertions['minor'];
         }
         if (array_key_exists('guardian_required', $assertions)) {
             return (bool) $assertions['guardian_required'];
         }
+        if ($this->is_founder($user_id) || $this->is_verified_doctor($user_id)) {
+            return false;
+        }
 
-        // File 25 must not calculate age. Unknown ordinary-account age and
-        // guardian state therefore fail closed for public-contact projection.
+        // File 25 never infers age. Unknown ordinary-account age remains minor-safe.
         return true;
     }
 
@@ -341,26 +451,24 @@ final class Native_Integration
         }
 
         try {
-            $source = gdo_get_verification_decision($user_id);
+            $source = gdo_file03_doctor_eligibility($user_id);
         } catch (\Throwable) {
             return $this->doctor_decision_cache[$user_id] = [];
         }
-        if (! is_array($source)) {
+        if (! is_array($source)
+            || ($source['source_of_truth'] ?? '') !== 'file09'
+            || ($source['consumer'] ?? '') !== 'file03'
+            || ! hash_equals(self::FILE_09_CONTRACT_VERSION, trim((string) ($source['version'] ?? '')))
+            || ! array_key_exists('verified', $source)
+            || ! is_bool($source['verified'])
+        ) {
             return $this->doctor_decision_cache[$user_id] = [];
         }
 
-        $state = (string) ($source['state'] ?? '');
-        $verified_until = (string) ($source['verified_until'] ?? '');
-        $fingerprint = (string) ($source['fingerprint'] ?? '');
-        if (! array_key_exists('verified', $source)
-            || ! is_bool($source['verified'])
-            || strlen($state) > 64
-            || ! hash_equals(sanitize_key($state), $state)
-            || strlen($verified_until) > 64
-            || trim($verified_until) !== $verified_until
-            || strlen($fingerprint) > 64
-            || trim($fingerprint) !== $fingerprint
-        ) {
+        $state = sanitize_key((string) ($source['state'] ?? 'unavailable'));
+        $verified_until = trim((string) ($source['verified_until'] ?? ''));
+        $fingerprint = strtolower(trim((string) ($source['fingerprint'] ?? '')));
+        if ($state === '' || strlen($state) > 64) {
             return $this->doctor_decision_cache[$user_id] = [];
         }
         if ($source['verified']
@@ -375,47 +483,45 @@ final class Native_Integration
             'verified' => $source['verified'],
             'verified_until' => $verified_until,
             'fingerprint' => $fingerprint,
+            'eligible' => ($source['eligible'] ?? false) === true,
+            'limited' => ($source['limited'] ?? false) === true,
         ];
     }
 
     /** @return array<string,mixed> */
     public function doctor_approved_snapshot(int $user_id): array
     {
-        return $this->is_verified_doctor($user_id) ? $this->raw_doctor_approved_snapshot($user_id) : [];
-    }
-
-    /** @return array<string,mixed> */
-    private function raw_doctor_approved_snapshot(int $user_id): array
-    {
         if (array_key_exists($user_id, $this->doctor_snapshot_cache)) {
             return $this->doctor_snapshot_cache[$user_id];
         }
-        if ($user_id <= 0 || ! $this->doctor_verification_available()) {
+        if (! $this->doctor_decision_is_current($this->doctor_verification_decision($user_id))) {
             return $this->doctor_snapshot_cache[$user_id] = [];
         }
 
+        // Prefer File 03's current public professional projection because it has
+        // already consumed File 09 and applied profile visibility/privacy rules.
+        $projection = $this->public_profile_projection($user_id, 0);
+        $professional = is_array($projection['professional'] ?? null) ? $projection['professional'] : [];
+        if ($professional !== []) {
+            return $this->doctor_snapshot_cache[$user_id] = [
+                'profile' => $this->normalize_professional($professional),
+                'fingerprint' => (string) ($this->doctor_verification_decision($user_id)['fingerprint'] ?? ''),
+            ];
+        }
+
+        if (! function_exists('gdo_get_approved_snapshot')) {
+            return $this->doctor_snapshot_cache[$user_id] = [];
+        }
         try {
             $source = gdo_get_approved_snapshot($user_id);
         } catch (\Throwable) {
             return $this->doctor_snapshot_cache[$user_id] = [];
         }
-        if (! is_array($source) || ! is_array($source['profile'] ?? null)) {
+        if (! is_array($source)) {
             return $this->doctor_snapshot_cache[$user_id] = [];
         }
-
-        $profile = [];
-        foreach ([
-            'qualification', 'licensing_authority', 'experience_years',
-            'specialty', 'languages', 'consultation_modes',
-        ] as $field) {
-            if (! isset($source['profile'][$field]) || ! is_scalar($source['profile'][$field])) {
-                continue;
-            }
-            $value = $this->plain_text((string) $source['profile'][$field], 300);
-            if ($value !== '') {
-                $profile[$field] = $value;
-            }
-        }
+        $raw = is_array($source['profile'] ?? null) ? $source['profile'] : $source;
+        $profile = $this->normalize_professional($raw);
         if ($profile === []) {
             return $this->doctor_snapshot_cache[$user_id] = [];
         }
@@ -430,13 +536,9 @@ final class Native_Integration
     {
         $assertions = $this->membership_assertions($user_id);
         $decision = $this->doctor_verification_decision($user_id);
-        $snapshot = $this->raw_doctor_approved_snapshot($user_id);
-
-        try {
-            $owner_verified = $this->doctor_verification_available() && (bool) gdo_user_is_verified($user_id);
-        } catch (\Throwable) {
-            $owner_verified = false;
-        }
+        $snapshot = $this->doctor_approved_snapshot($user_id);
+        $profile = $this->public_profile_projection($user_id, 0);
+        $badge = is_array($profile['badge'] ?? null) ? $profile['badge'] : [];
 
         $eligible = $assertions !== []
             && ($assertions['membership_type'] ?? '') === 'doctor'
@@ -447,21 +549,12 @@ final class Native_Integration
             && ! empty($assertions['can_practice'])
             && empty($assertions['minor'])
             && empty($assertions['guardian_required'])
-            && $owner_verified
             && $this->doctor_decision_is_current($decision)
+            && ! empty($decision['eligible'])
             && ! empty($snapshot['profile'])
-            && hash_equals((string) ($decision['fingerprint'] ?? ''), (string) ($snapshot['fingerprint'] ?? ''));
-
-        if ($eligible && $this->profiles_available()) {
-            try {
-                $status = sanitize_key((string) \SPD_Helpers::verification_status($user_id));
-            } catch (\Throwable) {
-                $status = 'unavailable';
-            }
-            if (in_array($status, ['rejected', 'suspended', 'revoked', 'expired', 'unavailable'], true)) {
-                $eligible = false;
-            }
-        }
+            && hash_equals((string) ($decision['fingerprint'] ?? ''), (string) ($snapshot['fingerprint'] ?? ''))
+            && ($profile['profile_type'] ?? '') === 'doctor'
+            && ($badge['verified'] ?? false) === true;
 
         return $eligible && self::strict_boolean_filter(apply_filters('sabri_public_experience/is_verified_doctor', $eligible, $user_id));
     }
@@ -470,12 +563,11 @@ final class Native_Integration
     private function doctor_decision_is_current(array $decision): bool
     {
         if (empty($decision['verified'])
-            || ! in_array((string) ($decision['state'] ?? ''), ['verified', 'approved'], true)
+            || ! in_array((string) ($decision['state'] ?? ''), ['verified', 'approved', 'reinstated', 'renewal_due'], true)
             || preg_match('/^[a-f0-9]{64}$/', (string) ($decision['fingerprint'] ?? '')) !== 1
         ) {
             return false;
         }
-
         $until = trim((string) ($decision['verified_until'] ?? ''));
         if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $until) !== 1) {
             return false;
@@ -502,8 +594,12 @@ final class Native_Integration
             return 'doctor';
         }
 
-        $type = sanitize_key((string) ($this->membership_assertions($user_id)['membership_type'] ?? ''));
+        $projection_type = sanitize_key((string) ($this->public_profile_projection($user_id, 0)['profile_type'] ?? ''));
+        if (in_array($projection_type, ['teacher', 'researcher', 'student', 'patient', 'pharmacy', 'institution', 'publisher', 'member'], true)) {
+            return $projection_type;
+        }
 
+        $type = sanitize_key((string) ($this->membership_assertions($user_id)['membership_type'] ?? ''));
         return match ($type) {
             'teacher' => 'teacher',
             'researcher' => 'researcher',
@@ -520,38 +616,30 @@ final class Native_Integration
     {
         $assertions = $this->membership_assertions($user_id);
         $status = (string) ($assertions['status'] ?? '');
-        $hard_blocked = in_array($status, [
-            'rejected', 'suspended', 'revoked', 'appeal_review',
-            'erasure_pending', 'deleted', 'invalid_application',
-        ], true);
+        $hard_blocked = in_array($status, ['rejected', 'suspended', 'revoked', 'appeal_review', 'erasure_pending', 'deleted', 'invalid_application'], true);
+
+        $file00_public = false;
         if ($this->is_founder($user_id)) {
-            return $assertions !== []
+            $file00_public = $assertions !== []
                 && empty($assertions['suspended'])
                 && ! $hard_blocked
-                && (! array_key_exists('public_profile_allowed', $assertions) || $assertions['public_profile_allowed'] === true)
-                    ? 'public'
-                    : 'private';
+                && (! array_key_exists('public_profile_allowed', $assertions) || $assertions['public_profile_allowed'] === true);
+        } else {
+            $file00_public = $assertions !== []
+                && ! empty($assertions['approved'])
+                && ! empty($assertions['eligible'])
+                && empty($assertions['suspended'])
+                && ! empty($assertions['public_profile_allowed']);
         }
-
-        if ($assertions === []
-            || empty($assertions['approved'])
-            || empty($assertions['eligible'])
-            || ! empty($assertions['suspended'])
-            || empty($assertions['public_profile_allowed'])
-        ) {
+        if (! $file00_public || ! $this->profiles_available() || $this->public_profile_projection($user_id, 0) === []) {
             return 'private';
         }
 
         $visibility = 'public';
-        $filtered = sanitize_key((string) apply_filters(
-            'sabri_public_experience/profile_visibility',
-            $visibility,
-            $user_id
-        ));
+        $filtered = sanitize_key((string) apply_filters('sabri_public_experience/profile_visibility', $visibility, $user_id));
         if (! in_array($filtered, ['public', 'members', 'private'], true)) {
             return $visibility;
         }
-
         $rank = ['public' => 0, 'members' => 1, 'private' => 2];
 
         return $rank[$filtered] >= $rank[$visibility] ? $filtered : $visibility;
@@ -560,20 +648,30 @@ final class Native_Integration
     public function profile_value(int $user_id, string $key, string $default = ''): string
     {
         $key = sanitize_key($key);
-        if ($this->profiles_available()) {
-            try {
-                $value = \SPD_Helpers::get($user_id, $key, '');
-            } catch (\Throwable) {
-                $value = '';
+        $projection = $this->public_profile_projection($user_id, 0);
+        $fields = is_array($projection['fields'] ?? null) ? $projection['fields'] : [];
+        $professional = is_array($projection['professional'] ?? null) ? $projection['professional'] : [];
+
+        $field_aliases = [
+            'bio' => 'bio', 'country' => 'country', 'city' => 'city',
+            'languages' => 'languages', 'studied_books' => 'studied_books', 'books_studied' => 'studied_books',
+        ];
+        if (isset($field_aliases[$key]) && array_key_exists($field_aliases[$key], $fields)) {
+            $value = $this->scalar_or_list($fields[$field_aliases[$key]]);
+            if ($value !== '') {
+                return $this->plain_text($value, $key === 'bio' ? 12000 : 1000);
             }
-            if (is_scalar($value) && trim((string) $value) !== '') {
-                return $this->plain_text((string) $value, $key === 'bio' ? 12000 : 300);
-            }
+        }
+        if (in_array($key, ['phone', 'whatsapp'], true)) {
+            $contact = $this->profile_contact($user_id, $key);
+            return $contact !== '' ? $contact : $default;
         }
 
         $professional_aliases = [
             'qualification' => 'qualification',
             'licensing_authority' => 'licensing_authority',
+            'council' => 'licensing_authority',
+            'institution' => 'institution',
             'experience_years' => 'experience_years',
             'specialty' => 'specialty',
             'specialization' => 'specialty',
@@ -581,33 +679,36 @@ final class Native_Integration
             'consultation_mode' => 'consultation_modes',
             'consultation_modes' => 'consultation_modes',
         ];
-        if (! isset($professional_aliases[$key])) {
-            return $default;
+        if (isset($professional_aliases[$key]) && array_key_exists($professional_aliases[$key], $professional)) {
+            $value = $this->scalar_or_list($professional[$professional_aliases[$key]]);
+            if ($value !== '') {
+                return $this->plain_text($value, 1000);
+            }
         }
 
-        $snapshot = $this->doctor_approved_snapshot($user_id);
-        $profile = is_array($snapshot['profile'] ?? null) ? $snapshot['profile'] : [];
-        $candidate = $professional_aliases[$key];
-
-        return isset($profile[$candidate]) ? (string) $profile[$candidate] : $default;
+        return $default;
     }
 
     /** @return array<string,mixed> */
     public function professional_credentials(int $user_id): array
     {
-        $snapshot = $this->doctor_approved_snapshot($user_id);
-        $profile = is_array($snapshot['profile'] ?? null) ? $snapshot['profile'] : [];
-        if ($profile === []) {
+        $projection = $this->public_profile_projection($user_id, 0);
+        $source = is_array($projection['professional'] ?? null) ? $projection['professional'] : [];
+        if ($source === []) {
+            $source = (array) ($this->doctor_approved_snapshot($user_id)['profile'] ?? []);
+        }
+        if ($source === []) {
             return [];
         }
 
         return array_filter([
-            'qualification' => (string) ($profile['qualification'] ?? ''),
-            'council' => (string) ($profile['licensing_authority'] ?? ''),
-            'experience_years' => (string) ($profile['experience_years'] ?? ''),
-            'specialization' => (string) ($profile['specialty'] ?? ''),
-            'languages' => (string) ($profile['languages'] ?? ''),
-            'consultation_mode' => (string) ($profile['consultation_modes'] ?? ''),
+            'qualification' => $this->scalar_or_list($source['qualification'] ?? ''),
+            'institution' => $this->scalar_or_list($source['institution'] ?? ''),
+            'council' => $this->scalar_or_list($source['licensing_authority'] ?? ''),
+            'experience_years' => $this->scalar_or_list($source['experience_years'] ?? ''),
+            'specialization' => $this->scalar_or_list($source['specialty'] ?? ''),
+            'languages' => $this->scalar_or_list($source['languages'] ?? ''),
+            'consultation_mode' => $this->scalar_or_list($source['consultation_modes'] ?? ''),
         ], static fn (mixed $value): bool => is_scalar($value) && trim((string) $value) !== '');
     }
 
@@ -620,7 +721,6 @@ final class Native_Integration
         if ($user_id <= 0 || ! $this->clinic_available()) {
             return $this->clinic_cache[$user_id] = [];
         }
-
         try {
             $source = swc_get_public_clinic_projection($user_id);
         } catch (\Throwable) {
@@ -650,17 +750,32 @@ final class Native_Integration
     /** @return array<string,mixed> */
     public function founder_profile(): array
     {
-        if (! $this->profiles_available()) {
+        $user_id = $this->founder_user_id();
+        $projection = $this->public_profile_projection($user_id, 0);
+        if ($user_id <= 0 || $projection === [] || ($projection['profile_type'] ?? '') !== 'founder') {
             return [];
         }
 
-        try {
-            $profile = \SPD_Helpers::founder();
-        } catch (\Throwable) {
-            return [];
+        $founder = is_array($projection['founder'] ?? null) ? $projection['founder'] : [];
+        $fields = is_array($projection['fields'] ?? null) ? $projection['fields'] : [];
+        $media = is_array($projection['media'] ?? null) ? $projection['media'] : [];
+        $contacts = is_array($projection['contacts'] ?? null) ? $projection['contacts'] : [];
+        $out = $founder;
+        $out['title'] = $this->plain_text((string) ($founder['professional_title'] ?? ''), 300);
+        $out['introduction'] = $this->plain_text((string) ($fields['bio'] ?? ''), 12000);
+        $location = array_filter([
+            $this->plain_text((string) ($fields['city'] ?? ''), 100),
+            $this->plain_text((string) ($fields['country'] ?? ''), 100),
+        ]);
+        if ($location !== []) {
+            $out['location'] = implode(', ', $location);
         }
+        $out['phone'] = self::canonical_contact($contacts['phone'] ?? '');
+        $out['whatsapp'] = self::canonical_contact($contacts['whatsapp'] ?? '');
+        $out['photo_id'] = is_array($media['avatar'] ?? null) ? max(0, (int) ($media['avatar']['attachment_id'] ?? 0)) : 0;
+        $out['cover_id'] = is_array($media['cover'] ?? null) ? max(0, (int) ($media['cover']['attachment_id'] ?? 0)) : 0;
 
-        return is_array($profile) ? $profile : [];
+        return $out;
     }
 
     /** @return list<string> */
@@ -669,7 +784,6 @@ final class Native_Integration
         if (! is_array($value)) {
             return [];
         }
-
         $keys = [];
         foreach ($value as $item) {
             if (! is_scalar($item)) {
@@ -682,6 +796,65 @@ final class Native_Integration
         }
 
         return array_values(array_unique($keys));
+    }
+
+    /** @param array<string,mixed> $source @return array<string,string> */
+    private function normalize_professional(array $source): array
+    {
+        $profile = [];
+        foreach (['qualification', 'institution', 'licensing_authority', 'experience_years', 'specialty', 'languages', 'consultation_modes'] as $field) {
+            if (! array_key_exists($field, $source)) {
+                continue;
+            }
+            $value = $this->scalar_or_list($source[$field]);
+            if ($value !== '') {
+                $profile[$field] = $this->plain_text($value, 1000);
+            }
+        }
+
+        return $profile;
+    }
+
+    private function scalar_or_list(mixed $value): string
+    {
+        if (is_scalar($value)) {
+            return trim((string) $value);
+        }
+        if (! is_array($value)) {
+            return '';
+        }
+        $items = [];
+        foreach (array_slice($value, 0, 50) as $item) {
+            if (! is_scalar($item)) {
+                continue;
+            }
+            $clean = trim((string) $item);
+            if ($clean !== '' && ! in_array($clean, $items, true)) {
+                $items[] = $clean;
+            }
+        }
+
+        return implode(', ', $items);
+    }
+
+    private static function canonical_contact(mixed $value): string
+    {
+        if (! is_scalar($value)) {
+            return '';
+        }
+        $raw = trim((string) $value);
+        if ($raw === '' || preg_match('/[\x00-\x1F\x7F]/', $raw) === 1) {
+            return '';
+        }
+        $clean = preg_replace('/[\s().-]+/u', '', $raw) ?? '';
+        if (preg_match('/^\+?[0-9]{7,15}$/', $clean) !== 1) {
+            return '';
+        }
+        if (str_starts_with($clean, '+') && preg_match('/^\+[1-9][0-9]{6,14}$/', $clean) !== 1) {
+            return '';
+        }
+
+        return $clean;
     }
 
     private static function strict_boolean_filter(mixed $value): bool
