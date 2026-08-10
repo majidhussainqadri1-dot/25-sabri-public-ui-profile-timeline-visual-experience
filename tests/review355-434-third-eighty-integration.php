@@ -21,10 +21,10 @@ try {
 $check(($ledger['review_range']['first'] ?? null) === 355, 'Third cycle must start at Review 355.');
 $check(($ledger['review_range']['last'] ?? null) === 434, 'Third cycle must end at Review 434.');
 $check(($ledger['review_range']['count'] ?? null) === 80, 'Third cycle must contain exactly 80 reviews.');
-$expectedDefects = [355,356,357,358,359,360,361,362,363,364,365,366,367,368,370,371,372,433];
+$expectedDefects = [355,356,357,358,359,360,361,362,363,364,365,366,367,368,370,371,372,433,434];
 $check(($ledger['defect_rounds'] ?? null) === $expectedDefects, 'Defect-bearing review ledger changed unexpectedly.');
 $clean = (array) ($ledger['clean_rounds'] ?? []);
-$check(count($clean) === 62 && in_array(369, $clean, true) && in_array(434, $clean, true) && ! in_array(433, $clean, true), 'Clean-review ledger must contain the remaining 62 rounds.');
+$check(count($clean) === 61 && in_array(369, $clean, true) && in_array(432, $clean, true) && ! in_array(433, $clean, true) && ! in_array(434, $clean, true), 'Clean-review ledger must contain the remaining 61 rounds.');
 $reviews = (array) ($ledger['reviews'] ?? []);
 $numbers = [];
 foreach ($reviews as $review) {
@@ -152,7 +152,7 @@ foreach ([
     'Unsafe, duplicate or symbolic entry detected in workflow artifact.',
     'Unsafe, duplicate or symbolic entry detected in inner ZIP.',
     'Embedded manifest or dependency matrix differs from detached evidence.',
-    "($modules[20]['reviewed_source_version'] ?? '') === '1.4.12'",
+    '(\$modules[20][\'reviewed_source_version\'] ?? \'\') === \'1.4.12\'',
 ] as $marker) {
     $check(str_contains($verifier, $marker), 'Artifact verifier third-cycle marker missing: ' . $marker);
 }
