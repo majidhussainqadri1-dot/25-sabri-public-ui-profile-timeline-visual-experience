@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 $root = dirname(__DIR__);
 $matrixPath = $root . '/config/source-completion-matrix.json';
+$futurePath = $root . '/config/future-public-experience-24.json';
 
 if (! is_file($matrixPath)) {
     fwrite(STDERR, "Missing source completion matrix.\n");
@@ -25,7 +26,6 @@ try {
 }
 
 $failures = [];
-
 $assert = static function (bool $condition, string $message) use (&$failures): void {
     if (! $condition) {
         $failures[] = $message;
@@ -52,7 +52,6 @@ if (is_string($plugin)) {
 
 $requirements = $matrix['requirements'] ?? null;
 $assert(is_array($requirements), 'Requirements must be an array.');
-
 $requiredIds = [
     'MP-R03-R07-FILE25-IDENTITY-BOUNDARY',
     'MP-P04-P05-IDENTITY-OWNERSHIP',
@@ -80,7 +79,6 @@ $requiredIds = [
     'F25-DEFINITION-OF-DONE-90-93',
     'REVIEW-CORRECTION-LINEAGE-20-93',
 ];
-
 $seen = [];
 $allowedStatuses = ['implemented', 'delegated', 'external_acceptance'];
 
@@ -90,24 +88,19 @@ if (is_array($requirements)) {
         if (! is_array($requirement)) {
             continue;
         }
-
         $id = $requirement['id'] ?? null;
         $status = $requirement['status'] ?? null;
         $summary = $requirement['summary'] ?? null;
         $evidence = $requirement['evidence'] ?? null;
-
         $assert(is_string($id) && preg_match('/^[A-Z0-9-]+$/', $id) === 1, sprintf('Requirement at index %d has an invalid ID.', $index));
         if (! is_string($id) || $id === '') {
             continue;
         }
-
         $assert(! isset($seen[$id]), sprintf('Duplicate requirement ID: %s.', $id));
         $seen[$id] = true;
-
         $assert(is_string($status) && in_array($status, $allowedStatuses, true), sprintf('Requirement %s has an invalid status.', $id));
         $assert(is_string($summary) && trim($summary) !== '', sprintf('Requirement %s needs a non-empty summary.', $id));
         $assert(is_array($evidence) && $evidence !== [], sprintf('Requirement %s needs evidence paths.', $id));
-
         if (is_array($evidence)) {
             foreach ($evidence as $path) {
                 $assert(is_string($path) && $path !== '', sprintf('Requirement %s contains an invalid evidence path.', $id));
@@ -118,7 +111,6 @@ if (is_array($requirements)) {
                 $assert(file_exists($root . '/' . $path), sprintf('Requirement %s evidence path does not exist: %s.', $id, $path));
             }
         }
-
         if ($status === 'external_acceptance') {
             $assert(($requirement['source_preparation_complete'] ?? null) === true, sprintf('External requirement %s must declare source preparation complete.', $id));
             $assert(($requirement['acceptance_pending'] ?? null) === true, sprintf('External requirement %s must remain acceptance-pending.', $id));
@@ -127,12 +119,66 @@ if (is_array($requirements)) {
         }
     }
 }
-
 foreach ($requiredIds as $requiredId) {
     $assert(isset($seen[$requiredId]), sprintf('Mandatory completion requirement is missing: %s.', $requiredId));
 }
+$assert(count($seen) === count($requiredIds), 'Completion matrix must contain exactly the governed base requirement groups.');
 
-$assert(count($seen) === count($requiredIds), 'Completion matrix must contain exactly the governed requirement groups.');
+$future = null;
+if (! is_file($futurePath)) {
+    $failures[] = 'Future Public Experience 24-requirement matrix is missing.';
+} else {
+    try {
+        $futureRaw = file_get_contents($futurePath);
+        $future = is_string($futureRaw) ? json_decode($futureRaw, true, 512, JSON_THROW_ON_ERROR) : null;
+    } catch (JsonException $exception) {
+        $failures[] = 'Invalid Future Public Experience JSON: ' . $exception->getMessage();
+    }
+}
+$futureSeen = [];
+if (is_array($future)) {
+    $assert(($future['schema_version'] ?? null) === 1, 'Future matrix schema must be integer 1.');
+    $assert(($future['contract_version'] ?? null) === '1.0.0', 'Future matrix contract must be 1.0.0.');
+    $assert(($future['governing_file'] ?? null) === 25, 'Future matrix must govern File 25.');
+    $futureRequirements = $future['requirements'] ?? null;
+    $assert(is_array($futureRequirements) && count($futureRequirements) === 24, 'Future matrix must contain exactly 24 approved requirements.');
+    if (is_array($futureRequirements)) {
+        foreach ($futureRequirements as $index => $requirement) {
+            $assert(is_array($requirement), sprintf('Future requirement at index %d must be an object.', $index));
+            if (! is_array($requirement)) {
+                continue;
+            }
+            $id = $requirement['id'] ?? null;
+            $assert(is_string($id) && preg_match('/^F25-FUT-(?:0[1-9]|1[0-9]|2[0-4])$/', $id) === 1, sprintf('Invalid future requirement ID at index %d.', $index));
+            if (is_string($id) && $id !== '') {
+                $assert(! isset($futureSeen[$id]), 'Duplicate future requirement ID: ' . $id);
+                $futureSeen[$id] = true;
+            }
+            $assert(($requirement['presentation_owner'] ?? null) === 'file-25', sprintf('Future requirement %s must remain File 25 presentation-owned.', (string) $id));
+            $assert(($requirement['source_status'] ?? null) === 'implemented-candidate', sprintf('Future requirement %s must be source-implemented candidate.', (string) $id));
+        }
+    }
+    for ($i = 1; $i <= 24; $i++) {
+        $id = sprintf('F25-FUT-%02d', $i);
+        $assert(isset($futureSeen[$id]), 'Missing approved future requirement: ' . $id);
+    }
+    foreach (['hostinger_staging_accepted', 'founder_staging_acceptance', 'live_deployed', 'operational'] as $externalGate) {
+        $assert(($future['release_truth'][$externalGate] ?? null) === false, sprintf('Future external gate %s must remain false.', $externalGate));
+    }
+    $assert(($future['invariants']['duplicate_backend_allowed'] ?? true) === false, 'Future enhancements may not create a duplicate backend.');
+    $assert(($future['invariants']['quality_score_affects_public_ranking'] ?? true) === false, 'Future quality score may not affect public ranking.');
+}
+foreach ([
+    'includes/class-future-public-experience.php',
+    'assets/css/future-public-experience.css',
+    'assets/js/future-public-experience.js',
+    'docs/FUTURE-PUBLIC-EXPERIENCE-24-ENHANCEMENTS-2026-08-10.md',
+    'tests/future-public-experience.php',
+    'tests/review189-191-future-public-experience.php',
+    'tests/review192-194-future-public-experience-post-review.php',
+] as $futureEvidence) {
+    $assert(file_exists($root . '/' . $futureEvidence), 'Future source evidence is missing: ' . $futureEvidence);
+}
 
 $readme = file_get_contents($root . '/README.md');
 $assert(is_string($readme), 'README must be readable.');
@@ -150,6 +196,7 @@ if ($failures !== []) {
 }
 
 echo sprintf(
-    "File 25 source completion verified: %d governed requirement groups, zero known source defects, external acceptance deferred.\n",
-    count($seen)
+    "File 25 source completion verified: %d base groups + %d approved future requirements; zero known source defects, external acceptance deferred.\n",
+    count($seen),
+    count($futureSeen)
 );
