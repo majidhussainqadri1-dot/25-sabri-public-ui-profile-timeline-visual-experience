@@ -10,9 +10,10 @@ if (! is_string($source)) {
 
 $required = [
     '$canonical = $this->sanitize_contacts($values, $user_id);',
-    'apply_filters(\'sabri_public_experience/public_contacts\', $canonical, $user_id)',
+    '$visibility = array_fill_keys(array_keys($canonical), true);',
+    "apply_filters(\n            'sabri_public_experience/public_contacts',\n            \$visibility,",
     'foreach ($canonical as $field => $value)',
-    'array_key_exists($field, $filtered) && (bool) $filtered[$field]',
+    "array_key_exists(\$field, \$filtered) && \$filtered[\$field] === true",
     '$public[$field] = $value;',
     '$founder[\'phone\'] ?? $this->native->profile_value($user_id, \'phone\')',
     '$founder[\'whatsapp\'] ?? $this->native->profile_value($user_id, \'whatsapp\')',
@@ -27,11 +28,12 @@ foreach ($required as $needle) {
 $forbidden = [
     '$clinic[\'phone\']',
     '$clinic[\'whatsapp\']',
+    "apply_filters('sabri_public_experience/public_contacts', \$canonical",
     'return $this->sanitize_contacts($filtered, $user_id);',
 ];
 foreach ($forbidden as $needle) {
     if (str_contains($source, $needle)) {
-        fwrite(STDERR, "Forbidden contact substitution path remains: {$needle}\n");
+        fwrite(STDERR, "Forbidden contact substitution/default-hide path remains: {$needle}\n");
         exit(1);
     }
 }
