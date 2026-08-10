@@ -49,8 +49,8 @@ foreach (['SPD_Helpers::get', 'SPD_Helpers::founder', 'SPD_Helpers::can_show_con
 }
 $check(str_contains($visibility, 'profile_contact($user_id, $field)'), 'File 25 must consume File 03 public-contact DTO truth.');
 $check(str_contains($visibility, 'return $authoritative && $filtered === true;'), 'Contact hooks may revoke but never grant.');
-$check(str_contains($repository, "profile_media_attachment_id($user_id, 'avatar')"), 'Avatar identity must come from current File 03 public DTO.');
-$check(str_contains($repository, "profile_media_attachment_id($user_id, 'cover')"), 'Cover identity must come from current File 03 public DTO.');
+$check(str_contains($repository, 'profile_media_attachment_id($user_id, \'avatar\')'), 'Avatar identity must come from current File 03 public DTO.');
+$check(str_contains($repository, 'profile_media_attachment_id($user_id, \'cover\')'), 'Cover identity must come from current File 03 public DTO.');
 $check(! str_contains($repository, 'get_avatar_url'), 'External avatar fallback is forbidden.');
 
 foreach ([
