@@ -79,8 +79,9 @@ foreach ((array) ($matrix['modules'] ?? []) as $module) {
 }
 $check(($modules[0]['reviewed_source_version'] ?? '') === '1.2.38' && ($modules[0]['reviewed_db_version'] ?? '') === '1.4.4' && ($modules[0]['required_contract_version'] ?? '') === '1.2.2', 'File00 current version/DB/contract truth mismatch.');
 $check(($modules[0]['reviewed_source_commit'] ?? '') === 'c37d0b101d0912bef1f26d0daf51a414d67907c0', 'File00 exact current main mismatch.');
-$check(($modules[9]['reviewed_source_branch'] ?? '') === 'codex/file09-1.3.0-rc6-80-round-review' && ($modules[9]['reviewed_source_commit'] ?? '') === '58313a67e1d21ad17c9a066e9a29c34245a0763e', 'File09 current RC6 branch/head mismatch.');
+$check(($modules[9]['reviewed_source_branch'] ?? '') === 'codex/file09-1.3.0-rc6-80-round-review' && ($modules[9]['reviewed_source_commit'] ?? '') === '6fa0a5cb7063b6b821bd50c105c735470f589b80', 'File09 current RC6 branch/head mismatch.');
 $check(($modules[14]['reviewed_source_version'] ?? '') === '1.4.2' && ($modules[14]['reviewed_source_commit'] ?? '') === 'b9045a4229d052103a5546477f664ac88b6ff034', 'File14 current main mismatch.');
+$check(($modules[21]['reviewed_package_version'] ?? '') === '1.0.5' && ($modules[21]['reviewed_runtime_version'] ?? '') === '1.0.3' && ($modules[21]['reviewed_schema_version'] ?? '') === '1.0.0' && ($modules[21]['reviewed_source_commit'] ?? '') === 'afeda8742d8e1ea62254823291a66f502058989c', 'File21 current package/runtime/schema/head mismatch.');
 $check(($modules[24]['reviewed_source_version'] ?? '') === '0.99.0' && ($modules[24]['reviewed_source_commit'] ?? '') === '0be43b3f424d7b53865587b2770479ca33f51a0b', 'File24 current main mismatch.');
 foreach ($modules as $module) {
     if (isset($module['staging_status'])) { $check($module['staging_status'] === 'pending', 'No module may be promoted to staging acceptance by source evidence.'); }
@@ -89,34 +90,36 @@ foreach ($modules as $module) {
 $staging = json_decode($read('config/staging-test-plan.json'), true);
 $ids = [];
 foreach ((array) ($staging['scenarios'] ?? []) as $scenario) { if (is_array($scenario)) { $ids[] = (string) ($scenario['id'] ?? ''); } }
-foreach (['file00-assertions','file09-doctor-decision','file14-visual-consumer','file24-current-assurance-contract','file03-route-parity'] as $id) {
-    $check(in_array($id, $ids, true), 'Fourth-cycle staging scenario missing: ' . $id);
+foreach (['file00-assertions','file09-doctor-decision','file14-visual-consumer','file21-current-profile-timeline-contract','file24-current-assurance-contract','file03-route-parity'] as $id) {
+    $check(in_array($id, $ids, true), 'Fourth-cycle staging scenario missing/currentized: ' . $id);
 }
 
 $verifier = $read('tools/verify-staging-artifact.php');
 foreach ([
     '($modules[0][\'reviewed_source_version\'] ?? \'\') === \'1.2.38\'',
-    '($modules[9][\'reviewed_source_commit\'] ?? \'\') === \'58313a67e1d21ad17c9a066e9a29c34245a0763e\'',
+    '($modules[9][\'reviewed_source_commit\'] ?? \'\') === \'6fa0a5cb7063b6b821bd50c105c735470f589b80\'',
     '($modules[14][\'reviewed_source_version\'] ?? \'\') === \'1.4.2\'',
+    '($modules[21][\'reviewed_package_version\'] ?? \'\') === \'1.0.5\'',
     '($modules[24][\'reviewed_source_version\'] ?? \'\') === \'0.99.0\'',
     'MAX_INNER_TOTAL_BYTES',
     'Embedded manifest or dependency matrix differs from detached evidence.',
 ] as $marker) {
-    $check(str_contains($verifier, $marker), 'Fourth-cycle artifact verifier marker missing: ' . $marker);
+    $check(str_contains($verifier, $marker), 'Fourth-cycle current-companion artifact verifier marker missing: ' . $marker);
 }
 
 $structure = $read('tools/verify-structure.php');
 foreach ([
     "FILE_00_MINIMUM_VERSION = '1.2.38'",
     '($modules[14][\'reviewed_source_version\'] ?? \'\') === \'1.4.2\'',
+    '($modules[21][\'reviewed_package_version\'] ?? \'\') === \'1.0.5\'',
     '($modules[24][\'reviewed_source_version\'] ?? \'\') === \'0.99.0\'',
     'file24-current-assurance-contract',
 ] as $marker) {
-    $check(str_contains($structure, $marker), 'Fourth-cycle structural verifier marker missing: ' . $marker);
+    $check(str_contains($structure, $marker), 'Fourth-cycle current structural verifier marker missing: ' . $marker);
 }
 
 $sourceMatrix = $read('config/source-completion-matrix.json');
-$check(str_contains($sourceMatrix, 'Reviews 435-514'), 'Source-completion matrix must record fourth-cycle lineage through Reviews 435-514.');
+$check(str_contains($sourceMatrix, 'Reviews 435-514'), 'Source-completion matrix must preserve fourth-cycle lineage through Reviews 435-514.');
 $check(str_contains($sourceMatrix, 'review435-514-fourth-eighty-current-truth.php'), 'Source-completion matrix must cite fourth-cycle executable evidence.');
 
 $composer = $read('composer.json');
@@ -134,4 +137,4 @@ if ($failures !== []) {
     exit(1);
 }
 
-echo "PASS: File 25 Reviews 435-514 — fourth eighty-round current-truth closure\n";
+echo "PASS: File 25 Reviews 435-514 — fourth eighty-round historical ledger preserved with current companion truth\n";
