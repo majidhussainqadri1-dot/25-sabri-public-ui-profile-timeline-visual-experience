@@ -51,12 +51,17 @@ $checks = [
     9 => ($modules[9]['reviewed_source_version'] ?? '') === '1.3.0'
         && ($modules[9]['required_contract_version'] ?? '') === '1.1.0'
         && ($modules[9]['reviewed_source_branch'] ?? '') === 'codex/file09-1.3.0-rc6-80-round-review'
-        && ($modules[9]['reviewed_source_commit'] ?? '') === '58313a67e1d21ad17c9a066e9a29c34245a0763e',
+        && ($modules[9]['reviewed_source_commit'] ?? '') === '6fa0a5cb7063b6b821bd50c105c735470f589b80',
     14 => ($modules[14]['reviewed_source_version'] ?? '') === '1.4.2'
         && ($modules[14]['reviewed_source_commit'] ?? '') === 'b9045a4229d052103a5546477f664ac88b6ff034'
         && ($modules[14]['required_primary_color'] ?? '') === '#087A4E',
     18 => ($modules[18]['reviewed_source_version'] ?? '') === '1.2.0-RC1',
     20 => ($modules[20]['governing_plan_version'] ?? '') === '4.1',
+    21 => ($modules[21]['reviewed_package_version'] ?? '') === '1.0.5'
+        && ($modules[21]['reviewed_runtime_version'] ?? '') === '1.0.3'
+        && ($modules[21]['reviewed_schema_version'] ?? '') === '1.0.0'
+        && ($modules[21]['reviewed_source_commit'] ?? '') === 'afeda8742d8e1ea62254823291a66f502058989c'
+        && ($modules[21]['required_profile_timeline_api'] ?? '') === 'Sabri\\HomeNewsFeed\\ProfileTimeline::query',
     22 => ($modules[22]['reviewed_source_version'] ?? '') === '1.0.0-rc.3' && ($modules[22]['required_contract_versions']['rest_api'] ?? '') === '1.2.0',
     23 => ($modules[23]['reviewed_source_commit'] ?? '') === 'a8a8c805f4730998ccb44bd95c87591836561759' && ($modules[23]['future_intelligence_branch']['head'] ?? '') === '50b9489a4a058d4628ef5dda220837393dd32010',
     24 => ($modules[24]['reviewed_source_version'] ?? '') === '0.99.0'
@@ -71,7 +76,7 @@ $plan = json_decode($read('config/staging-test-plan.json'), true);
 $check(is_array($plan) && ($plan['schema_version'] ?? null) === 3, 'Staging test plan schema 3 required.');
 $ids = [];
 foreach ((array) ($plan['scenarios'] ?? []) as $scenario) { if (is_array($scenario)) { $ids[] = (string) ($scenario['id'] ?? ''); } }
-foreach (['file00-assertions','file03-current-public-dto','file03-route-parity','file07-directory-visual-contract','file09-doctor-decision','file14-visual-consumer','file22-create-edit-contract','file23-private-management-contract','file24-current-assurance-contract','companion-token-bridge'] as $id) {
+foreach (['file00-assertions','file03-current-public-dto','file03-route-parity','file07-directory-visual-contract','file09-doctor-decision','file14-visual-consumer','file21-current-profile-timeline-contract','file22-create-edit-contract','file23-private-management-contract','file24-current-assurance-contract','companion-token-bridge'] as $id) {
     $check(in_array($id, $ids, true), 'Staging plan missing ' . $id);
 }
 
