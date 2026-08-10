@@ -6,6 +6,13 @@ if (! defined('ABSPATH')) {
     define('ABSPATH', __DIR__ . '/fixtures/');
 }
 
+if (! function_exists('apply_filters')) {
+    function apply_filters(string $hook_name, mixed $value, mixed ...$args): mixed
+    {
+        return $value;
+    }
+}
+
 require_once dirname(__DIR__) . '/includes/class-public-url.php';
 require_once dirname(__DIR__) . '/includes/class-future-public-experience.php';
 
