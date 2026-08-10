@@ -57,6 +57,12 @@ final class Profile_Renderer
             return;
         }
 
+        // Internal presentation identity only. Profile_Repository intentionally
+        // omits raw IDs from its public DTO; the renderer adds the resolved ID
+        // after the public projection is authorized so owner actions, metrics,
+        // completion tools and privacy previews can bind to the exact user.
+        $profile['user_id'] = (int) $user->ID;
+
         $preview_mode = Plan_Completion::preview_mode($profile);
         $owner_context = get_current_user_id() === (int) $user->ID || current_user_can('manage_options');
         if ($preview_mode === 'denied'
