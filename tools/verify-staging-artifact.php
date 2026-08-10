@@ -5,9 +5,8 @@ declare(strict_types=1);
 /**
  * Independent verifier for File 25 workflow artifacts and assembled directories.
  *
- * This verifier does not trust the builder, detached files, outer archive, or
- * inner package individually. Every layer is reconciled before a candidate is
- * reported as verified. Verification never implies staging or production acceptance.
+ * The verifier distrusts the builder, detached files, outer archive, inner ZIP,
+ * and dependency matrix independently. Verification never implies staging/live.
  */
 final class File25_Staging_Artifact_Verifier
 {
@@ -26,13 +25,12 @@ final class File25_Staging_Artifact_Verifier
         if (! class_exists('ZipArchive')) {
             throw new RuntimeException('The PHP Zip extension is required to verify the staging artifact.');
         }
-
         $artifact = trim($artifact);
         if ($artifact === '' || str_contains($artifact, "\0") || is_link($artifact)) {
             throw new InvalidArgumentException('Artifact path is invalid or symbolic.');
         }
 
-        $outer_artifact_sha256 = '';
+        $outer_sha256 = '';
         if (is_dir($artifact)) {
             $files = self::read_artifact_directory($artifact);
             $mode = 'directory';
@@ -41,16 +39,15 @@ final class File25_Staging_Artifact_Verifier
             if (! is_string($real)) {
                 throw new RuntimeException('Unable to resolve the artifact file.');
             }
-            $outer_artifact_sha256 = (string) hash_file('sha256', $real);
-            if (preg_match('/^[a-f0-9]{64}$/', $outer_artifact_sha256) !== 1) {
+            $outer_sha256 = (string) hash_file('sha256', $real);
+            if (preg_match('/^[a-f0-9]{64}$/', $outer_sha256) !== 1) {
                 throw new RuntimeException('Unable to calculate the outer artifact SHA-256.');
             }
             $expected_outer_sha256 = strtolower(trim($expected_outer_sha256));
             if ($expected_outer_sha256 !== '') {
-                if (preg_match('/^[a-f0-9]{64}$/', $expected_outer_sha256) !== 1) {
-                    throw new InvalidArgumentException('Expected outer artifact SHA-256 is invalid.');
-                }
-                if (! hash_equals($expected_outer_sha256, $outer_artifact_sha256)) {
+                if (preg_match('/^[a-f0-9]{64}$/', $expected_outer_sha256) !== 1
+                    || ! hash_equals($expected_outer_sha256, $outer_sha256)
+                ) {
                     throw new RuntimeException('Outer artifact SHA-256 does not match the expected digest.');
                 }
             }
@@ -62,7 +59,7 @@ final class File25_Staging_Artifact_Verifier
 
         $result = self::verify_bundle(self::identify_bundle($files));
         $result['artifact_mode'] = $mode;
-        $result['outer_artifact_sha256'] = $outer_artifact_sha256;
+        $result['outer_artifact_sha256'] = $outer_sha256;
 
         return $result;
     }
@@ -78,7 +75,6 @@ final class File25_Staging_Artifact_Verifier
         if (! is_array($entries)) {
             throw new RuntimeException('Unable to list the artifact directory.');
         }
-
         $files = [];
         foreach ($entries as $entry) {
             if ($entry === '.' || $entry === '..') {
@@ -96,11 +92,8 @@ final class File25_Staging_Artifact_Verifier
                 throw new RuntimeException('Artifact file exceeds the permitted size: ' . $entry);
             }
             $contents = file_get_contents($path);
-            if (! is_string($contents) || strlen($contents) !== $bytes) {
-                throw new RuntimeException('Unable to read artifact file: ' . $entry);
-            }
-            if (isset($files[$entry])) {
-                throw new RuntimeException('Duplicate entry detected in artifact directory: ' . $entry);
+            if (! is_string($contents) || strlen($contents) !== $bytes || isset($files[$entry])) {
+                throw new RuntimeException('Unable to read or uniquely identify artifact file: ' . $entry);
             }
             $files[$entry] = $contents;
         }
@@ -126,14 +119,10 @@ final class File25_Staging_Artifact_Verifier
             for ($index = 0; $index < $zip->numFiles; $index++) {
                 $name = $zip->getNameIndex($index);
                 $stat = $zip->statIndex($index);
-                if (! is_string($name) || ! is_array($stat) || ! self::outer_name_is_safe($name)) {
-                    throw new RuntimeException('Unsafe entry detected in the downloaded workflow artifact.');
-                }
-                if (isset($files[$name])) {
-                    throw new RuntimeException('Duplicate entry detected in the downloaded workflow artifact: ' . $name);
-                }
-                if (self::zip_entry_is_symlink($stat)) {
-                    throw new RuntimeException('Symbolic link detected in the downloaded workflow artifact.');
+                if (! is_string($name) || ! is_array($stat) || ! self::outer_name_is_safe($name)
+                    || isset($files[$name]) || self::zip_entry_is_symlink($stat)
+                ) {
+                    throw new RuntimeException('Unsafe, duplicate or symbolic entry detected in workflow artifact.');
                 }
                 $bytes = (int) ($stat['size'] ?? -1);
                 if ($bytes < 0 || $bytes > self::MAX_OUTER_FILE_BYTES) {
@@ -145,7 +134,6 @@ final class File25_Staging_Artifact_Verifier
                 }
                 $files[$name] = $contents;
             }
-
             return $files;
         } finally {
             $zip->close();
@@ -164,7 +152,6 @@ final class File25_Staging_Artifact_Verifier
         if (count($plugin_zips) !== 1) {
             throw new RuntimeException('Artifact must contain exactly one versioned File 25 plugin ZIP.');
         }
-
         $zip_name = (string) array_key_first($plugin_zips);
         $version = (string) $plugin_zips[$zip_name];
         $expected = [
@@ -196,26 +183,21 @@ final class File25_Staging_Artifact_Verifier
         $version = $bundle['version'];
         $zip_name = $bundle['zip_name'];
         $zip_bytes = $bundle['zip_bytes'];
-        $checksum_bytes = $bundle['checksum_bytes'];
-        $manifest_bytes = $bundle['manifest_bytes'];
-        $matrix_bytes = $bundle['matrix_bytes'];
-
-        if (preg_match('/^([a-f0-9]{64})  ([A-Za-z0-9._+-]+\.zip)\n?$/', $checksum_bytes, $match) !== 1) {
-            throw new RuntimeException('Detached package checksum has an invalid format.');
-        }
-        if (! hash_equals($zip_name, $match[2])) {
-            throw new RuntimeException('Detached checksum refers to a different package filename.');
+        if (preg_match('/^([a-f0-9]{64})  ([A-Za-z0-9._+-]+\.zip)\n?$/', $bundle['checksum_bytes'], $match) !== 1
+            || ! hash_equals($zip_name, $match[2])
+        ) {
+            throw new RuntimeException('Detached package checksum has an invalid format or filename.');
         }
         $package_sha256 = hash('sha256', $zip_bytes);
         if (! hash_equals(strtolower($match[1]), $package_sha256)) {
             throw new RuntimeException('Plugin ZIP SHA-256 does not match the detached checksum.');
         }
 
-        $manifest = self::decode_json_object($manifest_bytes, 'detached manifest');
+        $manifest = self::decode_json_object($bundle['manifest_bytes'], 'detached manifest');
         self::validate_manifest($manifest, $version);
-        $matrix = self::decode_json_object($matrix_bytes, 'dependency matrix');
-        $file24_status = self::validate_matrix($matrix, $version);
-        $inner = self::verify_inner_zip($zip_bytes, $manifest_bytes, $manifest, $matrix_bytes);
+        $matrix = self::decode_json_object($bundle['matrix_bytes'], 'dependency matrix');
+        $contract_status = self::validate_matrix($matrix, $version);
+        $inner = self::verify_inner_zip($zip_bytes, $bundle['manifest_bytes'], $manifest, $bundle['matrix_bytes']);
 
         return [
             'verified' => true,
@@ -224,7 +206,7 @@ final class File25_Staging_Artifact_Verifier
             'package_sha256' => $package_sha256,
             'payload_file_count' => $inner['payload_file_count'],
             'payload_bytes' => $inner['payload_bytes'],
-            'file24_status' => $file24_status,
+            'dependency_contract_status' => $contract_status,
             'staging_accepted' => false,
             'production_accepted' => false,
         ];
@@ -237,33 +219,27 @@ final class File25_Staging_Artifact_Verifier
             || ($manifest['package'] ?? '') !== self::PACKAGE_ROOT
             || ($manifest['file_number'] ?? null) !== 25
             || ($manifest['version'] ?? '') !== $version
+            || preg_match('/^[a-f0-9]{40}$/', (string) ($manifest['commit_sha'] ?? '')) !== 1
         ) {
             throw new RuntimeException('Detached manifest identity does not match File 25.');
         }
-        if (preg_match('/^[a-f0-9]{40}$/', (string) ($manifest['commit_sha'] ?? '')) !== 1) {
-            throw new RuntimeException('Detached manifest commit SHA is invalid.');
-        }
         $epoch = $manifest['source_date_epoch'] ?? null;
-        if (! is_int($epoch) || $epoch < 315532800 || $epoch > 4102444800) {
-            throw new RuntimeException('Detached manifest SOURCE_DATE_EPOCH is invalid.');
-        }
-        if (($manifest['generated_at_utc'] ?? '') !== gmdate('Y-m-d\TH:i:s\Z', $epoch)) {
-            throw new RuntimeException('Detached manifest timestamp is not derived from SOURCE_DATE_EPOCH.');
+        if (! is_int($epoch) || $epoch < 315532800 || $epoch > 4102444800
+            || ($manifest['generated_at_utc'] ?? '') !== gmdate('Y-m-d\TH:i:s\Z', $epoch)
+        ) {
+            throw new RuntimeException('Detached manifest deterministic timestamp is invalid.');
         }
         $files = $manifest['files'] ?? null;
         if (! is_array($files) || $files === [] || count($files) > self::MAX_INNER_FILES) {
             throw new RuntimeException('Detached manifest contains an invalid payload file map.');
         }
         foreach ($files as $relative => $metadata) {
-            if (! is_string($relative) || ! self::relative_payload_name_is_safe($relative) || ! is_array($metadata)) {
-                throw new RuntimeException('Detached manifest contains an unsafe payload entry.');
-            }
-            if (preg_match('/^[a-f0-9]{64}$/', (string) ($metadata['sha256'] ?? '')) !== 1) {
-                throw new RuntimeException('Detached manifest contains an invalid payload SHA-256.');
-            }
-            $bytes = $metadata['bytes'] ?? null;
-            if (! is_int($bytes) || $bytes < 0 || $bytes > self::MAX_INNER_FILE_BYTES) {
-                throw new RuntimeException('Detached manifest contains an invalid payload byte size.');
+            if (! is_string($relative) || ! self::relative_payload_name_is_safe($relative) || ! is_array($metadata)
+                || preg_match('/^[a-f0-9]{64}$/', (string) ($metadata['sha256'] ?? '')) !== 1
+                || ! is_int($metadata['bytes'] ?? null)
+                || $metadata['bytes'] < 0 || $metadata['bytes'] > self::MAX_INNER_FILE_BYTES
+            ) {
+                throw new RuntimeException('Detached manifest contains an invalid payload entry.');
             }
         }
     }
@@ -271,7 +247,7 @@ final class File25_Staging_Artifact_Verifier
     /** @param array<string,mixed> $matrix */
     private static function validate_matrix(array $matrix, string $version): string
     {
-        if (($matrix['schema_version'] ?? null) !== 2
+        if (($matrix['schema_version'] ?? null) !== 3
             || ($matrix['file'] ?? null) !== 25
             || ($matrix['runtime_version'] ?? '') !== $version
             || ($matrix['governing_sources']['platform_master_plan'] ?? '') !== 'Sabri Social Homeopathy Platform Definitive Master Plan 2026 v3.0'
@@ -286,71 +262,68 @@ final class File25_Staging_Artifact_Verifier
 
         $modules = [];
         foreach ((array) ($matrix['modules'] ?? []) as $module) {
-            if (is_array($module) && is_int($module['file'] ?? null)) {
-                if (isset($modules[$module['file']])) {
-                    throw new RuntimeException('Staging dependency matrix contains a duplicate File number.');
-                }
-                $modules[$module['file']] = $module;
+            if (! is_array($module) || ! is_int($module['file'] ?? null) || isset($modules[$module['file']])) {
+                throw new RuntimeException('Dependency matrix contains an invalid or duplicate File number.');
             }
+            $modules[$module['file']] = $module;
         }
-        foreach ([0, 3, 6, 8, 9, 10, 11, 12, 18, 20, 21, 24, 25] as $required) {
+        foreach ([0,3,6,7,8,9,10,11,12,14,18,20,21,22,23,24,25] as $required) {
             if (! isset($modules[$required])) {
                 throw new RuntimeException('Staging dependency matrix is missing File ' . $required . '.');
             }
         }
-
-        $file00 = $modules[0];
-        if (($file00['reviewed_package_version'] ?? '') !== '1.2.4'
-            || ($file00['accepted_source_range'] ?? '') !== '>=1.2.4 <1.3.0'
-            || ($file00['required_contract_version'] ?? '') !== '1.1.2'
-            || ($file00['foreign_table_reads_allowed'] ?? true) !== false
-            || ($file00['staging_status'] ?? '') !== 'pending'
-        ) {
-            throw new RuntimeException('File 00 reviewed contract or pending staging state is inaccurate.');
-        }
-        if (($modules[8]['required_public_contract_version'] ?? '') !== '1.0.0'
-            || ($modules[8]['foreign_table_reads_allowed'] ?? true) !== false
-            || ($modules[8]['staging_status'] ?? '') !== 'pending'
-        ) {
-            throw new RuntimeException('File 08 public clinic contract or pending state is inaccurate.');
-        }
-        if (($modules[9]['reviewed_source_version'] ?? '') !== '1.1.0'
-            || ($modules[9]['foreign_table_reads_allowed'] ?? true) !== false
-            || ($modules[9]['staging_status'] ?? '') !== 'pending'
-        ) {
-            throw new RuntimeException('File 09 verification contract or pending state is inaccurate.');
-        }
-        if (($modules[18]['reviewed_source_version'] ?? '') !== '1.2.0-RC1'
-            || ($modules[18]['foreign_table_reads_allowed'] ?? true) !== false
-            || ($modules[18]['staging_status'] ?? '') !== 'pending'
-        ) {
-            throw new RuntimeException('File 18 owner-DTO contract or pending state is inaccurate.');
-        }
-        if (($modules[20]['reviewed_source_version'] ?? '') !== '1.2.0'
-            || ($modules[20]['governing_plan_version'] ?? '') !== '4.1'
-            || ($modules[20]['staging_status'] ?? '') !== 'pending'
-        ) {
-            throw new RuntimeException('File 20 shell contract or pending state is inaccurate.');
+        foreach ($modules as $module) {
+            if (isset($module['staging_status']) && $module['staging_status'] !== 'pending') {
+                throw new RuntimeException('Dependency matrix falsely promotes a module beyond pending staging.');
+            }
         }
 
-        $file24 = $modules[24];
-        if (($file24['reviewed_package_version'] ?? '') !== '0.25.3'
-            || ($file24['accepted_source_range'] ?? '') !== '>=0.25.3 <0.26.0'
-            || ($file24['accepted_runtime_contract'] ?? '') !== 'reviewed-source-contract-pending-staging'
-            || ($file24['cache_partition_contract'] ?? '') !== 'not-yet-versioned'
-            || ($file24['staging_status'] ?? '') !== 'pending'
-        ) {
-            throw new RuntimeException('File 24 reviewed contract or pending staging state is inaccurate.');
-        }
-        if (($modules[25]['candidate_version'] ?? '') !== $version
-            || ($modules[25]['schema_version'] ?? '') !== '2'
-            || ($modules[25]['staging_status'] ?? '') !== 'pending'
-            || ($modules[25]['package_status'] ?? '') !== 'build-input-not-acceptance'
-        ) {
-            throw new RuntimeException('File 25 dependency-matrix candidate status is inaccurate.');
+        $checks = [
+            0 => ($modules[0]['reviewed_package_version'] ?? '') === '1.2.4'
+                && ($modules[0]['required_contract_version'] ?? '') === '1.1.2'
+                && ($modules[0]['foreign_table_reads_allowed'] ?? true) === false,
+            3 => ($modules[3]['reviewed_source_version'] ?? '') === '1.2.0-rc2'
+                && ($modules[3]['required_contract_version'] ?? '') === '1.4.0'
+                && ($modules[3]['reviewed_source_commit'] ?? '') === 'b96f74457f54341701c6cdb1a57d42baa1100081'
+                && ($modules[3]['foreign_table_reads_allowed'] ?? true) === false,
+            7 => ($modules[7]['reviewed_source_version'] ?? '') === '1.2.0'
+                && ($modules[7]['required_contract_version'] ?? '') === '1.2.0'
+                && ($modules[7]['reviewed_source_commit'] ?? '') === '67c32ec4af45a7de6e3d9c1dbf0f8614d6b5a844',
+            8 => ($modules[8]['required_public_contract_version'] ?? '') === '1.0.0'
+                && ($modules[8]['foreign_table_reads_allowed'] ?? true) === false,
+            9 => ($modules[9]['reviewed_source_version'] ?? '') === '1.3.0'
+                && ($modules[9]['required_contract_version'] ?? '') === '1.1.0'
+                && ($modules[9]['reviewed_source_commit'] ?? '') === '6d5c2850dbf86ce954e0c2fdef8adf36d2dbf1f1'
+                && ($modules[9]['foreign_table_reads_allowed'] ?? true) === false,
+            14 => ($modules[14]['reviewed_source_version'] ?? '') === '1.4.1'
+                && ($modules[14]['required_primary_color'] ?? '') === '#087A4E'
+                && ($modules[14]['reviewed_source_commit'] ?? '') === '3c524fb3d6ee481bc222660a56f6192b994e30d0',
+            18 => ($modules[18]['reviewed_source_version'] ?? '') === '1.2.0-RC1'
+                && ($modules[18]['foreign_table_reads_allowed'] ?? true) === false,
+            20 => ($modules[20]['reviewed_source_version'] ?? '') === '1.2.0'
+                && ($modules[20]['governing_plan_version'] ?? '') === '4.1',
+            22 => ($modules[22]['reviewed_source_version'] ?? '') === '1.0.0-rc.3'
+                && ($modules[22]['reviewed_source_commit'] ?? '') === 'c3b775b66fbbda4a9dd9891d63c08c74e2178741'
+                && ($modules[22]['required_contract_versions']['rest_api'] ?? '') === '1.2.0',
+            23 => ($modules[23]['reviewed_source_version'] ?? '') === '1.2.0'
+                && ($modules[23]['reviewed_source_commit'] ?? '') === 'a8a8c805f4730998ccb44bd95c87591836561759'
+                && ($modules[23]['future_intelligence_branch']['head'] ?? '') === '50b9489a4a058d4628ef5dda220837393dd32010',
+            24 => ($modules[24]['reviewed_package_version'] ?? '') === '0.25.3'
+                && ($modules[24]['accepted_runtime_contract'] ?? '') === 'reviewed-source-contract-pending-staging',
+            25 => ($modules[25]['candidate_version'] ?? '') === $version
+                && ($modules[25]['canonical_primary_color'] ?? '') === '#087A4E'
+                && ($modules[25]['design_token_owner'] ?? '') === 'file-25'
+                && ($modules[25]['structural_shell_owner'] ?? '') === 'file-20'
+                && ($modules[25]['schema_version'] ?? '') === '2'
+                && ($modules[25]['package_status'] ?? '') === 'build-input-not-acceptance',
+        ];
+        foreach ($checks as $file => $valid) {
+            if (! $valid) {
+                throw new RuntimeException('File ' . $file . ' reviewed contract or lifecycle truth is inaccurate.');
+            }
         }
 
-        return 'reviewed-source-contract-pending-staging';
+        return 'reviewed-source-contracts-pending-hostinger-staging';
     }
 
     /** @param array<string,mixed> $manifest @return array{payload_file_count:int,payload_bytes:int} */
@@ -362,11 +335,11 @@ final class File25_Staging_Artifact_Verifier
         }
         try {
             if (file_put_contents($temporary, $zip_bytes, LOCK_EX) !== strlen($zip_bytes)) {
-                throw new RuntimeException('Unable to write the temporary package file.');
+                throw new RuntimeException('Unable to write temporary package file.');
             }
             $zip = new ZipArchive();
             if ($zip->open($temporary, ZipArchive::RDONLY) !== true) {
-                throw new RuntimeException('Unable to open the inner File 25 plugin ZIP.');
+                throw new RuntimeException('Unable to open inner File 25 ZIP.');
             }
             try {
                 $expected = [];
@@ -376,70 +349,53 @@ final class File25_Staging_Artifact_Verifier
                 $expected[] = self::PACKAGE_ROOT . '/' . self::INNER_MANIFEST;
                 sort($expected, SORT_STRING);
                 if ($zip->numFiles !== count($expected) || $zip->numFiles > self::MAX_INNER_FILES + 1) {
-                    throw new RuntimeException('Inner plugin ZIP contains an invalid number of entries.');
+                    throw new RuntimeException('Inner ZIP contains an invalid number of entries.');
                 }
-
                 $actual = [];
                 $seen = [];
                 $total_bytes = 0;
                 for ($index = 0; $index < $zip->numFiles; $index++) {
                     $name = $zip->getNameIndex($index);
                     $stat = $zip->statIndex($index);
-                    if (! is_string($name) || ! is_array($stat) || ! self::inner_name_is_safe($name)) {
-                        throw new RuntimeException('Unsafe entry detected in the inner plugin ZIP.');
-                    }
-                    if (isset($seen[$name])) {
-                        throw new RuntimeException('Duplicate entry detected in the inner plugin ZIP: ' . $name);
+                    if (! is_string($name) || ! is_array($stat) || ! self::inner_name_is_safe($name)
+                        || isset($seen[$name]) || self::zip_entry_is_symlink($stat)
+                    ) {
+                        throw new RuntimeException('Unsafe, duplicate or symbolic entry detected in inner ZIP.');
                     }
                     $seen[$name] = true;
-                    if (self::zip_entry_is_symlink($stat)) {
-                        throw new RuntimeException('Symbolic link detected in the inner plugin ZIP.');
-                    }
                     $bytes = (int) ($stat['size'] ?? -1);
                     if ($bytes < 0 || $bytes > self::MAX_INNER_FILE_BYTES) {
-                        throw new RuntimeException('Inner plugin ZIP entry exceeds the permitted size: ' . $name);
+                        throw new RuntimeException('Inner ZIP entry exceeds permitted size: ' . $name);
                     }
                     $total_bytes += $bytes;
                     if ($total_bytes > self::MAX_INNER_TOTAL_BYTES) {
-                        throw new RuntimeException('Inner plugin ZIP exceeds the permitted total payload size.');
+                        throw new RuntimeException('Inner ZIP exceeds total expansion limit.');
                     }
                     $actual[] = $name;
                 }
                 sort($actual, SORT_STRING);
                 if ($actual !== $expected) {
-                    throw new RuntimeException('Inner plugin ZIP file set differs from the detached manifest.');
+                    throw new RuntimeException('Inner ZIP file set differs from detached manifest.');
                 }
-
                 $embedded_manifest = $zip->getFromName(self::PACKAGE_ROOT . '/' . self::INNER_MANIFEST);
-                if (! is_string($embedded_manifest) || ! hash_equals($manifest_bytes, $embedded_manifest)) {
-                    throw new RuntimeException('Embedded and detached staging manifests differ.');
-                }
                 $embedded_matrix = $zip->getFromName(self::PACKAGE_ROOT . '/' . self::INNER_MATRIX);
-                if (! is_string($embedded_matrix) || ! hash_equals($matrix_bytes, $embedded_matrix)) {
-                    throw new RuntimeException('Outer and embedded dependency matrices differ.');
+                if (! is_string($embedded_manifest) || ! hash_equals($manifest_bytes, $embedded_manifest)
+                    || ! is_string($embedded_matrix) || ! hash_equals($matrix_bytes, $embedded_matrix)
+                ) {
+                    throw new RuntimeException('Embedded manifest or dependency matrix differs from detached evidence.');
                 }
-
                 $payload_bytes = 0;
                 foreach ((array) $manifest['files'] as $relative => $metadata) {
-                    $name = self::PACKAGE_ROOT . '/' . $relative;
-                    $contents = $zip->getFromName($name);
-                    if (! is_string($contents)) {
-                        throw new RuntimeException('Manifest payload file is missing from the inner ZIP: ' . $relative);
+                    $contents = $zip->getFromName(self::PACKAGE_ROOT . '/' . $relative);
+                    if (! is_string($contents)
+                        || strlen($contents) !== (int) $metadata['bytes']
+                        || ! hash_equals((string) $metadata['sha256'], hash('sha256', $contents))
+                    ) {
+                        throw new RuntimeException('Manifest payload integrity mismatch: ' . $relative);
                     }
-                    $bytes = strlen($contents);
-                    if ($bytes !== (int) $metadata['bytes']) {
-                        throw new RuntimeException('Payload byte size differs from the manifest: ' . $relative);
-                    }
-                    if (! hash_equals((string) $metadata['sha256'], hash('sha256', $contents))) {
-                        throw new RuntimeException('Payload SHA-256 differs from the manifest: ' . $relative);
-                    }
-                    $payload_bytes += $bytes;
+                    $payload_bytes += strlen($contents);
                 }
-
-                return [
-                    'payload_file_count' => count((array) $manifest['files']),
-                    'payload_bytes' => $payload_bytes,
-                ];
+                return ['payload_file_count' => count((array) $manifest['files']), 'payload_bytes' => $payload_bytes];
             } finally {
                 $zip->close();
             }
@@ -459,28 +415,20 @@ final class File25_Staging_Artifact_Verifier
         if (! is_array($decoded) || array_is_list($decoded)) {
             throw new RuntimeException(ucfirst($label) . ' must be a JSON object.');
         }
-
         return $decoded;
     }
 
     private static function outer_name_is_safe(string $name): bool
     {
-        return $name !== ''
-            && strlen($name) <= 180
-            && basename($name) === $name
-            && ! str_contains($name, '..')
-            && ! str_contains($name, "\0")
+        return $name !== '' && strlen($name) <= 180 && basename($name) === $name
+            && ! str_contains($name, '..') && ! str_contains($name, "\0")
             && preg_match('/^[A-Za-z0-9._+-]+$/', $name) === 1;
     }
 
     private static function relative_payload_name_is_safe(string $name): bool
     {
-        return $name !== ''
-            && strlen($name) <= 240
-            && ! str_starts_with($name, '/')
-            && ! str_contains($name, '..')
-            && ! str_contains($name, '\\')
-            && ! str_contains($name, "\0")
+        return $name !== '' && strlen($name) <= 240 && ! str_starts_with($name, '/')
+            && ! str_contains($name, '..') && ! str_contains($name, '\\') && ! str_contains($name, "\0")
             && preg_match('#^[A-Za-z0-9._/+-]+$#', $name) === 1;
     }
 
@@ -494,9 +442,7 @@ final class File25_Staging_Artifact_Verifier
     private static function zip_entry_is_symlink(array $stat): bool
     {
         $attributes = (int) ($stat['external_attributes'] ?? $stat['externalAttributes'] ?? 0);
-        $mode = ($attributes >> 16) & 0xF000;
-
-        return $mode === 0xA000;
+        return (($attributes >> 16) & 0xF000) === 0xA000;
     }
 }
 
@@ -510,10 +456,8 @@ if (PHP_SAPI === 'cli' && realpath((string) ($_SERVER['SCRIPT_FILENAME'] ?? ''))
             $expected = substr($argument, strlen('--artifact-sha256='));
         }
     }
-
     try {
-        $report = File25_Staging_Artifact_Verifier::verify($artifact, $expected);
-        echo json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), PHP_EOL;
+        echo json_encode(File25_Staging_Artifact_Verifier::verify($artifact, $expected), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), PHP_EOL;
     } catch (Throwable $exception) {
         fwrite(STDERR, 'FAILED: ' . $exception->getMessage() . PHP_EOL);
         exit(1);
