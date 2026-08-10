@@ -3,8 +3,8 @@
   "file": 25,
   "review_range": {"first": 435, "last": 514, "count": 80},
   "method": "Fourth fresh eighty-round repository/source review. Current companion repository truth was re-read rather than inherited from historical File 25 evidence. Every defect-bearing review was corrected before the next review lens; exact-head CI was repeatedly rerun after corrections. Staging/live truth remains separate.",
-  "defect_rounds": [435,436,437,438,439,440,441,442,443,444,445,446,447,448,449,450,451,452,453,454],
-  "clean_rounds": [455,456,457,458,459,460,461,462,463,464,465,466,467,468,469,470,471,472,473,474,475,476,477,478,479,480,481,482,483,484,485,486,487,488,489,490,491,492,493,494,495,496,497,498,499,500,501,502,503,504,505,506,507,508,509,510,511,512,513,514],
+  "defect_rounds": [435,436,437,438,439,440,441,442,443,444,445,446,447,448,449,450,451,452,453,454,514],
+  "clean_rounds": [455,456,457,458,459,460,461,462,463,464,465,466,467,468,469,470,471,472,473,474,475,476,477,478,479,480,481,482,483,484,485,486,487,488,489,490,491,492,493,494,495,496,497,498,499,500,501,502,503,504,505,506,507,508,509,510,511,512,513],
   "external_truth": {
     "hostinger_staging_accepted": false,
     "founder_staging_acceptance": false,
@@ -39,7 +39,7 @@
     {"review":451,"focus":"Exact CI release-engineering regression","status":"defect-found-corrected","finding":"CI exposed historical File00/File09/File14/File24 assertions in tests/release-engineering.php.","correction":"Release engineering gate was reconciled to current exact source truth and rerun."},
     {"review":452,"focus":"Historical Reviews 174-176 File00 fixture","status":"defect-found-corrected","finding":"CI exposed File00 1.2.4/contract1.1.2 fixture in the historical three-plan regression.","correction":"Fixture now exercises current File00 1.2.38/contract1.2.2 without changing the historical behavioral intent."},
     {"review":453,"focus":"Reviews 39-53 native bootstrap fixture","status":"defect-found-corrected","finding":"CI next exposed the shared native bootstrap still defining File00 1.2.4/contract1.1.2, falsely making an eligible Founder private.","correction":"Shared bootstrap and assertion DTO were refreshed to File00 1.2.38/contract1.2.2; Reviews44-93 then progressed."},
-    {"review":454,"focus":"Structural verifier companion pins","status":"defect-found-corrected","finding":"CI finally exposed tools/verify-structure.php still enforcing old File00, File14 and File24 truth.","correction":"Structural verifier now pins current File00/File09/File14/File20/File22/File23/File24 contracts and current staging scenarios; exact-head CI passed after correction."},
+    {"review":454,"focus":"Structural verifier companion pins","status":"defect-found-corrected","finding":"CI finally exposed tools/verify-structure.php still enforcing old File00, File14 and File24 truth.","correction":"Structural verifier now pins current File00/File09/File14/File20/File22/File23/File24 contracts and current staging scenarios; intermediate exact-head CI passed after correction."},
     {"review":455,"focus":"Current File 00 identity/founder authority","status":"reviewed-clean"},
     {"review":456,"focus":"Current File 00 boolean assertion fail-closed semantics","status":"reviewed-clean"},
     {"review":457,"focus":"File 03 public DTO ownership","status":"reviewed-clean"},
@@ -99,6 +99,6 @@
     {"review":511,"focus":"Responsive/zoom/overflow source preparation","status":"reviewed-clean"},
     {"review":512,"focus":"Deterministic package/checksum/manifest/archive defenses","status":"reviewed-clean"},
     {"review":513,"focus":"Source-versus-staging/live truth separation","status":"reviewed-clean"},
-    {"review":514,"focus":"Fourth-cycle cross-plan exact-head closure","status":"reviewed-clean","evidence":"Review 514 is clean only if the final post-ledger exact branch HEAD passes the complete governed suite and deterministic package job; any later failure reopens it as defect-bearing."}
+    {"review":514,"focus":"Fourth-cycle exact-head closure evidence","status":"defect-found-corrected","finding":"The newly added fourth-cycle executable gate searched for backslash-prefixed literal $modules markers that do not exist in verifier source, so final exact-head CI correctly rejected Review 514 closure.","correction":"Removed the erroneous backslashes from literal source markers, reopened Review 514 as defect-bearing, and required another complete exact-head governed CI plus deterministic package run before closure."}
   ]
 }
