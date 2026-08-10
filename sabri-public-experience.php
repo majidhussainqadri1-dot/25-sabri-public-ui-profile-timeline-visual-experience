@@ -108,6 +108,7 @@ $spux_files = [
     'includes/class-forty-round-hardening.php',
     'includes/class-three-plan-corrections.php',
     'includes/class-central-plan-2026-corrections.php',
+    'includes/class-future-public-experience.php',
     'includes/class-plugin.php',
 ];
 
