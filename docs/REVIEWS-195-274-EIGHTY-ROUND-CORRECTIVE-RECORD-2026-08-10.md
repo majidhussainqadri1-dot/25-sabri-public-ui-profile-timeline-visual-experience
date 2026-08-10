@@ -26,7 +26,7 @@ This record documents the Founder-requested eighty consecutive source reviews af
 - **212** — Low-data client mutation selected all page media, potentially touching File 20/other module DOM. Scoped mutations to `.spux-profile`.
 - **213** — Visual-integrity diagnostics scanned the whole document, crossing File 25 ownership. Scoped diagnostics to `.spux-profile`.
 - **214** — Future CSS used stale/non-canonical token aliases. Reconciled to canonical File 25 muted/radius/shadow tokens.
-- **274** — The final exact-head CI/release-truth gate correctly failed because the new eighty-round regression test asserted the File 20 stacking-owner marker using array-return syntax (`=>`) while the executable shell contract stores it by assignment (`=`). This was a QA-evidence defect, not a production shell-ownership regression. The assertion was corrected to match the executable source, the ledger was amended, and exact-head CI must pass before closure.
+- **274** — Final exact-head release verification exposed a defect in the newly added eighty-round QA gate itself: first the shell-stacking assertion searched for array-return syntax (`=>`) although the executable contract uses assignment (`=`); after correcting that semantic mismatch, PHP syntax checking exposed an improperly quoted literal in the same assertion. Both QA-evidence defects were corrected at root cause. The underlying File 20 stacking ownership remained correct throughout. Exact-head CI is required to pass after these corrections before closure.
 
 ## Reviews 215–273 — no new source defect found
 
