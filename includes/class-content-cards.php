@@ -18,6 +18,8 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
 final class Content_Cards
 {
     public const CONTRACT_VERSION = '1.2.0';
+    public const VARIANT_CONTRACT_VERSION = '1.0.0';
+    private const MAX_VARIANTS = 20;
 
     private const TYPES = [
         'article',
@@ -28,6 +30,7 @@ final class Content_Cards
         'book',
         'pdf',
         'doctor',
+        'profile',
         'clinic',
         'event',
         'marketplace-item',
@@ -43,11 +46,15 @@ final class Content_Cards
         'danger',
     ];
 
+    /** @var array<string,callable> */
+    private static array $variant_renderers = [];
+
     /** @return array<string,mixed> */
     public static function contract(): array
     {
         return [
             'contract_version' => self::CONTRACT_VERSION,
+            'variant_contract_version' => self::VARIANT_CONTRACT_VERSION,
             'types' => self::TYPES,
             'badge_tones' => self::TONES,
             'class' => 'sabri-ui-content-card',
@@ -70,6 +77,10 @@ final class Content_Cards
             ],
             'renderer' => [self::class, 'render'],
             'public_normalizer' => [self::class, 'normalize_public'],
+            'variant_registration' => [self::class, 'register_variant'],
+            'variant_limit' => self::MAX_VARIANTS,
+            'variant_input' => 'normalized-public-card-only',
+            'variant_output_sanitized' => true,
             'owns_native_data' => false,
             'same_site_destinations' => true,
             'date_timezone' => 'UTC',
@@ -85,12 +96,46 @@ final class Content_Cards
         return array_merge($base, self::contract());
     }
 
+    public static function register_variant(string $variant, callable $renderer): bool
+    {
+        $raw = trim($variant);
+        $key = self::key($raw);
+        if ($key === '' || strlen($raw) > 64 || ! hash_equals($key, $raw)) {
+            return false;
+        }
+        if (isset(self::$variant_renderers[$key])) {
+            return false;
+        }
+        if (count(self::$variant_renderers) >= self::MAX_VARIANTS) {
+            return false;
+        }
+
+        self::$variant_renderers[$key] = $renderer;
+        return true;
+    }
+
     /** @param array<string,mixed> $args */
     public static function render(array $args = []): string
     {
+        $variant = self::key((string) ($args['variant'] ?? ''));
         $card = self::normalize_public($args);
         if ($card === null) {
             return '';
+        }
+
+        if ($variant !== '' && isset(self::$variant_renderers[$variant])) {
+            try {
+                $custom = (string) call_user_func(self::$variant_renderers[$variant], $card);
+            } catch (\Throwable) {
+                $custom = '';
+            }
+            if ($custom !== '') {
+                // Registered variants receive only the normalized public DTO,
+                // and their HTML is sanitized at the File 25 presentation edge.
+                return function_exists('wp_kses_post')
+                    ? wp_kses_post($custom)
+                    : self::escape_html($custom);
+            }
         }
 
         $type = $card['type'];
