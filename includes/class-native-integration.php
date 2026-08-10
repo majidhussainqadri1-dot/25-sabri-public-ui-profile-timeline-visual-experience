@@ -465,10 +465,16 @@ final class Native_Integration
             return $this->doctor_decision_cache[$user_id] = [];
         }
 
-        $state = sanitize_key((string) ($source['state'] ?? 'unavailable'));
+        $raw_state = trim((string) ($source['state'] ?? 'unavailable'));
+        $state = sanitize_key($raw_state);
         $verified_until = trim((string) ($source['verified_until'] ?? ''));
-        $fingerprint = strtolower(trim((string) ($source['fingerprint'] ?? '')));
-        if ($state === '' || strlen($state) > 64) {
+        $raw_fingerprint = trim((string) ($source['fingerprint'] ?? ''));
+        $fingerprint = strtolower($raw_fingerprint);
+        if ($state === ''
+            || strlen($raw_state) > 64
+            || ! hash_equals($state, $raw_state)
+            || ! hash_equals($fingerprint, $raw_fingerprint)
+        ) {
             return $this->doctor_decision_cache[$user_id] = [];
         }
         if ($source['verified']
