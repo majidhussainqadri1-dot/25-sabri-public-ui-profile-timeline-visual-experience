@@ -31,6 +31,7 @@
       "tests/future-public-experience.php",
       "tests/review189-191-future-public-experience.php",
       "tests/review192-194-future-public-experience-post-review.php",
+      "tests/review195-274-eighty-round-adversarial.php",
       "tools/verify-source-completion.php",
       "tools/verify-structure.php",
       "tools/verify-future-structure.php",
