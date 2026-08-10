@@ -17,6 +17,9 @@ $cards = $read('includes/class-content-cards.php');
 $sections = $read('includes/class-section-service.php');
 $rest = $read('includes/class-rest-controller.php');
 $design = $read('includes/class-design-system.php');
+$file20 = $read('includes/class-file-20-integration.php');
+$admin = $read('includes/class-admin-integration.php');
+$component = $read('includes/class-component-api.php');
 $assets = $read('includes/class-assets.php');
 $bridge = $read('assets/css/companion-token-bridge.css');
 $marketplace = $read('includes/providers/class-file-18-marketplace-provider.php');
@@ -91,6 +94,12 @@ $check(str_contains($rest, "'ETag'"), 'Public REST must emit deterministic ETags
 foreach (['native-contact-consent','same-origin-profile-media','conditional-profile-layout','profile-breadcrumbs','structured-profile-section-rest'] as $scope) {
     $check(str_contains($design, $scope), 'Design contract scope missing: ' . $scope);
 }
+$check(str_contains($file20, "REVIEWED_MINIMUM_VERSION = '1.4.12'"), 'File 20 current compatibility floor missing.');
+$check(str_contains($file20, "REVIEWED_CONTRACT_VERSION = '1.0.0'"), 'File 20 current contract version missing.');
+$check(str_contains($file20, "REVIEWED_SOURCE_COMMIT = '291486b22c7ed94b8be041192375b6d9b077fac5'"), 'File 20 exact reviewed source evidence missing.');
+$check(str_contains($design, 'sabri_shell_file25_visual_contract') && str_contains($design, "'primary_color' => '#087A4E'"), 'File 20 visual consumer bridge must publish File 25 canonical green.');
+$check(str_contains($admin, "SHELL_PARENT_SLUG = 'sabri-shell'"), 'File 25 admin must attach to File 20 when compatible.');
+$check(str_contains($component, 'Component API cannot bind a second timeline registry'), 'Component API must preserve one canonical request registry.');
 $check(str_contains($assets, 'companion-token-bridge.css'), 'Canonical File 25 style handle must include companion token bridge.');
 foreach (['--sabri-primary: var(--sabri-visual-primary)', '--sabri-color-primary: var(--sabri-visual-primary)', '--sabri-text: var(--sabri-visual-text)', '--sabri-radius: var(--sabri-visual-radius-card)'] as $marker) {
     $check(str_contains($bridge, $marker), 'Companion token alias missing: ' . $marker);
@@ -116,7 +125,10 @@ $check(($modules[9]['required_contract_version'] ?? '') === '1.1.0', 'File 09 in
 $check(($modules[9]['reviewed_source_commit'] ?? '') === '6d5c2850dbf86ce954e0c2fdef8adf36d2dbf1f1', 'File 09 exact reviewed candidate mismatch.');
 $check(($modules[14]['reviewed_source_version'] ?? '') === '1.4.1' && ($modules[14]['required_primary_color'] ?? '') === '#087A4E', 'File 14 visual consumer baseline mismatch.');
 $check(($modules[18]['reviewed_source_version'] ?? '') === '1.2.0-RC1', 'File 18 reviewed source mismatch.');
-$check(($modules[20]['reviewed_source_version'] ?? '') === '1.2.0' && ($modules[20]['governing_plan_version'] ?? '') === '4.1', 'File 20 structural owner baseline mismatch.');
+$check(($modules[20]['reviewed_source_version'] ?? '') === '1.4.12', 'File 20 current reviewed source mismatch.');
+$check(($modules[20]['required_contract_version'] ?? '') === '1.0.0', 'File 20 central-plan contract must be 1.0.0.');
+$check(($modules[20]['reviewed_source_commit'] ?? '') === '291486b22c7ed94b8be041192375b6d9b077fac5', 'File 20 exact reviewed main mismatch.');
+$check(($modules[20]['accepted_source_range'] ?? '') === '>=1.4.12 <1.5.0' && ($modules[20]['governing_plan_version'] ?? '') === '4.1', 'File 20 structural owner range/governance mismatch.');
 $check(($modules[22]['reviewed_source_version'] ?? '') === '1.0.0-rc.3', 'File 22 current candidate mismatch.');
 $check(($modules[22]['reviewed_source_commit'] ?? '') === 'c3b775b66fbbda4a9dd9891d63c08c74e2178741', 'File 22 exact head mismatch.');
 $check(($modules[22]['required_contract_versions']['rest_api'] ?? '') === '1.2.0', 'File 22 REST contract must be 1.2.0.');
@@ -130,10 +142,10 @@ foreach ($modules as $module) {
 $check(is_array($plan) && ($plan['schema_version'] ?? null) === 3, 'Staging test plan schema must be 3.');
 $scenario_ids = [];
 foreach ((array) ($plan['scenarios'] ?? []) as $scenario) { if (is_array($scenario)) { $scenario_ids[] = (string) ($scenario['id'] ?? ''); } }
-foreach (['file03-current-public-dto','file03-route-parity','file09-doctor-decision','file07-directory-visual-contract','file14-visual-consumer','file22-create-edit-contract','file23-private-management-contract','companion-token-bridge'] as $scenario) {
+foreach (['file03-current-public-dto','file03-route-parity','file09-doctor-decision','file07-directory-visual-contract','file14-visual-consumer','file20-current-shell-contract','file20-admin-parent','component-api-runtime','file22-create-edit-contract','file23-private-management-contract','companion-token-bridge'] as $scenario) {
     $check(in_array($scenario, $scenario_ids, true), 'Current staging scenario missing: ' . $scenario);
 }
-$check(str_contains($dependencies, 'File 25 retains visual-token ownership'), 'Dependency status must preserve File 20/File 25 ownership boundary.');
+$check(str_contains($dependencies, "'visual_token_owner'" ) === false || str_contains($dependencies, 'File 20 current 1.4.12 structural-shell/central-plan contract'), 'Dependency status must preserve File 20 structural/File 25 visual ownership boundary.');
 
 if ($failures !== []) {
     fwrite(STDERR, "FAILED\n- " . implode("\n- ", $failures) . "\n");
