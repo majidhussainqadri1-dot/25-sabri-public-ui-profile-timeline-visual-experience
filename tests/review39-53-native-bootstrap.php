@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace {
     if (! defined('ABSPATH')) { define('ABSPATH', __DIR__ . '/fixtures/'); }
-    if (! defined('SMC_VERSION')) { define('SMC_VERSION', '1.2.4'); }
-    if (! defined('SMC_CONTRACT_VERSION')) { define('SMC_CONTRACT_VERSION', '1.1.2'); }
+    if (! defined('SMC_VERSION')) { define('SMC_VERSION', '1.2.38'); }
+    if (! defined('SMC_CONTRACT_VERSION')) { define('SMC_CONTRACT_VERSION', '1.2.2'); }
     if (! defined('SPD_VERSION')) { define('SPD_VERSION', '1.2.0-rc2'); }
     if (! defined('SPD_CONTRACT_VERSION')) { define('SPD_CONTRACT_VERSION', '1.4.0'); }
     if (! defined('GDO_VERSION')) { define('GDO_VERSION', '1.3.0'); }
@@ -130,7 +130,7 @@ namespace {
     function r3953_assertions(int $id, string $type = 'member'): array
     {
         return [
-            'contract_version' => '1.1.2', 'user_id' => $id,
+            'contract_version' => '1.2.2', 'user_id' => $id,
             'application_exists' => true, 'institutional_account' => false,
             'account_class' => 'member', 'membership_type' => $type, 'status' => 'approved',
             'approved' => true, 'suspended' => false, 'eligible' => true,
