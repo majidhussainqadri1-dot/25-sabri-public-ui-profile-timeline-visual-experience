@@ -93,7 +93,15 @@ final class Dependency_Manager
                 'production_required' => true,
                 'available' => $this->native->shell_available(),
                 'version' => defined('SABRI_SHELL_VERSION') ? (string) SABRI_SHELL_VERSION : '',
-                'contract' => 'File 20 sole structural shell, route registry mounting, navigation, sidebar, drawer, and layout API; File 25 retains visual-token ownership',
+                'minimum' => File_20_Integration::REVIEWED_MINIMUM_VERSION,
+                'maximum_exclusive' => File_20_Integration::REVIEWED_MAXIMUM_VERSION,
+                'contract_version' => class_exists('Sabri\\UnifiedShell\\CentralPlanContract')
+                    && defined('Sabri\\UnifiedShell\\CentralPlanContract::CONTRACT_VERSION')
+                    ? (string) constant('Sabri\\UnifiedShell\\CentralPlanContract::CONTRACT_VERSION')
+                    : '',
+                'required_contract_version' => File_20_Integration::REVIEWED_CONTRACT_VERSION,
+                'reviewed_source_commit' => File_20_Integration::REVIEWED_SOURCE_COMMIT,
+                'contract' => 'File 20 current 1.4.12 structural-shell/central-plan contract; File 25 retains canonical visual-token ownership and must publish the File 20 visual-consumer bridge',
             ],
             'home_news' => [
                 'required' => false,
