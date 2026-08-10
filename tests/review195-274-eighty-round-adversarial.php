@@ -35,7 +35,9 @@ $check(($ledger['defect_rounds'] ?? null) === $expectedDefects, 'Defect-bearing 
 $check(($ledger['clean_rounds'] ?? null) === range(215, 274), 'Clean review list must be exactly Reviews 215-274.');
 $seen = [];
 foreach ($reviews as $row) {
-    if (! is_array($row)) continue;
+    if (! is_array($row)) {
+        continue;
+    }
     $number = $row['review'] ?? null;
     $check(is_int($number) && $number >= 195 && $number <= 274, 'Invalid review number in eighty-round ledger.');
     if (is_int($number)) {
@@ -70,13 +72,12 @@ $check(str_contains($future, '! array_key_exists($key, $checks)'), 'Review 197 q
 $check(str_contains($future, "['!Y-m-d\\TH:i:s\\Z'"), 'Review 198 strict timestamp parsing correction missing.');
 $check(str_contains($future, '(string) $integer === $value'), 'Review 199 canonical positive integer correction missing.');
 $check(str_contains($future, "'toolbarLabel' => __('Reading and accessibility preferences'"), 'Review 200 localization vocabulary correction missing.');
-$check(str_contains($js, "const t = (key, fallback)"), 'Review 201 client i18n consumption correction missing.');
-$check(str_contains($js, "code !== primaryCode && code !== secondary"), 'Review 202 exactly-two bilingual correction missing.');
+$check(str_contains($js, 'const t = (key, fallback)'), 'Review 201 client i18n consumption correction missing.');
+$check(str_contains($js, 'code !== primaryCode && code !== secondary'), 'Review 202 exactly-two bilingual correction missing.');
 $check(str_contains($js, 'url.username || url.password'), 'Review 203 client credential URL rejection missing.');
-$check(str_contains($shell, "'overlay_stacking_owner' =" ) === false, 'Invalid shell marker syntax detected.');
 $check(str_contains($shell, "'overlay_stacking_owner' => 'file-20'"), 'Review 204 shell stacking ownership correction missing.');
 $check(! str_contains($css, 'z-index: 9999'), 'Review 204 hard-coded overlay z-index remains.');
-$check(str_contains($renderer, "$profile['user_id'] = (int) $user->ID;"), 'Review 205 internal profile identity binding correction missing.');
+$check(str_contains($renderer, '$profile[\'user_id\'] = (int) $user->ID;'), 'Review 205 internal profile identity binding correction missing.');
 $check(str_contains($repository, '$visibility = array_fill_keys(array_keys($canonical), true);'), 'Review 206 contact visibility-map correction missing.');
 $check(str_contains($repository, '$public[$field] = $value;'), 'Review 206 canonical contact value preservation missing.');
 $check(str_contains($renderer, "['_privacy_state' => 'not-public']"), 'Review 207 private-contact completion semantic correction missing.');
