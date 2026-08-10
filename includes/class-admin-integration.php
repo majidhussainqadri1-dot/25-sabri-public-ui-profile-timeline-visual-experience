@@ -49,9 +49,10 @@ final class Admin_Integration
             return;
         }
 
-        // Remove the continuity-only top-level page and the component-lab child
-        // that was provisionally attached to it earlier in admin_menu.
+        // Remove every continuity-only submenu entry before removing the
+        // standalone parent, so WordPress retains no orphaned duplicate menu.
         remove_submenu_page('sabri-public-experience', 'sabri-public-experience-component-lab');
+        remove_submenu_page('sabri-public-experience', 'sabri-public-experience');
         remove_menu_page('sabri-public-experience');
 
         $plan = new Plan_Completion();
