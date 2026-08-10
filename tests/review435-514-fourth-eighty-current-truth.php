@@ -21,19 +21,20 @@ try {
 $check(($ledger['review_range']['first'] ?? null) === 435, 'Fourth cycle must start at Review 435.');
 $check(($ledger['review_range']['last'] ?? null) === 514, 'Fourth cycle must end at Review 514.');
 $check(($ledger['review_range']['count'] ?? null) === 80, 'Fourth cycle must contain exactly 80 reviews.');
-$expectedDefects = range(435, 454);
-$check(($ledger['defect_rounds'] ?? null) === $expectedDefects, 'Fourth-cycle defect rounds must be exactly 435-454.');
-$check(($ledger['clean_rounds'] ?? null) === range(455, 514), 'Fourth-cycle clean rounds must be exactly 455-514.');
+$expectedDefects = array_merge(range(435, 454), [514]);
+$check(($ledger['defect_rounds'] ?? null) === $expectedDefects, 'Fourth-cycle defect rounds must be 435-454 plus reopened Review 514.');
+$check(($ledger['clean_rounds'] ?? null) === range(455, 513), 'Fourth-cycle clean rounds must be exactly 455-513.');
 $reviews = (array) ($ledger['reviews'] ?? []);
 $numbers = [];
 foreach ($reviews as $review) {
     if (! is_array($review) || ! is_int($review['review'] ?? null)) { continue; }
     $number = $review['review'];
     $numbers[] = $number;
-    $expected = $number <= 454 ? 'defect-found-corrected' : 'reviewed-clean';
+    $defect = $number <= 454 || $number === 514;
+    $expected = $defect ? 'defect-found-corrected' : 'reviewed-clean';
     $check(($review['status'] ?? '') === $expected, 'Unexpected fourth-cycle status at Review ' . $number . '.');
     $check(is_string($review['focus'] ?? null) && trim((string) $review['focus']) !== '', 'Every fourth-cycle review needs a focus.');
-    if ($number <= 454) {
+    if ($defect) {
         $check(is_string($review['finding'] ?? null) && trim((string) $review['finding']) !== '', 'Defect review needs a finding: ' . $number);
         $check(is_string($review['correction'] ?? null) && trim((string) $review['correction']) !== '', 'Defect review needs a correction: ' . $number);
     }
@@ -94,10 +95,10 @@ foreach (['file00-assertions','file09-doctor-decision','file14-visual-consumer',
 
 $verifier = $read('tools/verify-staging-artifact.php');
 foreach ([
-    '(\$modules[0][\'reviewed_source_version\'] ?? \'\') === \'1.2.38\'',
-    '(\$modules[9][\'reviewed_source_commit\'] ?? \'\') === \'58313a67e1d21ad17c9a066e9a29c34245a0763e\'',
-    '(\$modules[14][\'reviewed_source_version\'] ?? \'\') === \'1.4.2\'',
-    '(\$modules[24][\'reviewed_source_version\'] ?? \'\') === \'0.99.0\'',
+    '($modules[0][\'reviewed_source_version\'] ?? \'\') === \'1.2.38\'',
+    '($modules[9][\'reviewed_source_commit\'] ?? \'\') === \'58313a67e1d21ad17c9a066e9a29c34245a0763e\'',
+    '($modules[14][\'reviewed_source_version\'] ?? \'\') === \'1.4.2\'',
+    '($modules[24][\'reviewed_source_version\'] ?? \'\') === \'0.99.0\'',
     'MAX_INNER_TOTAL_BYTES',
     'Embedded manifest or dependency matrix differs from detached evidence.',
 ] as $marker) {
@@ -107,8 +108,8 @@ foreach ([
 $structure = $read('tools/verify-structure.php');
 foreach ([
     "FILE_00_MINIMUM_VERSION = '1.2.38'",
-    '(\$modules[14][\'reviewed_source_version\'] ?? \'\') === \'1.4.2\'',
-    '(\$modules[24][\'reviewed_source_version\'] ?? \'\') === \'0.99.0\'',
+    '($modules[14][\'reviewed_source_version\'] ?? \'\') === \'1.4.2\'',
+    '($modules[24][\'reviewed_source_version\'] ?? \'\') === \'0.99.0\'',
     'file24-current-assurance-contract',
 ] as $marker) {
     $check(str_contains($structure, $marker), 'Fourth-cycle structural verifier marker missing: ' . $marker);
