@@ -32,8 +32,10 @@ final class Native_Integration
     public const FILE_09_MAXIMUM_VERSION = '1.4.0';
     public const FILE_09_CONTRACT_VERSION = '1.1.0';
 
-    public const FILE_08_MINIMUM_VERSION = '0.2.1';
-    public const FILE_08_MAXIMUM_VERSION = '0.3.0';
+    /** Current File 08 runtime/contract family plus its bounded File 25 compatibility projection. */
+    public const FILE_08_MINIMUM_VERSION = '1.2.0';
+    public const FILE_08_MAXIMUM_VERSION = '1.3.0';
+    public const FILE_08_CANONICAL_CONTRACT = '1.1.0';
     public const FILE_08_PUBLIC_PROJECTION_CONTRACT = '1.0.0';
     public const FILE_18_MINIMUM_VERSION = '1.2.0-RC1';
     public const FILE_18_MAXIMUM_VERSION = '1.3.0';
@@ -225,12 +227,13 @@ final class Native_Integration
     {
         $contract = $this->clinic_contract();
         $detected = $contract !== [];
+        $runtime = defined('WCA_VERSION') ? (string) WCA_VERSION : (defined('SWC_VERSION') ? (string) SWC_VERSION : '');
 
         return $detected && self::strict_boolean_filter(apply_filters(
             'sabri_public_experience/dependency/clinic_projection',
             $detected,
-            defined('SWC_VERSION') ? (string) SWC_VERSION : '',
-            self::FILE_08_PUBLIC_PROJECTION_CONTRACT
+            $runtime,
+            self::FILE_08_CANONICAL_CONTRACT
         ));
     }
 
@@ -242,10 +245,12 @@ final class Native_Integration
         }
 
         $this->clinic_contract_cache = [];
-        if (! defined('SWC_VERSION')
-            || ! defined('SWC_PUBLIC_CLINIC_CONTRACT_VERSION')
-            || ! $this->version_in_range((string) SWC_VERSION, self::FILE_08_MINIMUM_VERSION, self::FILE_08_MAXIMUM_VERSION)
-            || ! hash_equals(self::FILE_08_PUBLIC_PROJECTION_CONTRACT, trim((string) SWC_PUBLIC_CLINIC_CONTRACT_VERSION))
+        $runtime = defined('WCA_VERSION') ? (string) WCA_VERSION : (defined('SWC_VERSION') ? (string) SWC_VERSION : '');
+        if ($runtime === ''
+            || ! $this->version_in_range($runtime, self::FILE_08_MINIMUM_VERSION, self::FILE_08_MAXIMUM_VERSION)
+            || ! class_exists('WCA_Contracts')
+            || ! defined('WCA_Contracts::PUBLIC_CLINIC_CONTRACT_VERSION')
+            || ! hash_equals(self::FILE_08_CANONICAL_CONTRACT, trim((string) constant('WCA_Contracts::PUBLIC_CLINIC_CONTRACT_VERSION')))
             || ! function_exists('swc_get_public_clinic_projection')
             || ! function_exists('swc_public_clinic_projection_contract')
         ) {
@@ -281,7 +286,9 @@ final class Native_Integration
         }
 
         return $this->clinic_contract_cache = [
-            'contract_version' => self::FILE_08_PUBLIC_PROJECTION_CONTRACT,
+            'canonical_contract_version' => self::FILE_08_CANONICAL_CONTRACT,
+            'compatibility_projection_contract_version' => self::FILE_08_PUBLIC_PROJECTION_CONTRACT,
+            'runtime_version' => $runtime,
             'owner' => 'file-08',
             'fields' => $required_fields,
             'excludes' => $excludes,
