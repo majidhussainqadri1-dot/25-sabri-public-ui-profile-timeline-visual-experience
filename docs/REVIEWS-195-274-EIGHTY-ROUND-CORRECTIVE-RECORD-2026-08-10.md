@@ -2,7 +2,7 @@
 
 Date: 2026-08-10
 
-This record documents the Founder-requested eighty consecutive source reviews after the Future Public Experience Superset was added. Each defect-bearing round was corrected before the next review lens was evaluated. Source/CI evidence remains distinct from Hostinger staging, Founder staging acceptance, production, live deployment, and operations.
+This record documents the Founder-requested eighty consecutive source reviews after the Future Public Experience Superset was added. Each defect-bearing round was corrected immediately as discovered. Source/CI evidence remains distinct from Hostinger staging, Founder staging acceptance, production, live deployment, and operations.
 
 ## Defect-bearing rounds — corrected
 
@@ -26,10 +26,11 @@ This record documents the Founder-requested eighty consecutive source reviews af
 - **212** — Low-data client mutation selected all page media, potentially touching File 20/other module DOM. Scoped mutations to `.spux-profile`.
 - **213** — Visual-integrity diagnostics scanned the whole document, crossing File 25 ownership. Scoped diagnostics to `.spux-profile`.
 - **214** — Future CSS used stale/non-canonical token aliases. Reconciled to canonical File 25 muted/radius/shadow tokens.
+- **274** — The final exact-head CI/release-truth gate correctly failed because the new eighty-round regression test asserted the File 20 stacking-owner marker using array-return syntax (`=>`) while the executable shell contract stores it by assignment (`=`). This was a QA-evidence defect, not a production shell-ownership regression. The assertion was corrected to match the executable source, the ledger was amended, and exact-head CI must pass before closure.
 
-## Reviews 215–274 — no new source defect found
+## Reviews 215–273 — no new source defect found
 
-The remaining sixty reviews independently rechecked public DTO leakage, public payload allow-lists, native action ownership, no-JS behavior, timeline-local navigation and era summaries, relationship/citation URL safety, browser-local preferences, session restoration, share/snapshot privacy, translation bounds, local visual diagnostics, native timestamps, owner/admin privacy preview, Component Laboratory capability gates, non-ranking Quality Score, Files 00/03/08/09/20/21/22/23/24/26 ownership boundaries, media/QR/URL/slug security, timeline author/provider identity and pagination, search normalization, public card allow-lists, provider maturity gates, foreign-SQL prohibitions, no-store/ETag behavior, Safe Mode, repair/migration scope, deterministic packaging, package traversal/symlink/size limits, governing-plan traceability, and truthful release-state separation.
+The fifty-nine clean reviews independently rechecked public DTO leakage, public payload allow-lists, native action ownership, no-JS behavior, timeline-local navigation and era summaries, relationship/citation URL safety, browser-local preferences, session restoration, share/snapshot privacy, translation bounds, local visual diagnostics, native timestamps, owner/admin privacy preview, Component Laboratory capability gates, non-ranking Quality Score, Files 00/03/08/09/20/21/22/23/24/26 ownership boundaries, media/QR/URL/slug security, timeline author/provider identity and pagination, search normalization, public card allow-lists, provider maturity gates, foreign-SQL prohibitions, no-store/ETag behavior, Safe Mode, repair/migration scope, deterministic packaging, package traversal/symlink/size limits, and governing-plan traceability.
 
 The machine-readable per-round ledger is:
 
