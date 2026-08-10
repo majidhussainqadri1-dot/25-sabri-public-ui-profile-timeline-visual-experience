@@ -13,5 +13,6 @@ done < <(find "$ROOT/tests" -maxdepth 1 -type f -name '*.php' \
 
 php "$ROOT/tools/verify-source-completion.php"
 php "$ROOT/tools/verify-structure.php"
+php "$ROOT/tools/verify-future-structure.php"
 php "$ROOT/tools/verify-file06-and-components.php"
 php "$ROOT/tools/verify-provider-metadata.php"
