@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "contract_version": "1.0.0",
+  "governing_file": 25,
+  "governing_addendum": "Future Public Experience Superset 2026 — 24 Enhancements",
+  "founder_approval_date": "2026-08-10",
+  "canonical_owner": "file-25",
+  "ownership_boundaries": {
+    "file-20": "structural-shell-navigation-layout",
+    "file-24": "security-privacy-compliance-resilience-governance",
+    "file-26": "global-search-discovery-ranking",
+    "file-03": "profile-master-data-and-contact-consent",
+    "file-00": "membership-identity-authority",
+    "file-09": "doctor-verification-decision",
+    "file-21": "publications-and-feed-native-state",
+    "file-22": "create-edit-draft-preview-submit",
+    "file-23": "private-publishing-operations"
+  },
+  "requirements": [
+    {"id":"F25-FUT-01","name":"Adaptive Public Experience Engine","presentation_owner":"file-25","scope":"container-responsive public components","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-02","name":"Profile Trust Capsule","presentation_owner":"file-25","scope":"presentation of native verification/freshness facts","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-03","name":"Public Provenance Badges","presentation_owner":"file-25","scope":"presentation of native provenance/correction states","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-04","name":"Timeline Time Navigator","presentation_owner":"file-25","scope":"profile-local year navigation only","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-05","name":"Timeline Era Summaries","presentation_owner":"file-25","scope":"public page-local/provider-supplied era summaries","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-06","name":"Knowledge Relationship Explorer","presentation_owner":"file-25","scope":"read-only relationship presentation from native providers","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-07","name":"Profile Reading Mode","presentation_owner":"file-25","scope":"browser-local visual preference","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-08","name":"Accessibility Personalization Layer","presentation_owner":"file-25","scope":"browser-local visual preference","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-09","name":"Low Data Mode","presentation_owner":"file-25","scope":"browser/network-hint presentation preference","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-10","name":"Progressive Enhancement and No-JS Excellence","presentation_owner":"file-25","scope":"server-first public content remains usable","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-11","name":"Instant Back Forward Restoration","presentation_owner":"file-25","scope":"session-only scroll restoration","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-12","name":"Elegant View Transitions","presentation_owner":"file-25","scope":"optional progressive visual transition","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-13","name":"Smart Action Sheet","presentation_owner":"file-25","scope":"mobile presentation of native actions","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-14","name":"Universal Profile Share Studio","presentation_owner":"file-25","scope":"tracking-free canonical share presentation","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-15","name":"Public Profile Snapshot Card","presentation_owner":"file-25","scope":"public-safe printable/shareable card","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-16","name":"Profile Translation Switcher","presentation_owner":"file-25","scope":"presentation of approved provider translations","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-17","name":"Bilingual Side by Side Reading","presentation_owner":"file-25","scope":"parallel presentation of approved translations","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-18","name":"Public Citation and Reference Drawer","presentation_owner":"file-25","scope":"read-only provider reference presentation","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-19","name":"Contextual Profile Mini Cards","presentation_owner":"file-25","scope":"public-safe reusable profile preview","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-20","name":"Profile Visual Integrity Monitor","presentation_owner":"file-25","scope":"local presentation diagnostics/event only","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-21","name":"Content Freshness UX","presentation_owner":"file-25","scope":"presentation of native freshness timestamps","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-22","name":"Privacy Preview Simulator","presentation_owner":"file-25","scope":"owner/admin presentation simulation only","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-23","name":"Visual State Component Laboratory","presentation_owner":"file-25","scope":"manage_options internal visual laboratory","source_status":"implemented-candidate"},
+    {"id":"F25-FUT-24","name":"Public Experience Quality Score","presentation_owner":"file-25","scope":"owner/admin quality aid; no ranking effect","source_status":"implemented-candidate"}
+  ],
+  "invariants": {
+    "duplicate_backend_allowed": false,
+    "raw_sensitive_data_allowed": false,
+    "raw_analytics_warehouse_allowed": false,
+    "third_party_tracking_qr_allowed": false,
+    "client_preferences_are_authorization": false,
+    "no_js_core_required": true,
+    "native_action_execution_required": true,
+    "quality_score_affects_public_ranking": false
+  },
+  "release_truth": {
+    "hostinger_staging_accepted": false,
+    "founder_staging_acceptance": false,
+    "live_deployed": false,
+    "operational": false
+  }
+}
