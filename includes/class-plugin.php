@@ -69,6 +69,7 @@ final class Plugin
         File_20_Integration::register();
         (new Forty_Round_Hardening())->register();
         (new Plan_Completion())->register();
+        Admin_Integration::register();
 
         $router = new Profile_Router();
         $file_24 = new File_24_Integration($router);
@@ -77,6 +78,7 @@ final class Plugin
         $native = new Native_Integration();
         $dependencies = new Dependency_Manager($native);
         $timeline_registry = new Timeline_Registry();
+        Component_API::bind_timeline_registry($timeline_registry);
         $section_registry = new Section_Registry();
         $staging_probe = new Staging_Probe($dependencies, $timeline_registry, $section_registry);
         (new System_Check($dependencies, $timeline_registry, $section_registry, $staging_probe, $file_24))->register();
