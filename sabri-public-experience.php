@@ -88,6 +88,7 @@ $spux_files = [
     'includes/class-visibility-policy.php',
     'includes/class-profile-data.php',
     'includes/class-timeline-registry.php',
+    'includes/class-component-api.php',
     'includes/class-timeline-service.php',
     'includes/class-section-registry.php',
     'includes/class-section-service.php',
@@ -106,6 +107,7 @@ $spux_files = [
     'includes/class-rest-controller.php',
     'includes/class-system-check.php',
     'includes/class-plan-completion.php',
+    'includes/class-admin-integration.php',
     'includes/class-forty-round-hardening.php',
     'includes/class-three-plan-corrections.php',
     'includes/class-central-plan-2026-corrections.php',
@@ -180,7 +182,25 @@ if (! function_exists('sabri_visual_experience_render_welcome')) {
 if (! function_exists('sabri_public_render_profile_card')) {
     function sabri_public_render_profile_card(array $profile = []): string
     {
-        return \Sabri\PublicExperience\Content_Cards::render(['type' => 'profile', 'profile' => $profile, 'title' => (string) ($profile['display_name'] ?? '')]);
+        $name = (string) ($profile['display_name'] ?? '');
+        $location = array_values(array_filter([
+            (string) ($profile['city'] ?? ''),
+            (string) ($profile['country'] ?? ''),
+        ], static fn (string $value): bool => trim($value) !== ''));
+
+        return \Sabri\PublicExperience\Content_Cards::render([
+            'type' => 'profile',
+            'title' => $name,
+            'url' => (string) ($profile['canonical_url'] ?? ''),
+            'excerpt' => (string) ($profile['headline'] ?? $profile['bio'] ?? ''),
+            'image_url' => (string) ($profile['avatar_url'] ?? ''),
+            'image_alt' => $name !== '' ? sprintf(__('%s profile photograph', 'sabri-public-experience'), $name) : '',
+            'badge' => (string) ($profile['role_label'] ?? ''),
+            'badge_tone' => ($profile['verified'] ?? null) === true ? 'verified' : 'neutral',
+            'meta' => $location,
+            'action_label' => __('View profile', 'sabri-public-experience'),
+            'compact' => ! empty($profile['compact']),
+        ]);
     }
 }
 
@@ -215,14 +235,14 @@ if (! function_exists('sabri_public_render_author_header')) {
 if (! function_exists('sabri_public_register_timeline_provider')) {
     function sabri_public_register_timeline_provider($provider): void
     {
-        do_action('sabri_public_experience/external_timeline_provider', $provider);
+        \Sabri\PublicExperience\Component_API::register_timeline_provider($provider);
     }
 }
 
 if (! function_exists('sabri_public_register_card_variant')) {
     function sabri_public_register_card_variant(string $variant, callable $renderer): void
     {
-        do_action('sabri_public_experience/register_card_variant', sanitize_key($variant), $renderer);
+        \Sabri\PublicExperience\Component_API::register_card_variant($variant, $renderer);
     }
 }
 
