@@ -23,7 +23,7 @@ $check(is_string($completionRaw), 'Review 182: completion matrix must be readabl
 if (is_string($plugin)) {
     $check(str_contains($plugin, "'includes/class-central-plan-2026-corrections.php'"), 'Review 180: latest correction class must be loaded by the plugin.');
     $check(str_contains($plugin, 'Central_Plan_2026_Corrections::register();'), 'Review 180: latest correction class must be registered.');
-    $check(str_contains($plugin, "apply_filters('sabri_visual_experience/contract', $contract)"), 'Review 180: public visual contract must expose the final governed filter chain.');
+    $check(str_contains($plugin, "apply_filters('sabri_visual_experience/contract', \$contract)"), 'Review 180: public visual contract must expose the final governed filter chain.');
 }
 
 if (is_string($central)) {
