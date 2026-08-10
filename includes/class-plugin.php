@@ -70,6 +70,7 @@ final class Plugin
         (new Forty_Round_Hardening())->register();
         (new Plan_Completion())->register();
         Admin_Integration::register();
+        Component_API::register();
 
         $router = new Profile_Router();
         $file_24 = new File_24_Integration($router);
