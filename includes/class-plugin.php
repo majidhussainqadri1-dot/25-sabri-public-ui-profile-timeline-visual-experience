@@ -88,6 +88,7 @@ final class Plugin
 
         (new Upgrade_Manager())->register();
         (new Design_System())->register();
+        (new Future_Public_Experience())->register();
         (new Assets($router))->register();
         do_action('sabri_visual_experience/design_system_booted', Design_System::contract());
 
