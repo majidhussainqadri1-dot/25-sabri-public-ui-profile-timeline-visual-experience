@@ -66,6 +66,7 @@ final class Plugin
         Safe_Mode::begin('bootstrap');
 
         load_plugin_textdomain('sabri-public-experience', false, dirname(plugin_basename(SABRI_PUBLIC_EXPERIENCE_FILE)) . '/languages');
+        File_20_Integration::register();
         (new Forty_Round_Hardening())->register();
         (new Plan_Completion())->register();
 
