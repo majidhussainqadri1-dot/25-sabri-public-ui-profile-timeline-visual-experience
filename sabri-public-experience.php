@@ -112,6 +112,7 @@ $spux_files = [
     'includes/class-three-plan-corrections.php',
     'includes/class-central-plan-2026-corrections.php',
     'includes/class-future-public-experience.php',
+    'includes/class-current-companion-2026-08-10.php',
     'includes/class-plugin.php',
 ];
 
@@ -126,6 +127,7 @@ try {
     }
     \Sabri\PublicExperience\Three_Plan_Corrections::register();
     \Sabri\PublicExperience\Central_Plan_2026_Corrections::register();
+    \Sabri\PublicExperience\Current_Companion_2026_08_10::register();
     \Sabri\PublicExperience\Safe_Mode::end();
 } catch (Throwable $exception) {
     \Sabri\PublicExperience\Safe_Mode::enable('file-loading-exception', $exception);
