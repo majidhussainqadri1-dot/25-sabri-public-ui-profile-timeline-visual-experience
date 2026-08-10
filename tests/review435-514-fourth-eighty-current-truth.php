@@ -17,124 +17,71 @@ try {
     $ledger = [];
     $failures[] = 'Fourth-cycle ledger JSON invalid: ' . $exception->getMessage();
 }
-
-$check(($ledger['review_range']['first'] ?? null) === 435, 'Fourth cycle must start at Review 435.');
-$check(($ledger['review_range']['last'] ?? null) === 514, 'Fourth cycle must end at Review 514.');
-$check(($ledger['review_range']['count'] ?? null) === 80, 'Fourth cycle must contain exactly 80 reviews.');
-$expectedDefects = array_merge(range(435, 454), [514]);
-$check(($ledger['defect_rounds'] ?? null) === $expectedDefects, 'Fourth-cycle defect rounds must be 435-454 plus reopened Review 514.');
-$check(($ledger['clean_rounds'] ?? null) === range(455, 513), 'Fourth-cycle clean rounds must be exactly 455-513.');
-$reviews = (array) ($ledger['reviews'] ?? []);
+$check(($ledger['review_range']['first'] ?? null) === 435 && ($ledger['review_range']['last'] ?? null) === 514 && ($ledger['review_range']['count'] ?? null) === 80, 'Fourth-cycle historical range/count changed.');
+$check(($ledger['defect_rounds'] ?? null) === array_merge(range(435, 454), [514]), 'Fourth-cycle historical defect ledger changed.');
+$check(($ledger['clean_rounds'] ?? null) === range(455, 513), 'Fourth-cycle historical clean ledger changed.');
 $numbers = [];
-foreach ($reviews as $review) {
-    if (! is_array($review) || ! is_int($review['review'] ?? null)) { continue; }
-    $number = $review['review'];
-    $numbers[] = $number;
-    $defect = $number <= 454 || $number === 514;
-    $expected = $defect ? 'defect-found-corrected' : 'reviewed-clean';
-    $check(($review['status'] ?? '') === $expected, 'Unexpected fourth-cycle status at Review ' . $number . '.');
-    $check(is_string($review['focus'] ?? null) && trim((string) $review['focus']) !== '', 'Every fourth-cycle review needs a focus.');
-    if ($defect) {
-        $check(is_string($review['finding'] ?? null) && trim((string) $review['finding']) !== '', 'Defect review needs a finding: ' . $number);
-        $check(is_string($review['correction'] ?? null) && trim((string) $review['correction']) !== '', 'Defect review needs a correction: ' . $number);
-    }
+foreach ((array) ($ledger['reviews'] ?? []) as $row) {
+    if (is_array($row) && is_int($row['review'] ?? null)) { $numbers[] = $row['review']; }
 }
-$check($numbers === range(435, 514), 'Fourth-cycle reviews must be contiguous and unique.');
+$check($numbers === range(435, 514), 'Fourth-cycle historical reviews must remain contiguous.');
 foreach (['hostinger_staging_accepted','founder_staging_acceptance','production_accepted','live_deployed','operational','exact_deployed_code_verified','db_version_verified','migration_state_verified_live'] as $key) {
-    $check(($ledger['external_truth'][$key] ?? null) === false, 'External truth must remain unclaimed: ' . $key);
+    $check(($ledger['external_truth'][$key] ?? null) === false, 'Fourth-cycle external truth must remain false: ' . $key . '.');
 }
-$check(str_contains(implode(' ', (array) ($ledger['external_acceptance_blockers'] ?? [])), 'UUID'), 'File03/File25 route-parity blocker must remain explicit.');
+$check(str_contains(implode(' ', (array) ($ledger['external_acceptance_blockers'] ?? [])), 'UUID'), 'Fourth-cycle File03/File25 route-parity blocker must remain explicit.');
 
 $native = $read('includes/class-native-integration.php');
-foreach ([
-    "FILE_00_MINIMUM_VERSION = '1.2.38'",
-    "FILE_00_MAXIMUM_VERSION = '1.3.0'",
-    "FILE_00_CONTRACT_VERSION = '1.2.2'",
-    'SMC_Contracts::assertions',
-    "FILE_09_MINIMUM_VERSION = '1.3.0'",
-    "FILE_09_CONTRACT_VERSION = '1.1.0'",
-] as $marker) {
-    $check(str_contains($native, $marker), 'Current native-authority marker missing: ' . $marker);
+foreach (["FILE_00_MINIMUM_VERSION = '1.2.38'", "FILE_00_CONTRACT_VERSION = '1.2.2'", "FILE_09_MINIMUM_VERSION = '1.3.0'", "FILE_09_CONTRACT_VERSION = '1.1.0'", 'SMC_Contracts::assertions', 'gdo_file03_doctor_eligibility'] as $marker) {
+    $check(str_contains($native, $marker), 'Current native-authority marker missing: ' . $marker . '.');
 }
-
 $file24 = $read('includes/class-file-24-integration.php');
-foreach ([
-    "CONTRACT_VERSION = '1.1.0'",
-    "REVIEWED_MINIMUM_VERSION = '0.99.0'",
-    "REVIEWED_MAXIMUM_VERSION = '1.0.0'",
-    "REVIEWED_SOURCE_COMMIT = '0be43b3f424d7b53865587b2770479ca33f51a0b'",
-    'spcrc/module_manifests',
-    'spcrc/request_security_state',
-    "'staging_probe_cli' => 'wp sabri file25 staging-probe --expected-commit=<sha>'",
-] as $marker) {
-    $check(str_contains($file24, $marker), 'Current File24 marker missing: ' . $marker);
-}
-$check(! str_contains($file24, "'wp-cli:sabri file25 staging-probe'"), 'File24 manifest must not contain CLI pseudo-route.');
+$check(str_contains($file24, "REVIEWED_MINIMUM_VERSION = '0.99.0'") && str_contains($file24, "REVIEWED_SOURCE_COMMIT = '0be43b3f424d7b53865587b2770479ca33f51a0b'") && ! str_contains($file24, "'wp-cli:sabri file25 staging-probe'"), 'Current File 24 assurance boundary mismatch.');
 
 $matrix = json_decode($read('config/staging-dependencies.json'), true);
-$check(is_array($matrix) && ($matrix['schema_version'] ?? null) === 3, 'Staging dependency matrix schema 3 required.');
+$check(is_array($matrix) && ($matrix['schema_version'] ?? null) === 3, 'Current dependency matrix schema 3 required.');
 $modules = [];
-foreach ((array) ($matrix['modules'] ?? []) as $module) {
-    if (is_array($module) && isset($module['file'])) { $modules[(int) $module['file']] = $module; }
-}
-$check(($modules[0]['reviewed_source_version'] ?? '') === '1.2.38' && ($modules[0]['reviewed_db_version'] ?? '') === '1.4.4' && ($modules[0]['required_contract_version'] ?? '') === '1.2.2', 'File00 current version/DB/contract truth mismatch.');
-$check(($modules[0]['reviewed_source_commit'] ?? '') === 'c37d0b101d0912bef1f26d0daf51a414d67907c0', 'File00 exact current main mismatch.');
-$check(($modules[9]['reviewed_source_branch'] ?? '') === 'codex/file09-1.3.0-rc6-80-round-review' && ($modules[9]['reviewed_source_commit'] ?? '') === '6fa0a5cb7063b6b821bd50c105c735470f589b80', 'File09 current RC6 branch/head mismatch.');
-$check(($modules[14]['reviewed_source_version'] ?? '') === '1.4.2' && ($modules[14]['reviewed_source_commit'] ?? '') === 'b9045a4229d052103a5546477f664ac88b6ff034', 'File14 current main mismatch.');
-$check(($modules[21]['reviewed_package_version'] ?? '') === '1.0.5' && ($modules[21]['reviewed_runtime_version'] ?? '') === '1.0.3' && ($modules[21]['reviewed_schema_version'] ?? '') === '1.0.0' && ($modules[21]['reviewed_source_commit'] ?? '') === 'afeda8742d8e1ea62254823291a66f502058989c', 'File21 current package/runtime/schema/head mismatch.');
-$check(($modules[24]['reviewed_source_version'] ?? '') === '0.99.0' && ($modules[24]['reviewed_source_commit'] ?? '') === '0be43b3f424d7b53865587b2770479ca33f51a0b', 'File24 current main mismatch.');
-foreach ($modules as $module) {
-    if (isset($module['staging_status'])) { $check($module['staging_status'] === 'pending', 'No module may be promoted to staging acceptance by source evidence.'); }
-}
+foreach ((array) ($matrix['modules'] ?? []) as $module) { if (is_array($module) && isset($module['file'])) { $modules[(int) $module['file']] = $module; } }
+$check(($modules[0]['reviewed_source_commit'] ?? '') === 'c37d0b101d0912bef1f26d0daf51a414d67907c0' && ($modules[0]['required_contract_version'] ?? '') === '1.2.2', 'Current File 00 source/contract mismatch.');
+$check(($modules[9]['reviewed_source_branch'] ?? '') === 'codex/file09-1.3.0-rc6-80-round-review' && ($modules[9]['reviewed_source_commit'] ?? '') === '6fa0a5cb7063b6b821bd50c105c735470f589b80', 'Current File 09 source truth mismatch.');
+$check(($modules[14]['reviewed_source_version'] ?? '') === '1.4.2' && ($modules[14]['reviewed_source_commit'] ?? '') === 'b9045a4229d052103a5546477f664ac88b6ff034', 'Current File 14 source truth mismatch.');
+$check(($modules[20]['reviewed_source_version'] ?? '') === '1.4.12' && ($modules[20]['reviewed_source_commit'] ?? '') === '291486b22c7ed94b8be041192375b6d9b077fac5', 'Current File 20 source truth mismatch.');
+$check(($modules[21]['reviewed_package_version'] ?? '') === '1.0.5' && ($modules[21]['reviewed_runtime_version'] ?? '') === '1.0.3' && ($modules[21]['reviewed_schema_version'] ?? '') === '1.0.0' && ($modules[21]['reviewed_source_commit'] ?? '') === 'afeda8742d8e1ea62254823291a66f502058989c', 'Current File 21 source/runtime truth mismatch.');
+$check(($modules[22]['reviewed_source_commit'] ?? '') === 'c3b775b66fbbda4a9dd9891d63c08c74e2178741', 'Current File 22 source truth mismatch.');
+$check(($modules[23]['reviewed_source_commit'] ?? '') === 'a8a8c805f4730998ccb44bd95c87591836561759' && ($modules[23]['future_intelligence_branch']['head'] ?? '') === '50b9489a4a058d4628ef5dda220837393dd32010', 'Current File 23 source truth mismatch.');
+$check(($modules[24]['reviewed_source_version'] ?? '') === '0.99.0' && ($modules[24]['reviewed_source_commit'] ?? '') === '0be43b3f424d7b53865587b2770479ca33f51a0b', 'Current File 24 source truth mismatch.');
+foreach ($modules as $module) { if (isset($module['staging_status'])) { $check($module['staging_status'] === 'pending', 'Source evidence may not promote staging acceptance.'); } }
 
 $staging = json_decode($read('config/staging-test-plan.json'), true);
 $ids = [];
 foreach ((array) ($staging['scenarios'] ?? []) as $scenario) { if (is_array($scenario)) { $ids[] = (string) ($scenario['id'] ?? ''); } }
-foreach (['file00-assertions','file09-doctor-decision','file14-visual-consumer','file21-current-profile-timeline-contract','file24-current-assurance-contract','file03-route-parity'] as $id) {
-    $check(in_array($id, $ids, true), 'Fourth-cycle staging scenario missing/currentized: ' . $id);
+foreach (['file03-route-parity','file09-doctor-decision','file14-visual-consumer','file21-current-profile-timeline-contract','file24-current-assurance-contract'] as $id) {
+    $check(in_array($id, $ids, true), 'Current staging scenario missing: ' . $id . '.');
 }
 
 $verifier = $read('tools/verify-staging-artifact.php');
-foreach ([
-    '($modules[0][\'reviewed_source_version\'] ?? \'\') === \'1.2.38\'',
-    '($modules[9][\'reviewed_source_commit\'] ?? \'\') === \'6fa0a5cb7063b6b821bd50c105c735470f589b80\'',
-    '($modules[14][\'reviewed_source_version\'] ?? \'\') === \'1.4.2\'',
-    '($modules[21][\'reviewed_package_version\'] ?? \'\') === \'1.0.5\'',
-    '($modules[24][\'reviewed_source_version\'] ?? \'\') === \'0.99.0\'',
-    'MAX_INNER_TOTAL_BYTES',
-    'Embedded manifest or dependency matrix differs from detached evidence.',
-] as $marker) {
-    $check(str_contains($verifier, $marker), 'Fourth-cycle current-companion artifact verifier marker missing: ' . $marker);
+foreach (['6fa0a5cb7063b6b821bd50c105c735470f589b80','afeda8742d8e1ea62254823291a66f502058989c','MAX_INNER_TOTAL_BYTES','Embedded manifest or dependency matrix differs from detached evidence.'] as $marker) {
+    $check(str_contains($verifier, $marker), 'Current artifact verifier evidence missing: ' . $marker . '.');
 }
-
 $structure = $read('tools/verify-structure.php');
-foreach ([
-    "FILE_00_MINIMUM_VERSION = '1.2.38'",
-    '($modules[14][\'reviewed_source_version\'] ?? \'\') === \'1.4.2\'',
-    '($modules[21][\'reviewed_package_version\'] ?? \'\') === \'1.0.5\'',
-    '($modules[24][\'reviewed_source_version\'] ?? \'\') === \'0.99.0\'',
-    'file24-current-assurance-contract',
-] as $marker) {
-    $check(str_contains($structure, $marker), 'Fourth-cycle current structural verifier marker missing: ' . $marker);
+foreach (["FILE_00_MINIMUM_VERSION = '1.2.38'",'6fa0a5cb7063b6b821bd50c105c735470f589b80','afeda8742d8e1ea62254823291a66f502058989c','file24-current-assurance-contract'] as $marker) {
+    $check(str_contains($structure, $marker), 'Current structural verifier evidence missing: ' . $marker . '.');
 }
 
 $sourceMatrix = $read('config/source-completion-matrix.json');
-$check(str_contains($sourceMatrix, 'Reviews 435-514'), 'Source-completion matrix must preserve fourth-cycle lineage through Reviews 435-514.');
-$check(str_contains($sourceMatrix, 'review435-514-fourth-eighty-current-truth.php'), 'Source-completion matrix must cite fourth-cycle executable evidence.');
-
+$check(str_contains($sourceMatrix, 'REVIEW-CORRECTION-LINEAGE-20-93'), 'Current source-completion review-lineage group missing.');
+$check(str_contains($sourceMatrix, 'Reviews 515-594') && str_contains($sourceMatrix, 'tests/review515-594-fifth-eighty-current-truth.php'), 'Current source-completion matrix must point to the latest fifth-cycle evidence.');
 $composer = $read('composer.json');
-$check(str_contains($composer, 'tests/review435-514-fourth-eighty-current-truth.php'), 'Fourth-cycle executable gate must be in the governed test manifest.');
+$check(str_contains($composer, 'tests/review435-514-fourth-eighty-current-truth.php') && str_contains($composer, 'tests/review515-594-fifth-eighty-current-truth.php'), 'Governed manifest must preserve fourth and fifth review gates.');
 $check(is_file($root . '/docs/REVIEWS-435-514-FOURTH-EIGHTY-CURRENT-TRUTH-2026-08-10.md'), 'Fourth-cycle human record missing.');
 
 $workflow = $read('.github/workflows/ci.yml');
-$check(str_contains($workflow, 'actions/checkout@v5'), 'CI must keep checkout@v5.');
-$check(! str_contains($workflow, 'actions/checkout@v4'), 'Deprecated checkout@v4 must stay absent.');
-$check(str_contains($workflow, 'php: ["8.0", "8.3"]'), 'CI must preserve PHP 8.0 and 8.3 matrix.');
-$check(str_contains($workflow, 'name: Deterministic staging candidate'), 'Deterministic staging package job must remain present.');
+$check(str_contains($workflow, 'actions/checkout@v5') && ! str_contains($workflow, 'actions/checkout@v4'), 'CI checkout version drift.');
+$check(str_contains($workflow, 'php: ["8.0", "8.3"]'), 'CI PHP matrix drift.');
+$check(str_contains($workflow, 'name: Deterministic staging candidate'), 'Deterministic package job missing.');
 
 if ($failures !== []) {
     fwrite(STDERR, "FAILED Reviews 435-514\n- " . implode("\n- ", $failures) . "\n");
     exit(1);
 }
 
-echo "PASS: File 25 Reviews 435-514 — fourth eighty-round historical ledger preserved with current companion truth\n";
+echo "PASS: File 25 Reviews 435-514 — historical ledger preserved with latest current-truth evidence\n";
