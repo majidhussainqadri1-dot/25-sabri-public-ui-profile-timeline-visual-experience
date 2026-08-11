@@ -1,0 +1,209 @@
+.spux-breadcrumbs {
+    color: var(--spux-muted);
+    font-size: 0.9rem;
+    margin-block: 0 0.85rem;
+}
+
+.spux-breadcrumbs ol {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.spux-breadcrumbs li {
+    align-items: center;
+    display: inline-flex;
+    min-width: 0;
+}
+
+.spux-breadcrumbs li:not(:last-child)::after {
+    content: "/";
+    margin-inline-start: 0.35rem;
+}
+
+.spux-breadcrumbs a {
+    color: var(--spux-primary-strong);
+    overflow-wrap: anywhere;
+    text-underline-offset: 0.15em;
+}
+
+.spux-breadcrumbs a:focus-visible {
+    outline: 3px solid var(--spux-focus);
+    outline-offset: 2px;
+}
+
+.spux-breadcrumbs [aria-current="page"] {
+    color: var(--spux-text);
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.spux-section-stack {
+    display: grid;
+    gap: var(--spux-layout-gap, 1rem);
+}
+
+.spux-card-grid {
+    display: grid;
+    gap: var(--spux-layout-gap, 1rem);
+}
+
+.spux-card-grid--two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.spux-card--lead {
+    border-block-start: 0.3rem solid var(--spux-primary);
+}
+
+.spux-eyebrow {
+    color: var(--spux-primary-strong);
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    margin: 0 0 0.35rem;
+    text-transform: uppercase;
+}
+
+.spux-lead {
+    font-size: clamp(1.05rem, 2vw, 1.25rem);
+    line-height: 1.7;
+}
+
+.spux-card__heading-row {
+    align-items: start;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: space-between;
+}
+
+.spux-card__heading-row h3 {
+    margin-block-start: 0;
+}
+
+.spux-text-link {
+    color: var(--spux-primary-strong);
+    font-weight: 750;
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.18em;
+}
+
+.spux-text-link:focus-visible {
+    outline: 3px solid var(--spux-focus);
+    outline-offset: 3px;
+}
+
+.spux-filter-bar {
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    margin-block: 0 1rem;
+    max-width: 100%;
+    overflow-x: auto;
+    padding: 0.25rem 0.15rem 0.5rem;
+    scrollbar-width: thin;
+}
+
+.spux-filter-bar__item {
+    background: var(--spux-surface);
+    border: 1px solid var(--spux-border);
+    border-radius: 999px;
+    color: var(--spux-text);
+    flex: 0 0 auto;
+    font-weight: 750;
+    min-height: 2.75rem;
+    padding: 0.65rem 1rem;
+    text-decoration: none;
+}
+
+.spux-filter-bar__item:hover,
+.spux-filter-bar__item.is-active {
+    background: var(--spux-primary-soft);
+    border-color: var(--spux-primary);
+    color: var(--spux-primary-strong);
+}
+
+.spux-filter-bar__item:focus-visible {
+    outline: 3px solid var(--spux-focus);
+    outline-offset: 2px;
+}
+
+.spux-publication-list {
+    display: grid;
+    gap: 0.65rem;
+    margin-block: 0.75rem 0;
+    padding-inline-start: 1.35rem;
+}
+
+.spux-publication-list li::marker {
+    color: var(--spux-primary-strong);
+    font-weight: 800;
+}
+
+.spux-definition-grid {
+    display: grid;
+    gap: 0;
+    margin: 0;
+}
+
+.spux-definition-grid > div {
+    border-block-start: 1px solid var(--spux-border);
+    display: grid;
+    gap: 0.4rem 1rem;
+    grid-template-columns: minmax(8rem, 0.4fr) minmax(0, 1fr);
+    padding-block: 0.8rem;
+}
+
+.spux-definition-grid > div:first-child {
+    border-block-start: 0;
+}
+
+.spux-definition-grid dt {
+    color: var(--spux-muted);
+    font-weight: 750;
+}
+
+.spux-definition-grid dd {
+    margin: 0;
+}
+
+.spux-notice--trust {
+    border-inline-start: 0.3rem solid var(--spux-primary);
+}
+
+.spux-notice--danger {
+    border-inline-start: 0.3rem solid var(--spux-danger);
+}
+
+.spux-notice strong + p {
+    margin-block: 0.35rem 0;
+}
+
+body.spux-shell-connected .spux-profile {
+    padding-block-start: max(1rem, calc(var(--spux-layout-gap, 1.5rem) * 0.75));
+}
+
+@media (max-width: 48rem) {
+    .spux-card-grid--two {
+        grid-template-columns: 1fr;
+    }
+
+    .spux-definition-grid > div {
+        grid-template-columns: 1fr;
+    }
+
+    .spux-eyebrow {
+        letter-spacing: 0.02em;
+    }
+}
+
+@media (forced-colors: active) {
+    .spux-breadcrumbs a:focus-visible {
+        outline-color: CanvasText;
+    }
+}

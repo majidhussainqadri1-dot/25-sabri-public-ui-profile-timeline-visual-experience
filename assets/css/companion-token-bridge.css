@@ -1,0 +1,37 @@
+/*
+ * File 25 companion token bridge.
+ *
+ * Current companion modules still consume the platform-level `--sabri-*` and
+ * `--sabri-color-*` aliases. File 25 remains the sole visual-token owner: these
+ * aliases point one-way to canonical `--sabri-visual-*` values and never import
+ * competing visual truth from File 20 or another module.
+ */
+:root {
+    --sabri-primary: var(--sabri-visual-primary);
+    --sabri-primary-strong: var(--sabri-visual-primary-strong);
+    --sabri-primary-soft: var(--sabri-visual-primary-soft);
+    --sabri-color-primary: var(--sabri-visual-primary);
+    --sabri-color-primary-strong: var(--sabri-visual-primary-strong);
+    --sabri-color-primary-soft: var(--sabri-visual-primary-soft);
+    --sabri-on-primary: var(--sabri-visual-on-primary);
+    --sabri-text: var(--sabri-visual-text);
+    --sabri-muted: var(--sabri-visual-muted);
+    --sabri-surface: var(--sabri-visual-surface);
+    --sabri-page: var(--sabri-visual-page);
+    --sabri-border: var(--sabri-visual-border);
+    --sabri-focus: var(--sabri-visual-focus);
+    --sabri-success: var(--sabri-visual-success);
+    --sabri-warning: var(--sabri-visual-warning);
+    --sabri-danger: var(--sabri-visual-danger);
+    --sabri-radius: var(--sabri-visual-radius-card);
+    --sabri-radius-control: var(--sabri-visual-radius-control);
+    --sabri-shadow-1: var(--sabri-visual-shadow-1);
+    --sabri-shadow-2: var(--sabri-visual-shadow-2);
+    --sabri-space-1: var(--sabri-visual-space-1);
+    --sabri-space-2: var(--sabri-visual-space-2);
+    --sabri-space-3: var(--sabri-visual-space-3);
+    --sabri-space-4: var(--sabri-visual-space-4);
+    --sabri-space-5: var(--sabri-visual-space-5);
+    --sabri-space-6: var(--sabri-visual-space-6);
+    --sabri-space-7: var(--sabri-visual-space-7);
+}
