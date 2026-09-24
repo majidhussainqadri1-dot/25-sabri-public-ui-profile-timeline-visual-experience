@@ -1,0 +1,179 @@
+{
+  "schema_version": 2,
+  "file": 25,
+  "runtime_version": "0.14.0",
+  "governing_sources": {
+    "platform_master_plan": "Sabri Social Homeopathy Platform Definitive Master Plan 2026 v3.0",
+    "file_20_plan": "File 20 Harmonized Master Plan 2026 v4.1",
+    "file_25_plan": "Complete Public UI, Profile Timeline and Visual Experience — Final Harmonized Specification"
+  },
+  "purpose": "Exact multi-plugin staging candidate matrix. It records reviewed source expectations and mandatory ownership boundaries; it does not claim Hostinger staging, production, merge or Founder acceptance.",
+  "environment": {
+    "wordpress_minimum": "6.5",
+    "php_minimum": "8.0",
+    "target_site": "https://sabrisocialstaging.sabrihomeopathy.com/",
+    "live_changes_allowed": false,
+    "registration_disabled_required": true,
+    "search_indexing_disabled_required": true
+  },
+  "modules": [
+    {
+      "file": 0,
+      "name": "Sabri Membership Core",
+      "role": "hard runtime authority for identity, membership state, Founder identity, suspension, eligibility, guardian policy and public-profile authorization",
+      "reviewed_package_version": "1.2.4",
+      "accepted_source_range": ">=1.2.4 <1.3.0",
+      "required_contract_version": "1.1.2",
+      "required_symbols": ["SMC_VERSION", "SMC_CONTRACT_VERSION", "SMC_Contracts::assertions", "smc_founder_user_id", "smc_is_founder"],
+      "foreign_table_reads_allowed": false,
+      "bundled_with_file_25": false,
+      "staging_status": "pending"
+    },
+    {
+      "file": 3,
+      "name": "Sabri Profiles and Doctors",
+      "role": "profile master data, local profile media and explicit public-contact consent",
+      "reviewed_package_version": "0.2.0",
+      "accepted_source_range": ">=0.2.0 <0.3.0",
+      "required_symbols": ["SPD_VERSION", "SPD_Helpers", "SPD_Helpers::get", "SPD_Helpers::can_show_contact"],
+      "bundled_with_file_25": false,
+      "staging_status": "pending"
+    },
+    {
+      "file": 6,
+      "name": "Homeopathy Encyclopedia",
+      "role": "canonical Knowledge content owner",
+      "reviewed_package_version": "0.1.0",
+      "accepted_source_range": ">=0.1.0 <0.2.0",
+      "required_symbols": ["HE_VERSION", "HE_Content"],
+      "bundled_with_file_25": false,
+      "staging_status": "pending"
+    },
+    {
+      "file": 8,
+      "name": "Worldwide Clinic and Appointments",
+      "role": "canonical clinic, availability and appointment truth; File 25 consumes only the versioned owner-executed public clinic projection",
+      "reviewed_package_version": "0.2.1",
+      "reviewed_source_version": "0.2.1",
+      "accepted_source_range": ">=0.2.1 <0.3.0",
+      "required_public_contract_version": "1.0.0",
+      "required_symbols": ["SWC_VERSION", "SWC_PUBLIC_CLINIC_CONTRACT_VERSION", "swc_get_public_clinic_projection", "swc_public_clinic_projection_contract"],
+      "reviewed_source_commit": "bd6a10b693991fc518788ef8e3cba49531454821",
+      "reviewed_candidate_sha256": "36ce0c78aa51396b02bd0705021e66782bfc45b74636ac65b0826bd372103578",
+      "reviewed_ci_run": "Corrective Quality #64 / 30744250320",
+      "contract_status": "implemented-and-ci-verified-pending-hostinger-staging",
+      "foreign_table_reads_allowed": false,
+      "bundled_with_file_25": false,
+      "staging_status": "pending"
+    },
+    {
+      "file": 9,
+      "name": "Global Doctor Onboarding and Verification",
+      "role": "canonical doctor verification decision and immutable approved professional snapshot",
+      "reviewed_source_version": "1.1.0",
+      "accepted_source_range": ">=1.1.0 <1.2.0",
+      "required_symbols": ["GDO_VERSION", "gdo_get_verification_decision", "gdo_get_approved_snapshot", "gdo_user_is_verified"],
+      "source_lifecycle": "draft-corrective-candidate-pending-staging",
+      "foreign_table_reads_allowed": false,
+      "bundled_with_file_25": false,
+      "staging_status": "pending"
+    },
+    {
+      "file": 10,
+      "name": "Video Wall and Educational Broadcasting",
+      "role": "canonical video and live-broadcasting owner",
+      "reviewed_package_version": "0.1.0",
+      "accepted_source_range": ">=0.1.0 <0.2.0",
+      "required_symbols": ["SVW_VERSION", "SVW_Helpers"],
+      "bundled_with_file_25": false,
+      "staging_status": "pending"
+    },
+    {
+      "file": 11,
+      "name": "Reels and Short Video Discovery",
+      "role": "canonical Reel policy and discovery owner over File 10 video objects",
+      "reviewed_package_version": "0.1.0",
+      "accepted_source_range": ">=0.1.0 <0.2.0",
+      "required_symbols": ["SRL_VERSION", "SVW_VERSION", "SVW_Helpers"],
+      "bundled_with_file_25": false,
+      "staging_status": "pending"
+    },
+    {
+      "file": 12,
+      "name": "PDF Library and Digital Reading",
+      "role": "canonical documents, encryption, reading and download owner",
+      "reviewed_package_version": "0.1.0",
+      "accepted_source_range": ">=0.1.0 <0.2.0",
+      "required_symbols": ["SPL_VERSION", "SPL_Helpers"],
+      "bundled_with_file_25": false,
+      "staging_status": "pending"
+    },
+    {
+      "file": 18,
+      "name": "Sabri Marketplace",
+      "role": "canonical seller, listing, moderation, contact, offer and direct-deal owner; File 25 consumes owner-executed public DTOs only",
+      "reviewed_source_version": "1.2.0-RC1",
+      "accepted_source_range": ">=1.2.0-RC1 <1.3.0",
+      "required_symbols": ["SMP_VERSION", "smp_get_public_profile_listings or SMP_Utils::current_seller + SMP_REST::products", "SMP_Activator::marketplace_url"],
+      "transitional_adapter": "bounded-first-page-owner-api",
+      "foreign_table_reads_allowed": false,
+      "bundled_with_file_25": false,
+      "staging_status": "pending"
+    },
+    {
+      "file": 20,
+      "name": "Sabri Unified Application Shell",
+      "role": "sole global shell, navigation, route, sidebar, drawer and structural layout owner; File 25 owns visual tokens and visual regression",
+      "reviewed_source_version": "1.2.0",
+      "governing_plan_version": "4.1",
+      "accepted_source_range": ">=1.2.0 <1.3.0",
+      "required_symbols": ["SABRI_SHELL_VERSION"],
+      "bundled_with_file_25": false,
+      "staging_status": "pending"
+    },
+    {
+      "file": 21,
+      "name": "Home and News Feed",
+      "role": "canonical Home, News, publication, interaction, moderation and timeline owner",
+      "reviewed_source_range": ">=1.0.3 <2.0.0",
+      "required_symbols": ["SABRI_HNF_VERSION", "sabri_hnf_bootstrap", "Sabri\\HomeNewsFeed\\ProfileTimeline"],
+      "exact_staging_package": "pending",
+      "bundled_with_file_25": false,
+      "staging_status": "pending"
+    },
+    {
+      "file": 24,
+      "name": "Platform Security, Privacy, Compliance and Resilience Center",
+      "role": "canonical security governance, privacy orchestration, audit evidence, incidents, findings and resilience owner",
+      "reviewed_package_version": "0.25.3",
+      "accepted_source_range": ">=0.25.3 <0.26.0",
+      "required_symbols": ["SPCRC_VERSION", "Sabri\\Platform\\Security\\Registry\\ModuleRegistry"],
+      "file_25_module_key": "file-25-public-experience",
+      "accepted_runtime_contract": "reviewed-source-contract-pending-staging",
+      "cache_partition_contract": "not-yet-versioned",
+      "bundled_with_file_25": false,
+      "staging_status": "pending"
+    },
+    {
+      "file": 25,
+      "name": "Sabri Unified Global Visual Experience and Design System",
+      "role": "design tokens, public visual projection, profiles, federated timelines, responsive refinement, accessibility and visual acceptance",
+      "candidate_version": "0.14.0",
+      "bundled_with_file_25": true,
+      "staging_status": "pending",
+      "package_status": "build-input-not-acceptance",
+      "schema_version": "2",
+      "installed_preflight": "wp sabri file25 staging-probe --expected-commit=<sha>"
+    }
+  ],
+  "acceptance_rule": "No module is staging-accepted or production-accepted merely because this matrix, source code, a ZIP or green CI exists.",
+  "artifact_verification": {
+    "verifier": "tools/verify-staging-artifact.php",
+    "outer_artifact_sha256_supported": true,
+    "inner_package_checksum_required": true,
+    "embedded_manifest_match_required": true,
+    "embedded_dependency_matrix_match_required": true,
+    "staging_acceptance_implied": false
+  },
+  "staging_test_plan": "config/staging-test-plan.json"
+}
