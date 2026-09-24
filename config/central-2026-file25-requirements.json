@@ -1,0 +1,213 @@
+{
+  "schema": 1,
+  "file": 25,
+  "governing_date": "2026-08-10",
+  "governing_basis": {
+    "central": "Sabri Social Homeopathy Platform — Three Central Plans Consolidated Governing Master Plan 2026, including the 6 August 2026 Continuous Value / Top-20 Superset layer",
+    "file": "File 25 — Complete Public UI, Profile Timeline and Visual Experience — latest governing addendum",
+    "priority_rule": "Later explicit Founder-approved clauses supersede contradictory historical clauses. Verified runtime evidence proves implementation state only."
+  },
+  "ownership": {
+    "file_20": "structural shell, navigation, route placement and geometry",
+    "file_25": "canonical visual tokens, reusable public components, profiles/timelines presentation, responsive/accessibility refinement and screenshot-regression contract",
+    "file_26": "global search, discovery and ranking",
+    "native_modules": "domain data, decisions and write actions"
+  },
+  "file_specific_requirements": [
+    {
+      "id": "F25-CEN-01",
+      "priority": "P0",
+      "status": "implemented",
+      "requirement": "Canonical Sabri Green #087A4E, dark #065C3B and light #E7F5EE; semantic status colors remain separate; focus/contrast/dark mode are governed by File 25.",
+      "code": [
+        "includes/class-design-system.php",
+        "includes/class-central-plan-2026-corrections.php",
+        "assets/css/design-system.css",
+        "assets/css/public.css",
+        "includes/class-shell-integration.php"
+      ],
+      "tests": [
+        "tests/review183-185-new-governing-plans.php",
+        "tests/review186-188-post-correction-fresh-review.php"
+      ]
+    },
+    {
+      "id": "F25-CEN-02",
+      "priority": "P0",
+      "status": "source-prepared-external-evidence-pending",
+      "requirement": "Screenshot regression covers File 20 shell integration plus public profiles, timelines, components and states without creating a second theme, shell, database, search or ranking owner.",
+      "code": [
+        "includes/class-visual-acceptance.php",
+        "config/staging-test-plan.json",
+        "includes/class-design-system.php"
+      ],
+      "tests": [
+        "tests/review183-185-new-governing-plans.php",
+        "tests/review186-188-post-correction-fresh-review.php"
+      ],
+      "external_gate": "Real Hostinger browser/device/RTL/accessibility screenshots remain unaccepted until executed against the exact candidate commit."
+    }
+  ],
+  "central_requirements": [
+    {
+      "id": "CV-020",
+      "status": "source-prepared-owner-provider-pending",
+      "owner_boundary": "File 25 renders a same-site tracking-free QR asset only when a native/provider contract supplies it; File 25 does not create a tracking backend or duplicate profile identity.",
+      "code": [
+        "templates/partials/profile-hero.php",
+        "includes/class-design-system.php"
+      ]
+    },
+    {
+      "id": "CV-239",
+      "status": "source-prepared-external-evidence-pending",
+      "owner_boundary": "American English base with Urdu/Arabic presentation readiness; translation-memory ownership remains outside File 25.",
+      "code": [
+        "includes/class-visual-acceptance.php",
+        "assets/css/design-system.css",
+        "assets/css/public.css"
+      ]
+    },
+    {
+      "id": "CV-240",
+      "status": "implemented-source-external-evidence-pending",
+      "owner_boundary": "RTL logical layout and LTR/RTL screenshot contract.",
+      "code": [
+        "includes/class-design-system.php",
+        "assets/css/design-system.css",
+        "assets/css/public.css",
+        "includes/class-visual-acceptance.php"
+      ]
+    },
+    {
+      "id": "CV-241",
+      "status": "implemented-source-external-evidence-pending",
+      "owner_boundary": "WCAG-oriented keyboard, focus, zoom, reduced-motion and screen-reader evidence contract.",
+      "code": [
+        "includes/class-visual-acceptance.php",
+        "assets/css/design-system.css",
+        "assets/css/public.css"
+      ]
+    },
+    {
+      "id": "CV-267",
+      "status": "implemented",
+      "owner_boundary": "File 25 owns no covert tracker/raw analytics warehouse; public metrics remain bounded owner-provided aggregates.",
+      "code": [
+        "includes/class-plan-completion.php",
+        "config/all-chats-directive-matrix.json"
+      ]
+    },
+    {
+      "id": "CV-275",
+      "status": "source-prepared-external-measurement-pending",
+      "owner_boundary": "Responsive/payload/query source controls exist; real low-end and slow-network measurements are staging evidence.",
+      "code": [
+        "includes/class-visual-acceptance.php",
+        "config/staging-test-plan.json"
+      ]
+    },
+    {
+      "id": "CV-276",
+      "status": "implemented-source-operational-monitoring-pending",
+      "owner_boundary": "Source diagnostics/evidence contracts exist; production monitoring remains operational evidence.",
+      "code": [
+        "includes/class-system-check.php",
+        "includes/class-staging-probe.php"
+      ]
+    },
+    {
+      "id": "CV-277",
+      "status": "implemented",
+      "owner_boundary": "Optional provider failures degrade safely without security fail-open.",
+      "code": [
+        "includes/class-dependency-manager.php",
+        "includes/class-safe-mode.php"
+      ]
+    },
+    {
+      "id": "CV-280",
+      "status": "implemented",
+      "owner_boundary": "Two new independent review/fix/retest sets are mandatory after this latest-plan correction.",
+      "tests": [
+        "tests/review183-185-new-governing-plans.php",
+        "tests/review186-188-post-correction-fresh-review.php"
+      ]
+    },
+    {
+      "id": "CV-283",
+      "status": "implemented-source-staging-rehearsal-pending",
+      "owner_boundary": "Versioned migration/dry-run/rollback source exists; real staging backup/restore remains external.",
+      "code": [
+        "includes/class-upgrade-manager.php",
+        "includes/class-plan-completion.php"
+      ]
+    },
+    {
+      "id": "CV-289",
+      "status": "implemented",
+      "owner_boundary": "Profile structured data remains truthful and bounded to ProfilePage plus Person/Organization types already supported by the current renderer; no unverified medical or licensing claim is injected.",
+      "code": [
+        "includes/class-profile-renderer.php"
+      ]
+    },
+    {
+      "id": "CV-290",
+      "status": "implemented-source-staging-verification-pending",
+      "owner_boundary": "Canonical/noindex rules exist; sitemap/indexing behavior requires staging evidence.",
+      "code": [
+        "includes/class-profile-renderer.php",
+        "includes/class-plan-completion.php"
+      ]
+    },
+    {
+      "id": "CV-295",
+      "status": "source-prepared-owner-provider-pending",
+      "owner_boundary": "Canonical safe deep link and optional same-site QR presentation; no open redirect or tracking service.",
+      "code": [
+        "templates/partials/profile-hero.php",
+        "includes/class-public-url.php"
+      ]
+    }
+  ],
+  "acceptance_journeys": [
+    {
+      "id": "AJ-04",
+      "status": "source-prepared-external-integration-pending",
+      "requirement": "Verified doctor personal-site experience: profile, share/QR, SEO and appointment CTA."
+    },
+    {
+      "id": "AJ-31",
+      "status": "source-prepared-external-evidence-pending",
+      "requirement": "200–400% zoom, keyboard, screen reader, reduced motion and focus order."
+    },
+    {
+      "id": "AJ-32",
+      "status": "source-prepared-external-evidence-pending",
+      "requirement": "Urdu/Arabic RTL with English LTR islands, dates and navigation semantics."
+    },
+    {
+      "id": "AJ-33",
+      "status": "source-prepared-external-evidence-pending",
+      "requirement": "Slow 3G/low-end text-first and degraded/offline behavior."
+    },
+    {
+      "id": "AJ-39",
+      "status": "source-prepared-external-evidence-pending",
+      "requirement": "Screenshot corpus for desktop/mobile/tablet, RTL/LTR, roles and empty/loading/error states including File 20 shell integration."
+    },
+    {
+      "id": "AJ-40",
+      "status": "implemented-source-review-gate",
+      "requirement": "Two fresh post-correction reviews; exact-head CI must be green before candidate handoff."
+    }
+  ],
+  "external_acceptance": {
+    "hostinger_staging": false,
+    "real_role_browser_rtl_accessibility": false,
+    "founder_acceptance": false,
+    "production": false,
+    "live": false,
+    "operational": false
+  }
+}

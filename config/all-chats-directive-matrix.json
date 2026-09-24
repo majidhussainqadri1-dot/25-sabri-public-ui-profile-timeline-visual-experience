@@ -1,0 +1,178 @@
+{
+  "schema": 1,
+  "document": "Sabri Platform All-Chats Recovered Directive Register 2026 v2.1",
+  "document_date": "2026-08-05",
+  "file_number": 25,
+  "scope": "File 25 visual, profile, timeline and shared presentation responsibilities only",
+  "truthful_boundary": "File 25 implements visual primitives and public presentation. File 20 remains the global shell, navigation, welcome-frequency and route-placement owner; File 26 remains ranking/search owner; native modules retain data and workflow authority.",
+  "directives": [
+    {
+      "id": "CHAT-UX-001",
+      "status": "implemented_visual",
+      "owner_boundary": "File 20 invocation/session/account/cookie/localStorage/30-day frequency; File 25 accessible green responsive visual primitive",
+      "evidence": [
+        "includes/class-three-plan-corrections.php",
+        "sabri-public-experience.php",
+        "tests/review174-176-three-plan-corrections.php"
+      ]
+    },
+    {
+      "id": "CHAT-UX-002",
+      "status": "implemented_visual",
+      "owner_boundary": "File 20 single top navigation structure; File 25 active/overflow/responsive visual presentation",
+      "evidence": [
+        "includes/class-forty-round-hardening.php",
+        "tests/review134-173-current-directives.php"
+      ]
+    },
+    {
+      "id": "CHAT-UX-003",
+      "status": "implemented_visual",
+      "owner_boundary": "File 20 structural placement; File 25 RTL logical properties, LTR isolation and mobile visual order",
+      "evidence": [
+        "includes/class-forty-round-hardening.php",
+        "assets/css/design-system.css",
+        "tests/review134-173-current-directives.php"
+      ]
+    },
+    {
+      "id": "CHAT-UX-004",
+      "status": "implemented_visual",
+      "owner_boundary": "File 20 shared Back/Home destination logic and native contextual Previous/Next; File 25 safe accessible control presentation",
+      "evidence": [
+        "includes/class-forty-round-hardening.php",
+        "includes/class-public-url.php",
+        "tests/review134-173-current-directives.php"
+      ]
+    },
+    {
+      "id": "CHAT-DOC-001",
+      "status": "implemented_visual",
+      "owner_boundary": "Files 07/09 doctor facts, File 26 ranking, File 24 fairness assurance; File 25 badge/card presentation only",
+      "evidence": [
+        "includes/class-forty-round-hardening.php",
+        "tests/review134-173-current-directives.php"
+      ]
+    },
+    {
+      "id": "CHAT-COM-001",
+      "status": "delegated",
+      "owner_boundary": "File 17 Smail mailbox/thread/message; File 25 reusable visual tokens only when consumed through contracts",
+      "evidence": [
+        "docs/GOVERNING-SCOPE.md",
+        "includes/class-design-system.php"
+      ]
+    },
+    {
+      "id": "CHAT-PDF-001",
+      "status": "delegated",
+      "owner_boundary": "File 12 reader, rights and progress; File 25 reusable visual primitives only",
+      "evidence": [
+        "docs/GOVERNING-SCOPE.md",
+        "includes/providers/class-file-12-pdf-media-provider.php"
+      ]
+    },
+    {
+      "id": "CHAT-DL-001",
+      "status": "implemented_visual",
+      "owner_boundary": "Native content owner eligibility and shared Download Manager lifecycle; File 25 accessible action/state presentation",
+      "evidence": [
+        "includes/class-forty-round-hardening.php",
+        "tests/review134-173-current-directives.php"
+      ]
+    },
+    {
+      "id": "CHAT-NOTE-001",
+      "status": "delegated",
+      "owner_boundary": "Future canonical owner pending global harmonization; File 25 must not create the notes backend",
+      "evidence": [
+        "docs/GOVERNING-SCOPE.md"
+      ]
+    },
+    {
+      "id": "CHAT-UPL-001",
+      "status": "delegated",
+      "owner_boundary": "Future canonical owner and CF-04/native processing contracts; File 25 must not create binary ownership",
+      "evidence": [
+        "docs/GOVERNING-SCOPE.md"
+      ]
+    },
+    {
+      "id": "CHAT-XFER-001",
+      "status": "delegated",
+      "owner_boundary": "File 17 transfer workflow and CF-04 processing after activation; File 25 has no transfer backend",
+      "evidence": [
+        "docs/GOVERNING-SCOPE.md"
+      ]
+    },
+    {
+      "id": "CHAT-QA-001",
+      "status": "source_corrected_external_pending",
+      "owner_boundary": "File 25 source defects corrected and regression-tested; platform-wide post-GitHub harmonization and Hostinger acceptance remain external gates",
+      "evidence": [
+        "docs/REVIEWS-174-176-THREE-PLAN-CORRECTIVE-RECORD-2026-08-05.md",
+        "tests/review174-176-three-plan-corrections.php"
+      ]
+    },
+    {
+      "id": "CHAT-DOC-021",
+      "status": "implemented_visual",
+      "owner_boundary": "Files 03/07/08/17/20/23/26 retain data and workflow truth; File 25 provides the coherent public doctor website-like presentation",
+      "evidence": [
+        "includes/class-profile-router.php",
+        "includes/class-profile-repository.php",
+        "includes/class-profile-renderer.php"
+      ]
+    },
+    {
+      "id": "CHAT-REC-024",
+      "status": "implemented_governance",
+      "owner_boundary": "All-Chats v2.1 is explicitly named and mapped without overriding canonical owners",
+      "evidence": [
+        "config/all-chats-directive-matrix.json",
+        "config/source-completion-matrix.json"
+      ]
+    },
+    {
+      "id": "RCD-001",
+      "status": "implemented_visual",
+      "owner_boundary": "Founder-approved green is canonical primary identity; semantic colors remain contextual",
+      "evidence": [
+        "includes/class-forty-round-hardening.php",
+        "tests/review134-173-current-directives.php"
+      ]
+    },
+    {
+      "id": "ALL-CHATS-V2.1-SECTION-25",
+      "status": "delegated_ecosystem",
+      "owner_boundary": "File 25 supplies one coherent visual/profile layer; File 20 navigation, File 26 discovery and each domain module retain canonical ownership",
+      "evidence": [
+        "includes/class-design-system.php",
+        "includes/class-profile-renderer.php",
+        "docs/GOVERNING-SCOPE.md"
+      ]
+    }
+  ],
+  "superseded_controls": [
+    {
+      "id": "SUP-001",
+      "rule": "Orange primary color is historical only; green is current primary."
+    },
+    {
+      "id": "SUP-003",
+      "rule": "The historical fixed eight-second overlay is not active; File 20 owns non-blocking first-eligible-visit and 30-day frequency."
+    },
+    {
+      "id": "SUP-004",
+      "rule": "Historical File 24/25 visual numbering and no-File-26 statements are superseded by File 24 Security, File 25 Public Visual Experience and File 26 Search/Discovery."
+    }
+  ],
+  "external_acceptance": {
+    "hostinger_staging": false,
+    "real_role_browser_rtl_accessibility": false,
+    "founder_acceptance": false,
+    "production": false,
+    "live": false,
+    "operational": false
+  }
+}
