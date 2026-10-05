@@ -4,7 +4,7 @@ Tags: design-system, profiles, timeline, accessibility, responsive, public-ui, c
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 0.14.0
+Stable tag: 0.15.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,18 +14,20 @@ File 25 global public design system, public profiles, authoritative File 00/08/0
 
 This is the existing File 25, canonically named “Sabri Unified Global Visual Experience and Design System,” with the subtitle “Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency.” No duplicate File 26 is created.
 
-The reviewed 0.14.0 source correction includes:
+The reviewed 0.15.0 source correction includes:
 
 * explicit three-plan traceability for Master Plan v3.0, All-Chats v2.1, and File 25 Specification 2.0;
 * canonical File 03 contact preservation with monotonic revoke-only filters and substitution denial;
 * fail-closed high-risk rebuild/migration authorization requiring strict explicit approval;
+* data-free recoverable Safe Mode public profile routes using a no-store/noindex 503 native-theme surface;
+* Reviews 595–614 current cross-file repository-head reconciliation and release-documentation completion;
 * `CHAT-UX-001` accessible green welcome visual presentation with File 20 retaining the 30-day frequency owner;
 * Master Plan v3.0 and File 20 plan v4.1 ownership reconciliation;
-* File 00 `1.2.4` / contract `1.1.2` as the sole membership, Founder, suspension, eligibility, guardian-policy and public-profile assertion authority;
+* current File 00 membership contract `1.2.3` with reviewed `1.2.2` compatibility as the sole membership, Founder, suspension, eligibility, guardian-policy and public-profile assertion authority;
 * File 09 `1.1.0` verification decisions and immutable approved professional snapshots as the Doctor-verification authority;
 * removal of File 25 Doctor verification derived from local qualification, role or license-expiry fields;
 * removal of all File 25 reads from `smc_professional_credentials`, `smc_clinics`, or other foreign File 00 tables;
-* exact reviewed File 08 `0.2.1` and public clinic contract `1.0.0`, with owner-executed projection APIs, dedicated clinic-address handling, authoritative practitioner gating, and explicit pending Hostinger acceptance;
+* current File 08 public clinic projection `1.1.0` with reviewed `1.0.0` compatibility, owner-executed projection APIs, dedicated clinic-address handling, authoritative practitioner gating, and explicit pending Hostinger acceptance;
 * File 18 `1.2.0-RC1` owner-executed public DTO consumption with bounded transitional API access and no File 25 Marketplace SQL;
 * no File 25 age calculation; explicit File 00 minor/guardian assertions govern, and unknown ordinary contact state fails closed;
 * global semantic visual tokens without duplicating File 20's application shell;
