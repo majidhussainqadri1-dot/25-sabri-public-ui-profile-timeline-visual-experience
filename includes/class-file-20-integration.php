@@ -20,7 +20,7 @@ final class File_20_Integration
     public const REVIEWED_MINIMUM_VERSION = '1.4.12';
     public const REVIEWED_MAXIMUM_VERSION = '1.5.0';
     public const REVIEWED_CONTRACT_VERSION = '1.0.0';
-    public const REVIEWED_SOURCE_COMMIT = '291486b22c7ed94b8be041192375b6d9b077fac5';
+    public const REVIEWED_SOURCE_COMMIT = '8a4dbcaf4fef8e926b9b834ecfde16c21a0f00ca';
 
     public static function register(): void
     {
