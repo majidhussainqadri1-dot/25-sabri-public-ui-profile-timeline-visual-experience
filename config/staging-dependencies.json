@@ -1,7 +1,7 @@
 {
   "schema_version": 3,
   "file": 25,
-  "runtime_version": "0.14.0",
+  "runtime_version": "0.15.0",
   "governing_sources": {
     "platform_master_plan": "Sabri Social Homeopathy Platform Definitive Master Plan 2026 v3.0",
     "file_20_plan": "File 20 Harmonized Master Plan 2026 v4.1",
@@ -14,27 +14,418 @@
     "rule": "Later explicit approved clauses supersede contradictory historical clauses without converting repository evidence into staging/live evidence."
   },
   "purpose": "Exact multi-plugin staging candidate matrix. Reviewed source expectations are repository evidence only; Hostinger staging, production, merge and Founder acceptance remain separate gates.",
-  "environment": {"wordpress_minimum":"6.5","php_minimum":"8.0","target_site":"https://sabrisocialstaging.sabrihomeopathy.com/","live_changes_allowed":false,"registration_disabled_required":true,"search_indexing_disabled_required":true},
+  "environment": {
+    "wordpress_minimum": "6.5",
+    "php_minimum": "8.0",
+    "target_site": "https://sabrisocialstaging.sabrihomeopathy.com/",
+    "live_changes_allowed": false,
+    "registration_disabled_required": true,
+    "search_indexing_disabled_required": true,
+    "file25_wordpress_minimum": "6.5",
+    "file25_php_minimum": "8.0",
+    "integrated_candidate_wordpress_minimum": "7.0",
+    "integrated_candidate_php_minimum": "8.1",
+    "integrated_minimum_basis": "Current File 03 main requires WordPress 7.0/PHP 8.1; current File 21 and File 22 require PHP 8.1. File 25 standalone minima remain unchanged."
+  },
   "modules": [
-    {"file":0,"name":"Sabri Membership Core","reviewed_package_version":"1.2.38","reviewed_source_version":"1.2.38","reviewed_db_version":"1.4.4","reviewed_source_commit":"c37d0b101d0912bef1f26d0daf51a414d67907c0","accepted_source_range":">=1.2.38 <1.3.0","required_contract_version":"1.2.2","required_symbols":["SMC_VERSION","SMC_DB_VERSION","SMC_CONTRACT_VERSION","SMC_Contracts::assertions","smc_founder_user_id","smc_is_founder"],"foreign_table_reads_allowed":false,"bundled_with_file_25":false,"staging_status":"pending"},
-    {"file":3,"name":"Sabri Profiles and Doctors","role":"canonical profile master and current public personal-site/Future Superset projection owner; File 25 consumes only declared public contracts and metadata","reviewed_source_version":"1.2.0-rc2","reviewed_db_version":"1.2.0","reviewed_contract_version":"1.4.0","reviewed_source_branch":"codex/file-03-second-fresh-80-review-20260810","reviewed_source_commit":"b862efb94be87980e96a5b864bc5c7aec49183d9","accepted_source_range":">=1.2.0-rc2 <1.3.0","required_contract_version":"1.4.0","required_symbols":["SPD_VERSION","SPD_CONTRACT_VERSION","spd_get_public_profile","spd_get_personal_site_profile","spd_get_profile_contract_manifest","SPD_Contracts::component_manifest"],"future_superset":"18 enhancements; second fresh 80-review candidate; feature-branch source truth only","route_truth":"File 03 /profile/{public_id}/ family and File 25 slug presentation routes still require one canonical indexable destination, permanent aliases and no redirect loop/SEO duplication on Hostinger staging.","foreign_table_reads_allowed":false,"bundled_with_file_25":false,"staging_status":"pending"},
-    {"file":6,"name":"Homeopathy Encyclopedia","reviewed_package_version":"0.1.0","accepted_source_range":">=0.1.0 <0.2.0","required_symbols":["HE_VERSION","HE_Content"],"bundled_with_file_25":false,"staging_status":"pending"},
-    {"file":7,"name":"Doctors Directory and Discovery","reviewed_source_version":"1.2.0","reviewed_db_version":"1.1.0","reviewed_contract_version":"1.2.0","required_contract_version":"1.2.0","reviewed_projection_schema":2,"reviewed_source_branch":"fix/file-07-second-fresh-80-review-20260810","reviewed_source_commit":"b37c7c7b46f3f57b7325e075601c10bf3ced72ba","accepted_source_range":">=1.2.0 <1.3.0","required_symbols":["DDD_VERSION","DDD_DB_VERSION","DDD_CONTRACT_VERSION","DDD_PROJECTION_SCHEMA"],"source_lifecycle":"second-fresh-80-review-feature-branch-candidate-pending-merge-and-hostinger-staging","bundled_with_file_25":false,"staging_status":"pending"},
-    {"file":8,"name":"Worldwide Clinic and Appointments","role":"canonical clinic/appointment owner; current WCA contract 1.1.0 is validated while File 25 consumes the bounded legacy-compatible public-clinic DTO 1.0.0 only","reviewed_package_version":"1.2.0","reviewed_source_version":"1.2.0","reviewed_schema_version":"3.1.0","reviewed_source_branch":"codex/file08-new-governing-plans-completion-2026","reviewed_source_commit":"cb302617d2a2def23de1883b8d9fead10bce7ef3","accepted_source_range":">=1.2.0 <1.3.0","required_canonical_contract_version":"1.1.0","required_public_contract_version":"1.0.0","required_symbols":["WCA_VERSION","WCA_Contracts::PUBLIC_CLINIC_CONTRACT_VERSION","swc_get_public_clinic_projection","swc_public_clinic_projection_contract"],"contract_status":"current-feature-branch-source-reviewed-pending-hostinger-staging","foreign_table_reads_allowed":false,"bundled_with_file_25":false,"staging_status":"pending"},
-    {"file":9,"name":"Global Doctor Onboarding and Verification","reviewed_source_version":"1.3.0","reviewed_schema_version":6,"reviewed_contract_version":"1.1.0","reviewed_source_branch":"codex/file09-1.3.0-rc6-80-round-review","reviewed_source_commit":"9103310fc93d978b6e70661f024a079fc0971003","accepted_source_range":">=1.3.0 <1.4.0","required_contract_version":"1.1.0","required_symbols":["GDO_VERSION","GDO_Integration_Contracts::VERSION","gdo_file03_doctor_eligibility"],"source_lifecycle":"rc6-feature-branch-sixth-fresh-80-review-candidate-pending-merge-and-hostinger-staging","foreign_table_reads_allowed":false,"bundled_with_file_25":false,"staging_status":"pending"},
-    {"file":10,"name":"Video Wall and Educational Broadcasting","reviewed_package_version":"0.1.0","accepted_source_range":">=0.1.0 <0.2.0","required_symbols":["SVW_VERSION","SVW_Helpers"],"bundled_with_file_25":false,"staging_status":"pending"},
-    {"file":11,"name":"Reels and Short Video Discovery","reviewed_package_version":"0.1.0","accepted_source_range":">=0.1.0 <0.2.0","required_symbols":["SRL_VERSION","SVW_VERSION","SVW_Helpers"],"bundled_with_file_25":false,"staging_status":"pending"},
-    {"file":12,"name":"PDF Library and Digital Reading","reviewed_package_version":"0.1.0","accepted_source_range":">=0.1.0 <0.2.0","required_symbols":["SPL_VERSION","SPL_Helpers"],"bundled_with_file_25":false,"staging_status":"pending"},
-    {"file":14,"name":"Global Clinic USP and Conversion Integration","reviewed_source_version":"1.4.3","reviewed_schema_version":10004,"reviewed_source_branch":"review/file14-fifth-80-round-2026-08-10","reviewed_source_commit":"907a04b25567a607e5ecb11d26e50bd0f07852be","accepted_source_range":">=1.4.3 <1.5.0","required_symbols":["GCU_VERSION","GCU_SCHEMA_VERSION","GCU_FUTURE_PLAN_VERSION","GCU_BRAND_PRIMARY"],"required_primary_color":"#087A4E","source_lifecycle":"fifth-80-review-feature-branch-candidate-pending-merge-and-hostinger-staging","bundled_with_file_25":false,"staging_status":"pending"},
-    {"file":18,"name":"Sabri Marketplace","reviewed_source_version":"1.2.0-RC1","accepted_source_range":">=1.2.0-RC1 <1.3.0","required_symbols":["SMP_VERSION","smp_get_public_profile_listings","SMP_Activator::marketplace_url"],"foreign_table_reads_allowed":false,"bundled_with_file_25":false,"staging_status":"pending"},
-    {"file":20,"name":"Sabri Unified Application Shell","reviewed_source_version":"1.4.12","reviewed_source_commit":"291486b22c7ed94b8be041192375b6d9b077fac5","reviewed_contract_version":"1.0.0","governing_plan_version":"4.1","accepted_source_range":">=1.4.12 <1.5.0","required_contract_version":"1.0.0","required_symbols":["SABRI_SHELL_VERSION","Sabri\\UnifiedShell\\CentralPlanContract::CONTRACT_VERSION","sabri_shell_contract_registry","sabri_shell_file25_visual_contract"],"bundled_with_file_25":false,"staging_status":"pending"},
-    {"file":21,"name":"Home and News Feed","reviewed_package_version":"1.0.5","reviewed_runtime_version":"1.0.3","reviewed_schema_version":"1.0.0","reviewed_source_branch":"main","reviewed_source_commit":"afeda8742d8e1ea62254823291a66f502058989c","reviewed_source_range":">=1.0.3 <2.0.0","required_profile_timeline_api":"Sabri\\HomeNewsFeed\\ProfileTimeline::query","required_symbols":["SABRI_HNF_PACKAGE_VERSION","SABRI_HNF_VERSION","SABRI_HNF_SCHEMA_VERSION","sabri_hnf_bootstrap","Sabri\\HomeNewsFeed\\ProfileTimeline"],"bundled_with_file_25":false,"staging_status":"pending"},
-    {"file":22,"name":"Sabri Universal Post Composer","reviewed_source_version":"1.0.0-rc.3","reviewed_db_version":"1.0.0","reviewed_source_commit":"c3b775b66fbbda4a9dd9891d63c08c74e2178741","accepted_source_range":">=1.0.0-rc.3 <1.1.0","required_contract_versions":{"adapter_api":"1.0.0","workflow_api":"1.0.0","subject_schema_api":"1.0.0","governance_api":"1.0.0","lifecycle_api":"1.0.0","rest_api":"1.2.0","plan_contract":"1.0.0"},"required_symbols":["SUPC_VERSION","SUPC_SCHEMA_VERSION","SUPC_REST_API_VERSION","supc_adapter_governance","supc_lifecycle_capabilities","supc_execute_lifecycle"],"canonical_public_create_route":"/create/","foreign_table_reads_allowed":false,"bundled_with_file_25":false,"staging_status":"pending"},
-    {"file":23,"name":"Doctor and Founder Publishing Dashboard","reviewed_source_version":"1.2.0","reviewed_source_commit":"a8a8c805f4730998ccb44bd95c87591836561759","accepted_source_range":">=1.2.0 <1.3.0","required_contract_version":"2.0.0","required_symbols":["SPDB_VERSION","SPDB_CONTRACT_VERSION","spdb","spdb_get_capabilities","spdb_get_dependency_manifest"],"canonical_private_management_route":"/publishing-dashboard/","future_intelligence_branch":{"branch":"feature/file23-future-publishing-intelligence-24","head":"50b9489a4a058d4628ef5dda220837393dd32010","status":"feature-branch-only-not-main-not-staging-accepted","required_for_file25_core_profile_management_route":false},"foreign_table_reads_allowed":false,"bundled_with_file_25":false,"staging_status":"pending"},
-    {"file":24,"name":"Platform Security, Privacy, Compliance and Resilience Center","reviewed_package_version":"0.99.0","reviewed_source_version":"0.99.0","reviewed_source_commit":"0be43b3f424d7b53865587b2770479ca33f51a0b","accepted_source_range":">=0.99.0 <1.0.0","required_symbols":["SPCRC_VERSION","Sabri\\Platform\\Security\\Registry\\ModuleRegistry"],"file_25_module_key":"file-25-public-experience","accepted_runtime_contract":"reviewed-current-0.99.0-source-contract-pending-staging","bundled_with_file_25":false,"staging_status":"pending"},
-    {"file":25,"name":"Sabri Unified Global Visual Experience and Design System","candidate_version":"0.14.0","canonical_primary_color":"#087A4E","design_token_owner":"file-25","structural_shell_owner":"file-20","bundled_with_file_25":true,"staging_status":"pending","package_status":"build-input-not-acceptance","schema_version":"2","installed_preflight":"wp sabri file25 staging-probe --expected-commit=<sha>"}
+    {
+      "file": 0,
+      "name": "Sabri Membership Core",
+      "reviewed_package_version": "1.2.38",
+      "reviewed_source_version": "1.2.38",
+      "reviewed_db_version": "1.4.4",
+      "reviewed_source_commit": "c37d0b101d0912bef1f26d0daf51a414d67907c0",
+      "accepted_source_range": ">=1.2.38 <1.3.0",
+      "required_contract_version": "1.2.2",
+      "required_symbols": [
+        "SMC_VERSION",
+        "SMC_DB_VERSION",
+        "SMC_CONTRACT_VERSION",
+        "SMC_Contracts::assertions",
+        "smc_founder_user_id",
+        "smc_is_founder"
+      ],
+      "foreign_table_reads_allowed": false,
+      "bundled_with_file_25": false,
+      "staging_status": "pending",
+      "current_repository_head": "2fa7c022ee9cd1b65432e900579512f304532442",
+      "current_source_version_observed": "1.2.44",
+      "current_db_version_observed": "1.4.5",
+      "current_contract_version_observed": "1.2.3",
+      "supported_contract_versions": [
+        "1.2.2",
+        "1.2.3"
+      ],
+      "current_repository_review": "compatible-after-file25-0.15.0-contract-reconciliation"
+    },
+    {
+      "file": 3,
+      "name": "Sabri Profiles and Doctors",
+      "role": "canonical profile master and current public personal-site/Future Superset projection owner; File 25 consumes only declared public contracts and metadata",
+      "reviewed_source_version": "1.2.0-rc2",
+      "reviewed_db_version": "1.2.0",
+      "reviewed_contract_version": "1.4.0",
+      "reviewed_source_branch": "codex/file-03-second-fresh-80-review-20260810",
+      "reviewed_source_commit": "b862efb94be87980e96a5b864bc5c7aec49183d9",
+      "accepted_source_range": ">=1.2.0-rc2 <1.3.0",
+      "required_contract_version": "1.4.0",
+      "required_symbols": [
+        "SPD_VERSION",
+        "SPD_CONTRACT_VERSION",
+        "spd_get_public_profile",
+        "spd_get_personal_site_profile",
+        "spd_get_profile_contract_manifest",
+        "SPD_Contracts::component_manifest"
+      ],
+      "future_superset": "18 enhancements; second fresh 80-review candidate; feature-branch source truth only",
+      "route_truth": "File 03 /profile/{public_id}/ family and File 25 slug presentation routes still require one canonical indexable destination, permanent aliases and no redirect loop/SEO duplication on Hostinger staging.",
+      "foreign_table_reads_allowed": false,
+      "bundled_with_file_25": false,
+      "staging_status": "pending",
+      "current_repository_head": "636e3ef965423887f810718abec3cd1c11c3659d",
+      "current_source_version_observed": "1.2.0-rc18",
+      "current_db_version_observed": "1.2.0",
+      "current_contract_version_observed": "1.4.0",
+      "current_wordpress_minimum_observed": "7.0",
+      "current_php_minimum_observed": "8.1"
+    },
+    {
+      "file": 6,
+      "name": "Homeopathy Encyclopedia",
+      "reviewed_package_version": "0.1.0",
+      "accepted_source_range": ">=0.1.0 <0.2.0",
+      "required_symbols": [
+        "HE_VERSION",
+        "HE_Content"
+      ],
+      "bundled_with_file_25": false,
+      "staging_status": "pending"
+    },
+    {
+      "file": 7,
+      "name": "Doctors Directory and Discovery",
+      "reviewed_source_version": "1.2.0",
+      "reviewed_db_version": "1.1.0",
+      "reviewed_contract_version": "1.2.0",
+      "required_contract_version": "1.2.0",
+      "reviewed_projection_schema": 2,
+      "reviewed_source_branch": "fix/file-07-second-fresh-80-review-20260810",
+      "reviewed_source_commit": "b37c7c7b46f3f57b7325e075601c10bf3ced72ba",
+      "accepted_source_range": ">=1.2.0 <1.3.0",
+      "required_symbols": [
+        "DDD_VERSION",
+        "DDD_DB_VERSION",
+        "DDD_CONTRACT_VERSION",
+        "DDD_PROJECTION_SCHEMA"
+      ],
+      "source_lifecycle": "second-fresh-80-review-feature-branch-candidate-pending-merge-and-hostinger-staging",
+      "bundled_with_file_25": false,
+      "staging_status": "pending",
+      "current_repository_head": "67c32ec4af45a7de6e3d9c1dbf0f8614d6b5a844"
+    },
+    {
+      "file": 8,
+      "name": "Worldwide Clinic and Appointments",
+      "role": "canonical clinic/appointment owner; current WCA contract 1.1.0 is validated while File 25 consumes the bounded legacy-compatible public-clinic DTO 1.0.0 only",
+      "reviewed_package_version": "1.2.0",
+      "reviewed_source_version": "1.2.0",
+      "reviewed_schema_version": "3.1.0",
+      "reviewed_source_branch": "codex/file08-new-governing-plans-completion-2026",
+      "reviewed_source_commit": "cb302617d2a2def23de1883b8d9fead10bce7ef3",
+      "accepted_source_range": ">=1.2.0 <1.3.0",
+      "required_canonical_contract_version": "1.1.0",
+      "required_public_contract_version": "1.0.0",
+      "required_symbols": [
+        "WCA_VERSION",
+        "WCA_Contracts::PUBLIC_CLINIC_CONTRACT_VERSION",
+        "swc_get_public_clinic_projection",
+        "swc_public_clinic_projection_contract"
+      ],
+      "contract_status": "current-feature-branch-source-reviewed-pending-hostinger-staging",
+      "foreign_table_reads_allowed": false,
+      "bundled_with_file_25": false,
+      "staging_status": "pending",
+      "current_repository_head": "70541974ce0ffb16aebef557c3016eb7447662f4",
+      "current_source_version_observed": "1.2.15",
+      "current_schema_version_observed": "3.4.0",
+      "current_canonical_contract_version_observed": "1.1.0",
+      "current_public_projection_contract_version_observed": "1.1.0",
+      "supported_public_projection_contract_versions": [
+        "1.0.0",
+        "1.1.0"
+      ],
+      "current_repository_review": "compatible-after-file25-0.15.0-contract-reconciliation"
+    },
+    {
+      "file": 9,
+      "name": "Global Doctor Onboarding and Verification",
+      "reviewed_source_version": "1.3.0",
+      "reviewed_schema_version": 6,
+      "reviewed_contract_version": "1.1.0",
+      "reviewed_source_branch": "codex/file09-1.3.0-rc6-80-round-review",
+      "reviewed_source_commit": "9103310fc93d978b6e70661f024a079fc0971003",
+      "accepted_source_range": ">=1.3.0 <1.4.0",
+      "required_contract_version": "1.1.0",
+      "required_symbols": [
+        "GDO_VERSION",
+        "GDO_Integration_Contracts::VERSION",
+        "gdo_file03_doctor_eligibility"
+      ],
+      "source_lifecycle": "rc6-feature-branch-sixth-fresh-80-review-candidate-pending-merge-and-hostinger-staging",
+      "foreign_table_reads_allowed": false,
+      "bundled_with_file_25": false,
+      "staging_status": "pending",
+      "current_repository_head": "d35eb982becdf0224a5b850a0c6fb4ace8bf075b",
+      "current_source_version_observed": "1.3.0",
+      "current_schema_version_observed": 6,
+      "current_contract_version_observed": "1.1.0"
+    },
+    {
+      "file": 10,
+      "name": "Video Wall and Educational Broadcasting",
+      "reviewed_package_version": "0.1.0",
+      "accepted_source_range": ">=0.1.0 <0.2.0",
+      "required_symbols": [
+        "SVW_VERSION",
+        "SVW_Helpers"
+      ],
+      "bundled_with_file_25": false,
+      "staging_status": "pending",
+      "current_repository_head": "4b8a3dda140186c01b05d998e729cb1aeeed2cf3"
+    },
+    {
+      "file": 11,
+      "name": "Reels and Short Video Discovery",
+      "reviewed_package_version": "0.1.0",
+      "accepted_source_range": ">=0.1.0 <0.2.0",
+      "required_symbols": [
+        "SRL_VERSION",
+        "SVW_VERSION",
+        "SVW_Helpers"
+      ],
+      "bundled_with_file_25": false,
+      "staging_status": "pending",
+      "current_repository_head": "c2df8e72bad76dc1a7fb83cbe039541f7aa1fd8b"
+    },
+    {
+      "file": 12,
+      "name": "PDF Library and Digital Reading",
+      "reviewed_package_version": "0.1.0",
+      "accepted_source_range": ">=0.1.0 <0.2.0",
+      "required_symbols": [
+        "SPL_VERSION",
+        "SPL_Helpers"
+      ],
+      "bundled_with_file_25": false,
+      "staging_status": "pending",
+      "current_repository_head": "2b369ef2d609247896e1ab32118f1dc498407f51"
+    },
+    {
+      "file": 14,
+      "name": "Global Clinic USP and Conversion Integration",
+      "reviewed_source_version": "1.4.3",
+      "reviewed_schema_version": 10004,
+      "reviewed_source_branch": "review/file14-fifth-80-round-2026-08-10",
+      "reviewed_source_commit": "907a04b25567a607e5ecb11d26e50bd0f07852be",
+      "accepted_source_range": ">=1.4.3 <1.5.0",
+      "required_symbols": [
+        "GCU_VERSION",
+        "GCU_SCHEMA_VERSION",
+        "GCU_FUTURE_PLAN_VERSION",
+        "GCU_BRAND_PRIMARY"
+      ],
+      "required_primary_color": "#087A4E",
+      "source_lifecycle": "fifth-80-review-feature-branch-candidate-pending-merge-and-hostinger-staging",
+      "bundled_with_file_25": false,
+      "staging_status": "pending",
+      "current_repository_head": "db60c4bc5c37a5c88126b78c31b34c75236f33d7",
+      "current_source_version_observed": "1.4.4",
+      "current_schema_version_observed": 10005
+    },
+    {
+      "file": 18,
+      "name": "Sabri Marketplace",
+      "reviewed_source_version": "1.2.0-RC1",
+      "accepted_source_range": ">=1.2.0-RC1 <1.3.0",
+      "required_symbols": [
+        "SMP_VERSION",
+        "smp_get_public_profile_listings",
+        "SMP_Activator::marketplace_url"
+      ],
+      "foreign_table_reads_allowed": false,
+      "bundled_with_file_25": false,
+      "staging_status": "pending",
+      "current_repository_head": "04a5872e3e2e170ee400e7c607e39abd5484df65"
+    },
+    {
+      "file": 20,
+      "name": "Sabri Unified Application Shell",
+      "reviewed_source_version": "1.4.12",
+      "reviewed_source_commit": "291486b22c7ed94b8be041192375b6d9b077fac5",
+      "reviewed_contract_version": "1.0.0",
+      "governing_plan_version": "4.1",
+      "accepted_source_range": ">=1.4.12 <1.5.0",
+      "required_contract_version": "1.0.0",
+      "required_symbols": [
+        "SABRI_SHELL_VERSION",
+        "Sabri\\UnifiedShell\\CentralPlanContract::CONTRACT_VERSION",
+        "sabri_shell_contract_registry",
+        "sabri_shell_file25_visual_contract"
+      ],
+      "bundled_with_file_25": false,
+      "staging_status": "pending",
+      "current_repository_head": "8a4dbcaf4fef8e926b9b834ecfde16c21a0f00ca",
+      "current_source_version_observed": "1.4.17",
+      "current_contract_version_observed": "1.0.0"
+    },
+    {
+      "file": 21,
+      "name": "Home and News Feed",
+      "reviewed_package_version": "1.0.5",
+      "reviewed_runtime_version": "1.0.3",
+      "reviewed_schema_version": "1.0.0",
+      "reviewed_source_branch": "main",
+      "reviewed_source_commit": "afeda8742d8e1ea62254823291a66f502058989c",
+      "reviewed_source_range": ">=1.0.3 <2.0.0",
+      "required_profile_timeline_api": "Sabri\\HomeNewsFeed\\ProfileTimeline::query",
+      "required_symbols": [
+        "SABRI_HNF_PACKAGE_VERSION",
+        "SABRI_HNF_VERSION",
+        "SABRI_HNF_SCHEMA_VERSION",
+        "sabri_hnf_bootstrap",
+        "Sabri\\HomeNewsFeed\\ProfileTimeline"
+      ],
+      "bundled_with_file_25": false,
+      "staging_status": "pending",
+      "current_repository_head": "f2eb7e95ddea327af36ea725ffb923b029f885e6",
+      "current_package_version_observed": "1.0.5",
+      "current_runtime_version_observed": "1.0.3",
+      "current_schema_version_observed": "1.0.0",
+      "current_php_minimum_observed": "8.1"
+    },
+    {
+      "file": 22,
+      "name": "Sabri Universal Post Composer",
+      "reviewed_source_version": "1.0.0-rc.3",
+      "reviewed_db_version": "1.0.0",
+      "reviewed_source_commit": "c3b775b66fbbda4a9dd9891d63c08c74e2178741",
+      "accepted_source_range": ">=1.0.0-rc.3 <1.1.0",
+      "required_contract_versions": {
+        "adapter_api": "1.0.0",
+        "workflow_api": "1.0.0",
+        "subject_schema_api": "1.0.0",
+        "governance_api": "1.0.0",
+        "lifecycle_api": "1.0.0",
+        "rest_api": "1.2.0",
+        "plan_contract": "1.0.0"
+      },
+      "required_symbols": [
+        "SUPC_VERSION",
+        "SUPC_SCHEMA_VERSION",
+        "SUPC_REST_API_VERSION",
+        "supc_adapter_governance",
+        "supc_lifecycle_capabilities",
+        "supc_execute_lifecycle"
+      ],
+      "canonical_public_create_route": "/create/",
+      "foreign_table_reads_allowed": false,
+      "bundled_with_file_25": false,
+      "staging_status": "pending",
+      "current_repository_head": "b7a7f2e69411cbd32f0574fd12d766fb70c01b7a",
+      "current_source_version_observed": "1.0.0-rc.3",
+      "current_php_minimum_observed": "8.1"
+    },
+    {
+      "file": 23,
+      "name": "Doctor and Founder Publishing Dashboard",
+      "reviewed_source_version": "1.2.0",
+      "reviewed_source_commit": "a8a8c805f4730998ccb44bd95c87591836561759",
+      "accepted_source_range": ">=1.2.0 <1.3.0",
+      "required_contract_version": "2.0.0",
+      "required_symbols": [
+        "SPDB_VERSION",
+        "SPDB_CONTRACT_VERSION",
+        "spdb",
+        "spdb_get_capabilities",
+        "spdb_get_dependency_manifest"
+      ],
+      "canonical_private_management_route": "/publishing-dashboard/",
+      "future_intelligence_branch": {
+        "branch": "feature/file23-future-publishing-intelligence-24",
+        "head": "50b9489a4a058d4628ef5dda220837393dd32010",
+        "status": "feature-branch-only-not-main-not-staging-accepted",
+        "required_for_file25_core_profile_management_route": false
+      },
+      "foreign_table_reads_allowed": false,
+      "bundled_with_file_25": false,
+      "staging_status": "pending",
+      "current_repository_head": "a8a8c805f4730998ccb44bd95c87591836561759"
+    },
+    {
+      "file": 24,
+      "name": "Platform Security, Privacy, Compliance and Resilience Center",
+      "reviewed_package_version": "0.99.0",
+      "reviewed_source_version": "0.99.0",
+      "reviewed_source_commit": "0be43b3f424d7b53865587b2770479ca33f51a0b",
+      "accepted_source_range": ">=0.99.0 <1.0.0",
+      "required_symbols": [
+        "SPCRC_VERSION",
+        "Sabri\\Platform\\Security\\Registry\\ModuleRegistry"
+      ],
+      "file_25_module_key": "file-25-public-experience",
+      "accepted_runtime_contract": "reviewed-current-0.99.0-source-contract-pending-staging",
+      "bundled_with_file_25": false,
+      "staging_status": "pending",
+      "current_repository_head": "a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb",
+      "current_source_version_observed": "0.99.0"
+    },
+    {
+      "file": 25,
+      "name": "Sabri Unified Global Visual Experience and Design System",
+      "candidate_version": "0.15.0",
+      "canonical_primary_color": "#087A4E",
+      "design_token_owner": "file-25",
+      "structural_shell_owner": "file-20",
+      "bundled_with_file_25": true,
+      "staging_status": "pending",
+      "package_status": "build-input-not-acceptance",
+      "schema_version": "2",
+      "installed_preflight": "wp sabri file25 staging-probe --expected-commit=<sha>",
+      "source_branch": "fix/reviews-595-614-cross-file-completion-20261005",
+      "source_status": "corrected-candidate-pending-exact-head-ci"
+    }
   ],
-  "acceptance_rule":"No module is staging-accepted or production-accepted merely because this matrix, source code, a ZIP or green CI exists.",
-  "artifact_verification":{"verifier":"tools/verify-staging-artifact.php","outer_artifact_sha256_supported":true,"inner_package_checksum_required":true,"embedded_manifest_match_required":true,"embedded_dependency_matrix_match_required":true,"staging_acceptance_implied":false},
-  "staging_test_plan":"config/staging-test-plan.json"
+  "acceptance_rule": "No module is staging-accepted or production-accepted merely because this matrix, source code, a ZIP or green CI exists.",
+  "artifact_verification": {
+    "verifier": "tools/verify-staging-artifact.php",
+    "outer_artifact_sha256_supported": true,
+    "inner_package_checksum_required": true,
+    "embedded_manifest_match_required": true,
+    "embedded_dependency_matrix_match_required": true,
+    "staging_acceptance_implied": false
+  },
+  "staging_test_plan": "config/staging-test-plan.json",
+  "observed_repository_heads": {
+    "10": "4b8a3dda140186c01b05d998e729cb1aeeed2cf3",
+    "11": "c2df8e72bad76dc1a7fb83cbe039541f7aa1fd8b",
+    "12": "2b369ef2d609247896e1ab32118f1dc498407f51",
+    "14": "db60c4bc5c37a5c88126b78c31b34c75236f33d7",
+    "15": "4e5d768d637052063bf37a038592b8f7b27f120a",
+    "17": "8ae656e51796d1f05865d8be5dca2480443d79ca",
+    "18": "04a5872e3e2e170ee400e7c607e39abd5484df65",
+    "19": "04078025b643ab7696e4cb4e37826bf152defa18",
+    "20": "8a4dbcaf4fef8e926b9b834ecfde16c21a0f00ca",
+    "21": "f2eb7e95ddea327af36ea725ffb923b029f885e6",
+    "22": "b7a7f2e69411cbd32f0574fd12d766fb70c01b7a",
+    "23": "a8a8c805f4730998ccb44bd95c87591836561759",
+    "24": "a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb",
+    "26": "bbea3aad466792a4a6a62b53532bbd45c7c592de",
+    "observed_at": "2026-10-05",
+    "evidence_class": "repository-source-only-not-staging-live",
+    "00": "2fa7c022ee9cd1b65432e900579512f304532442",
+    "03": "636e3ef965423887f810718abec3cd1c11c3659d",
+    "07": "67c32ec4af45a7de6e3d9c1dbf0f8614d6b5a844",
+    "08": "70541974ce0ffb16aebef557c3016eb7447662f4",
+    "09": "d35eb982becdf0224a5b850a0c6fb4ace8bf075b"
+  }
 }
