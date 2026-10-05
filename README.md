@@ -6,97 +6,66 @@ WordPress module for the **Sabri Social Homeopathy Platform**. This is the exist
 
 ## Current corrective candidate
 
-- Runtime: `0.14.0`
+- Runtime: `0.15.0`
 - Schema: `2`
-- Branch: `feature/25a-25b-foundation`
-- Pull request: Draft PR #1
+- Branch: `fix/reviews-595-614-cross-file-completion-20261005`
+- Baseline main SHA reviewed: `59927df876dc92c7461351420c7b7c95c65c6a93`
 - Governing product plan: Master Plan `v3.0`
-- Governing shell plan: File 20 `v4.1`
-- Source implementation status: **Complete**
-- Known unresolved source defects: **0**
+- Governing File 25 plan: Final Harmonized Specification `2.0`
+- Source correction status: **Reviews 595–614 corrected; exact-head CI pending**
+- Known unresolved source defects after the recorded corrections: **0**
 - Hostinger staging accepted: **No**
 - Production approved: **No**
-- Live deployment authorized: **No**
+- Live deployment verified: **No**
 
-Version `0.14.0` corrects authoritative-contract drift, binds the File 25 staging candidate to the reviewed File 08 `0.2.1` public clinic projection, and now carries machine-verifiable three-plan traceability for Master Plan v3.0, All-Chats v2.1, and File 25 Specification 2.0.
+Version `0.15.0` reopens the earlier source-completion declaration against current companion repository truth. It corrects File 00 and File 08 contract drift, restores default-deny high-risk authorization, preserves recoverable public profile routes in Safe Mode through a data-free 503 native-theme surface, restores release-documentation contracts, and records current repository heads separately from historical reviewed pins.
 
-## Source implementation completion
+## Source implementation status
 
-The governed File 25 source scope is complete against the Sabri Social Homeopathy Platform Definitive Master Plan `v3.0`, the All-Chats Recovered Directive Register `v2.1`, and File 25 Final Harmonized Specification `2.0`.
+The governed File 25 source scope has been re-reviewed through **Reviews 595–614** against the Definitive Master Plan `v3.0`, File 25 Final Harmonized Specification `2.0`, and current companion repository source truth.
 
 Machine-readable traceability:
 
 ```text
 config/source-completion-matrix.json
 config/all-chats-directive-matrix.json
+config/review595-614-twenty-round-cross-file-completeness-ledger.json
+config/staging-dependencies.json
 ```
 
-Executable verification:
-
-```bash
-php tools/verify-source-completion.php
-```
-
-Human-readable declaration:
+Current repository-head audit:
 
 ```text
-docs/SOURCE-IMPLEMENTATION-COMPLETION-DECLARATION-2026-08-04.md
+docs/CROSS-FILE-HEAD-AUDIT-2026-10-05.md
 ```
 
-“Source implementation complete” means the governed File 25 source-owned capabilities are implemented, delegated ownership boundaries are enforced, Reviews 20–93 remain executable, and no known unresolved source defect is open. It does **not** mean Hostinger staging, Founder acceptance, production approval, live deployment or operational acceptance.
+The candidate remains **pending exact-head CI**. Repository source evidence does not establish Hostinger staging, Founder acceptance, production approval, live deployment, deployed database/schema state, migration state, or operational acceptance.
 
-## Corrected ownership boundaries
+## Current ownership and compatibility boundaries
 
-- **File 00 `1.2.4`, contract `1.1.2`:** identity, membership state, Founder identity, suspension, eligibility, guardian policy, professional eligibility, and public-profile authorization.
-- **File 03 `0.2.0`:** profile master data, same-origin profile media, and explicit public-contact consent.
-- **File 08 `0.2.1`, public clinic contract `1.0.0`:** clinic, availability, appointment truth, authoritative practitioner gating, and owner-executed public clinic projection. File 25 consumes only the public DTO and performs no File 08 table reads.
-- **File 09 `1.1.0`:** Doctor verification decision and immutable approved professional snapshot.
-- **File 18 `1.2.0-RC1`:** seller, listing, moderation, contact, offer, metric, and direct-deal truth. File 25 consumes owner-executed public DTOs only.
-- **File 20 `1.2.0`:** sole global shell, route, navigation, sidebar, drawer, and structural layout owner.
-- **File 21:** publication, Home/News, interaction, moderation, and timeline truth.
-- **File 24 `>=0.25.3 <0.26.0`:** security, privacy, compliance, incident, audit-evidence, and resilience governance.
-- **File 25:** visual tokens, public visual projection, profiles, federated timelines, reusable components, responsive refinement, accessibility, SEO presentation, visual acceptance, and deterministic staging packaging.
+- **File 00:** current observed main runtime `1.2.44`, DB `1.4.5`, membership contract `1.2.3`. File 25 supports the reviewed `1.2.2` and current `1.2.3` assertion contracts without direct File 00 table reads.
+- **File 03:** current observed main `1.2.0-rc18`, contract `1.4.0`; profile master data, canonical URLs, public media and contact-consent truth remain File 03-owned.
+- **File 08:** current observed main `1.2.15`, schema `3.4.0`, public clinic projection `1.1.0`. File 25 supports reviewed projection contracts `1.0.0` and `1.1.0` only through the strict public DTO.
+- **File 09:** current observed `1.3.0`, integration contract `1.1.0`; Doctor verification truth remains File 09-owned.
+- **File 18:** seller/listing truth remains owner-native; File 25 consumes owner-executed public DTOs only.
+- **File 20:** current observed `1.4.17`, central-plan contract `1.0.0`; sole global shell/navigation/structural-layout owner.
+- **File 21:** current observed package `1.0.5`, runtime `1.0.3`, schema `1.0.0`; canonical publication/ProfileTimeline owner.
+- **File 22:** current observed `1.0.0-rc.3`; create/edit workflow owner.
+- **File 23:** current observed `1.2.0`; private publishing-operations owner.
+- **File 24:** current observed `0.99.0`; security, privacy, compliance, incident, audit-evidence and resilience owner.
+- **File 25:** public visual tokens, public profile/timeline presentation, reusable public components, accessibility/responsive refinement, SEO presentation and visual acceptance contracts.
 
-## File 08 exact reviewed input
+The current integrated staging candidate must satisfy at least **WordPress 7.0** and **PHP 8.1** because current companion requirements are stricter than File 25's standalone minima of WordPress 6.5/PHP 8.0.
 
-File 25's deterministic staging matrix is bound to:
+## Version 0.15.0 corrections — Reviews 595–614
 
-```text
-File 08 runtime: 0.2.1
-Public clinic contract: 1.0.0
-Source commit: bd6a10b693991fc518788ef8e3cba49531454821
-Candidate SHA-256: 36ce0c78aa51396b02bd0705021e66782bfc45b74636ac65b0826bd372103578
-Source CI: Corrective Quality #64 / 30744250320
-Hostinger staging status: pending
-```
-
-Required owner symbols:
-
-```php
-SWC_VERSION
-SWC_PUBLIC_CLINIC_CONTRACT_VERSION
-swc_get_public_clinic_projection()
-swc_public_clinic_projection_contract()
-```
-
-The DTO allow list is `name`, dedicated clinic `address`, `country`, `city`, `hours`, and `timezone`. File 25 discards contact fields and native identifiers even if a malformed provider attempts to include them. Phone and WhatsApp remain governed separately by File 03 value ownership and contact consent.
-
-## Version 0.14.0 corrections
-
-- Corrected the canonical-contact filter so consented File 03 phone/WhatsApp values survive the default filter while substitutions remain denied.
-- Changed high-risk rebuild/migration authorization to fail closed unless an authoritative provider explicitly returns `true`.
-- Added `CHAT-UX-001` welcome visual presentation with File 20 retained as the exclusive first-visit/session/30-day frequency owner.
-- Added All-Chats v2.1 directive traceability and corrected the File 24 source-integration status wording in `SECURITY.md`.
-- Replaced stale File 00 assumptions with exact `SMC_Contracts::assertions()` contract `1.1.2`.
-- Removed File 25 reads from foreign File 00 professional-credential and clinic tables.
-- Removed locally derived Doctor verification, qualification-role inference, and license-expiry authority.
-- Required both File 00 eligibility/can-practice assertions and File 09 current verification decision.
-- Projected professional presentation only from File 09's immutable approved snapshot.
-- Removed File 25 age calculation; explicit File 00 minor/guardian assertions govern, while unknown ordinary contact state fails closed.
-- Replaced the File 08 placeholder with the exact reviewed `0.2.1` owner contract and pending-Hostinger staging evidence.
-- Replaced File 18 direct SQL with owner APIs: future `smp_get_public_profile_listings()` or the bounded `SMP_Utils::current_seller()` + `SMP_REST::products()` transitional path.
-- Updated the File 00/03/08/09/18/20/21/24/25 dependency matrix and Hostinger staging scenarios.
-- Added the dual-plan source-completion matrix and executable verifier without changing the external acceptance boundary.
+- Reconciled File 00 current contract `1.2.3` while preserving exact reviewed `1.2.2` compatibility.
+- Reconciled File 08 current public clinic projection `1.1.0` while preserving exact reviewed `1.0.0` compatibility and the strict field/exclusion allow-list.
+- Changed high-risk timeline-index rebuild and migration execute/rollback authorization to **default deny** unless an explicit authoritative approval adapter returns true.
+- Added the Safe Mode public recovery surface: canonical profile routes remain recoverable with a data-free, no-store, noindex `503` native-theme template while optional providers, design assets, migrations and File 25 write paths stay disabled.
+- Added explicit root accessibility, performance, migration, rollback and staging-acceptance contracts required by the File 25 release structure.
+- Added a dated cross-file current-HEAD audit and current repository-head observations without replacing historical reviewed dependency pins.
+- Recorded all twenty rounds and the six defect rounds in a machine-readable ledger.
 
 ## Existing visual and public contracts retained
 
@@ -166,7 +135,7 @@ A passing source suite, package verifier, or installed preflight authorizes manu
 ## Remaining mandatory gates
 
 - Exact Files 00/03/06/08/09/10/11/12/18/20/21/24/25 installation on canonical Hostinger staging.
-- Real File 08 `0.2.1` public/private/eligible/ineligible/suspended/revoked/empty clinic projections and File 25 rendering behavior.
+- Real File 08 current `1.2.15` public/private/eligible/ineligible/suspended/revoked/empty clinic projections and File 25 rendering behavior.
 - Real Founder, Doctor, Member, Patient, Student, minor, suspended, rejected, private, and wrong-author workflows.
 - File 03 consent-on/consent-off, File 09 expiry/revocation, and File 18 owner-DTO tests.
 - Urdu RTL, keyboard, screen reader, 200%/400% zoom, forced colors, reduced motion, target viewports, and visual regression evidence.
