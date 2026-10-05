@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace {
     if (! defined('ABSPATH')) { define('ABSPATH', __DIR__ . '/fixtures/'); }
-    define('SMC_VERSION', '1.2.38');
-    define('SMC_CONTRACT_VERSION', '1.2.2');
+    define('SMC_VERSION', '1.2.44');
+    define('SMC_CONTRACT_VERSION', '1.2.3');
     define('SPD_VERSION', '1.2.0-rc2');
     define('SPD_CONTRACT_VERSION', '1.4.0');
     define('GDO_VERSION', '1.3.0');
-    define('WCA_VERSION', '1.2.0');
-    define('SWC_VERSION', '1.2.0');
+    define('WCA_VERSION', '1.2.15');
+    define('SWC_VERSION', '1.2.15');
     define('SWC_PUBLIC_CLINIC_CONTRACT_VERSION', '1.1.0');
 
     final class WP_User
@@ -92,7 +92,7 @@ namespace {
     {
         if ($user_id !== 7) { return []; }
         return [
-            'contract_version' => '1.0.0',
+            'contract_version' => '1.1.0',
             'clinic' => [
                 'name' => 'Global Clinic', 'address' => 'Main Road', 'country' => 'Pakistan',
                 'city' => 'Gujrat', 'hours' => 'Mon–Fri 09:00–17:00', 'timezone' => 'Asia/Karachi',
@@ -103,7 +103,7 @@ namespace {
     function swc_public_clinic_projection_contract(): array
     {
         return [
-            'contract_version' => '1.0.0', 'owner' => 'file-08',
+            'contract_version' => '1.1.0', 'owner' => 'file-08',
             'fields' => ['name', 'address', 'country', 'city', 'hours', 'timezone'],
             'excludes' => ['phone','whatsapp','email','user_id','native_id','verification_evidence','appointments','patient_data','private_notes','analytics','payments','clinical_records','messages'],
             'writes_data' => false,
@@ -117,7 +117,7 @@ namespace {
 
     $base = static function (int $user_id, string $type = 'member'): array {
         return [
-            'contract_version' => '1.2.2', 'user_id' => $user_id, 'application_exists' => true,
+            'contract_version' => '1.2.3', 'user_id' => $user_id, 'application_exists' => true,
             'institutional_account' => false, 'account_class' => 'member', 'membership_type' => $type,
             'status' => 'approved', 'approved' => true, 'suspended' => false, 'eligible' => true,
             'guardian_verified' => true, 'professional_verified' => $type === 'doctor',
@@ -181,7 +181,7 @@ namespace {
     $check = static function (bool $condition, string $message) use (&$failures): void { if (! $condition) { $failures[] = $message; } };
     $native = new Native_Integration();
 
-    $check($native->membership_available(), 'File 00 1.2.38 / contract 1.2.2 must be accepted.');
+    $check($native->membership_available(), 'File 00 1.2.44 / contract 1.2.3 must be accepted through the compatible 1.2.x contract family.');
     $check($native->profiles_available(), 'File 03 1.2.0-rc2 / contract 1.4.0 must be accepted through current public DTO APIs.');
     $check($native->doctor_verification_available(), 'File 09 1.3.0 / integration contract 1.1.0 must be accepted.');
     $check($native->founder_user_id() === 1, 'Founder identity must come only from File 00.');
@@ -193,7 +193,7 @@ namespace {
     $check(! $native->is_verified_doctor(14), 'Expired verification must fail closed.');
     $check(! $native->is_verified_doctor(15), 'Invalid verification date must fail closed.');
     $check($native->membership_assertions(12) === [], 'Mismatched File 00 assertion contract must fail closed.');
-    $check($native->clinic_available(), 'Current File 08 1.2.0 / canonical contract 1.1.0 with bounded public projection 1.0.0 must be available.');
+    $check($native->clinic_available(), 'Current File 08 1.2.15 / canonical and bounded public projection contract 1.1.0 must be available.');
 
     $credentials = $native->professional_credentials(7);
     $check(($credentials['qualification'] ?? '') === 'DHMS', 'Qualification must come from the current public professional projection.');
@@ -203,7 +203,7 @@ namespace {
 
     $contract = $native->clinic_contract();
     $check(($contract['canonical_contract_version'] ?? '') === '1.1.0', 'File 08 current canonical public-clinic contract must be 1.1.0.');
-    $check(($contract['compatibility_projection_contract_version'] ?? '') === '1.0.0', 'File 25 must retain the bounded compatibility DTO contract 1.0.0.');
+    $check(($contract['compatibility_projection_contract_version'] ?? '') === '1.1.0', 'File 25 must consume the current bounded File 08 public DTO contract 1.1.0.');
     $clinic = $native->clinic(7);
     $check(($clinic['name'] ?? '') === 'Global Clinic', 'Clinic must come from File 08 bounded public projection.');
     $check(! array_key_exists('phone', $clinic), 'File 08 contact must not bypass File 03 contact consent.');
