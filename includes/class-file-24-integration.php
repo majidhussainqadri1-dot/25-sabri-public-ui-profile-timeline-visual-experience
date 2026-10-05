@@ -23,7 +23,7 @@ final class File_24_Integration
     public const MODULE_KEY = 'file-25-public-experience';
     public const REVIEWED_MINIMUM_VERSION = '0.99.0';
     public const REVIEWED_MAXIMUM_VERSION = '1.0.0';
-    public const REVIEWED_SOURCE_COMMIT = '0be43b3f424d7b53865587b2770479ca33f51a0b';
+    public const REVIEWED_SOURCE_COMMIT = 'a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb';
 
     private static bool $pending_safe_mode_request = false;
 
