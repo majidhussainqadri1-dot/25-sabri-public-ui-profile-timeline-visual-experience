@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.15.0 — Twenty-Round Current Cross-File Completion Review 595–614
+
+### Corrected
+
+- Reconciled File 25 with current File 00 main membership contract `1.2.3` while preserving the reviewed `1.2.2` compatibility family and zero foreign-table reads.
+- Reconciled File 25 with current File 08 public clinic projection `1.1.0` while preserving reviewed `1.0.0` compatibility under the same strict bounded field/exclusion contract.
+- Restored fail-closed authorization for high-risk timeline-index rebuild and migration execute/rollback operations; capability alone no longer authorizes them.
+- Added a Safe Mode public recovery surface so canonical File 25 profile routes remain recoverable through a data-free, no-store/noindex `503` native-theme template while optional providers and File 25 mutations stay disabled.
+- Reconciled current companion repository-head observations and integrated WordPress/PHP minima without converting repository evidence into staging/live evidence.
+- Restored the explicit release-documentation contracts required by the File 25 plan.
+
+### Added
+
+- `config/review595-614-twenty-round-cross-file-completeness-ledger.json`
+- `tests/review595-614-twenty-round-cross-file-completeness.php`
+- `docs/CROSS-FILE-HEAD-AUDIT-2026-10-05.md`
+- `ACCESSIBILITY.md`, `PERFORMANCE.md`, `MIGRATION.md`, `ROLLBACK.md`, and `STAGING-ACCEPTANCE.md`
+- Current repository-head observations in `config/staging-dependencies.json`.
+
+### Review result
+
+Defect rounds: **596, 599, 610, 611, 613, 614**. The other fourteen rounds found no new source defect in their assigned scope after earlier corrections were carried forward.
+
+### Acceptance boundary
+
+The `0.15.0` branch is a repository source candidate. Exact-head CI, Hostinger-equivalent staging, real browser/accessibility/RTL/performance evidence, Founder acceptance, production deployment, exact deployed-code parity, live DB/schema verification, migration-state verification and operational monitoring remain separate gates.
+
+
 ## 0.14.0 — Three-Plan Corrective Review 174–176
 
 ### Corrected
