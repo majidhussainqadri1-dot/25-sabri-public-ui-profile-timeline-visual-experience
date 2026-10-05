@@ -15,12 +15,13 @@
   },
   "purpose": "Exact multi-plugin staging candidate matrix. Reviewed source expectations are repository evidence only; Hostinger staging, production, merge and Founder acceptance remain separate gates.",
   "environment": {
-    "wordpress_minimum": "6.5",
-    "php_minimum": "8.0",
+    "wordpress_minimum": "7.0",
+    "php_minimum": "8.3",
     "target_site": "https://sabrisocialstaging.sabrihomeopathy.com/",
     "live_changes_allowed": false,
     "registration_disabled_required": true,
-    "search_indexing_disabled_required": true
+    "search_indexing_disabled_required": true,
+    "note": "Full current multi-plugin staging baseline. File 25 itself retains its independently tested plugin minimums; this matrix must satisfy the strictest current included companion requirement."
   },
   "modules": [
     {
