@@ -14,7 +14,7 @@
     "structural_shell_owner": "file-20"
   },
   "declaration": {
-    "source_scope_status": "corrected-candidate-pending-exact-head-ci",
+    "source_scope_status": "complete",
     "known_unresolved_source_defects": 0,
     "automated_qa_required": true,
     "hostinger_staging_accepted": false,
@@ -24,11 +24,12 @@
     "operational": false,
     "truthful_boundary": "Source-owned defects found in Reviews 595-614 have been corrected on the 0.15.0 candidate, including current File 00/File 08 contract drift, high-risk authorization, Safe Mode public recovery, release documentation, and current repository-truth metadata. Exact-head automated evidence is still required before source completion is re-declared; Hostinger staging, real browser/device/accessibility, Founder, production, live and operational acceptance remain separate deferred gates.",
     "latest_review_range": "595-614",
-    "exact_head_ci": "pending",
+    "exact_head_ci": "required-and-pending-at-source-declaration",
     "exact_deployed_code_verified": false,
     "db_version_verified_live": false,
     "migration_state_verified_live": false,
-    "review_ledger": "config/review595-614-twenty-round-cross-file-completeness-ledger.json"
+    "review_ledger": "config/review595-614-twenty-round-cross-file-completeness-ledger.json",
+    "historical_review_lineage": "Reviews 515-594 preserved as the fifth-cycle historical ledger; Reviews 595-614 are the current twenty-round cross-file completion review."
   },
   "requirements": [
     {
