@@ -43,7 +43,8 @@ final class Dependency_Manager
                 'maximum_exclusive' => Native_Integration::FILE_00_MAXIMUM_VERSION,
                 'contract_version' => defined('SMC_CONTRACT_VERSION') ? (string) SMC_CONTRACT_VERSION : '',
                 'required_contract_version' => Native_Integration::FILE_00_CONTRACT_VERSION,
-                'contract' => 'File 00 versioned membership assertions, Founder identity, suspension, eligibility, and public-profile authorization',
+                'supported_contract_versions' => Native_Integration::FILE_00_SUPPORTED_CONTRACT_VERSIONS,
+                'contract' => 'File 00 current 1.2.3 membership assertions with reviewed 1.2.2 compatibility; Founder identity, suspension, eligibility, and public-profile authorization remain File 00 truth',
             ],
             'profiles' => [
                 'required' => false,
@@ -77,7 +78,8 @@ final class Dependency_Manager
                 'minimum' => Native_Integration::FILE_08_MINIMUM_VERSION,
                 'maximum_exclusive' => Native_Integration::FILE_08_MAXIMUM_VERSION,
                 'required_contract_version' => Native_Integration::FILE_08_PUBLIC_PROJECTION_CONTRACT,
-                'contract' => 'File 08 versioned public clinic projection; File 25 performs no clinic-table reads',
+                'supported_contract_versions' => Native_Integration::FILE_08_SUPPORTED_PUBLIC_PROJECTION_CONTRACTS,
+                'contract' => 'File 08 current public clinic projection 1.1.0 with reviewed 1.0.0 compatibility; File 25 performs no clinic-table reads',
             ],
             'marketplace_projection' => [
                 'required' => false,
@@ -101,7 +103,7 @@ final class Dependency_Manager
                     : '',
                 'required_contract_version' => File_20_Integration::REVIEWED_CONTRACT_VERSION,
                 'reviewed_source_commit' => File_20_Integration::REVIEWED_SOURCE_COMMIT,
-                'contract' => 'File 20 current 1.4.12 structural-shell/central-plan contract; File 25 retains canonical visual-token ownership and must publish the File 20 visual-consumer bridge',
+                'contract' => 'File 20 current reviewed 1.4.x structural-shell/central-plan contract; File 25 retains canonical visual-token ownership and must publish the File 20 visual-consumer bridge',
             ],
             'home_news' => [
                 'required' => false,
