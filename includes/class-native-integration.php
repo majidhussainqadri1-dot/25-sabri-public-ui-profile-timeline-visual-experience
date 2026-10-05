@@ -20,7 +20,8 @@ final class Native_Integration
 {
     public const FILE_00_MINIMUM_VERSION = '1.2.38';
     public const FILE_00_MAXIMUM_VERSION = '1.3.0';
-    public const FILE_00_CONTRACT_VERSION = '1.2.2';
+    public const FILE_00_CONTRACT_VERSION = '1.2.3';
+    public const FILE_00_SUPPORTED_CONTRACT_VERSIONS = ['1.2.2', '1.2.3'];
 
     /** Current File 03 public profile contract — exact reviewed 2026-08-10 family. */
     public const FILE_03_MINIMUM_VERSION = '1.2.0-rc2';
@@ -36,7 +37,8 @@ final class Native_Integration
     public const FILE_08_MINIMUM_VERSION = '1.2.0';
     public const FILE_08_MAXIMUM_VERSION = '1.3.0';
     public const FILE_08_CANONICAL_CONTRACT = '1.1.0';
-    public const FILE_08_PUBLIC_PROJECTION_CONTRACT = '1.0.0';
+    public const FILE_08_PUBLIC_PROJECTION_CONTRACT = '1.1.0';
+    public const FILE_08_SUPPORTED_PUBLIC_PROJECTION_CONTRACTS = ['1.0.0', '1.1.0'];
     public const FILE_18_MINIMUM_VERSION = '1.2.0-RC1';
     public const FILE_18_MAXIMUM_VERSION = '1.3.0';
 
@@ -63,7 +65,7 @@ final class Native_Integration
         $detected = defined('SMC_VERSION')
             && defined('SMC_CONTRACT_VERSION')
             && $this->version_in_range((string) SMC_VERSION, self::FILE_00_MINIMUM_VERSION, self::FILE_00_MAXIMUM_VERSION)
-            && hash_equals(self::FILE_00_CONTRACT_VERSION, trim((string) SMC_CONTRACT_VERSION))
+            && in_array(trim((string) SMC_CONTRACT_VERSION), self::FILE_00_SUPPORTED_CONTRACT_VERSIONS, true)
             && class_exists('SMC_Contracts')
             && method_exists('SMC_Contracts', 'assertions')
             && function_exists('smc_founder_user_id')
@@ -275,7 +277,8 @@ final class Native_Integration
         $expected_fields = $required_fields;
         sort($expected_fields);
 
-        if (! hash_equals(self::FILE_08_PUBLIC_PROJECTION_CONTRACT, trim((string) ($source['contract_version'] ?? '')))
+        $projection_contract = trim((string) ($source['contract_version'] ?? ''));
+        if (! in_array($projection_contract, self::FILE_08_SUPPORTED_PUBLIC_PROJECTION_CONTRACTS, true)
             || sanitize_key((string) ($source['owner'] ?? '')) !== 'file-08'
             || $fields !== $expected_fields
             || array_diff($required_excludes, $excludes) !== []
@@ -287,7 +290,8 @@ final class Native_Integration
 
         return $this->clinic_contract_cache = [
             'canonical_contract_version' => self::FILE_08_CANONICAL_CONTRACT,
-            'compatibility_projection_contract_version' => self::FILE_08_PUBLIC_PROJECTION_CONTRACT,
+            'compatibility_projection_contract_version' => $projection_contract,
+            'reviewed_projection_contract_version' => self::FILE_08_PUBLIC_PROJECTION_CONTRACT,
             'runtime_version' => $runtime,
             'owner' => 'file-08',
             'fields' => $required_fields,
@@ -740,7 +744,7 @@ final class Native_Integration
             return $this->clinic_cache[$user_id] = [];
         }
         if (! is_array($source)
-            || ! hash_equals(self::FILE_08_PUBLIC_PROJECTION_CONTRACT, trim((string) ($source['contract_version'] ?? '')))
+            || ! in_array(trim((string) ($source['contract_version'] ?? '')), self::FILE_08_SUPPORTED_PUBLIC_PROJECTION_CONTRACTS, true)
             || ! is_array($source['clinic'] ?? null)
         ) {
             return $this->clinic_cache[$user_id] = [];
