@@ -86,6 +86,11 @@ final class Plugin
         Staging_CLI::register($staging_probe);
 
         if (Safe_Mode::is_active()) {
+            // Preserve recoverable canonical profile routes with a deliberately
+            // data-free native-theme fallback. Optional providers, migrations,
+            // design assets and File 25 write paths remain disabled.
+            (new Safe_Mode_Public($router))->register();
+            do_action('sabri_public_experience/safe_mode_public_ready', $router);
             Safe_Mode::end();
             return;
         }
