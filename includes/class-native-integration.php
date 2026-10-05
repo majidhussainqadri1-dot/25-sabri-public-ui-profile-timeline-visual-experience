@@ -20,7 +20,8 @@ final class Native_Integration
 {
     public const FILE_00_MINIMUM_VERSION = '1.2.38';
     public const FILE_00_MAXIMUM_VERSION = '1.3.0';
-    public const FILE_00_CONTRACT_VERSION = '1.2.2';
+    public const FILE_00_MINIMUM_CONTRACT_VERSION = '1.2.2';
+    public const FILE_00_MAXIMUM_CONTRACT_VERSION = '1.3.0';
 
     /** Current File 03 public profile contract — exact reviewed 2026-08-10 family. */
     public const FILE_03_MINIMUM_VERSION = '1.2.0-rc2';
@@ -36,7 +37,7 @@ final class Native_Integration
     public const FILE_08_MINIMUM_VERSION = '1.2.0';
     public const FILE_08_MAXIMUM_VERSION = '1.3.0';
     public const FILE_08_CANONICAL_CONTRACT = '1.1.0';
-    public const FILE_08_PUBLIC_PROJECTION_CONTRACT = '1.0.0';
+    public const FILE_08_PUBLIC_PROJECTION_CONTRACT = '1.1.0';
     public const FILE_18_MINIMUM_VERSION = '1.2.0-RC1';
     public const FILE_18_MAXIMUM_VERSION = '1.3.0';
 
@@ -63,7 +64,7 @@ final class Native_Integration
         $detected = defined('SMC_VERSION')
             && defined('SMC_CONTRACT_VERSION')
             && $this->version_in_range((string) SMC_VERSION, self::FILE_00_MINIMUM_VERSION, self::FILE_00_MAXIMUM_VERSION)
-            && hash_equals(self::FILE_00_CONTRACT_VERSION, trim((string) SMC_CONTRACT_VERSION))
+            && $this->version_in_range((string) SMC_CONTRACT_VERSION, self::FILE_00_MINIMUM_CONTRACT_VERSION, self::FILE_00_MAXIMUM_CONTRACT_VERSION)
             && class_exists('SMC_Contracts')
             && method_exists('SMC_Contracts', 'assertions')
             && function_exists('smc_founder_user_id')
@@ -361,7 +362,7 @@ final class Native_Integration
             return $this->assertion_cache[$user_id] = [];
         }
         if (! is_array($source)
-            || ! hash_equals(self::FILE_00_CONTRACT_VERSION, trim((string) ($source['contract_version'] ?? '')))
+            || ! $this->version_in_range((string) ($source['contract_version'] ?? ''), self::FILE_00_MINIMUM_CONTRACT_VERSION, self::FILE_00_MAXIMUM_CONTRACT_VERSION)
             || (int) ($source['user_id'] ?? 0) !== $user_id
         ) {
             return $this->assertion_cache[$user_id] = [];
@@ -379,7 +380,7 @@ final class Native_Integration
         }
 
         $assertions = [
-            'contract_version' => self::FILE_00_CONTRACT_VERSION,
+            'contract_version' => sanitize_text_field((string) ($source['contract_version'] ?? '')),
             'user_id' => $user_id,
             'account_class' => $account_class,
             'membership_type' => $membership_type,
