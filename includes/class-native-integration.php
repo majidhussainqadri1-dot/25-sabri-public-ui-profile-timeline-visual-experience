@@ -364,8 +364,9 @@ final class Native_Integration
         } catch (\Throwable) {
             return $this->assertion_cache[$user_id] = [];
         }
+        $source_contract = trim((string) ($source['contract_version'] ?? ''));
         if (! is_array($source)
-            || ! hash_equals(self::FILE_00_CONTRACT_VERSION, trim((string) ($source['contract_version'] ?? '')))
+            || ! in_array($source_contract, self::FILE_00_SUPPORTED_CONTRACT_VERSIONS, true)
             || (int) ($source['user_id'] ?? 0) !== $user_id
         ) {
             return $this->assertion_cache[$user_id] = [];
@@ -383,7 +384,7 @@ final class Native_Integration
         }
 
         $assertions = [
-            'contract_version' => self::FILE_00_CONTRACT_VERSION,
+            'contract_version' => $source_contract,
             'user_id' => $user_id,
             'account_class' => $account_class,
             'membership_type' => $membership_type,
