@@ -139,6 +139,7 @@ $thumbnail_unsafe = timeline_item(['thumbnail_reference' => 'javascript:alert(1)
 check($thumbnail_unsafe->get('thumbnail_reference') === null, 'Unsafe thumbnail references must be removed.');
 
 $provider = new class implements Timeline_Provider {
+    use \Sabri\PublicExperience\Contracts\Timeline_Provider_Plan_Defaults;
     public function get_provider_id(): string { return 'test-provider'; }
     public function get_provider_version(): string { return '1.0.0'; }
     public function is_available(): bool { return true; }
@@ -161,6 +162,7 @@ check($duplicate_rejected, 'Provider registry must reject duplicate IDs.');
 $invalid_id_rejected = false;
 try {
     $registry->register(new class implements Timeline_Provider {
+    use \Sabri\PublicExperience\Contracts\Timeline_Provider_Plan_Defaults;
         public function get_provider_id(): string { return 'Invalid Provider'; }
         public function get_provider_version(): string { return '1.0.0'; }
         public function is_available(): bool { return true; }
@@ -176,6 +178,7 @@ check($invalid_id_rejected, 'Provider registry must reject non-canonical IDs.');
 $invalid_maturity_rejected = false;
 try {
     $registry->register(new class implements Timeline_Provider {
+    use \Sabri\PublicExperience\Contracts\Timeline_Provider_Plan_Defaults;
         public function get_provider_id(): string { return 'invalid-maturity'; }
         public function get_provider_version(): string { return '1.0.0'; }
         public function is_available(): bool { return true; }
@@ -191,6 +194,7 @@ check($invalid_maturity_rejected, 'Provider registry must reject unknown maturit
 $duplicate_registry = new Timeline_Registry();
 foreach (['first-provider', 'second-provider'] as $index => $provider_id) {
     $duplicate_registry->register(new class($provider_id, $index) implements Timeline_Provider {
+    use \Sabri\PublicExperience\Contracts\Timeline_Provider_Plan_Defaults;
         public function __construct(private string $id, private int $index) {}
         public function get_provider_id(): string { return $this->id; }
         public function get_provider_version(): string { return '1.0.0'; }
@@ -215,6 +219,7 @@ check(count($deduped['items']) === 1, 'Timeline service must suppress cross-prov
 
 $mismatch_registry = new Timeline_Registry();
 $mismatch_registry->register(new class implements Timeline_Provider {
+    use \Sabri\PublicExperience\Contracts\Timeline_Provider_Plan_Defaults;
     public function get_provider_id(): string { return 'wrong-author'; }
     public function get_provider_version(): string { return '1.0.0'; }
     public function is_available(): bool { return true; }
@@ -235,6 +240,7 @@ check($mismatch['provider_errors'] === ['wrong-author'], 'Author mismatch must b
 
 $spoof_registry = new Timeline_Registry();
 $spoof_registry->register(new class implements Timeline_Provider {
+    use \Sabri\PublicExperience\Contracts\Timeline_Provider_Plan_Defaults;
     public function get_provider_id(): string { return 'registered-provider'; }
     public function get_provider_version(): string { return '1.0.0'; }
     public function is_available(): bool { return true; }
@@ -255,6 +261,7 @@ check($spoofed['provider_errors'] === ['registered-provider'], 'Provider identit
 
 $external_registry = new Timeline_Registry();
 $external_registry->register(new class implements Timeline_Provider {
+    use \Sabri\PublicExperience\Contracts\Timeline_Provider_Plan_Defaults;
     public function get_provider_id(): string { return 'external-provider'; }
     public function get_provider_version(): string { return '1.0.0'; }
     public function is_available(): bool { return true; }
@@ -276,6 +283,7 @@ check($external['provider_errors'] === ['external-provider'], 'External canonica
 
 $pagination_registry = new Timeline_Registry();
 $pagination_provider = new class implements Timeline_Provider {
+    use \Sabri\PublicExperience\Contracts\Timeline_Provider_Plan_Defaults;
     /** @var array<string,mixed> */
     public array $last_query = [];
     public function get_provider_id(): string { return 'pagination-provider'; }
