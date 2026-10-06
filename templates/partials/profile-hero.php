@@ -28,7 +28,13 @@ if ($canonical_url !== '' && function_exists('apply_filters')) {
     </div>
     <div class="spux-hero__body">
         <?php if (! empty($profile['avatar_url'])) : ?>
-            <img class="spux-avatar" src="<?php echo esc_url((string) $profile['avatar_url']); ?>" alt="<?php echo esc_attr(sprintf(__('%s profile photograph', 'sabri-public-experience'), $display_name)); ?>" width="160" height="160">
+            <?php
+            $avatar_alt = trim((string) ($profile['avatar_alt'] ?? ''));
+            if ($avatar_alt === '') {
+                $avatar_alt = sprintf(__('%s profile photograph', 'sabri-public-experience'), $display_name);
+            }
+            ?>
+            <img class="spux-avatar" src="<?php echo esc_url((string) $profile['avatar_url']); ?>" alt="<?php echo esc_attr($avatar_alt); ?>" width="160" height="160">
         <?php else : ?>
             <span class="spux-avatar spux-avatar--initials" aria-hidden="true"><?php echo esc_html($initials ?: 'SH'); ?></span>
         <?php endif; ?>
