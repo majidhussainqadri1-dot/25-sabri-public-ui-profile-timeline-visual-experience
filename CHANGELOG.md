@@ -8,13 +8,14 @@
 - Suppressed owner/viewer-mutating profile actions and the Completion Assistant inside preview so preview cannot widen authorization or expose owner controls.
 - Added usable owner-only preview destinations to the Completion Assistant while preserving native File 03 editing ownership.
 - Added bounded `timeline_page_size` (5–50, default 20) and made profile Timeline pagination consume it.
+- Reconciled current File 03 contract `1.4.0` public-media DTO shape: File 25 now consumes owner-approved same-origin `url`/`alt`/focal fields without requiring an absent `attachment_id`.
 - Added explicit browser-Back scroll restoration using same-tab session state while keeping filters/search/pagination URL-addressable.
 - Wired `profile_template` standard/compact/institutional into observable token-based presentation without creating a second shell.
 - Reconciled stale README/WordPress-readme/source-status evidence and removed obsolete historical dependency pins from installation instructions.
 
 ### Review result
 
-Defect rounds: **638, 639, 640, 652, 653**. The other fifteen review scopes were clean after carrying forward prior corrections.
+Defect rounds: **638, 639, 640, 641, 652, 653**. The other fourteen review scopes were clean after carrying forward prior corrections.
 
 ### Acceptance boundary
 
