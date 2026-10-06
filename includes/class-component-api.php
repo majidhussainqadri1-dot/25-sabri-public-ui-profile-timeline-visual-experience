@@ -35,7 +35,7 @@ final class Component_API
 
     public static function register_timeline_provider(mixed $provider): bool
     {
-        if (! $provider instanceof Timeline_Provider) {
+        if (! $provider instanceof Timeline_Provider || ! Timeline_Registry::meets_plan_contract($provider)) {
             return false;
         }
 
@@ -83,6 +83,7 @@ final class Component_API
             'contract_version' => self::CONTRACT_VERSION,
             'owner' => 'file-25',
             'timeline_provider_interface' => Timeline_Provider::class,
+            'timeline_provider_required_methods' => Timeline_Registry::plan_required_methods(),
             'timeline_provider_queue_limit' => self::MAX_PENDING_TIMELINE_PROVIDERS,
             'timeline_registry_owner' => 'file-25-read-projection-registry',
             'card_variant_registry' => 'bounded-request-local',
