@@ -127,7 +127,7 @@ final class Content_Cards
             try {
                 $custom = (string) call_user_func(self::$variant_renderers[$variant], $card);
             } catch (\Throwable) {
-                Observability::emit('visual_component_failure', [
+                self::observe('visual_component_failure', [
                     'component' => 'content_card_variant',
                     'operation' => 'render',
                     'reason_code' => 'variant_renderer_exception',
@@ -293,6 +293,15 @@ final class Content_Cards
             'action_label' => self::text($args['action_label'] ?? '', 100),
             'compact' => ! empty($args['compact']),
         ];
+    }
+
+
+    /** @param array<string,mixed> $context */
+    private static function observe(string $code, array $context = []): void
+    {
+        if (class_exists(Observability::class)) {
+            Observability::emit($code, $context);
+        }
     }
 
     private static function timestamp(mixed $value): ?int
