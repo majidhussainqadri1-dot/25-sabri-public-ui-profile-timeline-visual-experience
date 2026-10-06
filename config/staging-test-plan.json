@@ -63,7 +63,7 @@
     {
       "id": "file08-clinic-projection",
       "category": "integration",
-      "requirement": "Exact current File 08 1.2.0 / schema 3.1.0 branch codex/file08-new-governing-plans-completion-2026 at cb302617d2a2def23de1883b8d9fead10bce7ef3 exposes WCA canonical public-clinic contract 1.1.0 and bounded compatibility projection 1.0.0. File 25 accepts the current runtime family but consumes only name/address/country/city/hours/timezone; phone/email/WhatsApp/native IDs/appointments/patient data remain excluded."
+      "requirement": "Historical reviewed File 08 baseline is 1.2.0/schema 3.1.0; current main at 70541974ce0ffb16aebef557c3016eb7447662f4 is runtime 1.2.15/schema 3.4.0 with public-clinic contract 1.1.0. File 25 consumes only the bounded read projection name/address/country/city/hours/timezone. Current File 08 main does not publish a profile-user→clinic public_ref/booking-destination contract, so File 25 must hide the profile Appointment action rather than infer a route or query File 08 storage."
     },
     {
       "id": "file09-doctor-decision",
@@ -138,7 +138,7 @@
     {
       "id": "profile-native-action-routing",
       "category": "integration",
-      "requirement": "Profile actions must resolve only through native owner contracts: File 03 report/edit/privacy, File 17 Message, File 08 Appointment, File 22 Composer and File 23 Publishing Dashboard. Missing/invalid/expired/unauthorized integration hides the action. File 17 Follow remains hidden until File 17 publishes a current target-bound Follow URL contract."
+      "requirement": "Profile actions resolve only through contracts actually published by native owners. Current source supports File 03 report/edit/privacy and a concrete File 03-projected internal Message URL when present, File 22 Composer, and File 23 Publishing Dashboard. Current File 17 main publishes no target-bound Follow URL and no separate File 25 message-destination hook; current File 08 main publishes no profile-user→booking destination contract. Those unavailable actions must be hidden, never guessed, dead, or mislabeled."
     },
     {
       "id": "profile-owner-publishing-links",
