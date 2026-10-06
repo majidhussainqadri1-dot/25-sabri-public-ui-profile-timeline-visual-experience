@@ -61,8 +61,8 @@ interface Timeline_Provider
  */
 trait Timeline_Provider_Plan_Defaults
 {
-    /** @param array<string,mixed> $item */
-    public function normalize_public_item(array $item, int $author_id): ?Normalized_Timeline_Item
+    /** @param mixed $item */
+    public function normalize_public_item(mixed $item, int $author_id): ?Normalized_Timeline_Item
     {
         unset($item, $author_id);
         return null;
