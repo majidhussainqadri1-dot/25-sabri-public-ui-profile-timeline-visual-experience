@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "file": 25,
+  "review_range": {
+    "first": 615,
+    "last": 634,
+    "count": 20
+  },
+  "basis": {
+    "baseline_main_sha": "19009a0934970d63ca60fda1fe9df1ac7288d42a",
+    "baseline_main_ci": {
+      "run_number": 1540,
+      "run_id": 37451916755,
+      "conclusion": "success"
+    },
+    "candidate_branch": "fix/reviews-615-634-fresh-cross-file-audit-20261006",
+    "file25_plan": "Complete Public UI, Profile Timeline and Visual Experience — Final Harmonized Specification 2.0 plus governing addenda",
+    "central_plan": "Sabri Social Homeopathy Platform Definitive/Consolidated Governing Master Plan 2026",
+    "method": "Fresh 20-scope audit. Each scope was evaluated against plan ownership plus current related repository source truth; corrections preserve canonical owner boundaries and do not convert repository evidence into staging/live truth."
+  },
+  "defect_rounds": [
+    621,
+    623,
+    634
+  ],
+  "clean_rounds": [
+    615,
+    616,
+    617,
+    618,
+    619,
+    620,
+    622,
+    624,
+    625,
+    626,
+    627,
+    628,
+    629,
+    630,
+    631,
+    632,
+    633
+  ],
+  "reviews": [
+    {
+      "review": 615,
+      "focus": "repository-baseline-and-ci-truth",
+      "status": "reviewed-clean",
+      "finding": "Current main baseline 19009a0934970d63ca60fda1fe9df1ac7288d42a and main CI run 1540 were verified as repository/CI evidence only."
+    },
+    {
+      "review": 616,
+      "focus": "file25-plan-scope-and-ownership",
+      "status": "reviewed-clean",
+      "finding": "File 25 remains public profile/timeline/card/visual presentation owner and does not acquire native domain backends."
+    },
+    {
+      "review": 617,
+      "focus": "central-plan-file20-visual-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 20 remains structural shell/layout owner; File 25 visual-system/component ownership remains within current central-plan boundary."
+    },
+    {
+      "review": 618,
+      "focus": "file00-identity-membership-contact-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 00 current assertion family remains bounded and foreign-table reads stay prohibited."
+    },
+    {
+      "review": 619,
+      "focus": "file03-profile-route-edit-privacy-report",
+      "status": "reviewed-clean",
+      "finding": "File 03 remains profile/public-projection owner; File 25 consumes declared projection/routes only."
+    },
+    {
+      "review": 620,
+      "focus": "file07-directory-discovery-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 07 retains directory/discovery/ranking truth; File 25 remains a visual consumer."
+    },
+    {
+      "review": 621,
+      "focus": "file08-clinic-and-appointment-contract",
+      "status": "defect-found-corrected",
+      "finding": "File 25 referenced an unpublished sabri_file08_public_clinic_projection_v1 action hook and claimed Appointment routing complete. Current File 08 main publishes a bounded clinic read projection and booking routes but no profile-user→clinic-ref booking-destination contract. Removed invented hook dependency; Appointment now hides fail-closed."
+    },
+    {
+      "review": 622,
+      "focus": "file09-verification-contract",
+      "status": "reviewed-clean",
+      "finding": "Current File 09 1.3.0/integration 1.1.0 remains within reviewed compatibility and verification truth remains owner-native."
+    },
+    {
+      "review": 623,
+      "focus": "file17-follow-message-contract",
+      "status": "defect-found-corrected",
+      "finding": "File 25 referenced unpublished File 17 action URL hooks. Current File 17 owns relationship/messaging state but no reviewed target-bound Follow URL or File25-specific Message destination hook was found. Removed invented hooks; Message uses only a concrete File03-projected internal URL when present, Follow hides fail-closed."
+    },
+    {
+      "review": 624,
+      "focus": "file18-marketplace-boundary",
+      "status": "reviewed-clean",
+      "finding": "Marketplace public projection remains read-only; no File 18 SQL/domain ownership moved into File 25."
+    },
+    {
+      "review": 625,
+      "focus": "file20-shell-admin-integration",
+      "status": "reviewed-clean",
+      "finding": "Shell/admin nesting and no-second-shell boundary remain intact."
+    },
+    {
+      "review": 626,
+      "focus": "file21-timeline-publication-bridge",
+      "status": "reviewed-clean",
+      "finding": "File 21 remains canonical publication/ProfileTimeline owner; File 25 remains federated presentation."
+    },
+    {
+      "review": 627,
+      "focus": "file22-composer-destination",
+      "status": "reviewed-clean",
+      "finding": "File 22 remains create/edit owner; File 25 resolves only the owner route when available."
+    },
+    {
+      "review": 628,
+      "focus": "file23-publishing-dashboard",
+      "status": "reviewed-clean",
+      "finding": "File 23 remains private publishing-operations owner; File 25 uses guarded owner destination only."
+    },
+    {
+      "review": 629,
+      "focus": "file24-security-privacy-assurance",
+      "status": "reviewed-clean",
+      "finding": "File 24 remains assurance/governance owner; File 25 retains only native secure-rendering obligations."
+    },
+    {
+      "review": 630,
+      "focus": "file26-search-ranking-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 26 remains global search/discovery/ranking owner; File 25 stays profile-local presentation/search UI only."
+    },
+    {
+      "review": 631,
+      "focus": "rest-component-action-security",
+      "status": "reviewed-clean",
+      "finding": "REST/component APIs remain bounded, same-site and permission/rate-limit aware; no unpublished native mutation contract is exposed."
+    },
+    {
+      "review": 632,
+      "focus": "safe-mode-repair-migration-rollback",
+      "status": "reviewed-clean",
+      "finding": "Safe Mode, File25-only repair, reversible redirects and non-destructive ownership boundaries remain intact."
+    },
+    {
+      "review": 633,
+      "focus": "accessibility-performance-i18n-seo-metrics",
+      "status": "reviewed-clean",
+      "finding": "Source contracts cover responsive/RTL/accessibility/performance/SEO/metrics preparation; real browser/device evidence remains external acceptance."
+    },
+    {
+      "review": 634,
+      "focus": "release-status-documentation-truth",
+      "status": "defect-found-corrected",
+      "finding": "README/source/dependency metadata still described the earlier branch and pending exact-head CI after main 19009... had passed CI. Refreshed current review lineage and separated baseline repository/CI proof from still-unverified staging/live truth."
+    }
+  ],
+  "corrections": {
+    "file08_profile_appointment": "Removed unpublished File 08 action hook dependency; fail closed until File 08 publishes an authoritative target-bound booking destination contract.",
+    "file17_profile_actions": "Removed unpublished File 17 Follow/Message URL hooks; Follow hides; Message may use only a concrete File 03 public projection URL.",
+    "status_truth": "Refreshed File 25 review/source metadata from the earlier 595-614 candidate state to the current 615-634 candidate without promoting external acceptance."
+  },
+  "external_truth": {
+    "hostinger_staging_accepted": false,
+    "founder_staging_acceptance": false,
+    "production_accepted": false,
+    "live_deployed": false,
+    "operational": false,
+    "exact_deployed_code_verified": false,
+    "db_version_verified_live": false,
+    "migration_state_verified_live": false
+  },
+  "unresolved_cross_file_dependencies": [
+    "File 08 current main lacks an authoritative profile-user-to-booking-destination contract for File 25.",
+    "File 17 current main lacks an authoritative target-bound Follow destination contract for File 25; no separate File25-specific Message URL hook is relied upon."
+  ],
+  "source_candidate": {
+    "runtime": "0.15.0",
+    "known_unresolved_file25_source_defects_after_corrections": 0,
+    "exact_candidate_head_ci": "pending"
+  }
+}
