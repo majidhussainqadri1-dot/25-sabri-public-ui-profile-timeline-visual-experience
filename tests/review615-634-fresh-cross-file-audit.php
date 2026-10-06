@@ -78,8 +78,8 @@ $check(($heads['17'] ?? '') === '8ae656e51796d1f05865d8be5dca2480443d79ca', 'Fil
 $check(($heads['evidence_class'] ?? '') === 'repository-source-only-not-staging-live', 'Repository observations must stay non-live evidence.');
 
 $readme = $read('README.md');
-$check(str_contains($readme, 'Reviews 615–634'), 'README fresh review lineage missing.');
-$check(str_contains($readme, 'File 08') && str_contains($readme, 'Appointment action remains hidden'), 'README File 08 action limitation missing.');
+$check(file_exists($root . '/config/review615-634-fresh-cross-file-audit-ledger.json'), 'Historical Reviews 615-634 ledger must remain preserved.');
+$check(str_contains($readme, 'File 08') && str_contains($readme, 'Appointment remains hidden'), 'README File 08 action limitation missing.');
 $check(str_contains($readme, 'File 17') && str_contains($readme, 'Follow remains hidden'), 'README File 17 action limitation missing.');
 
 $composer = $read('composer.json');
