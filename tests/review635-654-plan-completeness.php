@@ -48,13 +48,13 @@ $check(str_contains($plan, "'timeline_page_size' => ['type' => 'int', 'default' 
 $check(str_contains($plan, 'public static function preview_urls(array $profile): array'), 'Owner preview URL factory missing.');
 $check(str_contains($plan, "['public', 'member', 'mobile', 'desktop', 'contact', 'search', 'social']"), 'Seven governed preview modes missing.');
 $check(str_contains($plan, 'View-as-Public is a projection-only surface'), 'Projection-only preview rationale missing.');
-$check(str_contains($plan, "$profile['profile_template'] = (string) $preferences['profile_template'];"), 'profile_template preference is not applied.');
+$check(str_contains($plan, "\$profile['profile_template'] = (string) \$preferences['profile_template'];"), 'profile_template preference is not applied.');
 
 $renderer = $read('includes/class-profile-renderer.php');
-$check(str_contains($renderer, "$timeline_page_size = max(5, min(50"), 'Renderer does not consume bounded timeline page size.');
-$check(str_contains($renderer, "'per_page' => $timeline_page_size"), 'Timeline service call does not use governed page size.');
-$check(str_contains($renderer, "$completion_assistant = $preview_mode === ''"), 'Completion Assistant is not suppressed in preview.');
-$check(str_contains($renderer, "$context['preview_urls']"), 'Renderer does not expose authorized preview destinations.');
+$check(str_contains($renderer, "\$timeline_page_size = max(5, min(50"), 'Renderer does not consume bounded timeline page size.');
+$check(str_contains($renderer, "'per_page' => \$timeline_page_size"), 'Timeline service call does not use governed page size.');
+$check(str_contains($renderer, "\$completion_assistant = \$preview_mode === ''"), 'Completion Assistant is not suppressed in preview.');
+$check(str_contains($renderer, "\$context['preview_urls']"), 'Renderer does not expose authorized preview destinations.');
 
 $template = $read('templates/public-profile.php');
 foreach (['spux-preview-toolbar','spux-preview-modes','Contact visibility preview','Search-engine preview','Social share-card preview','data-spux-template','data-spux-preview-mode'] as $marker) {
