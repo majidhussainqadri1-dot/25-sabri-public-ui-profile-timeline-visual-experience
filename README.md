@@ -6,23 +6,24 @@ WordPress module for the **Sabri Social Homeopathy Platform**. This is the exist
 
 ## Current corrective candidate
 
-- Runtime: `0.15.0`
+- Runtime: `0.16.0`
 - Schema: `2`
-- Branch: `fix/reviews-595-614-cross-file-completion-20261005`
-- Baseline main SHA reviewed: `59927df876dc92c7461351420c7b7c95c65c6a93`
-- Governing product plan: Master Plan `v3.0`
+- Branch: `fix/reviews-615-634-plan-completion-20261006`
+- Baseline main SHA reviewed: `e5e26696ffb1169884809d34127ed0cae1ba5b50`
+- Governing product plan: Master Plan `v3.0` plus current central addenda
 - Governing File 25 plan: Final Harmonized Specification `2.0`
-- Source correction status: **Reviews 595–614 corrected; exact-head CI pending**
+- Source correction status: **Reviews 615–634 corrected; exact-head CI pending**
 - Known unresolved source defects after the recorded corrections: **0**
 - Hostinger staging accepted: **No**
+- Founder acceptance: **No**
 - Production approved: **No**
 - Live deployment verified: **No**
 
-Version `0.15.0` reopens the earlier source-completion declaration against current companion repository truth. It corrects File 00 and File 08 contract drift, restores default-deny high-risk authorization, preserves recoverable public profile routes in Safe Mode through a data-free 503 native-theme surface, restores release-documentation contracts, and records current repository heads separately from historical reviewed pins.
+Version `0.16.0` performs a fresh twenty-round plan/cross-file completion audit over the merged `0.15.0` main baseline. It completes the File 25 timeline-provider contract, owner preview surfaces, Founder native appointment presentation, governed timeline page-size setting, privacy-minimized observability taxonomy and current File 09/File 23 repository-truth metadata.
 
 ## Source implementation status
 
-The governed File 25 source scope has been re-reviewed through **Reviews 595–614** against the Definitive Master Plan `v3.0`, File 25 Final Harmonized Specification `2.0`, and current companion repository source truth.
+The governed File 25 source scope has been re-reviewed through **Reviews 615–634** against the Definitive Master Plan `v3.0`, File 25 Final Harmonized Specification `2.0`, and current companion repository source truth.
 
 Machine-readable traceability:
 
@@ -30,16 +31,17 @@ Machine-readable traceability:
 config/source-completion-matrix.json
 config/all-chats-directive-matrix.json
 config/review595-614-twenty-round-cross-file-completeness-ledger.json
+config/review615-634-twenty-round-plan-completion-ledger.json
 config/staging-dependencies.json
 ```
 
-Current repository-head audit:
+Current review report:
 
 ```text
-docs/CROSS-FILE-HEAD-AUDIT-2026-10-05.md
+docs/REVIEWS-615-634-SIXTH-FRESH-PLAN-COMPLETION-2026-10-06.md
 ```
 
-The candidate remains **pending exact-head CI**. Repository source evidence does not establish Hostinger staging, Founder acceptance, production approval, live deployment, deployed database/schema state, migration state, or operational acceptance.
+The `0.16.0` candidate remains **pending exact-head CI** until GitHub Actions completes on the final branch head. Repository source evidence does not establish Hostinger staging, Founder acceptance, production approval, live deployment, deployed database/schema state, migration state, or operational acceptance.
 
 ## Current ownership and compatibility boundaries
 
@@ -56,6 +58,16 @@ The candidate remains **pending exact-head CI**. Repository source evidence does
 - **File 25:** public visual tokens, public profile/timeline presentation, reusable public components, accessibility/responsive refinement, SEO presentation and visual acceptance contracts.
 
 The current integrated staging candidate must satisfy at least **WordPress 7.0** and **PHP 8.1** because current companion requirements are stricter than File 25's standalone minima of WordPress 6.5/PHP 8.0.
+
+## Version 0.16.0 corrections — Reviews 615–634
+
+- Refreshed current File 09 and File 23 repository-source observations without converting source evidence into staging/live truth.
+- Completed the section-46 Timeline Provider Contract: normalization, canonical URL, visibility, public actions, public metrics, correction state, sync events and health are now governed at registration/runtime.
+- Added Founder native appointment presentation when the native action owner supplies a safe destination.
+- Surfaced all seven owner-only profile preview modes: logged-out public, registered member, mobile, desktop, contact visibility, search-engine and social share-card.
+- Added bounded `timeline_page_size` configuration (5–50, default 20) and wired it into public rendering.
+- Added the complete privacy-minimized diagnostic taxonomy required by section 74, including reviewed File 24 advisory forwarding for security-critical diagnostic classes.
+- Preserved all prior review ledgers while advancing current traceability through Reviews 615–634.
 
 ## Version 0.15.0 corrections — Reviews 595–614
 
