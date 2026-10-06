@@ -4,7 +4,7 @@ Tags: design-system, profiles, timeline, accessibility, responsive, public-ui, c
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 0.15.0
+Stable tag: 0.16.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,7 +14,7 @@ File 25 global public design system, public profiles, authoritative File 00/08/0
 
 This is the existing File 25, canonically named “Sabri Unified Global Visual Experience and Design System,” with the subtitle “Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency.” No duplicate File 26 is created.
 
-The reviewed 0.15.0 source correction includes:
+The reviewed 0.16.0 source correction includes:
 
 * explicit three-plan traceability for Master Plan v3.0, All-Chats v2.1, and File 25 Specification 2.0;
 * canonical File 03 contact preservation with monotonic revoke-only filters and substitution denial;
