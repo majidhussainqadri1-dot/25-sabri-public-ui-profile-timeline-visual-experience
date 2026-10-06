@@ -22,7 +22,7 @@
     "production_accepted": false,
     "live_deployed": false,
     "operational": false,
-    "truthful_boundary": "Source-owned defects found in Reviews 595-614 have been corrected on the 0.15.0 candidate, including current File 00/File 08 contract drift, high-risk authorization, Safe Mode public recovery, release documentation, and current repository-truth metadata. Exact-head automated evidence is still required before source completion is re-declared; Hostinger staging, real browser/device/accessibility, Founder, production, live and operational acceptance remain separate deferred gates.",
+    "truthful_boundary": "Source-owned defects found in Reviews 595-614 have been corrected on the 0.15.0 candidate, including current File 00/File 08 contract drift, high-risk authorization, Safe Mode public recovery, release documentation, and current repository-truth metadata. Exact-head automated evidence is still required before source completion is re-declared; Hostinger staging, real browser/device/accessibility, Founder, production, live and operational acceptance remain separate deferred gates. Post-Reviews-595–614 revalidation additionally requires current owner-native profile-action routing and 2026-10-06 File 09/File 23 repository-head parity; these remain source evidence only.",
     "latest_review_range": "595-614",
     "exact_head_ci": "required-and-pending-at-source-declaration",
     "exact_deployed_code_verified": false,
@@ -124,7 +124,7 @@
       "id": "F25-PROFILE-CLASSES-HERO-30-38",
       "source": "File 25 sections 30-38",
       "status": "implemented",
-      "summary": "Founder, verified Doctor and permitted Member presentation, profile hero, sections, actions and public-view boundaries are implemented from current owner assertions and projections.",
+      "summary": "Founder, verified Doctor and permitted Member presentation, profile hero, sections and actions are implemented from owner assertions/projections. Owner-native action URLs fail closed: missing or stale owner integration hides the action rather than creating a dead or misleading button.",
       "evidence": [
         "includes/class-profile-repository.php",
         "includes/class-profile-data.php",

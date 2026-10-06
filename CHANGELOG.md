@@ -2,6 +2,12 @@
 
 ## 0.15.0 — Twenty-Round Current Cross-File Completion Review 595–614
 
+### Post-review revalidation — 2026-10-06
+
+- Added owner-native, fail-closed profile action resolution for File 03 report/edit/privacy, File 17 Message, File 08 Appointment, File 22 Composer and File 23 Publishing Dashboard.
+- Follow is deliberately hidden until File 17 publishes a target-bound Follow URL contract; a generic Network page is not mislabeled as a Follow action.
+- Refreshed File 09 current main to `9639f75ba046ac1a36e39d5e9aae56c7bae3279b` and File 23 current main to `dcae138e6073f4d0ff596623deb05b9940b8271b` after both advanced relative to the dated audit.
+- Added syntax validation for `assets/js/future-public-experience.js` and a governed post-614 regression gate.
 ### Corrected
 
 - Reconciled File 25 with current File 00 main membership contract `1.2.3` while preserving the reviewed `1.2.2` compatibility family and zero foreign-table reads.

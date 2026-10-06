@@ -41,7 +41,8 @@
       "tools/verify-structure.php",
       "tools/verify-future-structure.php",
       "tools/verify-file06-and-components.php",
-      "tools/verify-provider-metadata.php"
+      "tools/verify-provider-metadata.php",
+      "tests/post614-current-head-action-reconciliation.php"
     ]
   }
 }

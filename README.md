@@ -12,7 +12,7 @@ WordPress module for the **Sabri Social Homeopathy Platform**. This is the exist
 - Baseline main SHA reviewed: `59927df876dc92c7461351420c7b7c95c65c6a93`
 - Governing product plan: Master Plan `v3.0`
 - Governing File 25 plan: Final Harmonized Specification `2.0`
-- Source correction status: **Reviews 595–614 corrected; exact-head CI pending**
+- Source correction status: **Reviews 595–614 corrected; post-review current-head/action reconciliation in progress**
 - Known unresolved source defects after the recorded corrections: **0**
 - Hostinger staging accepted: **No**
 - Production approved: **No**
@@ -65,6 +65,9 @@ The current integrated staging candidate must satisfy at least **WordPress 7.0**
 - Added the Safe Mode public recovery surface: canonical profile routes remain recoverable with a data-free, no-store, noindex `503` native-theme template while optional providers, design assets, migrations and File 25 write paths stay disabled.
 - Added explicit root accessibility, performance, migration, rollback and staging-acceptance contracts required by the File 25 release structure.
 - Added a dated cross-file current-HEAD audit and current repository-head observations without replacing historical reviewed dependency pins.
+- Completed fail-closed owner-native profile actions: File 03 report/edit/privacy, File 17 Message, File 08 Appointment, File 22 Composer and File 23 Publishing Dashboard; Follow stays hidden until File 17 publishes a target-bound Follow URL contract.
+- Revalidated File 09 and File 23 current repository heads on 2026-10-06 after their source truth advanced during the audit window.
+- CI now syntax-checks both `assets/js/public.js` and `assets/js/future-public-experience.js`.
 - Recorded all twenty rounds and the six defect rounds in a machine-readable ledger.
 
 ## Existing visual and public contracts retained

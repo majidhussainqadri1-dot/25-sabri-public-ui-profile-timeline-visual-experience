@@ -97,13 +97,178 @@ final class Current_Companion_2026_08_10
     public static function filter_action_url(string $url, string $action, int $user_id): string
     {
         $action = sanitize_key($action);
+        $user_id = max(0, $user_id);
+        if ($user_id <= 0) {
+            return '';
+        }
+
+        $candidate = Public_URL::sanitize_same_site($url, false);
+        if ($candidate === '') {
+            $candidate = self::native_action_url($action, $user_id);
+        }
+
         if (in_array($action, ['appointment', 'message'], true)) {
             $lifecycle = self::professional_lifecycle($user_id);
             if ($lifecycle !== '' && $lifecycle !== 'active') {
                 return '';
             }
         }
-        return $url;
+
+        return Public_URL::sanitize_same_site($candidate, false);
+    }
+
+    /**
+     * Resolve only destinations declared by the canonical owner module.
+     * File 25 renders links; it never performs relationship, appointment,
+     * profile, Composer or publishing-dashboard mutations here.
+     */
+    private static function native_action_url(string $action, int $user_id): string
+    {
+        $viewer_id = function_exists('get_current_user_id') ? max(0, (int) get_current_user_id()) : 0;
+        $owner = $viewer_id > 0 && $viewer_id === $user_id;
+
+        if ($action === 'report') {
+            $source = self::personal_site($user_id);
+            return Public_URL::sanitize_same_site((string) ($source['report_url'] ?? ''), false);
+        }
+
+        if ($action === 'message' && $viewer_id > 0 && ! $owner) {
+            $source = self::personal_site($user_id);
+            $from_profile = Public_URL::sanitize_same_site((string) ($source['contacts']['internal_message_url'] ?? ''), false);
+            if ($from_profile !== '') {
+                return $from_profile;
+            }
+            try {
+                $resolved = apply_filters('sabri_network_message_profile_url', '', $user_id, $viewer_id, self::FILE_03_CONTRACT);
+            } catch (\Throwable) {
+                return '';
+            }
+            return is_string($resolved) ? Public_URL::sanitize_same_site($resolved, false) : '';
+        }
+
+        // File 17 currently owns Follow/Connect state but does not publish a
+        // target-bound Follow URL contract. Do not turn its generic Network
+        // page into a misleading Follow action. A future owner contract may
+        // supply a same-site, current, target-bound destination here.
+        if ($action === 'follow' && $viewer_id > 0 && ! $owner) {
+            try {
+                $claim = apply_filters(
+                    'sabri_file17_profile_action_url_v1',
+                    null,
+                    'follow',
+                    $user_id,
+                    $viewer_id,
+                    self::FILE_03_CONTRACT
+                );
+            } catch (\Throwable) {
+                return '';
+            }
+            if (! is_array($claim)
+                || empty($claim['available'])
+                || sanitize_key((string) ($claim['action'] ?? '')) !== 'follow'
+                || (int) ($claim['target_user_id'] ?? 0) !== $user_id
+            ) {
+                return '';
+            }
+            return self::current_claim_url($claim, 'url', 300);
+        }
+
+        if ($action === 'appointment' && $viewer_id > 0 && ! $owner) {
+            try {
+                $claim = apply_filters('sabri_file08_public_clinic_projection_v1', null, $user_id, $viewer_id, self::FILE_03_CONTRACT);
+            } catch (\Throwable) {
+                return '';
+            }
+            if (! is_array($claim)
+                || ! hash_equals('1.0.0', trim((string) ($claim['contract_version'] ?? '')))
+                || (int) ($claim['doctor_user_id'] ?? 0) !== $user_id
+                || sanitize_key((string) ($claim['status'] ?? '')) !== 'active'
+                || sanitize_key((string) ($claim['visibility'] ?? '')) !== 'public'
+            ) {
+                return '';
+            }
+            return self::current_claim_url($claim, 'appointment_url', 300);
+        }
+
+        if (in_array($action, ['edit_profile', 'manage_privacy'], true)
+            && $owner
+            && self::file03_route_declared('/account/profile/')
+        ) {
+            return Public_URL::sanitize_same_site(home_url('/account/profile/'), false);
+        }
+
+        if ($action === 'composer' && $owner
+            && class_exists('Sabri\\UniversalComposer\\Core\\Page_Resolver')
+            && is_callable(['Sabri\\UniversalComposer\\Core\\Page_Resolver', 'url'])
+        ) {
+            try {
+                $resolved = \Sabri\UniversalComposer\Core\Page_Resolver::url();
+            } catch (\Throwable) {
+                return '';
+            }
+            return is_string($resolved) ? Public_URL::sanitize_same_site($resolved, false) : '';
+        }
+
+        if ($action === 'publishing_dashboard' && $owner
+            && class_exists('SPDB_Dashboard_Router')
+            && is_callable(['SPDB_Dashboard_Router', 'route_url'])
+            && class_exists('SPDB_Membership_Guard')
+            && is_callable(['SPDB_Membership_Guard', 'can_user_view_restricted_dashboard'])
+            && class_exists('SPDB_Capabilities')
+            && is_callable(['SPDB_Capabilities', 'current_user_can'])
+        ) {
+            try {
+                if (! \SPDB_Membership_Guard::can_user_view_restricted_dashboard($viewer_id)
+                    || ! \SPDB_Capabilities::current_user_can('spdb_view_dashboard')
+                ) {
+                    return '';
+                }
+                $resolved = \SPDB_Dashboard_Router::route_url();
+            } catch (\Throwable) {
+                return '';
+            }
+            return is_string($resolved) ? Public_URL::sanitize_same_site($resolved, false) : '';
+        }
+
+        return '';
+    }
+
+    /** @param array<string,mixed> $claim */
+    private static function current_claim_url(array $claim, string $field, int $max_age): string
+    {
+        $generated = trim((string) ($claim['generated_at'] ?? ''));
+        $valid_until = trim((string) ($claim['valid_until'] ?? ''));
+        $generated_ts = $generated !== '' ? strtotime($generated) : false;
+        $valid_ts = $valid_until !== '' ? strtotime($valid_until) : false;
+        $now = time();
+        if ($generated_ts === false
+            || $valid_ts === false
+            || $generated_ts > $now + 60
+            || $generated_ts < $now - max(60, $max_age)
+            || $valid_ts < $now
+        ) {
+            return '';
+        }
+        return Public_URL::sanitize_same_site((string) ($claim[$field] ?? ''), false);
+    }
+
+    private static function file03_route_declared(string $route): bool
+    {
+        if (! function_exists('spd_get_profile_contract_manifest')) {
+            return false;
+        }
+        try {
+            $manifest = spd_get_profile_contract_manifest();
+        } catch (\Throwable) {
+            return false;
+        }
+        if (! is_array($manifest)
+            || sanitize_key((string) ($manifest['owner_key'] ?? '')) !== 'file03'
+            || ! hash_equals(self::FILE_03_CONTRACT, trim((string) ($manifest['contract_version'] ?? '')))
+        ) {
+            return false;
+        }
+        return in_array($route, (array) ($manifest['routes'] ?? []), true);
     }
 
     /** @param array<string,mixed> $existing @param array<string,mixed> $profile @return array<string,mixed> */
