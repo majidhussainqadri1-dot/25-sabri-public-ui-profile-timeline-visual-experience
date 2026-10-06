@@ -31,7 +31,7 @@ The audit re-read the File 25 Final Harmonized Specification 2.0, the central go
 | 638 | Profile Actions / View as Public | Defect corrected |
 | 639 | Completion Assistant / preview access | Defect corrected |
 | 640 | Timeline page size / browser Back | Defect corrected |
-| 641 | File 03 public projection/privacy | Clean |
+| 641 | File 03 public projection/privacy/media | Defect corrected |
 | 642 | File 08 clinic/appointment boundary | Clean |
 | 643 | File 17 Follow/Message boundary | Clean |
 | 644 | File 21 publication/ProfileTimeline | Clean |
@@ -46,7 +46,7 @@ The audit re-read the File 25 Final Harmonized Specification 2.0, the central go
 | 653 | Release/status/documentation truth | Defect corrected |
 | 654 | Final cross-file parity / external truth | Clean |
 
-Defect rounds: **638, 639, 640, 652, 653**.
+Defect rounds: **638, 639, 640, 641, 652, 653**.
 
 ## Review 638 — View as Public was nominal rather than complete
 
@@ -93,6 +93,20 @@ Correction:
 - filter/search/page state remains URL-addressable;
 - public JavaScript stores scroll position only in same-tab `sessionStorage` and restores it only for browser `back_forward` navigation;
 - storage/privacy failure degrades safely without breaking the public page.
+
+## Review 641 — current File 03 media DTO shape had drifted from File 25's consumer
+
+Current File 03 main `636e3ef965423887f810718abec3cd1c11c3659d` remains contract `1.4.0`, but its public media projection publishes bounded same-origin `url`, `alt`, `focal_x` and `focal_y` fields. It does not require or publish a private `attachment_id` in that public DTO.
+
+File 25 still required `attachment_id` before accepting avatar/cover media. Therefore a valid current File 03 public profile could lose its avatar/cover in File 25 and the Completion Assistant could falsely report missing image/alt data.
+
+Correction:
+
+- added a bounded current File 03 public-media adapter that accepts only same-origin URL, canonical alt text and bounded focal coordinates;
+- kept the historical attachment-ID helper only as compatibility metadata, not as a prerequisite for current media;
+- profile rendering now consumes the canonical owner-approved URL directly;
+- canonical avatar alt metadata is preserved and the template uses a descriptive fallback only when the owner supplies no alt;
+- no File 03 table or private media identifier is required.
 
 ## Review 652 — profile_template was a dead governed setting
 
