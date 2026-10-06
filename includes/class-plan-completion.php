@@ -353,7 +353,10 @@ final class Plan_Completion
             return false;
         }
         if (in_array($operation, ['rebuild_index', 'migration_execute', 'migration_rollback'], true)) {
-            return apply_filters('sabri_public_experience/high_risk_authorized', true, $operation, get_current_user_id()) === true;
+            // High-risk projection rebuilds and migration mutations require an
+            // explicit owner-approved authorization adapter. Capability alone is
+            // intentionally insufficient; absent approval fails closed.
+            return apply_filters('sabri_public_experience/high_risk_authorized', false, $operation, get_current_user_id()) === true;
         }
         return true;
     }

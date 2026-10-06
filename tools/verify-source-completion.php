@@ -34,7 +34,7 @@ $assert = static function (bool $condition, string $message) use (&$failures): v
 
 $assert(($matrix['schema'] ?? null) === 1, 'Matrix schema must be integer 1.');
 $assert(($matrix['module']['file_number'] ?? null) === 25, 'Matrix must govern File 25.');
-$assert(($matrix['module']['runtime'] ?? null) === '0.14.0', 'Matrix runtime must match 0.14.0.');
+$assert(($matrix['module']['runtime'] ?? null) === '0.15.0', 'Matrix runtime must match 0.15.0.');
 $assert(($matrix['declaration']['source_scope_status'] ?? null) === 'complete', 'Source scope must be declared complete.');
 $assert(($matrix['declaration']['known_unresolved_source_defects'] ?? null) === 0, 'Known unresolved source defects must be integer zero.');
 $assert(($matrix['declaration']['automated_qa_required'] ?? null) === true, 'Automated QA must remain mandatory.');
@@ -46,8 +46,8 @@ foreach (['hostinger_staging_accepted', 'founder_acceptance', 'production_accept
 $plugin = file_get_contents($root . '/sabri-public-experience.php');
 $assert(is_string($plugin), 'Main plugin file must be readable.');
 if (is_string($plugin)) {
-    $assert(preg_match('/^\s*\* Version:\s*0\.14\.0\s*$/m', $plugin) === 1, 'Plugin header version must match matrix runtime.');
-    $assert(str_contains($plugin, "define('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.14.0');"), 'Runtime constant must match matrix runtime.');
+    $assert(preg_match('/^\s*\* Version:\s*0\.15\.0\s*$/m', $plugin) === 1, 'Plugin header version must match matrix runtime.');
+    $assert(str_contains($plugin, "define('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.15.0');"), 'Runtime constant must match matrix runtime.');
     $assert(str_contains($plugin, "'includes/class-future-public-experience.php'"), 'Future Public Experience class must be loaded by the production bootstrap.');
 }
 
@@ -179,6 +179,19 @@ if (is_array($future)) {
     $assert(($future['invariants']['quality_score_affects_public_ranking'] ?? true) === false, 'Future quality score may not affect public ranking.');
 }
 foreach ([
+    'ACCESSIBILITY.md',
+    'PERFORMANCE.md',
+    'MIGRATION.md',
+    'ROLLBACK.md',
+    'STAGING-ACCEPTANCE.md',
+    'docs/CROSS-FILE-HEAD-AUDIT-2026-10-05.md',
+    'config/review595-614-twenty-round-cross-file-completeness-ledger.json',
+    'tests/review595-614-twenty-round-cross-file-completeness.php',
+] as $currentEvidence) {
+    $assert(file_exists($root . '/' . $currentEvidence), 'Current Reviews 595-614 evidence is missing: ' . $currentEvidence);
+}
+
+foreach ([
     'includes/class-future-public-experience.php',
     'assets/css/future-public-experience.css',
     'assets/js/future-public-experience.js',
@@ -194,7 +207,7 @@ foreach ([
 $readme = file_get_contents($root . '/README.md');
 $assert(is_string($readme), 'README must be readable.');
 if (is_string($readme)) {
-    $assert(str_contains($readme, 'Source implementation status: **Complete**'), 'README must declare source implementation complete.');
+    $assert(str_contains($readme, 'Reviews 595–614') && str_contains($readme, 'Known unresolved source defects after the recorded corrections: **0**'), 'README must declare current corrected source status.');
     $assert(str_contains($readme, 'Hostinger staging accepted: **No**'), 'README must retain the Hostinger staging boundary.');
     $assert(str_contains($readme, 'Production approved: **No**'), 'README must retain the production boundary.');
 }

@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "file": 25,
+  "review_range": {
+    "first": 595,
+    "last": 614,
+    "count": 20
+  },
+  "basis": {
+    "repository_baseline": "59927df876dc92c7461351420c7b7c95c65c6a93",
+    "branch": "fix/reviews-595-614-cross-file-completion-20261005",
+    "file25_plan": "Complete Public UI, Profile Timeline and Visual Experience — Final Harmonized Specification 2.0",
+    "platform_plan": "Sabri Social Homeopathy Platform Definitive Master Plan v3.0",
+    "method": "Each round was completed as a separate scope review; defects were corrected only after the round finding was established, then later rounds used the corrected branch state."
+  },
+  "defect_rounds": [
+    596,
+    599,
+    610,
+    611,
+    613,
+    614
+  ],
+  "clean_rounds": [
+    595,
+    597,
+    598,
+    600,
+    601,
+    602,
+    603,
+    604,
+    605,
+    606,
+    607,
+    608,
+    609,
+    612
+  ],
+  "reviews": [
+    {
+      "review": 595,
+      "focus": "governance-and-canonical-scope",
+      "status": "reviewed-clean",
+      "finding": "File 25 remains public visual/profile/timeline presentation; no second shell/domain backend/search owner."
+    },
+    {
+      "review": 596,
+      "focus": "file00-membership-contract",
+      "status": "defect-found-corrected",
+      "finding": "Current File 00 contract advanced to 1.2.3; File 25 hard-pinned 1.2.2 and would fail closed. Added exact reviewed 1.2.2/1.2.3 compatibility with 1.2.3 current."
+    },
+    {
+      "review": 597,
+      "focus": "file03-profile-contract-routes",
+      "status": "reviewed-clean",
+      "finding": "Current File 03 contract 1.4.0 and runtime 1.2.0-rc18 remain inside reviewed family; integrated environment minimum WP 7.0/PHP 8.1 recorded."
+    },
+    {
+      "review": 598,
+      "focus": "file07-directory-boundary",
+      "status": "reviewed-clean",
+      "finding": "Directory remains discovery owner; File 25 presentation consumes bounded public destinations only."
+    },
+    {
+      "review": 599,
+      "focus": "file08-clinic-projection",
+      "status": "defect-found-corrected",
+      "finding": "Current File 08 public clinic projection advanced to 1.1.0 with unchanged bounded field shape; File 25 hard-pinned 1.0.0. Added reviewed 1.0.0/1.1.0 compatibility with 1.1.0 current."
+    },
+    {
+      "review": 600,
+      "focus": "file09-verification",
+      "status": "reviewed-clean",
+      "finding": "Current File 09 contract 1.1.0 remains compatible and verification truth stays owner-native."
+    },
+    {
+      "review": 601,
+      "focus": "file14-conversion",
+      "status": "reviewed-clean",
+      "finding": "File 14 remains conversion/CTA owner and current 1.4.4 repository truth does not transfer domain ownership to File 25."
+    },
+    {
+      "review": 602,
+      "focus": "file20-shell",
+      "status": "reviewed-clean",
+      "finding": "Current File 20 1.4.17 / contract 1.0.0 remains inside File 25 reviewed range; structural shell ownership preserved."
+    },
+    {
+      "review": 603,
+      "focus": "file21-timeline",
+      "status": "reviewed-clean",
+      "finding": "Current File 21 package/runtime 1.0.5/1.0.3 keeps ProfileTimeline owner API compatible; File 25 remains read-only adapter."
+    },
+    {
+      "review": 604,
+      "focus": "file22-composer",
+      "status": "reviewed-clean",
+      "finding": "Create/edit authority remains File 22; File 25 only presents canonical destination/action."
+    },
+    {
+      "review": 605,
+      "focus": "file23-publishing-dashboard",
+      "status": "reviewed-clean",
+      "finding": "Private publishing management remains File 23; File 25 public presentation does not duplicate its backend."
+    },
+    {
+      "review": 606,
+      "focus": "file24-security-privacy",
+      "status": "reviewed-clean",
+      "finding": "Current File 24 remains 0.99.0 and central assurance owner; File 25 bounded integration remains compatible."
+    },
+    {
+      "review": 607,
+      "focus": "optional-domain-providers",
+      "status": "reviewed-clean",
+      "finding": "Files 05/06/10/11/12/15/18 remain native owners; missing optional provider hides/degenerates the section rather than inventing truth."
+    },
+    {
+      "review": 608,
+      "focus": "rest-mutation-contracts",
+      "status": "reviewed-clean",
+      "finding": "Preferences, rebuild-index and reconcile-profile REST mutations exist with permission, idempotency, validation and rate controls."
+    },
+    {
+      "review": 609,
+      "focus": "component-api",
+      "status": "reviewed-clean",
+      "finding": "Required render/register component APIs exist without acquiring native data ownership."
+    },
+    {
+      "review": 610,
+      "focus": "high-risk-authorization",
+      "status": "defect-found-corrected",
+      "finding": "High-risk rebuild/migration authorization defaulted to allow despite prior correction/test. Default changed to deny unless explicit owner approval returns true."
+    },
+    {
+      "review": 611,
+      "focus": "safe-mode-public-recovery",
+      "status": "defect-found-corrected",
+      "finding": "Safe Mode returned before public router/renderer, violating recoverable-route/basic-safe-template requirement. Added data-free 503 native-theme recovery route/template."
+    },
+    {
+      "review": 612,
+      "focus": "accessibility-performance-rtl",
+      "status": "reviewed-clean",
+      "finding": "Source contracts remain present; real browser/device/zoom/screen-reader/RTL/performance evidence remains external staging evidence."
+    },
+    {
+      "review": 613,
+      "focus": "release-documentation",
+      "status": "defect-found-corrected",
+      "finding": "Root release documentation required by File 25 structure was incomplete/stale. Added explicit accessibility/performance/migration/rollback/staging documents and refreshed candidate status."
+    },
+    {
+      "review": 614,
+      "focus": "repository-truth-and-environment",
+      "status": "defect-found-corrected",
+      "finding": "Dependency matrix described historical pins as if current and omitted integrated WP/PHP minima. Added dated current repository-head observations and integrated minimums without promoting staging/live status."
+    }
+  ],
+  "corrections": {
+    "file00_contract_compatibility": "Current 1.2.3 plus reviewed 1.2.2 compatibility; no foreign table reads.",
+    "file08_projection_compatibility": "Current 1.1.0 plus reviewed 1.0.0 compatibility over the same strict public allow-list.",
+    "high_risk_authorization": "Default deny; explicit approval adapter required.",
+    "safe_mode_public_recovery": "Canonical profile routes render data-free 503 native-theme recovery surface; optional providers/writes stay disabled.",
+    "release_docs": "Root acceptance/operations documents restored as source contracts only.",
+    "repository_truth": "Current companion HEAD observations are dated source evidence; historical reviewed pins remain separately preserved."
+  },
+  "external_truth": {
+    "hostinger_staging_accepted": false,
+    "founder_staging_acceptance": false,
+    "production_accepted": false,
+    "live_deployed": false,
+    "operational": false,
+    "exact_deployed_code_verified": false,
+    "db_version_verified": false,
+    "migration_state_verified_live": false
+  },
+  "source_candidate": {
+    "version": "0.15.0",
+    "exact_head_ci": "pending",
+    "known_unresolved_source_defects_after_corrections": 0
+  }
+}

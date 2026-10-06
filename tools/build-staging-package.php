@@ -27,6 +27,11 @@ final class File25_Staging_Package_Builder
         'CHANGELOG.md',
         'SECURITY.md',
         'PRIVACY.md',
+        'ACCESSIBILITY.md',
+        'PERFORMANCE.md',
+        'MIGRATION.md',
+        'ROLLBACK.md',
+        'STAGING-ACCEPTANCE.md',
     ];
 
     private const RUNTIME_DIRECTORIES = [
