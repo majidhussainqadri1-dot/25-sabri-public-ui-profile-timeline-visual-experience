@@ -8,8 +8,6 @@ WordPress module for the **Sabri Social Homeopathy Platform**. This is the exist
 
 - Runtime: `0.14.0`
 - Schema: `2`
-- Branch: `feature/25a-25b-foundation`
-- Pull request: Draft PR #1
 - Governing product plan: Master Plan `v3.0`
 - Governing shell plan: File 20 `v4.1`
 - Source implementation status: **Complete**
@@ -18,7 +16,7 @@ WordPress module for the **Sabri Social Homeopathy Platform**. This is the exist
 - Production approved: **No**
 - Live deployment authorized: **No**
 
-Version `0.14.0` corrects authoritative-contract drift, binds the File 25 staging candidate to the reviewed File 08 `0.2.1` public clinic projection, and now carries machine-verifiable three-plan traceability for Master Plan v3.0, All-Chats v2.1, and File 25 Specification 2.0.
+Version `0.14.0` is reconciled against the current File 25 plan, the central governing plan, and current companion repository heads. File 25 now consumes File 08 public clinic contract `1.1.0`, records File 17/19/26 ownership boundaries explicitly, and keeps repository/CI evidence separate from staging/live truth.
 
 ## Source implementation completion
 
@@ -47,40 +45,36 @@ docs/SOURCE-IMPLEMENTATION-COMPLETION-DECLARATION-2026-08-04.md
 
 ## Corrected ownership boundaries
 
-- **File 00 `1.2.4`, contract `1.1.2`:** identity, membership state, Founder identity, suspension, eligibility, guardian policy, professional eligibility, and public-profile authorization.
-- **File 03 `0.2.0`:** profile master data, same-origin profile media, and explicit public-contact consent.
-- **File 08 `0.2.1`, public clinic contract `1.0.0`:** clinic, availability, appointment truth, authoritative practitioner gating, and owner-executed public clinic projection. File 25 consumes only the public DTO and performs no File 08 table reads.
-- **File 09 `1.1.0`:** Doctor verification decision and immutable approved professional snapshot.
-- **File 18 `1.2.0-RC1`:** seller, listing, moderation, contact, offer, metric, and direct-deal truth. File 25 consumes owner-executed public DTOs only.
-- **File 20 `1.2.0`:** sole global shell, route, navigation, sidebar, drawer, and structural layout owner.
-- **File 21:** publication, Home/News, interaction, moderation, and timeline truth.
-- **File 24 `>=0.25.3 <0.26.0`:** security, privacy, compliance, incident, audit-evidence, and resilience governance.
-- **File 25:** visual tokens, public visual projection, profiles, federated timelines, reusable components, responsive refinement, accessibility, SEO presentation, visual acceptance, and deterministic staging packaging.
-
+- **File 00 `1.2.44`, contract `1.2.3`:** identity, membership state, Founder identity, suspension, eligibility, guardian policy and public-profile authorization.
+- **File 03 `1.2.0-rc18`, contract `1.4.0`:** canonical profile master, public profile/personal-site DTO, public contact consent and profile-report/edit routes.
+- **File 07 `1.2.0`, contract `1.2.0`:** Doctors Directory domain discovery; platform-wide ranking remains File 26.
+- **File 08 `1.2.15`, public clinic contract `1.1.0`:** clinic/appointment truth and owner-executed clinic/appointment projections. File 25 performs no File 08 table writes/reads.
+- **File 09 `1.3.0`, integration contract `1.1.0`:** Doctor verification decision and approved professional evidence projection.
+- **File 14 `1.4.4`:** Global Clinic USP/conversion consumer; File 25 remains visual-token owner.
+- **File 17 `2.1.0`:** Follow/Connect/Message/Calls canonical owner; File 25 may render only current owner-authorized destinations/actions.
+- **File 18 `1.2.0-RC1`:** Marketplace truth; File 25 consumes public DTOs only.
+- **File 19 `3.0.5`:** sole user-facing notification center/delivery owner; File 25 creates no duplicate notification backend.
+- **File 20 `1.4.17`:** sole structural shell/navigation/layout owner.
+- **File 21 package `1.0.5` / runtime `1.0.3`:** Home/News/publication/timeline truth.
+- **File 22 current main:** canonical Create/edit workflow and `/create/` destination.
+- **File 23 `1.2.0` current main:** private Publishing Dashboard and publishing-intelligence management.
+- **File 24 `0.99.0`:** security/privacy/compliance/resilience assurance owner.
+- **File 26 `1.2.0`, contract `1.2`:** global Search/Discovery/Recommendations/Knowledge Graph/Classification owner.
+- **File 25:** canonical visual tokens, public visual projection, profile/timeline presentation, component API, responsive/accessibility refinement and deterministic staging packaging.
 ## File 08 exact reviewed input
 
-File 25's deterministic staging matrix is bound to:
-
-```text
-File 08 runtime: 0.2.1
-Public clinic contract: 1.0.0
-Source commit: bd6a10b693991fc518788ef8e3cba49531454821
-Candidate SHA-256: 36ce0c78aa51396b02bd0705021e66782bfc45b74636ac65b0826bd372103578
-Source CI: Corrective Quality #64 / 30744250320
-Hostinger staging status: pending
-```
+File 25's current source matrix is bound to File 08 main `1.2.15`, schema `3.4.0`, public clinic contract `1.1.0`, source commit `70541974ce0ffb16aebef557c3016eb7447662f4`. This is repository source truth only; Hostinger staging remains pending.
 
 Required owner symbols:
 
 ```php
-SWC_VERSION
-SWC_PUBLIC_CLINIC_CONTRACT_VERSION
+WCA_VERSION
+WCA_Contracts::PUBLIC_CLINIC_CONTRACT_VERSION
 swc_get_public_clinic_projection()
 swc_public_clinic_projection_contract()
 ```
 
-The DTO allow list is `name`, dedicated clinic `address`, `country`, `city`, `hours`, and `timezone`. File 25 discards contact fields and native identifiers even if a malformed provider attempts to include them. Phone and WhatsApp remain governed separately by File 03 value ownership and contact consent.
-
+The bounded compatibility DTO allow list is `name`, dedicated clinic `address`, `country`, `city`, `hours`, and `timezone`; current File 03/File 08 cross-file claims additionally provide validated native clinic/appointment destinations without transferring appointment truth to File 25.
 ## Version 0.14.0 corrections
 
 - Corrected the canonical-contact filter so consented File 03 phone/WhatsApp values survive the default filter while substitutions remain denied.
@@ -142,6 +136,7 @@ GET /wp-json/sabri-public/v1/providers/health
 composer validate --strict --no-check-publish
 composer test
 node --check assets/js/public.js
+node --check assets/js/future-public-experience.js
 php tools/verify-structure.php
 php tools/verify-source-completion.php
 ```
