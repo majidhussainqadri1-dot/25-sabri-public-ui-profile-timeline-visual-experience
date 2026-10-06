@@ -67,6 +67,15 @@ final class Timeline_Registry
         if (! self::maturity_is_exact($maturity)) {
             throw new InvalidArgumentException(sprintf('Invalid timeline provider maturity: %s', $maturity));
         }
+        try {
+            $provider->register_sync_events();
+        } catch (\Throwable $exception) {
+            throw new InvalidArgumentException(sprintf(
+                'Timeline provider sync-event registration failed: %s',
+                $raw_id
+            ), 0, $exception);
+        }
+
         if (isset($this->providers[$raw_id])) {
             throw new InvalidArgumentException(sprintf('Timeline provider already registered: %s', $raw_id));
         }
