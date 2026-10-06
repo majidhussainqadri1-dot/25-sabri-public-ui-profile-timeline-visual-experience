@@ -42,6 +42,7 @@ final class Plan_Completion
     private const PREFERENCE_SCHEMA = [
         'profile_template' => ['type' => 'enum', 'default' => 'standard', 'allowed' => ['standard', 'compact', 'institutional']],
         'timeline_provider_mode' => ['type' => 'enum', 'default' => 'federated', 'allowed' => ['federated', 'indexed']],
+        'timeline_page_size' => ['type' => 'int', 'default' => 20, 'minimum' => 5, 'maximum' => 50],
         'public_visibility' => ['type' => 'bool', 'default' => true],
         'responsive_preview' => ['type' => 'enum', 'default' => 'desktop', 'allowed' => ['mobile', 'tablet', 'desktop']],
         'accessibility_mode' => ['type' => 'bool', 'default' => true],
@@ -556,11 +557,13 @@ final class Plan_Completion
         $canonical = Public_URL::sanitize_same_site($profile['canonical_url'] ?? '', false);
         $current = function_exists('get_current_user_id') ? get_current_user_id() : 0;
         $owner = $current > 0 && $current === $user_id;
-        $is_doctor = ($profile['verified'] ?? null) === true && ($profile['class'] ?? '') === 'doctor';
+        $profile_class = (string) ($profile['class'] ?? '');
+        $is_doctor = ($profile['verified'] ?? null) === true && $profile_class === 'doctor';
+        $has_clinic_action = $is_doctor || $profile_class === 'founder';
         if (function_exists('is_user_logged_in') && is_user_logged_in() && ! $owner && $user_id > 0) {
             $actions['follow'] = self::action_url('follow', $user_id);
             $actions['message'] = self::action_url('message', $user_id);
-            if ($is_doctor) {
+            if ($has_clinic_action) {
                 $actions['appointment'] = self::action_url('appointment', $user_id);
             }
             $actions['report'] = self::action_url('report', $user_id);
@@ -737,11 +740,23 @@ final class Plan_Completion
         if (Public_URL::sanitize_same_site($profile['canonical_url'] ?? '', false) === '') {
             $missing[] = 'canonical_profile_url';
         }
+        $preview_urls = [];
+        $canonical = Public_URL::sanitize_same_site($profile['canonical_url'] ?? '', false);
+        if ($canonical !== '') {
+            foreach (self::PREVIEW_MODES as $mode) {
+                $preview = Public_URL::sanitize_same_site(add_query_arg('spux_preview', $mode, $canonical), false);
+                if ($preview !== '') {
+                    $preview_urls[$mode] = $preview;
+                }
+            }
+        }
+
         return [
             'authorized' => true,
             'complete' => $missing === [],
             'missing' => array_values(array_unique($missing)),
             'preview_modes' => self::PREVIEW_MODES,
+            'preview_urls' => $preview_urls,
             'edit_url' => self::action_url('edit_profile', $user_id),
         ];
     }
