@@ -125,10 +125,12 @@ final class Profile_Renderer
         $context['preview_mode'] = $preview_mode;
         $context['preferences'] = Plan_Completion::preferences();
 
+        $timeline_page_size = (int) ($context['preferences']['timeline_page_size'] ?? 20);
+        $timeline_page_size = max(5, min(50, $timeline_page_size));
         $timeline = [
             'items' => [],
             'page' => 1,
-            'per_page' => 20,
+            'per_page' => $timeline_page_size,
             'has_more' => false,
             'truncated' => false,
             'provider_errors' => [],
@@ -159,7 +161,7 @@ final class Profile_Renderer
             $context['timeline_search_error'] = $search_error;
             $timeline = $this->timeline->get_for_author((int) $user->ID, [
                 'page' => max(1, (int) get_query_var('paged')),
-                'per_page' => 20,
+                'per_page' => $timeline_page_size,
                 'content_type' => $content_type,
                 'search' => $search_query,
             ]);
