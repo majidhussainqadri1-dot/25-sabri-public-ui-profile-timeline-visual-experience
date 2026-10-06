@@ -6,6 +6,7 @@ namespace Sabri\PublicExperience\Providers;
 
 use Sabri\PublicExperience\Contracts\Timeline_Provider;
 use Sabri\PublicExperience\Normalized_Timeline_Item;
+use Sabri\PublicExperience\Contracts\Timeline_Provider_Plan_Defaults;
 
 if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
     exit;
@@ -22,6 +23,7 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
  */
 final class File_21_Provider implements Timeline_Provider
 {
+    use Timeline_Provider_Plan_Defaults;
     private const PROVIDER_ID = 'file-21';
     private const MINIMUM_SUPPORTED_VERSION = '1.0.3';
     private const NEXT_INCOMPATIBLE_VERSION = '2.0.0';
@@ -128,7 +130,7 @@ final class File_21_Provider implements Timeline_Provider
                 if (! is_array($native_item)) {
                     continue;
                 }
-                $normalized = $this->normalize($native_item, $author_id);
+                $normalized = $this->normalize_public_item($native_item, $author_id);
                 if ($normalized !== null) {
                     $items[] = $normalized;
                 }
@@ -165,8 +167,12 @@ final class File_21_Provider implements Timeline_Provider
         ];
     }
 
-    /** @param array<string,mixed> $item */
-    private function normalize(array $item, int $author_id): ?Normalized_Timeline_Item
+    /** @param mixed $item */
+    public function normalize_public_item(mixed $item, int $author_id): ?Normalized_Timeline_Item
+    {
+        if (! is_array($item)) {
+            return null;
+        }
     {
         $id = isset($item['id']) ? (int) $item['id'] : 0;
         $title = isset($item['title']) && is_scalar($item['title']) ? (string) $item['title'] : '';
