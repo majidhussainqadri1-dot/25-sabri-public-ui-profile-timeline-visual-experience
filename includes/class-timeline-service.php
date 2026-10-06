@@ -93,7 +93,7 @@ final class Timeline_Service
                     || ! in_array($metadata['maturity'], ['read-only', 'staging-accepted', 'production-accepted'], true)
                     || ! $provider->is_available()
                 ) {
-                    Observability::emit('provider_unavailable', [
+                    self::observe('provider_unavailable', [
                         'provider_id' => (string) $provider_id,
                         'operation' => 'timeline_read',
                         'status' => (string) $metadata['maturity'],
@@ -150,7 +150,7 @@ final class Timeline_Service
                         throw new \UnexpectedValueException('Timeline provider projection helpers disagreed with the normalized public item.');
                     }
                     if (! $this->canonical_is_allowed($provider_url, $item)) {
-                        Observability::emit('broken_canonical_url', [
+                        self::observe('broken_canonical_url', [
                             'provider_id' => (string) $provider_id,
                             'operation' => 'timeline_read',
                             'reason_code' => 'non_canonical_or_external',
@@ -164,7 +164,7 @@ final class Timeline_Service
                         || isset($items[$key])
                         || ($canonical_key !== '' && (isset($provider_canonical_items[$canonical_key]) || isset($canonical_items[$canonical_key])))
                     ) {
-                        Observability::emit('duplicate_projection', [
+                        self::observe('duplicate_projection', [
                             'provider_id' => (string) $provider_id,
                             'operation' => 'timeline_deduplication',
                             'reason_code' => 'native_or_canonical_duplicate',
@@ -185,7 +185,7 @@ final class Timeline_Service
                 }
             } catch (\Throwable $exception) {
                 $errors[] = (string) $provider_id;
-                Observability::emit('normalization_failure', [
+                self::observe('normalization_failure', [
                     'provider_id' => (string) $provider_id,
                     'operation' => 'timeline_projection',
                     'reason_code' => 'provider_contract_failure',
@@ -239,7 +239,7 @@ final class Timeline_Service
             : 500;
         $slow_threshold = max(50, min(10000, $slow_threshold));
         if ($duration_ms >= $slow_threshold) {
-            Observability::emit('slow_query', [
+            self::observe('slow_query', [
                 'operation' => 'timeline_read',
                 'duration_ms' => $duration_ms,
                 'reason_code' => 'timeline_threshold_exceeded',
@@ -257,6 +257,15 @@ final class Timeline_Service
             'truncated' => $truncated,
             'provider_errors' => array_values(array_unique($errors)),
         ];
+    }
+
+
+    /** @param array<string,mixed> $context */
+    private static function observe(string $code, array $context = []): void
+    {
+        if (class_exists(Observability::class)) {
+            Observability::emit($code, $context);
+        }
     }
 
 
