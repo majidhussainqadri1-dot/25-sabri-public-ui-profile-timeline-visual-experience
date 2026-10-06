@@ -248,6 +248,12 @@ final class Profile_Repository
             $value = self::canonical_contact($this->native->profile_contact($user_id, $field));
             if ($value !== '' && $this->visibility->can_show_contact($user_id, $field)) {
                 $canonical[$field] = $value;
+            } elseif ($value !== '') {
+                Observability::emit('privacy_field_rejection', [
+                    'operation' => 'public_profile_projection',
+                    'component' => 'contact',
+                    'reason_code' => 'visibility_policy_rejected_' . $field,
+                ]);
             }
         }
         if ($canonical === []) {
@@ -261,7 +267,13 @@ final class Profile_Repository
         foreach ($canonical as $field => $value) {
             if (array_key_exists($field, $filtered) && $filtered[$field] === true) {
                 $public[$field] = $value;
+                continue;
             }
+            Observability::emit('privacy_field_rejection', [
+                'operation' => 'public_profile_projection',
+                'component' => 'contact',
+                'reason_code' => 'presentation_filter_revoked_' . $field,
+            ]);
         }
 
         return $public;
