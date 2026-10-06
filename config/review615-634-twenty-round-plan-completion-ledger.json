@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "file": 25,
+  "review_range": {
+    "first": 615,
+    "last": 634,
+    "count": 20
+  },
+  "methodology": "Twenty independent source-review rounds were completed against File 25 Final Harmonized Specification 2.0, central governing plans, and current companion repository source truth before this corrective batch. Each defect round was frozen before correction; later rounds evaluate the corrected state only where chronologically applicable.",
+  "baseline": {
+    "main_head": "e5e26696ffb1169884809d34127ed0cae1ba5b50",
+    "baseline_version": "0.15.0",
+    "exact_main_ci": "green-before-new-review"
+  },
+  "defect_rounds": [
+    616,
+    628,
+    630,
+    631,
+    632,
+    634
+  ],
+  "clean_rounds": [
+    615,
+    617,
+    618,
+    619,
+    620,
+    621,
+    622,
+    623,
+    624,
+    625,
+    626,
+    627,
+    629,
+    633
+  ],
+  "reviews": [
+    {
+      "review": 615,
+      "focus": "governance-canonical-ownership",
+      "status": "reviewed-clean",
+      "finding": "File 25 remains the public visual/profile/timeline presentation owner; File 20 shell, File 21 publication, File 24 assurance and File 26 discovery ownership remain intact."
+    },
+    {
+      "review": 616,
+      "focus": "current-repository-truth-status-metadata",
+      "status": "defect-found-corrected",
+      "finding": "File 09 and File 23 repository-head observations plus File 25 candidate/CI lineage were stale after later companion/main changes. Current repository-source evidence was refreshed without promoting staging/live truth."
+    },
+    {
+      "review": 617,
+      "focus": "file00-identity-membership",
+      "status": "reviewed-clean",
+      "finding": "Current File 00 membership contract remains compatible through the reviewed 1.2.2/1.2.3 family; no foreign table reads."
+    },
+    {
+      "review": 618,
+      "focus": "file03-profile-route-contact-authority",
+      "status": "reviewed-clean",
+      "finding": "File 03 remains profile/public-contact/canonical-profile authority and current 1.4.0 contract is compatible."
+    },
+    {
+      "review": 619,
+      "focus": "file07-directory-discovery-boundary",
+      "status": "reviewed-clean",
+      "finding": "Doctor discovery/ranking remains File 07-owned; File 25 is presentation-only."
+    },
+    {
+      "review": 620,
+      "focus": "file08-clinic-projection",
+      "status": "reviewed-clean",
+      "finding": "Current File 08 public clinic projection remains compatible through reviewed 1.0.0/1.1.0 DTOs."
+    },
+    {
+      "review": 621,
+      "focus": "file09-current-verification-companion",
+      "status": "reviewed-clean",
+      "finding": "File 09 main advanced in repository history but retained runtime 1.3.0 and integration contract 1.1.0; File 25 verification consumer remains compatible."
+    },
+    {
+      "review": 622,
+      "focus": "file14-conversion-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 14 conversion/CTA ownership remains native and no duplicate conversion backend was introduced."
+    },
+    {
+      "review": 623,
+      "focus": "file20-shell-token-admin-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 20 remains sole structural shell/navigation/layout owner; File 25 remains visual presentation/token consumer/extension owner."
+    },
+    {
+      "review": 624,
+      "focus": "file21-publication-timeline-owner",
+      "status": "reviewed-clean",
+      "finding": "File 21 remains canonical publication/ProfileTimeline owner; File 25 consumes a bounded read projection only."
+    },
+    {
+      "review": 625,
+      "focus": "file22-composer-destination",
+      "status": "reviewed-clean",
+      "finding": "Create/edit workflows remain File 22-owned and File 25 exposes only safe native destinations."
+    },
+    {
+      "review": 626,
+      "focus": "file23-current-dashboard-companion",
+      "status": "reviewed-clean",
+      "finding": "File 23 main advanced with publishing-intelligence/release work while retaining runtime 1.2.0 and contract 2.0.0; File 25 private-management destination boundary remains compatible."
+    },
+    {
+      "review": 627,
+      "focus": "file24-security-and-file26-search-boundaries",
+      "status": "reviewed-clean",
+      "finding": "File 24 remains assurance/incident owner and File 26 remains global search/ranking owner; File 25 does not duplicate either backend."
+    },
+    {
+      "review": 628,
+      "focus": "timeline-provider-contract-section46",
+      "status": "defect-found-corrected",
+      "finding": "The production provider interface/registry exposed only six methods while the File 25 plan requires thirteen minimum provider capabilities. Added complete provider-plan defaults, registration enforcement, projection helper validation and sync-event registration."
+    },
+    {
+      "review": 629,
+      "focus": "normalized-timeline-object-section47",
+      "status": "reviewed-clean",
+      "finding": "Normalized_Timeline_Item already covers the governed public timeline object, redacts internal IDs and enforces canonical/public state constraints."
+    },
+    {
+      "review": 630,
+      "focus": "profile-actions-and-view-as-public",
+      "status": "defect-found-corrected",
+      "finding": "Founder appointment/clinic action was excluded by a doctor-only gate and six owner preview modes were not surfaced. Founder native appointment routing and all seven owner-only preview destinations are now exposed without changing authorization."
+    },
+    {
+      "review": 631,
+      "focus": "admin-configuration-section71",
+      "status": "defect-found-corrected",
+      "finding": "Timeline page size was hard-coded to 20 despite being a governed File 25 setting. Added bounded 5–50 preference and wired it into public timeline rendering."
+    },
+    {
+      "review": 632,
+      "focus": "observability-section74",
+      "status": "defect-found-corrected",
+      "finding": "The required diagnostic taxonomy was absent. Added privacy-minimized governed events, File 24 elevated-monitoring forwarding for security-critical diagnostics, and runtime instrumentation for provider, normalization, duplicates, canonical URLs, privacy, cache, visual, slow-query, REST authorization, stale-index and rebuild failures."
+    },
+    {
+      "review": 633,
+      "focus": "safe-mode-repair-migration-release",
+      "status": "reviewed-clean",
+      "finding": "Safe Mode recovery, owner-scoped repair, reversible migration and release documentation remain present after the previous correction cycle."
+    },
+    {
+      "review": 634,
+      "focus": "qa-traceability-release-lineage",
+      "status": "defect-found-corrected",
+      "finding": "Completion matrices and historical tests still described Reviews through 594/614 and exact-head status as pending after the merged 0.15.0 main CI. Advanced traceability to Reviews 615–634 and converted historical tests into forward-compatible baselines."
+    }
+  ],
+  "current_companion_source_observations": {
+    "observed_at": "2026-10-06",
+    "evidence_class": "repository-source-only-not-staging-live",
+    "file09_head": "9639f75ba046ac1a36e39d5e9aae56c7bae3279b",
+    "file09_contract": "1.1.0",
+    "file23_head": "dcae138e6073f4d0ff596623deb05b9940b8271b",
+    "file23_contract": "2.0.0"
+  },
+  "external_truth": {
+    "hostinger_staging_accepted": false,
+    "founder_staging_acceptance": false,
+    "production_accepted": false,
+    "live_deployed": false,
+    "operational": false,
+    "exact_deployed_code_verified": false,
+    "db_version_verified_live": false,
+    "migration_state_verified_live": false
+  },
+  "source_candidate": {
+    "version": "0.16.0",
+    "branch": "fix/reviews-615-634-plan-completion-20261006",
+    "exact_head_ci": "pending",
+    "known_unresolved_source_defects_after_corrections": 0
+  }
+}
