@@ -20,7 +20,8 @@ The reviewed 0.16.0 source correction includes:
 * canonical File 03 contact preservation with monotonic revoke-only filters and substitution denial;
 * fail-closed high-risk rebuild/migration authorization requiring strict explicit approval;
 * data-free recoverable Safe Mode public profile routes using a no-store/noindex 503 native-theme surface;
-* Reviews 595–614 current cross-file repository-head reconciliation and release-documentation completion;
+* Reviews 595–614 cross-file repository-head reconciliation and release-documentation completion;
+* Reviews 615–634 fresh plan/cross-file completion, including the complete timeline-provider contract, Founder/native preview actions, governed timeline page size, privacy-minimized observability, and current File 09/File 23 repository-source reconciliation;
 * `CHAT-UX-001` accessible green welcome visual presentation with File 20 retaining the 30-day frequency owner;
 * Master Plan v3.0 and File 20 plan v4.1 ownership reconciliation;
 * current File 00 membership contract `1.2.3` with reviewed `1.2.2` compatibility as the sole membership, Founder, suspension, eligibility, guardian-policy and public-profile assertion authority;
@@ -38,10 +39,10 @@ The reviewed 0.16.0 source correction includes:
 * visible/structured breadcrumbs, safe OpenGraph image alternative text, and governed 404/410 handling;
 * structured Knowledge and Media REST projections plus bounded aggregate provider health;
 * schema-2 route parity, deterministic staging ZIPs, embedded/detached manifests, checksums, independent verification, and installed-package preflight;
-* exact File 24 `>=0.25.3 <0.26.0` reviewed-source integration;
+* current reviewed File 24 `0.99.0` source-contract integration, with security/privacy/compliance/resilience ownership retained by File 24;
 * PHP 8.0/8.3 and JavaScript CI, including authoritative native-contract and foreign-table regression gates.
 
-The exact File 08 staging input is runtime `0.2.1`, source commit `bd6a10b693991fc518788ef8e3cba49531454821`, and candidate SHA-256 `36ce0c78aa51396b02bd0705021e66782bfc45b74636ac65b0826bd372103578`. Source and package verification are complete, but File 08 and File 25 Hostinger runtime acceptance remains pending.
+The historical File 08 `0.2.1` package evidence is retained only as earlier review lineage. The current repository-source observation is File 08 `1.2.15` with canonical/public projection contract `1.1.0`; the exact install set for staging must come from `config/staging-dependencies.json`. Repository evidence does not prove the deployed Hostinger version.
 
 This candidate is not production-complete. Exact multi-plugin Hostinger staging, visual/accessibility evidence, upgrade, rollback, performance, deployment, monitoring, and Founder acceptance remain pending. Source compatibility, a ZIP, or green automated tests do not constitute staging or production acceptance.
 
@@ -50,12 +51,22 @@ This candidate is not production-complete. Exact multi-plugin Hostinger staging,
 1. Use only the exact dependency candidates listed in `config/staging-dependencies.json` on a backed-up, noindex Hostinger staging installation.
 2. Verify the detached SHA-256 checksum and embedded manifest before extracting the File 25 package.
 3. Upload the `sabri-public-experience` folder to `/wp-content/plugins/`.
-4. Confirm File 00 `1.2.4` / contract `1.1.2`, File 03 contact consent, File 08 `0.2.1` / contract `1.0.0`, File 09 `1.1.0`, File 18 `1.2.0-RC1`, File 20 `1.2.0`, and File 24 `0.25.x` exact boundaries.
+4. Confirm the exact versions/contracts recorded in `config/staging-dependencies.json`; at this source review the relevant current observations include File 00 contract `1.2.3`, File 03 contract `1.4.0`, File 08 public projection `1.1.0`, File 09 integration contract `1.1.0`, File 20 contract `1.0.0`, File 23 contract `2.0.0`, and File 24 runtime `0.99.0`.
 5. Verify File 08 owner APIs `swc_get_public_clinic_projection()` and `swc_public_clinic_projection_contract()` before testing clinic sections.
 6. Run `wp sabri file25 staging-probe --expected-commit=<sha>` and correct every fail-closed gate.
 7. Complete real roles, routes, clinic projections, RTL, accessibility, browsers, performance, upgrade, rollback, restore, logs, and Founder acceptance before release.
 
 == Changelog ==
+
+= 0.16.0 =
+* Completed Reviews 615–634; defect rounds 616, 628, 630, 631, 632 and 634 were corrected.
+* Completed the section-46 timeline-provider contract and enforced it at provider/component registration.
+* Added Founder native appointment presentation and all seven owner-only View-as-Public preview modes.
+* Added governed timeline page size (5–50, default 20) and privacy-minimized section-74 diagnostics.
+* Refreshed current File 09/File 23 repository-source observations while keeping staging/live acceptance unclaimed.
+
+= 0.15.0 =
+* Completed Reviews 595–614 current cross-file correction cycle and Safe Mode/release-contract hardening.
 
 = 0.14.0 =
 * Added All-Chats v2.1 traceability and the File 25 welcome visual primitive while preserving File 20 frequency ownership.
