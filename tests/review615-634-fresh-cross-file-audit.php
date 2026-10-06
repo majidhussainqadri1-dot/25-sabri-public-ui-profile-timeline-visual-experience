@@ -62,7 +62,8 @@ try {
     $matrix = [];
     $failures[] = 'Source matrix invalid: ' . $e->getMessage();
 }
-$check(($matrix['declaration']['latest_review_range'] ?? '') === '615-634', 'Source matrix latest review range must be 615-634.');
+$latestRange = (string) ($matrix['declaration']['latest_review_range'] ?? '');
+$check(in_array($latestRange, ['615-634', '635-654'], true), 'Source matrix must preserve or advance beyond Reviews 615-634.');
 $check(($matrix['declaration']['known_unresolved_source_defects'] ?? null) === 0, 'File 25 known unresolved source defects must remain zero after corrections.');
 foreach (['hostinger_staging_accepted','founder_acceptance','production_accepted','live_deployed','operational'] as $gate) {
     $check(($matrix['declaration'][$gate] ?? null) === false, 'Source matrix promoted external gate: ' . $gate);
@@ -77,8 +78,8 @@ $check(($heads['17'] ?? '') === '8ae656e51796d1f05865d8be5dca2480443d79ca', 'Fil
 $check(($heads['evidence_class'] ?? '') === 'repository-source-only-not-staging-live', 'Repository observations must stay non-live evidence.');
 
 $readme = $read('README.md');
-$check(str_contains($readme, 'Reviews 615–634'), 'README fresh review lineage missing.');
-$check(str_contains($readme, 'File 08') && str_contains($readme, 'Appointment action remains hidden'), 'README File 08 action limitation missing.');
+$check(file_exists($root . '/config/review615-634-fresh-cross-file-audit-ledger.json'), 'Historical Reviews 615-634 ledger must remain preserved.');
+$check(str_contains($readme, 'File 08') && str_contains($readme, 'Appointment remains hidden'), 'README File 08 action limitation missing.');
 $check(str_contains($readme, 'File 17') && str_contains($readme, 'Follow remains hidden'), 'README File 17 action limitation missing.');
 
 $composer = $read('composer.json');

@@ -20,7 +20,7 @@ The reviewed 0.15.0 source correction includes:
 * canonical File 03 contact preservation with monotonic revoke-only filters and substitution denial;
 * fail-closed high-risk rebuild/migration authorization requiring strict explicit approval;
 * data-free recoverable Safe Mode public profile routes using a no-store/noindex 503 native-theme surface;
-* Reviews 595–614 current cross-file repository-head reconciliation and release-documentation completion;
+* Reviews 635–654 fresh plan-to-code/cross-file completion, including functional View-as-Public modes, Completion Assistant preview links, governed timeline page size, browser-Back scroll restoration, active profile-template presentation, and release-status reconciliation;
 * `CHAT-UX-001` accessible green welcome visual presentation with File 20 retaining the 30-day frequency owner;
 * Master Plan v3.0 and File 20 plan v4.1 ownership reconciliation;
 * current File 00 membership contract `1.2.3` with reviewed `1.2.2` compatibility as the sole membership, Founder, suspension, eligibility, guardian-policy and public-profile assertion authority;
@@ -34,14 +34,15 @@ The reviewed 0.15.0 source correction includes:
 * reusable containers, layouts, cards, buttons, badges, notices, forms, tables, skeletons, and visual states;
 * exact same-origin URL enforcement for actions, cards, profile media, and OpenGraph media;
 * File 03 public-contact consent for Founder, Doctor, and permitted Member contact rendering;
+* current File 03 contract `1.4.0` public avatar/cover DTO consumption from bounded same-origin `url`/`alt`/focal fields without requiring a private `attachment_id`;
 * immutable canonical Founder public spelling and privacy-safe initials instead of an external avatar service;
 * visible/structured breadcrumbs, safe OpenGraph image alternative text, and governed 404/410 handling;
 * structured Knowledge and Media REST projections plus bounded aggregate provider health;
 * schema-2 route parity, deterministic staging ZIPs, embedded/detached manifests, checksums, independent verification, and installed-package preflight;
-* exact File 24 `>=0.25.3 <0.26.0` reviewed-source integration;
+* current File 24 `0.99.0` reviewed-source integration while staging/live acceptance remains separately unverified;
 * PHP 8.0/8.3 and JavaScript CI, including authoritative native-contract and foreign-table regression gates.
 
-The exact File 08 staging input is runtime `0.2.1`, source commit `bd6a10b693991fc518788ef8e3cba49531454821`, and candidate SHA-256 `36ce0c78aa51396b02bd0705021e66782bfc45b74636ac65b0826bd372103578`. Source and package verification are complete, but File 08 and File 25 Hostinger runtime acceptance remains pending.
+Current repository review observes File 08 main at runtime `1.2.15`, schema `3.4.0`, public-clinic contract `1.1.0`. The exact integrated staging package set and checksums must be frozen from `config/staging-dependencies.json` and the generated staging manifest at release time; repository source observations never substitute for installed staging or live evidence.
 
 This candidate is not production-complete. Exact multi-plugin Hostinger staging, visual/accessibility evidence, upgrade, rollback, performance, deployment, monitoring, and Founder acceptance remain pending. Source compatibility, a ZIP, or green automated tests do not constitute staging or production acceptance.
 
@@ -50,12 +51,22 @@ This candidate is not production-complete. Exact multi-plugin Hostinger staging,
 1. Use only the exact dependency candidates listed in `config/staging-dependencies.json` on a backed-up, noindex Hostinger staging installation.
 2. Verify the detached SHA-256 checksum and embedded manifest before extracting the File 25 package.
 3. Upload the `sabri-public-experience` folder to `/wp-content/plugins/`.
-4. Confirm File 00 `1.2.4` / contract `1.1.2`, File 03 contact consent, File 08 `0.2.1` / contract `1.0.0`, File 09 `1.1.0`, File 18 `1.2.0-RC1`, File 20 `1.2.0`, and File 24 `0.25.x` exact boundaries.
+4. Confirm every installed companion version, contract, schema and package checksum against the exact current `config/staging-dependencies.json` plus generated staging manifest; do not reuse historical version pins as deployed truth.
 5. Verify File 08 owner APIs `swc_get_public_clinic_projection()` and `swc_public_clinic_projection_contract()` before testing clinic sections.
 6. Run `wp sabri file25 staging-probe --expected-commit=<sha>` and correct every fail-closed gate.
 7. Complete real roles, routes, clinic projections, RTL, accessibility, browsers, performance, upgrade, rollback, restore, logs, and Founder acceptance before release.
 
 == Changelog ==
+
+= 0.15.0 =
+* Reviews 635–654 completed a fresh File 25 plan-to-code and companion-boundary audit.
+* Implemented all seven owner-only View-as-Public projection modes and hid owner/viewer-mutating actions while previewing.
+* Added usable Completion Assistant preview destinations without editing File 00/File 03 truth.
+* Added bounded `timeline_page_size` (5–50) and explicit browser-Back scroll restoration for URL-addressable timeline filters/pages.
+* Reconciled current File 03 public media DTO compatibility so valid avatar/cover media and canonical alt metadata no longer disappear when `attachment_id` is absent.
+* Made the governed standard/compact/institutional profile-template setting visibly affect token-based presentation without creating a second shell.
+* Preserved File 08 Appointment and File 17 Follow as fail-closed hidden actions until their canonical owners publish authoritative target-bound destinations.
+* Refreshed repository/dependency documentation without claiming Hostinger staging, production, deployed parity, live DB/schema, migration state or operations.
 
 = 0.14.0 =
 * Added All-Chats v2.1 traceability and the File 25 welcome visual primitive while preserving File 20 frequency ownership.

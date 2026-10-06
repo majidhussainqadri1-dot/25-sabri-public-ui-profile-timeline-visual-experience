@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "file": 25,
+  "review_range": {
+    "first": 635,
+    "last": 654,
+    "count": 20
+  },
+  "basis": {
+    "baseline_main_sha": "210b4b250fd0f996b1fb6b9eb5471dec831f6dfa",
+    "baseline_main_ci": {
+      "run_number": 1601,
+      "run_id": 37503157743,
+      "conclusion": "success"
+    },
+    "candidate_branch": "fix/reviews-635-654-plan-completeness-20261006",
+    "file25_plan": "Complete Public UI, Profile Timeline and Visual Experience — Final Harmonized Specification 2.0 plus governing addenda",
+    "central_plan": "Sabri Social Homeopathy Platform Definitive/Consolidated Governing Master Plan 2026",
+    "method": "Fresh twenty-scope plan-to-code and cross-file audit. Each scope was checked against File 25 plan obligations, central ownership law and current companion repository source. Corrections preserve native owner authority and do not convert repository evidence into staging/live truth."
+  },
+  "defect_rounds": [
+    638,
+    639,
+    640,
+    641,
+    652,
+    653
+  ],
+  "clean_rounds": [
+    635,
+    636,
+    637,
+    642,
+    643,
+    644,
+    645,
+    646,
+    647,
+    648,
+    649,
+    650,
+    651,
+    654
+  ],
+  "reviews": [
+    {
+      "review": 635,
+      "focus": "repository-baseline-and-exact-ci-truth",
+      "status": "reviewed-clean",
+      "finding": "Baseline main 210b4b250fd0f996b1fb6b9eb5471dec831f6dfa and exact main CI run 1601 were verified as repository/CI evidence only."
+    },
+    {
+      "review": 636,
+      "focus": "file25-final-plan-and-central-ownership",
+      "status": "reviewed-clean",
+      "finding": "File 25 remains the public profile/timeline/component visual owner; no second shell, feed, profile master, security center or global search backend was introduced."
+    },
+    {
+      "review": 637,
+      "focus": "file20-shell-and-design-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 20 remains the structural shell/navigation/layout owner while File 25 applies only governed visual/presentation refinements."
+    },
+    {
+      "review": 638,
+      "focus": "profile-actions-and-view-as-public",
+      "status": "defect-found-corrected",
+      "finding": "The seven governed View-as-Public modes existed only as query labels and owner controls still rendered during preview. Added real preview navigation/surfaces and suppress owner/viewer-mutating profile actions in preview."
+    },
+    {
+      "review": 639,
+      "focus": "completion-assistant-preview-access",
+      "status": "defect-found-corrected",
+      "finding": "The completion assistant exposed a preview mode list but no usable preview destinations, and it remained visible inside preview. Added owner preview URLs and suppress completion controls during preview."
+    },
+    {
+      "review": 640,
+      "focus": "timeline-page-size-and-browser-back",
+      "status": "defect-found-corrected",
+      "finding": "The plan allows timeline page size and requires browser-Back scroll restoration, but per-page was hard-coded to 20 and no restoration existed. Added bounded 5..50 timeline_page_size plus URL-preserving Back scroll restoration."
+    },
+    {
+      "review": 641,
+      "focus": "file03-public-profile-and-privacy-projection",
+      "status": "defect-found-corrected",
+      "finding": "Current File 03 contract 1.4.0 public media DTO publishes same-origin url/alt/focal fields but omits attachment_id; File 25 incorrectly required attachment_id and therefore could hide valid current avatar/cover media and falsely report missing alt text. Added bounded current DTO media consumption while retaining legacy attachment-id compatibility helper."
+    },
+    {
+      "review": 642,
+      "focus": "file08-clinic-and-appointment-owner-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 08 remains clinic/appointment owner; File 25 continues to hide Appointment because no profile-user to booking-destination owner contract is published."
+    },
+    {
+      "review": 643,
+      "focus": "file17-follow-and-message-owner-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 17 remains relationship/messaging owner; Follow remains hidden without target-bound owner contract and Message remains limited to a concrete File 03-projected URL when present."
+    },
+    {
+      "review": 644,
+      "focus": "file21-timeline-publication-bridge",
+      "status": "reviewed-clean",
+      "finding": "File 21 remains canonical publication/ProfileTimeline owner; File 25 performs only bounded federated presentation."
+    },
+    {
+      "review": 645,
+      "focus": "file22-composer-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 22 remains create/edit workflow owner and File 25 opens only owner-native Composer destination."
+    },
+    {
+      "review": 646,
+      "focus": "file23-publishing-dashboard-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 23 remains private publishing operations owner; File 25 uses only guarded owner-native dashboard routing."
+    },
+    {
+      "review": 647,
+      "focus": "file24-security-privacy-assurance-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 24 remains assurance/governance owner; File 25 secure rendering and noindex/no-store preview behavior remain local presentation controls."
+    },
+    {
+      "review": 648,
+      "focus": "file26-global-search-ranking-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 26 remains global search/discovery/ranking owner; File 25 search remains profile-local presentation only."
+    },
+    {
+      "review": 649,
+      "focus": "rest-and-component-api",
+      "status": "reviewed-clean",
+      "finding": "REST/component APIs remain bounded, versioned and read-oriented with no new native-domain mutation authority."
+    },
+    {
+      "review": 650,
+      "focus": "observability-and-system-check",
+      "status": "reviewed-clean",
+      "finding": "Diagnostics/System Check boundaries remain File25-local and sensitive/native owner data are not promoted into logs."
+    },
+    {
+      "review": 651,
+      "focus": "safe-mode-repair-migration-rollback",
+      "status": "reviewed-clean",
+      "finding": "Safe Mode, repair and reversible migration remain non-destructive and do not modify foreign owner data."
+    },
+    {
+      "review": 652,
+      "focus": "profile-template-admin-setting",
+      "status": "defect-found-corrected",
+      "finding": "profile_template was configurable but had no observable presentation effect. Wired standard/compact/institutional template state into the profile DOM and token-based CSS without creating a second shell."
+    },
+    {
+      "review": 653,
+      "focus": "release-documentation-and-status-truth",
+      "status": "defect-found-corrected",
+      "finding": "README/readme/source metadata still described the prior audit candidate or obsolete dependency pins after main 210b.../CI1601. Refreshed current audit lineage and removed mutable exact-head CI assertions from static source status."
+    },
+    {
+      "review": 654,
+      "focus": "final-cross-file-parity-and-external-truth",
+      "status": "reviewed-clean",
+      "finding": "Current related repository heads and owner boundaries were rechecked; external staging/live/deployed/database/migration claims remain unpromoted."
+    }
+  ],
+  "corrections": {
+    "view_as_public": "Implemented all seven governed owner preview destinations/surfaces and suppressed owner/viewer-mutating actions inside preview.",
+    "completion_assistant": "Added usable owner preview URLs and removed completion/edit controls from the projection-only preview surface.",
+    "timeline_operability": "Added bounded timeline_page_size and explicit browser-Back scroll restoration while keeping filter/search/page state in the URL.",
+    "profile_template": "Made the governed profile_template setting visibly affect token-based profile presentation without creating a second shell.",
+    "status_truth": "Refreshed documentation/review lineage and records exact-head CI as external evidence rather than a mutable frozen status in source.",
+    "file03_current_media": "Consume File 03 1.4.0 public media URL/alt/focal projection directly; do not require a private attachment_id absent from the current owner DTO. Avatar alt now remains canonical with descriptive render fallback."
+  },
+  "external_truth": {
+    "hostinger_staging_accepted": false,
+    "founder_staging_acceptance": false,
+    "production_accepted": false,
+    "live_deployed": false,
+    "operational": false,
+    "exact_deployed_code_verified": false,
+    "db_version_verified_live": false,
+    "migration_state_verified_live": false
+  },
+  "unresolved_cross_file_dependencies": [
+    "File 08 current main does not publish an authoritative profile-user-to-booking-destination contract for File 25.",
+    "File 17 current main does not publish an authoritative target-bound Follow destination contract for File 25; Message appears only when File 03's public projection contains a concrete owner-approved same-site destination."
+  ],
+  "source_candidate": {
+    "runtime": "0.15.0",
+    "known_unresolved_file25_source_defects_after_corrections": 0,
+    "exact_current_head_ci": "external-evidence-required-not-frozen-in-source"
+  }
+}

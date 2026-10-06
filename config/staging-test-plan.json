@@ -38,7 +38,7 @@
     {
       "id": "file03-current-public-dto",
       "category": "integration",
-      "requirement": "Exact reviewed File 03 1.2.0-rc2 / DB 1.2.0 / contract 1.4.0 branch codex/file-03-second-fresh-80-review-20260810 at b862efb94be87980e96a5b864bc5c7aec49183d9 exposes spd_get_public_profile, spd_get_personal_site_profile and spd_get_profile_contract_manifest. File 25 consumes declared public DTOs only and never reads File 03 tables."
+      "requirement": "Current File 03 main at 636e3ef965423887f810718abec3cd1c11c3659d is runtime 1.2.0-rc18 / DB 1.2.0 / contract 1.4.0 and exposes spd_get_public_profile, spd_get_personal_site_profile and spd_get_profile_contract_manifest. Current public media rows expose bounded same-origin url/alt/focal_x/focal_y and do not require attachment_id. File 25 must render valid owner-approved media from that DTO, retain canonical alt metadata with a descriptive render fallback, never read File 03 tables, and fail closed on malformed/non-same-site media."
     },
     {
       "id": "file03-future-public-experience",
@@ -214,6 +214,21 @@
       "id": "founder-acceptance",
       "category": "acceptance",
       "requirement": "Founder signs the exact tested commit only after all required staging evidence is complete."
+    },
+    {
+      "id": "owner-public-preview",
+      "category": "profile",
+      "requirement": "Authorized profile owner can switch among public/member/mobile/desktop/contact/search/social preview modes. Preview responses are noindex/noarchive, projection-only, suppress owner/mutating actions and completion controls, never widen native authorization, and expose only canonical public data."
+    },
+    {
+      "id": "timeline-config-and-back-navigation",
+      "category": "timeline",
+      "requirement": "Admin-governed timeline_page_size is bounded 5..50 and controls rendered profile Timeline pagination. Timeline filter/search/page URLs survive browser Back with restored scroll position without unsafe storage dependency."
+    },
+    {
+      "id": "profile-template-setting",
+      "category": "visual",
+      "requirement": "The governed profile_template preference has observable token-based standard/compact/institutional presentation behavior and never creates a second shell or unsafe CSS injection path."
     }
   ]
 }

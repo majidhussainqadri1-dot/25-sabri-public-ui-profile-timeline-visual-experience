@@ -420,3 +420,72 @@
         border-color: CanvasText;
     }
 }
+
+
+/* File 25 §§38/70: owner-only public projection previews. */
+.spux-preview-toolbar,
+.spux-preview-card {
+    margin-block: 1rem;
+}
+
+.spux-preview-modes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block: 0.75rem;
+}
+
+.spux-preview-modes .is-active {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+.spux-preview--mobile > .spux-container {
+    inline-size: min(100%, 390px);
+    margin-inline: auto;
+}
+
+.spux-preview--desktop > .spux-container {
+    inline-size: min(100%, 1200px);
+    margin-inline: auto;
+}
+
+.spux-search-preview__title,
+.spux-social-preview__title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin-block-end: 0.25rem;
+}
+
+.spux-search-preview__url {
+    overflow-wrap: anywhere;
+}
+
+.spux-social-preview img {
+    border-radius: var(--spux-radius-sm);
+    block-size: 5rem;
+    inline-size: 5rem;
+    object-fit: cover;
+}
+
+/* The governed profile-template setting has visible, token-based behavior. */
+.spux-profile[data-spux-template="compact"] .spux-hero__body {
+    gap: 0.75rem;
+}
+
+.spux-profile[data-spux-template="compact"] .spux-section-stack,
+.spux-profile[data-spux-template="compact"] .spux-timeline {
+    gap: 0.75rem;
+}
+
+.spux-profile[data-spux-template="institutional"] .spux-hero__body {
+    border-block-end: 1px solid var(--spux-border);
+}
+
+@media (forced-colors: active) {
+    .spux-preview-toolbar,
+    .spux-preview-card,
+    .spux-profile[data-spux-template="institutional"] .spux-hero__body {
+        border-color: CanvasText;
+    }
+}

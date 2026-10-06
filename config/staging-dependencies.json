@@ -87,7 +87,9 @@
       "current_db_version_observed": "1.2.0",
       "current_contract_version_observed": "1.4.0",
       "current_wordpress_minimum_observed": "7.0",
-      "current_php_minimum_observed": "8.1"
+      "current_php_minimum_observed": "8.1",
+      "current_public_media_shape": "media.avatar/media.cover: url, alt, focal_x, focal_y; attachment_id is not required by current public DTO",
+      "file25_consumption": "bounded current public DTO only; same-origin URL plus canonical alt/focal metadata; no File 03 table or private-ID dependency"
     },
     {
       "file": 6,
@@ -394,9 +396,9 @@
       "package_status": "build-input-not-acceptance",
       "schema_version": "2",
       "installed_preflight": "wp sabri file25 staging-probe --expected-commit=<sha>",
-      "source_branch": "fix/reviews-615-634-fresh-cross-file-audit-20261006",
-      "source_status": "reviews-615-634-corrected-candidate-pending-exact-head-ci",
-      "baseline_main_sha": "19009a0934970d63ca60fda1fe9df1ac7288d42a"
+      "source_branch": "fix/reviews-635-654-plan-completeness-20261006",
+      "source_status": "reviews-635-654-source-corrected; exact current HEAD CI must be queried externally",
+      "baseline_main_sha": "210b4b250fd0f996b1fb6b9eb5471dec831f6dfa"
     }
   ],
   "acceptance_rule": "No module is staging-accepted or production-accepted merely because this matrix, source code, a ZIP or green CI exists.",
@@ -432,7 +434,7 @@
     "07": "67c32ec4af45a7de6e3d9c1dbf0f8614d6b5a844",
     "08": "70541974ce0ffb16aebef557c3016eb7447662f4",
     "09": "9639f75ba046ac1a36e39d5e9aae56c7bae3279b",
-    "action_integration_note": "File 17/08/03/22/23 owner-native profile actions are resolved fail-closed by File 25; File 17 currently has no target-bound Follow URL contract, so Follow remains hidden unless the owner publishes one."
+    "action_integration_note": "File 25 resolves only published owner-native profile destinations. File 08 Appointment and File 17 Follow remain hidden until authoritative target-bound owner contracts exist; Message is shown only when File 03 public projection supplies a concrete same-site destination."
   },
   "file25_fresh_audit": {
     "baseline_main_sha": "19009a0934970d63ca60fda1fe9df1ac7288d42a",
@@ -448,5 +450,32 @@
     "file17_follow_contract": "owner-contract-pending-hide-action",
     "file17_message_contract": "use-only-concrete-file03-public-projection-url-when-present",
     "evidence_boundary": "Repository source/CI only; no staging/live/deployed parity claim."
+  },
+  "file25_review635_654_audit": {
+    "baseline_main_sha": "210b4b250fd0f996b1fb6b9eb5471dec831f6dfa",
+    "baseline_main_ci": {
+      "run_number": 1601,
+      "run_id": 37503157743,
+      "conclusion": "success"
+    },
+    "review_range": "635-654",
+    "candidate_branch": "fix/reviews-635-654-plan-completeness-20261006",
+    "exact_current_head_ci": "external-evidence-required-not-frozen-in-source",
+    "defect_rounds": [
+      638,
+      639,
+      640,
+      641,
+      652,
+      653
+    ],
+    "view_as_public": "seven-mode projection-only preview implemented; preview suppresses owner/viewer-mutating actions and completion controls",
+    "timeline_operability": "bounded timeline_page_size 5..50 plus browser-Back scroll restoration",
+    "profile_template": "standard/compact/institutional presentation now observable through governed data attribute and token-based CSS",
+    "file08_profile_appointment_contract": "owner-contract-pending-hide-action",
+    "file17_follow_contract": "owner-contract-pending-hide-action",
+    "file17_message_contract": "use-only-concrete-file03-public-projection-url-when-present",
+    "evidence_boundary": "Repository source/CI only; no staging/live/deployed parity claim.",
+    "file03_current_public_media": "contract 1.4.0 current DTO uses bounded same-origin url/alt/focal_x/focal_y; File 25 must not require attachment_id"
   }
 }

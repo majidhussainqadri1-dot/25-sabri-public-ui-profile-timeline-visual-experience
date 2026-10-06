@@ -40,6 +40,32 @@
         return legacyCopy(url);
     };
 
+
+    const profileRoot = document.querySelector('[data-spux-profile-class]');
+    if (profileRoot && 'scrollRestoration' in window.history) {
+        // File 25 §45 requires browser-Back scroll restoration while filters and
+        // pagination remain URL-addressable. Keep state local to this tab only.
+        const key = 'spux-scroll:' + window.location.pathname + window.location.search;
+        try {
+            window.history.scrollRestoration = 'manual';
+            window.addEventListener('pagehide', () => {
+                window.sessionStorage.setItem(key, String(Math.max(0, Math.round(window.scrollY))));
+            });
+            const navigation = window.performance && typeof window.performance.getEntriesByType === 'function'
+                ? window.performance.getEntriesByType('navigation')[0]
+                : null;
+            if (navigation && navigation.type === 'back_forward') {
+                const stored = Number.parseInt(window.sessionStorage.getItem(key) || '', 10);
+                if (Number.isFinite(stored) && stored >= 0) {
+                    window.requestAnimationFrame(() => window.scrollTo(0, stored));
+                }
+            }
+        } catch (error) {
+            // Storage/privacy restrictions must never break public profile use.
+            window.history.scrollRestoration = 'auto';
+        }
+    }
+
     document.querySelectorAll('[data-spux-share]').forEach((button) => {
         button.addEventListener('click', async () => {
             if (button.disabled) {

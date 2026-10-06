@@ -82,17 +82,16 @@ final class Profile_Repository
         $professional = $profile_class === 'doctor' ? Profile_Data::professional_details($credentials) : [];
         $clinic = Profile_Data::clinic($clinic_source);
 
-        // File 03 1.4.0 owns profile media identity. Consume attachment IDs only
-        // from its authorized public DTO; legacy File 25 user-meta aliases are no
-        // longer a source of truth.
-        $photo_id = $this->native->profile_media_attachment_id($user_id, 'avatar');
-        $cover_id = $this->native->profile_media_attachment_id($user_id, 'cover');
-
-        // File 03 media ownership/purpose metadata are revalidated locally before
-        // rendering the same-site URL. File 25 never falls back to Gravatar or a
-        // third-party avatar service.
-        $avatar = $this->owned_media_url($photo_id, $user_id, 'avatar', 'medium');
-        $cover = $this->owned_media_url($cover_id, $user_id, 'cover', 'large');
+        // File 03 1.4.0 owns public profile media truth. Its current DTO
+        // intentionally publishes bounded same-origin URL/alt/focal fields and
+        // does not require a private attachment identifier. File 25 consumes
+        // that owner-approved projection directly and never falls back to
+        // Gravatar, user meta aliases, or a third-party avatar service.
+        $avatar_media = $this->native->profile_media($user_id, 'avatar');
+        $cover_media = $this->native->profile_media($user_id, 'cover');
+        $avatar = (string) ($avatar_media['url'] ?? '');
+        $cover = (string) ($cover_media['url'] ?? '');
+        $avatar_alt = $this->plain_text((string) ($avatar_media['alt'] ?? ''), 300);
         $headline = $profile_class === 'founder'
             ? (string) ($founder_source['title'] ?? '')
             : (string) ($professional['specialization'] ?? $this->native->profile_value($user_id, 'specialty'));
@@ -134,6 +133,7 @@ final class Profile_Repository
             'role_label' => $this->role_label($profile_class),
             'verified' => in_array($profile_class, ['founder', 'doctor'], true) && ($badge['verified'] ?? false) === true,
             'avatar_url' => $avatar,
+            'avatar_alt' => $avatar_alt,
             'cover_url' => $cover,
             'headline' => $headline,
             'bio' => $bio,
@@ -170,6 +170,10 @@ final class Profile_Repository
             $profile['cover_url'],
             $filtered['cover_url'] ?? $profile['cover_url']
         );
+        // Alternative text is canonical File 03 public media metadata. Presentation
+        // filters may not substitute it; the template supplies a descriptive
+        // fallback only when the canonical owner has no alt value.
+        $profile['avatar_alt'] = $avatar_alt;
         $profile['country'] = $this->plain_text((string) $profile['country'], 100);
         $profile['city'] = $this->plain_text((string) $profile['city'], 100);
         $profile['location_text'] = $this->plain_text((string) $profile['location_text'], 240);

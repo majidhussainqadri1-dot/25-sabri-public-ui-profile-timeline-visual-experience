@@ -123,12 +123,14 @@ final class Profile_Renderer
         $context['available_sections'] = $available_sections;
         $context['breadcrumbs'] = $this->breadcrumbs($profile, $context);
         $context['preview_mode'] = $preview_mode;
+        $context['preview_urls'] = $preview_mode !== '' ? Plan_Completion::preview_urls($profile) : [];
         $context['preferences'] = Plan_Completion::preferences();
 
+        $timeline_page_size = max(5, min(50, (int) ($context['preferences']['timeline_page_size'] ?? 20)));
         $timeline = [
             'items' => [],
             'page' => 1,
-            'per_page' => 20,
+            'per_page' => $timeline_page_size,
             'has_more' => false,
             'truncated' => false,
             'provider_errors' => [],
@@ -159,7 +161,7 @@ final class Profile_Renderer
             $context['timeline_search_error'] = $search_error;
             $timeline = $this->timeline->get_for_author((int) $user->ID, [
                 'page' => max(1, (int) get_query_var('paged')),
-                'per_page' => 20,
+                'per_page' => $timeline_page_size,
                 'content_type' => $content_type,
                 'search' => $search_query,
             ]);
@@ -189,7 +191,17 @@ final class Profile_Renderer
         if (empty($completion_profile['contacts'])) {
             $completion_profile['contacts'] = ['_privacy_state' => 'not-public'];
         }
-        $completion_assistant = Plan_Completion::completion_assistant($completion_profile);
+        $completion_assistant = $preview_mode === ''
+            ? Plan_Completion::completion_assistant($completion_profile)
+            : [
+                'authorized' => false,
+                'complete' => false,
+                'missing' => [],
+                'preview_modes' => [],
+                'preview_urls' => [],
+                'default_responsive_preview' => '',
+                'edit_url' => '',
+            ];
         $completion_assistant['contact_privacy_state'] = empty($profile['contacts']) ? 'not-public' : 'public';
 
         $GLOBALS['sabri_public_experience_profile_user'] = $user;
