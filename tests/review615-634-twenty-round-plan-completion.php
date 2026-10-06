@@ -55,9 +55,9 @@ $plan = $read('includes/class-plan-completion.php');
 $renderer = $read('includes/class-profile-renderer.php');
 $template = $read('templates/public-profile.php');
 $check(str_contains($plan, "'timeline_page_size' => ['type' => 'int', 'default' => 20, 'minimum' => 5, 'maximum' => 50]"), 'Governed timeline page-size preference missing.');
-$check(str_contains($renderer, "'per_page' => $timeline_page_size"), 'Renderer must consume governed timeline page size.');
-$check(str_contains($plan, "$has_clinic_action = $is_doctor || $profile_class === 'founder';"), 'Founder native appointment/clinic action gate missing.');
-$check(str_contains($plan, "'preview_urls' => $preview_urls"), 'Owner preview URLs missing from completion assistant.');
+$check(str_contains($renderer, "'per_page' => \$timeline_page_size"), 'Renderer must consume governed timeline page size.');
+$check(str_contains($plan, "\$has_clinic_action = \$is_doctor || \$profile_class === 'founder';"), 'Founder native appointment/clinic action gate missing.');
+$check(str_contains($plan, "'preview_urls' => \$preview_urls"), 'Owner preview URLs missing from completion assistant.');
 foreach (['public','member','mobile','desktop','contact','search','social'] as $mode) {
     $check(str_contains($template, "'" . $mode . "' =>"), 'Rendered owner preview mode missing: ' . $mode);
 }
