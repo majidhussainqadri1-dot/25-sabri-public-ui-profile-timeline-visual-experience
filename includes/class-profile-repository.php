@@ -249,7 +249,7 @@ final class Profile_Repository
             if ($value !== '' && $this->visibility->can_show_contact($user_id, $field)) {
                 $canonical[$field] = $value;
             } elseif ($value !== '') {
-                Observability::emit('privacy_field_rejection', [
+                self::observe('privacy_field_rejection', [
                     'operation' => 'public_profile_projection',
                     'component' => 'contact',
                     'reason_code' => 'visibility_policy_rejected_' . $field,
@@ -269,7 +269,7 @@ final class Profile_Repository
                 $public[$field] = $value;
                 continue;
             }
-            Observability::emit('privacy_field_rejection', [
+            self::observe('privacy_field_rejection', [
                 'operation' => 'public_profile_projection',
                 'component' => 'contact',
                 'reason_code' => 'presentation_filter_revoked_' . $field,
@@ -277,6 +277,15 @@ final class Profile_Repository
         }
 
         return $public;
+    }
+
+
+    /** @param array<string,mixed> $context */
+    private static function observe(string $code, array $context = []): void
+    {
+        if (class_exists(Observability::class)) {
+            Observability::emit($code, $context);
+        }
     }
 
     private static function canonical_contact(mixed $value): string
