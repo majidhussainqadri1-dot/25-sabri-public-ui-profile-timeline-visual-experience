@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.16.0 — Sixth Fresh Twenty-Round Plan/Cross-File Completion Review 615–634
+
+### Corrected
+
+- Refreshed current repository-source evidence after File 09 and File 23 advanced while retaining their compatible File 25-facing contracts.
+- Completed the File 25 section-46 timeline-provider contract: normalization, canonical URL, visibility, public actions, public metrics, correction state, sync events and health are now governed at registration/runtime.
+- Added Founder native appointment presentation when the native action owner returns a safe same-site destination.
+- Surfaced all seven authorized owner-only View-as-Public modes without changing native authorization.
+- Replaced the hard-coded public timeline page size with the governed bounded 5–50 preference.
+- Added the complete privacy-minimized section-74 diagnostic taxonomy and reviewed File 24 advisory forwarding for security-critical diagnostic classes.
+- Advanced current source traceability from Reviews 595–614 to Reviews 615–634 while preserving earlier ledgers as historical evidence.
+
+### Review result
+
+Defect rounds: **616, 628, 630, 631, 632, 634**. The other fourteen rounds were clean in their assigned scope.
+
+### Acceptance boundary
+
+Version `0.16.0` is repository-source work until its exact head passes CI and is merged. Hostinger staging, real browser/device/accessibility/RTL/performance acceptance, Founder approval, production/live deployment, exact deployed-code parity, live DB/schema verification, migration-state verification and operational monitoring remain separate gates.
+
+
 ## 0.15.0 — Twenty-Round Current Cross-File Completion Review 595–614
 
 ### Corrected
