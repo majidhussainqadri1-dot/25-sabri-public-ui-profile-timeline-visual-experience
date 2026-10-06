@@ -26,14 +26,14 @@ $file22 = $modules[22] ?? [];
 $file23 = $modules[23] ?? [];
 $file25 = $modules[25] ?? [];
 $check(($file22['reviewed_source_version'] ?? '') === '1.0.0-rc.3', 'Review 179: File 22 reviewed source must be 1.0.0-rc.3.');
-$check(($file22['reviewed_source_commit'] ?? '') === 'c3b775b66fbbda4a9dd9891d63c08c74e2178741', 'Review 179: File 22 exact reviewed head must be current.');
+$check(($file22['reviewed_source_commit'] ?? '') === 'b7a7f2e69411cbd32f0574fd12d766fb70c01b7a', 'Review 179: File 22 exact reviewed head must be current.');
 $check(($file22['required_contract_versions']['rest_api'] ?? '') === '1.2.0', 'Review 179: File 22 REST contract 1.2.0 required.');
 $check(($file22['canonical_public_create_route'] ?? '') === '/create/', 'Review 179: File 22 create route must stay canonical.');
 $check(($file22['staging_status'] ?? '') === 'pending', 'Review 179: File 22 staging remains pending.');
 $check(($file23['reviewed_source_version'] ?? '') === '1.2.0', 'Review 179: File 23 stable source must be 1.2.0.');
-$check(($file23['reviewed_source_commit'] ?? '') === 'a8a8c805f4730998ccb44bd95c87591836561759', 'Review 179: File 23 stable main head mismatch.');
+$check(($file23['reviewed_source_commit'] ?? '') === 'dcae138e6073f4d0ff596623deb05b9940b8271b', 'Review 179: File 23 stable main head mismatch.');
 $check(($file23['canonical_private_management_route'] ?? '') === '/publishing-dashboard/', 'Review 179: File 23 private route must stay canonical.');
-$check(($file23['future_intelligence_branch']['head'] ?? '') === '50b9489a4a058d4628ef5dda220837393dd32010', 'Review 179: File 23 FPI24 branch truth missing.');
+$check(str_contains((string) ($file23['future_intelligence_status'] ?? ''), 'merged to main'), 'Review 179: File 23 FPI24 merged-source truth missing.');
 $check(($file23['staging_status'] ?? '') === 'pending', 'Review 179: File 23 staging remains pending.');
 $check(($file25['canonical_primary_color'] ?? '') === '#087A4E' && ($file25['design_token_owner'] ?? '') === 'file-25' && ($file25['structural_shell_owner'] ?? '') === 'file-20', 'Reviews 177-178: File 25/File 20 visual ownership mismatch.');
 
