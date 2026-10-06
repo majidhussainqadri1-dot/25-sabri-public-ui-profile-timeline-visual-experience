@@ -62,7 +62,8 @@ try {
     $matrix = [];
     $failures[] = 'Source matrix invalid: ' . $e->getMessage();
 }
-$check(($matrix['declaration']['latest_review_range'] ?? '') === '615-634', 'Source matrix latest review range must be 615-634.');
+$latestRange = (string) ($matrix['declaration']['latest_review_range'] ?? '');
+$check(in_array($latestRange, ['615-634', '635-654'], true), 'Source matrix must preserve or advance beyond Reviews 615-634.');
 $check(($matrix['declaration']['known_unresolved_source_defects'] ?? null) === 0, 'File 25 known unresolved source defects must remain zero after corrections.');
 foreach (['hostinger_staging_accepted','founder_acceptance','production_accepted','live_deployed','operational'] as $gate) {
     $check(($matrix['declaration'][$gate] ?? null) === false, 'Source matrix promoted external gate: ' . $gate);
