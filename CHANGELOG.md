@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.15.0 — Plan/Code/Cross-File Completeness Reviews 635–654 — 2026-10-06
+
+### Corrected
+
+- Completed File 25 §38 View as Public with governed public/member/mobile/desktop/contact/search/social projection modes instead of a label-only preview.
+- Suppressed owner/viewer-mutating profile actions and the Completion Assistant inside preview so preview cannot widen authorization or expose owner controls.
+- Added usable owner-only preview destinations to the Completion Assistant while preserving native File 03 editing ownership.
+- Added bounded `timeline_page_size` (5–50, default 20) and made profile Timeline pagination consume it.
+- Added explicit browser-Back scroll restoration using same-tab session state while keeping filters/search/pagination URL-addressable.
+- Wired `profile_template` standard/compact/institutional into observable token-based presentation without creating a second shell.
+- Reconciled stale README/WordPress-readme/source-status evidence and removed obsolete historical dependency pins from installation instructions.
+
+### Review result
+
+Defect rounds: **638, 639, 640, 652, 653**. The other fifteen review scopes were clean after carrying forward prior corrections.
+
+### Acceptance boundary
+
+These corrections establish File 25 repository-source completeness only. Exact current-head CI must be checked externally after the final commit. Hostinger staging, Founder acceptance, production/live deployment, exact deployed-code parity, live DB/schema, migration state and operations remain separate unverified gates.
+
+
 ## 0.15.0 — Fresh Cross-File Audit Reviews 615–634 — 2026-10-06
 
 ### Corrected
