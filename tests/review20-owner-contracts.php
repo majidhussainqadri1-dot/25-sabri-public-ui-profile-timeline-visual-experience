@@ -8,7 +8,7 @@ if (! is_string($source)) { fwrite(STDERR, "Unable to read Native_Integration so
 $required = [
     "FILE_08_MINIMUM_VERSION = '1.2.0'",
     "FILE_08_CANONICAL_CONTRACT = '1.1.0'",
-    "FILE_08_PUBLIC_PROJECTION_CONTRACT = '1.0.0'",
+    "FILE_08_PUBLIC_PROJECTION_CONTRACT = '1.1.0'",
     'WCA_Contracts::PUBLIC_CLINIC_CONTRACT_VERSION',
     'swc_public_clinic_projection_contract',
     'swc_get_public_clinic_projection',
