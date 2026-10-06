@@ -34,6 +34,7 @@ The reviewed 0.15.0 source correction includes:
 * reusable containers, layouts, cards, buttons, badges, notices, forms, tables, skeletons, and visual states;
 * exact same-origin URL enforcement for actions, cards, profile media, and OpenGraph media;
 * File 03 public-contact consent for Founder, Doctor, and permitted Member contact rendering;
+* current File 03 contract `1.4.0` public avatar/cover DTO consumption from bounded same-origin `url`/`alt`/focal fields without requiring a private `attachment_id`;
 * immutable canonical Founder public spelling and privacy-safe initials instead of an external avatar service;
 * visible/structured breadcrumbs, safe OpenGraph image alternative text, and governed 404/410 handling;
 * structured Knowledge and Media REST projections plus bounded aggregate provider health;
@@ -62,6 +63,7 @@ This candidate is not production-complete. Exact multi-plugin Hostinger staging,
 * Implemented all seven owner-only View-as-Public projection modes and hid owner/viewer-mutating actions while previewing.
 * Added usable Completion Assistant preview destinations without editing File 00/File 03 truth.
 * Added bounded `timeline_page_size` (5–50) and explicit browser-Back scroll restoration for URL-addressable timeline filters/pages.
+* Reconciled current File 03 public media DTO compatibility so valid avatar/cover media and canonical alt metadata no longer disappear when `attachment_id` is absent.
 * Made the governed standard/compact/institutional profile-template setting visibly affect token-based presentation without creating a second shell.
 * Preserved File 08 Appointment and File 17 Follow as fail-closed hidden actions until their canonical owners publish authoritative target-bound destinations.
 * Refreshed repository/dependency documentation without claiming Hostinger staging, production, deployed parity, live DB/schema, migration state or operations.
