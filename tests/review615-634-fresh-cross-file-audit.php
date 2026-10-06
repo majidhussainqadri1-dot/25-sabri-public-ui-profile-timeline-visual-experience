@@ -54,7 +54,7 @@ foreach ((array) ($plan['scenarios'] ?? []) as $scenario) {
 $actionText = (string) ($scenarios['profile-native-action-routing']['requirement'] ?? '');
 $check(str_contains($actionText, 'must be hidden') && str_contains($actionText, 'publishes no target-bound Follow URL'), 'Staging action scenario must reflect current owner gaps.');
 $clinicText = (string) ($scenarios['file08-clinic-projection']['requirement'] ?? '');
-$check(str_contains($clinicText, '1.2.15') && str_contains($clinicText, 'profile user directly to a clinic public reference'), 'File 08 current source/action boundary not recorded.');
+$check(str_contains($clinicText, '1.2.15') && str_contains($clinicText, 'profile-user→clinic public_ref/booking-destination contract'), 'File 08 current source/action boundary not recorded.');
 
 try {
     $matrix = json_decode($read('config/source-completion-matrix.json'), true, 512, JSON_THROW_ON_ERROR);
