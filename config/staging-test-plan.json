@@ -214,6 +214,21 @@
       "id": "founder-acceptance",
       "category": "acceptance",
       "requirement": "Founder signs the exact tested commit only after all required staging evidence is complete."
+    },
+    {
+      "id": "owner-public-preview",
+      "category": "profile",
+      "requirement": "Authorized profile owner can switch among public/member/mobile/desktop/contact/search/social preview modes. Preview responses are noindex/noarchive, projection-only, suppress owner/mutating actions and completion controls, never widen native authorization, and expose only canonical public data."
+    },
+    {
+      "id": "timeline-config-and-back-navigation",
+      "category": "timeline",
+      "requirement": "Admin-governed timeline_page_size is bounded 5..50 and controls rendered profile Timeline pagination. Timeline filter/search/page URLs survive browser Back with restored scroll position without unsafe storage dependency."
+    },
+    {
+      "id": "profile-template-setting",
+      "category": "visual",
+      "requirement": "The governed profile_template preference has observable token-based standard/compact/institutional presentation behavior and never creates a second shell or unsafe CSS injection path."
     }
   ]
 }
