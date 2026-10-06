@@ -14,6 +14,15 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
 final class Timeline_Registry
 {
     private const MAX_PROVIDERS = 25;
+    private const PLAN_REQUIRED_METHODS = [
+        'normalize_public_item',
+        'get_canonical_url',
+        'get_visibility_state',
+        'get_public_actions',
+        'get_public_metrics',
+        'get_correction_state',
+        'register_sync_events',
+    ];
     private const MATURITY_LEVELS = [
         'detected',
         'read-only',
@@ -37,6 +46,16 @@ final class Timeline_Registry
             $maturity = $provider->get_maturity_level();
         } catch (\Throwable $exception) {
             throw new InvalidArgumentException('Timeline provider metadata could not be read safely.', 0, $exception);
+        }
+
+        foreach (self::PLAN_REQUIRED_METHODS as $required_method) {
+            if (! is_callable([$provider, $required_method])) {
+                throw new InvalidArgumentException(sprintf(
+                    'Timeline provider %s is missing File 25 plan contract method: %s',
+                    (string) $raw_id,
+                    $required_method
+                ));
+            }
         }
 
         if (! self::provider_id_is_exact($raw_id)) {
