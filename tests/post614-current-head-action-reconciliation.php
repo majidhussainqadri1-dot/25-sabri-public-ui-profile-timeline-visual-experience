@@ -27,7 +27,7 @@ foreach ([
 $check(str_contains($current, "if (in_array(\$action, ['appointment', 'message'], true))"), 'Professional lifecycle action suppression missing.');
 $check(str_contains($current, 'Current File 17 owns Follow/Connect state'), 'Follow owner-boundary rationale missing.');
 $check(str_contains($current, 'Current File 08') && str_contains($current, 'no owner API that maps a profile user'), 'File 08 appointment owner-boundary rationale missing.');
-$check(str_contains($current, "($action === 'follow' || $action === 'appointment')") && str_contains($current, "return '';"), 'Follow/appointment must fail closed while owner destination contracts are unpublished.');
+$check(str_contains($current, "(\$action === 'follow' || \$action === 'appointment')") && str_contains($current, "return '';"), 'Follow/appointment must fail closed while owner destination contracts are unpublished.');
 foreach (['sabri_file17_profile_action_url_v1','sabri_network_message_profile_url','sabri_file08_public_clinic_projection_v1','SN_Activator::network_url()'] as $invented) {
     $check(! str_contains($current, $invented), 'File 25 must not depend on unpublished or misleading owner action hooks: ' . $invented);
 }
