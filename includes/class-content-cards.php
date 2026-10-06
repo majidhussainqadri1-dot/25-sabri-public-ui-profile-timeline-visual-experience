@@ -127,6 +127,11 @@ final class Content_Cards
             try {
                 $custom = (string) call_user_func(self::$variant_renderers[$variant], $card);
             } catch (\Throwable) {
+                Observability::emit('visual_component_failure', [
+                    'component' => 'content_card_variant',
+                    'operation' => 'render',
+                    'reason_code' => 'variant_renderer_exception',
+                ]);
                 $custom = '';
             }
             if ($custom !== '') {
