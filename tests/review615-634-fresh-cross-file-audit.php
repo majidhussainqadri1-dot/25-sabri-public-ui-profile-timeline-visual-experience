@@ -36,7 +36,7 @@ $current = $read('includes/class-current-companion-2026-08-10.php');
 foreach (['sabri_file08_public_clinic_projection_v1','sabri_file17_profile_action_url_v1','sabri_network_message_profile_url'] as $invented) {
     $check(! str_contains($current, $invented), 'Unpublished owner action hook remains: ' . $invented);
 }
-$check(str_contains($current, "($action === 'follow' || $action === 'appointment')"), 'Follow/Appointment explicit fail-closed gate missing.');
+$check(str_contains($current, "(\$action === 'follow' || \$action === 'appointment')"), 'Follow/Appointment explicit fail-closed gate missing.');
 $check(str_contains($current, "['internal_message_url']"), 'Concrete File 03-projected message destination path missing.');
 $check(str_contains($current, 'no owner API that maps a profile user'), 'File 08 owner-contract limitation rationale missing.');
 $check(str_contains($current, 'Current File 17 main owns messaging but does not publish'), 'File 17 message boundary rationale missing.');
@@ -54,7 +54,7 @@ foreach ((array) ($plan['scenarios'] ?? []) as $scenario) {
 $actionText = (string) ($scenarios['profile-native-action-routing']['requirement'] ?? '');
 $check(str_contains($actionText, 'must be hidden') && str_contains($actionText, 'publishes no target-bound Follow URL'), 'Staging action scenario must reflect current owner gaps.');
 $clinicText = (string) ($scenarios['file08-clinic-projection']['requirement'] ?? '');
-$check(str_contains($clinicText, '1.2.15') && str_contains($clinicText, 'no profile-user'), 'File 08 current source/action boundary not recorded.');
+$check(str_contains($clinicText, '1.2.15') && str_contains($clinicText, 'profile user directly to a clinic public reference'), 'File 08 current source/action boundary not recorded.');
 
 try {
     $matrix = json_decode($read('config/source-completion-matrix.json'), true, 512, JSON_THROW_ON_ERROR);
