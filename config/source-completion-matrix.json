@@ -4,7 +4,7 @@
     "file_number": 25,
     "title": "Sabri Unified Global Visual Experience and Design System",
     "subtitle": "Complete Public UI, Profile Timeline, Responsive Refinement and Visual Consistency",
-    "runtime": "0.15.0",
+    "runtime": "0.16.0",
     "master_plan": "SSH-PMP-2026-v3.0 plus 6–7 August 2026 central governing addenda",
     "file_plan": "File 25 — Complete Public UI, Profile Timeline and Visual Experience — Final Harmonized Specification 2.0 plus governing completion addendum and Future Public Experience 24",
     "all_chats_plan": "Sabri Platform All-Chats Recovered Directive Register 2026 v2.1 — 2026-08-05",
@@ -22,14 +22,14 @@
     "production_accepted": false,
     "live_deployed": false,
     "operational": false,
-    "truthful_boundary": "Source-owned defects found in Reviews 595-614 have been corrected on the 0.15.0 candidate, including current File 00/File 08 contract drift, high-risk authorization, Safe Mode public recovery, release documentation, and current repository-truth metadata. Exact-head automated evidence is still required before source completion is re-declared; Hostinger staging, real browser/device/accessibility, Founder, production, live and operational acceptance remain separate deferred gates.",
-    "latest_review_range": "595-614",
+    "truthful_boundary": "Source-owned defects found in Reviews 615-634 have been corrected on the 0.16.0 candidate: current repository-truth metadata, the complete timeline-provider contract, Founder native appointment presentation, all owner preview modes, governed timeline page size, and privacy-minimized observability. Exact-head automated QA is required before merge; Hostinger staging, real browser/device/accessibility evidence, Founder acceptance, production/live deployment, deployed DB/schema and migration state remain separate external gates.",
+    "latest_review_range": "615-634",
     "exact_head_ci": "required-and-pending-at-source-declaration",
     "exact_deployed_code_verified": false,
     "db_version_verified_live": false,
     "migration_state_verified_live": false,
-    "review_ledger": "config/review595-614-twenty-round-cross-file-completeness-ledger.json",
-    "historical_review_lineage": "Reviews 515-594 preserved as the fifth-cycle historical ledger; Reviews 595-614 are the current twenty-round cross-file completion review."
+    "review_ledger": "config/review615-634-twenty-round-plan-completion-ledger.json",
+    "historical_review_lineage": "Reviews 515-594 and 595-614 remain preserved historical/current-main correction ledgers; Reviews 615-634 are the newest twenty-round plan/cross-file completion review."
   },
   "requirements": [
     {
@@ -124,26 +124,31 @@
       "id": "F25-PROFILE-CLASSES-HERO-30-38",
       "source": "File 25 sections 30-38",
       "status": "implemented",
-      "summary": "Founder, verified Doctor and permitted Member presentation, profile hero, sections, actions and public-view boundaries are implemented from current owner assertions and projections.",
+      "summary": "Founder, verified Doctor and permitted Member presentation, native-owner actions, Founder appointment presentation, all seven owner-only View-as-Public preview modes and profile hero/section boundaries are implemented from current owner assertions/projections.",
       "evidence": [
         "includes/class-profile-repository.php",
         "includes/class-profile-data.php",
         "includes/class-profile-renderer.php",
         "templates/public-profile.php",
-        "templates/partials/profile-hero.php"
+        "templates/partials/profile-hero.php",
+        "includes/class-plan-completion.php",
+        "tests/review615-634-twenty-round-plan-completion.php"
       ]
     },
     {
       "id": "F25-TIMELINE-39-48",
       "source": "File 25 sections 39-48",
       "status": "implemented",
-      "summary": "Federated read-only timeline eligibility, concrete provider identity, author binding, chronology/pinning, filters/search, pagination, truncation and duplicate suppression are implemented; current File 21 ProfileTimeline remains the canonical feed bridge.",
+      "summary": "Federated read-only timeline eligibility, the complete section-46 provider contract, provider identity/maturity, normalization helpers, sync-event registration, chronology/pinning, filters/search, pagination, truncation and duplicate suppression are implemented; File 21 remains canonical publication owner.",
       "evidence": [
         "includes/class-timeline-registry.php",
         "includes/class-timeline-service.php",
         "includes/class-normalized-timeline-item.php",
         "includes/providers/class-file-21-provider.php",
-        "tests/review53-provider-transactionality.php"
+        "tests/review53-provider-transactionality.php",
+        "includes/contracts/interface-timeline-provider.php",
+        "includes/class-component-api.php",
+        "tests/review615-634-twenty-round-plan-completion.php"
       ]
     },
     {
@@ -226,12 +231,15 @@
       "id": "F25-ADMIN-CONFIG-71",
       "source": "File 25 section 71",
       "status": "implemented",
-      "summary": "Governed presentation preferences, provider declarations, dependency state and safe defaults are exposed through bounded File 25 configuration, with administration nested under compatible File 20 shell architecture.",
+      "summary": "Governed presentation preferences include bounded timeline page size and other File 25 controls, provider/dependency state and safe defaults, with administration nested under compatible File 20 shell architecture.",
       "evidence": [
         "includes/class-admin-integration.php",
         "includes/class-plugin.php",
         "includes/class-section-registry.php",
-        "docs/ARCHITECTURE.md"
+        "docs/ARCHITECTURE.md",
+        "includes/class-plan-completion.php",
+        "includes/class-profile-renderer.php",
+        "tests/review615-634-twenty-round-plan-completion.php"
       ]
     },
     {
@@ -252,13 +260,16 @@
       "id": "F25-OBSERVABILITY-SAFE-MODE-REPAIR-74-76",
       "source": "File 25 sections 74-76",
       "status": "implemented",
-      "summary": "Provider health, System Check, Safe Mode, diagnostics, staging preflight and bounded File25-only repair behaviors are implemented without mutating foreign native domain data.",
+      "summary": "The governed diagnostic taxonomy, privacy-minimized event boundary, File 24 advisory forwarding, provider/System Check/Safe Mode/staging preflight and File25-only repair behaviors are implemented without foreign native-domain mutation.",
       "evidence": [
         "includes/class-system-check.php",
         "includes/class-safe-mode.php",
         "includes/class-staging-probe.php",
         "tests/safe-mode.php",
-        "tests/staging-probe.php"
+        "tests/staging-probe.php",
+        "includes/class-observability.php",
+        "includes/class-timeline-service.php",
+        "tests/review615-634-twenty-round-plan-completion.php"
       ]
     },
     {
@@ -277,13 +288,16 @@
       "id": "F25-QA-80-84",
       "source": "File 25 sections 80-84",
       "status": "implemented",
-      "summary": "Role, profile-state, timeline-state, security, accessibility, companion-contract and adversarial source-level QA is governed through Reviews 20-594, including the fifth fresh eighty-round current-truth cycle.",
+      "summary": "Role, profile-state, timeline-state, security, accessibility, companion-contract and adversarial source-level QA is governed through Reviews 615-634 while all earlier review ledgers remain immutable historical evidence.",
       "evidence": [
         "composer.json",
         "tests/authoritative-native-contracts.php",
         "tests/review435-514-fourth-eighty-current-truth.php",
         "tests/review515-594-fifth-eighty-current-truth.php",
-        "config/review515-594-fifth-eighty-current-truth-ledger.json"
+        "config/review515-594-fifth-eighty-current-truth-ledger.json",
+        "config/review595-614-twenty-round-cross-file-completeness-ledger.json",
+        "config/review615-634-twenty-round-plan-completion-ledger.json",
+        "tests/review615-634-twenty-round-plan-completion.php"
       ]
     },
     {
@@ -346,26 +360,30 @@
       "id": "REVIEW-CORRECTION-LINEAGE-20-93",
       "source": "Master Plan zero-known-defect/review-fix discipline and current File 25 completion addenda",
       "status": "implemented",
-      "summary": "Historical corrective cycles remain preserved and current source review lineage now extends through Reviews 515-594. The fifth cycle corrected File09 exact-source drift, File21 exact integration evidence, REST Last-Modified, bounded rate limiting and public REST contract metadata while keeping all external acceptance gates false.",
+      "summary": "Historical corrective cycles remain preserved and current source review lineage now extends through Reviews 615-634. The newest cycle reconciles current companion heads and closes provider-contract, preview/action, page-size, observability and traceability gaps while keeping every external acceptance gate false.",
       "evidence": [
         "composer.json",
         "config/review515-594-fifth-eighty-current-truth-ledger.json",
         "tests/review515-594-fifth-eighty-current-truth.php",
-        "docs/REVIEWS-515-594-FIFTH-EIGHTY-CURRENT-TRUTH-2026-08-10.md"
+        "docs/REVIEWS-515-594-FIFTH-EIGHTY-CURRENT-TRUTH-2026-08-10.md",
+        "config/review595-614-twenty-round-cross-file-completeness-ledger.json",
+        "config/review615-634-twenty-round-plan-completion-ledger.json",
+        "tests/review615-634-twenty-round-plan-completion.php"
       ]
     }
   ],
   "current_repository_audit": {
-    "date": "2026-10-05",
-    "evidence": "docs/CROSS-FILE-HEAD-AUDIT-2026-10-05.md",
+    "date": "2026-10-06",
+    "evidence": "config/review615-634-twenty-round-plan-completion-ledger.json",
     "status": "repository-source-only",
+    "baseline_main_head": "e5e26696ffb1169884809d34127ed0cae1ba5b50",
     "defect_rounds": [
-      596,
-      599,
-      610,
-      611,
-      613,
-      614
+      616,
+      628,
+      630,
+      631,
+      632,
+      634
     ]
   }
 }
