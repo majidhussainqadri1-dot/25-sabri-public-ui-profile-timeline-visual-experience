@@ -128,7 +128,7 @@ final class Plan_Completion
             if (preg_match('/^[a-f0-9]{64}$/', $expected) === 1 && $expected !== str_repeat('0', 64)) {
                 $actual = hash('sha256', (string) wp_json_encode(self::canonicalize_for_hash($clean)));
                 if (! hash_equals($expected, $actual)) {
-                    Observability::emit('cache_mismatch', [
+                    self::observe('cache_mismatch', [
                         'operation' => 'preferences_read',
                         'reason_code' => 'preference_hash_mismatch',
                     ]);
@@ -359,11 +359,20 @@ final class Plan_Completion
                 : $default;
     }
 
+
+    /** @param array<string,mixed> $context */
+    private static function observe(string $code, array $context = []): void
+    {
+        if (class_exists(Observability::class)) {
+            Observability::emit($code, $context);
+        }
+    }
+
     private static function rest_permission(string $operation): bool
     {
         $allowed = self::can_operate($operation);
         if (! $allowed) {
-            Observability::emit('rest_authorization_rejection', [
+            self::observe('rest_authorization_rejection', [
                 'operation' => $operation,
                 'route' => 'sabri-public/v1',
                 'reason_code' => 'permission_denied',
@@ -996,7 +1005,7 @@ final class Plan_Completion
                 'updated_at_utc' => $failed,
                 'error_code' => 'builder_contract_unavailable',
             ];
-            Observability::emit('rebuild_failure', [
+            self::observe('rebuild_failure', [
                 'operation' => 'timeline_index_rebuild',
                 'status' => 'failed',
                 'reason_code' => 'builder_contract_unavailable',
@@ -1044,7 +1053,7 @@ final class Plan_Completion
                 $index['error_code'] = 'stale_rebuild_reconciled';
                 $index['updated_at_utc'] = gmdate('Y-m-d H:i:s');
                 update_option(self::INDEX_OPTION, $index, false);
-                Observability::emit('stale_index', [
+                self::observe('stale_index', [
                     'operation' => 'repair',
                     'status' => 'reconciled',
                     'reason_code' => 'stale_rebuild_reconciled',
