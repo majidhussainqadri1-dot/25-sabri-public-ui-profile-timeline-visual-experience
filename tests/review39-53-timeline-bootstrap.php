@@ -18,6 +18,7 @@ namespace {
 
     final class R3953_Timeline_Provider implements \Sabri\PublicExperience\Contracts\Timeline_Provider
     {
+        use \Sabri\PublicExperience\Contracts\Timeline_Provider_Plan_Defaults;
         /** @param list<mixed> $items */
         public function __construct(
             private string $id,
