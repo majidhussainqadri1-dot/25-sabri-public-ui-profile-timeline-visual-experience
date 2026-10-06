@@ -173,7 +173,7 @@ final class File_21_Provider implements Timeline_Provider
         if (! is_array($item)) {
             return null;
         }
-    {
+
         $id = isset($item['id']) ? (int) $item['id'] : 0;
         $title = isset($item['title']) && is_scalar($item['title']) ? (string) $item['title'] : '';
         $excerpt = isset($item['excerpt']) && is_scalar($item['excerpt']) ? (string) $item['excerpt'] : '';
