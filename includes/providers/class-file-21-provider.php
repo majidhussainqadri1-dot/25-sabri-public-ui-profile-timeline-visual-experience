@@ -6,6 +6,7 @@ namespace Sabri\PublicExperience\Providers;
 
 use Sabri\PublicExperience\Contracts\Timeline_Provider;
 use Sabri\PublicExperience\Normalized_Timeline_Item;
+use Sabri\PublicExperience\Observability;
 use Sabri\PublicExperience\Contracts\Timeline_Provider_Plan_Defaults;
 
 if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
@@ -206,6 +207,11 @@ final class File_21_Provider implements Timeline_Provider
                 'available_actions' => ['view', 'share'],
             ]);
         } catch (\InvalidArgumentException) {
+            Observability::emit('normalization_failure', [
+                'provider_id' => self::PROVIDER_ID,
+                'operation' => 'normalize_public_item',
+                'reason_code' => 'invalid_public_item',
+            ]);
             return null;
         }
     }
