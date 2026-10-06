@@ -29,7 +29,7 @@ try {
 
 $check(($ledger['schema_version'] ?? null) === 1 && ($ledger['file'] ?? null) === 25, 'Fresh review ledger identity mismatch.');
 $check(($ledger['review_range']['first'] ?? null) === 635 && ($ledger['review_range']['last'] ?? null) === 654 && ($ledger['review_range']['count'] ?? null) === 20, 'Fresh twenty-round range mismatch.');
-$check(($ledger['defect_rounds'] ?? null) === [638, 639, 640, 652, 653], 'Fresh defect rounds mismatch.');
+$check(($ledger['defect_rounds'] ?? null) === [638, 639, 640, 641, 652, 653], 'Fresh defect rounds mismatch.');
 $reviewNumbers = [];
 foreach ((array) ($ledger['reviews'] ?? []) as $row) {
     if (! is_array($row) || ! is_int($row['review'] ?? null)) {
@@ -55,6 +55,15 @@ $check(str_contains($renderer, "\$timeline_page_size = max(5, min(50"), 'Rendere
 $check(str_contains($renderer, "'per_page' => \$timeline_page_size"), 'Timeline service call does not use governed page size.');
 $check(str_contains($renderer, "\$completion_assistant = \$preview_mode === ''"), 'Completion Assistant is not suppressed in preview.');
 $check(str_contains($renderer, "\$context['preview_urls']"), 'Renderer does not expose authorized preview destinations.');
+
+$native = $read('includes/class-native-integration.php');
+$check(str_contains($native, 'public function profile_media(int $user_id, string $purpose): array'), 'Current File 03 public media DTO adapter missing.');
+$check(str_contains($native, "['url']") && str_contains($native, "['alt']") && str_contains($native, "['focal_x']") && str_contains($native, "['focal_y']"), 'Bounded File 03 media fields are not consumed.');
+
+$repository = $read('includes/class-profile-repository.php');
+$check(str_contains($repository, "\$avatar_media = \$this->native->profile_media(\$user_id, 'avatar');"), 'Profile repository still fails to consume current File 03 avatar DTO.');
+$check(str_contains($repository, "'avatar_alt' => \$avatar_alt"), 'Canonical File 03 avatar alternative text is not projected.');
+
 
 $template = $read('templates/public-profile.php');
 foreach (['spux-preview-toolbar','spux-preview-modes','Contact visibility preview','Search-engine preview','Social share-card preview','data-spux-template','data-spux-preview-mode'] as $marker) {
