@@ -50,6 +50,7 @@ final class Plan_Completion
         'safe_mode_controls' => ['type' => 'bool', 'default' => true],
         'diagnostics_enabled' => ['type' => 'bool', 'default' => true],
         'visual_density' => ['type' => 'enum', 'default' => 'comfortable', 'allowed' => ['comfortable', 'compact']],
+        'timeline_page_size' => ['type' => 'int', 'default' => 20, 'minimum' => 5, 'maximum' => 50],
         'featured_section_order' => ['type' => 'list', 'default' => ['overview', 'timeline', 'about'], 'allowed' => self::SECTIONS, 'maximum' => 12],
         'enabled_public_tabs' => ['type' => 'list', 'default' => self::SECTIONS, 'allowed' => self::SECTIONS, 'maximum' => 12],
         'cover_focal_point' => ['type' => 'enum', 'default' => 'center', 'allowed' => ['center', 'top', 'bottom', 'left', 'right']],
@@ -556,6 +557,12 @@ final class Plan_Completion
         $canonical = Public_URL::sanitize_same_site($profile['canonical_url'] ?? '', false);
         $current = function_exists('get_current_user_id') ? get_current_user_id() : 0;
         $owner = $current > 0 && $current === $user_id;
+        $preview_mode = sanitize_key((string) ($GLOBALS['sabri_public_experience_context']['preview_mode'] ?? ''));
+        // View-as-Public is a projection-only surface. It must never expose
+        // owner controls or viewer-mutating actions while the owner is previewing.
+        if ($preview_mode !== '') {
+            return [];
+        }
         $is_doctor = ($profile['verified'] ?? null) === true && ($profile['class'] ?? '') === 'doctor';
         if (function_exists('is_user_logged_in') && is_user_logged_in() && ! $owner && $user_id > 0) {
             $actions['follow'] = self::action_url('follow', $user_id);
@@ -714,7 +721,7 @@ final class Plan_Completion
         $current = function_exists('get_current_user_id') ? get_current_user_id() : 0;
         $authorized = $user_id > 0 && ($current === $user_id || (function_exists('current_user_can') && current_user_can('manage_options')));
         if (! $authorized) {
-            return ['authorized' => false, 'complete' => false, 'missing' => [], 'preview_modes' => [], 'edit_url' => ''];
+            return ['authorized' => false, 'complete' => false, 'missing' => [], 'preview_modes' => [], 'preview_urls' => [], 'default_responsive_preview' => '', 'edit_url' => ''];
         }
         $missing = [];
         foreach (['display_name', 'avatar_url', 'cover_url', 'headline', 'bio'] as $field) {
@@ -742,6 +749,8 @@ final class Plan_Completion
             'complete' => $missing === [],
             'missing' => array_values(array_unique($missing)),
             'preview_modes' => self::PREVIEW_MODES,
+            'preview_urls' => self::preview_urls($profile),
+            'default_responsive_preview' => (string) (self::preferences()['responsive_preview'] ?? 'desktop'),
             'edit_url' => self::action_url('edit_profile', $user_id),
         ];
     }
@@ -767,6 +776,7 @@ final class Plan_Completion
         $profile['section_labels'] = $labels;
         $profile['available_sections'] = $available;
         $profile['visual_density'] = (string) $preferences['visual_density'];
+        $profile['profile_template'] = (string) $preferences['profile_template'];
         $profile['cover_focal_point'] = (string) $preferences['cover_focal_point'];
         return $profile;
     }
@@ -784,6 +794,23 @@ final class Plan_Completion
         $user_id = self::exact_integer($profile['user_id'] ?? null) ?? 0;
         $current = get_current_user_id();
         return $user_id > 0 && ($current === $user_id || current_user_can('manage_options')) ? $raw : 'denied';
+    }
+
+    /** @param array<string,mixed> $profile @return array<string,string> */
+    public static function preview_urls(array $profile): array
+    {
+        $canonical = Public_URL::sanitize_same_site($profile['canonical_url'] ?? '', false);
+        if ($canonical === '') {
+            return [];
+        }
+        $urls = [];
+        foreach (self::PREVIEW_MODES as $mode) {
+            $url = Public_URL::sanitize_same_site(add_query_arg('spux_preview', $mode, $canonical), false);
+            if ($url !== '') {
+                $urls[$mode] = $url;
+            }
+        }
+        return $urls;
     }
 
     /** @param array<string,bool> $robots @return array<string,bool> */
