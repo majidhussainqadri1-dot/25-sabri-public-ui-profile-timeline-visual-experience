@@ -35,7 +35,7 @@ $check = static function (bool $condition, string $message) use (&$failures): vo
 $contract = File_24_Integration::contract();
 $check(($contract['contract_version'] ?? '') === '1.1.0', 'File 25/File 24 integration contract version must be current.');
 $check(($contract['file_24_constant'] ?? '') === 'SPCRC_VERSION', 'The exact File 24 runtime constant must be SPCRC_VERSION.');
-$check(($contract['reviewed_source_commit'] ?? '') === '0be43b3f424d7b53865587b2770479ca33f51a0b', 'File 24 exact reviewed current-main source must remain pinned.');
+$check(($contract['reviewed_source_commit'] ?? '') === 'a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb', 'File 24 exact reviewed current-main source must remain pinned.');
 $check(($contract['module_manifest_contract'] ?? '') === '1.0.0', 'Current File 24 module-manifest contract must be explicit.');
 $check(($contract['module_key'] ?? '') === 'file-25-public-experience', 'File 25 must have one canonical File 24 module key.');
 $check(($contract['staging_probe_cli'] ?? '') === 'wp sabri file25 staging-probe --expected-commit=<sha>', 'CLI staging probe must remain outside the File 24 route manifest.');
