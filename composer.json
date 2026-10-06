@@ -37,6 +37,7 @@
       "tests/review435-514-fourth-eighty-current-truth.php",
       "tests/review515-594-fifth-eighty-current-truth.php",
       "tests/review595-614-twenty-round-cross-file-completeness.php",
+      "tests/review615-634-twenty-round-plan-completion.php",
       "tools/verify-source-completion.php",
       "tools/verify-structure.php",
       "tools/verify-future-structure.php",
