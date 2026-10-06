@@ -29,6 +29,7 @@ namespace Sabri\PublicExperience\Tests {
 
     class Mutable_Timeline_Provider implements Timeline_Provider
     {
+        use \Sabri\PublicExperience\Contracts\Timeline_Provider_Plan_Defaults;
         public string $id = 'mutable-timeline';
         public string $version = '1.0.0';
         public string $maturity = 'read-only';
