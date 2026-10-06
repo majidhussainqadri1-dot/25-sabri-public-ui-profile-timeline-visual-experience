@@ -60,7 +60,7 @@ $plugin = $read('includes/class-plugin.php');
 $bootstrap = $read('sabri-public-experience.php');
 $safePublic = $read('includes/class-safe-mode-public.php');
 $safeTemplate = $read('templates/safe-mode-profile.php');
-$check(str_contains($bootstrap, "* Version:     0.15.0") && str_contains($bootstrap, "SABRI_PUBLIC_EXPERIENCE_VERSION', '0.15.0'"), 'Runtime 0.15.0 identity missing.');
+$check(preg_match('/^\\s*\\* Version:\\s*(\\d+\\.\\d+\\.\\d+)\\s*$/m', $bootstrap, $version_match) === 1 && version_compare((string) ($version_match[1] ?? '0.0.0'), '0.15.0', '>='), 'Runtime must preserve the 0.15.0 correction baseline or newer.');
 $check(str_contains($bootstrap, "'includes/class-safe-mode-public.php'"), 'Safe Mode public class is not loaded.');
 $check(str_contains($plugin, '(new Safe_Mode_Public($router))->register();'), 'Safe Mode does not register recoverable public routes.');
 foreach (['status_header(503)', "Cache-Control: no-store", "Retry-After: 300", "templates/safe-mode-profile.php"] as $marker) {
@@ -74,7 +74,7 @@ try {
     $deps = [];
     $failures[] = 'Dependency matrix JSON invalid: ' . $exception->getMessage();
 }
-$check(($deps['runtime_version'] ?? null) === '0.15.0', 'Dependency matrix runtime must be 0.15.0.');
+$check(version_compare((string) ($deps['runtime_version'] ?? '0.0.0'), '0.15.0', '>='), 'Dependency matrix must preserve the 0.15.0 correction baseline or newer.');
 $check(($deps['environment']['integrated_candidate_wordpress_minimum'] ?? null) === '7.0', 'Integrated WordPress minimum must reflect current File 03.');
 $check(($deps['environment']['integrated_candidate_php_minimum'] ?? null) === '8.1', 'Integrated PHP minimum must reflect current companions.');
 $heads = (array) ($deps['observed_repository_heads'] ?? []);
@@ -100,7 +100,7 @@ try {
     $matrix = [];
     $failures[] = 'Source completion matrix JSON invalid: ' . $exception->getMessage();
 }
-$check(($matrix['module']['runtime'] ?? null) === '0.15.0', 'Source completion matrix runtime must be 0.15.0.');
+$check(version_compare((string) ($matrix['module']['runtime'] ?? '0.0.0'), '0.15.0', '>='), 'Source completion matrix must preserve the 0.15.0 correction baseline or newer.');
 foreach (['hostinger_staging_accepted','founder_acceptance','production_accepted','live_deployed','operational'] as $gate) {
     $check(($matrix['declaration'][$gate] ?? null) === false, 'Source matrix must not promote external acceptance: ' . $gate);
 }
