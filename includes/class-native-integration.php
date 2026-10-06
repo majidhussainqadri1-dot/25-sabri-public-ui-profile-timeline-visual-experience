@@ -177,20 +177,43 @@ final class Native_Integration
         return (string) ($this->public_profile_projection($user_id, 0)['canonical_url'] ?? '');
     }
 
-    public function profile_media_attachment_id(int $user_id, string $purpose): int
+    /** @return array{url:string,alt:string,focal_x:float,focal_y:float,attachment_id:int} */
+    public function profile_media(int $user_id, string $purpose): array
     {
         $purpose = sanitize_key($purpose);
         if (! in_array($purpose, ['avatar', 'cover'], true)) {
-            return 0;
+            return ['url' => '', 'alt' => '', 'focal_x' => 50.0, 'focal_y' => 50.0, 'attachment_id' => 0];
         }
         $row = $this->public_profile_projection($user_id, 0)['media'][$purpose] ?? null;
         if (! is_array($row)) {
-            return 0;
+            return ['url' => '', 'alt' => '', 'focal_x' => 50.0, 'focal_y' => 50.0, 'attachment_id' => 0];
         }
-        $attachment_id = (int) ($row['attachment_id'] ?? 0);
-        $url = Public_URL::sanitize_same_site($row['url'] ?? '', false);
 
-        return $attachment_id > 0 && $url !== '' ? $attachment_id : 0;
+        // File 03 contract 1.4.0 currently publishes a same-origin URL, alt text
+        // and focal coordinates. Older reviewed projections may also expose an
+        // attachment_id. File 25 accepts both shapes without requiring a foreign
+        // private identifier that the current owner contract intentionally omits.
+        $url = Public_URL::sanitize_same_site($row['url'] ?? '', false);
+        if ($url === '') {
+            return ['url' => '', 'alt' => '', 'focal_x' => 50.0, 'focal_y' => 50.0, 'attachment_id' => 0];
+        }
+
+        $alt = $this->plain_text((string) ($row['alt'] ?? $row['alt_text'] ?? ''), 300);
+        $focal_x = is_numeric($row['focal_x'] ?? null) ? (float) $row['focal_x'] : 50.0;
+        $focal_y = is_numeric($row['focal_y'] ?? null) ? (float) $row['focal_y'] : 50.0;
+
+        return [
+            'url' => $url,
+            'alt' => $alt,
+            'focal_x' => max(0.0, min(100.0, $focal_x)),
+            'focal_y' => max(0.0, min(100.0, $focal_y)),
+            'attachment_id' => max(0, (int) ($row['attachment_id'] ?? 0)),
+        ];
+    }
+
+    public function profile_media_attachment_id(int $user_id, string $purpose): int
+    {
+        return (int) $this->profile_media($user_id, $purpose)['attachment_id'];
     }
 
     public function profile_contact(int $user_id, string $field): string
