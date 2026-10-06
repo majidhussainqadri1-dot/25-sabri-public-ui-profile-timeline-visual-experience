@@ -48,14 +48,11 @@ final class Timeline_Registry
             throw new InvalidArgumentException('Timeline provider metadata could not be read safely.', 0, $exception);
         }
 
-        foreach (self::PLAN_REQUIRED_METHODS as $required_method) {
-            if (! is_callable([$provider, $required_method])) {
-                throw new InvalidArgumentException(sprintf(
-                    'Timeline provider %s is missing File 25 plan contract method: %s',
-                    (string) $raw_id,
-                    $required_method
-                ));
-            }
+        if (! self::meets_plan_contract($provider)) {
+            throw new InvalidArgumentException(sprintf(
+                'Timeline provider %s is missing one or more File 25 plan contract methods.',
+                (string) $raw_id
+            ));
         }
 
         if (! self::provider_id_is_exact($raw_id)) {
@@ -92,6 +89,25 @@ final class Timeline_Registry
         ];
         ksort($this->providers, SORT_STRING);
         ksort($this->registered_metadata, SORT_STRING);
+    }
+
+    public static function meets_plan_contract(mixed $provider): bool
+    {
+        if (! $provider instanceof Timeline_Provider) {
+            return false;
+        }
+        foreach (self::PLAN_REQUIRED_METHODS as $required_method) {
+            if (! is_callable([$provider, $required_method])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** @return list<string> */
+    public static function plan_required_methods(): array
+    {
+        return self::PLAN_REQUIRED_METHODS;
     }
 
     public function unregister(string $provider_id): void
