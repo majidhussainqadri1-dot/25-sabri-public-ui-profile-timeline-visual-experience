@@ -16,11 +16,6 @@ $read = static function (string $path) use ($root, &$failures): string {
 $current = $read('includes/class-current-companion-2026-08-10.php');
 foreach ([
     'native_action_url',
-    'current_claim_url',
-    "sabri_network_message_profile_url",
-    "sabri_file17_profile_action_url_v1",
-    "sabri_file08_public_clinic_projection_v1",
-    "hash_equals('1.0.0'",
     "file03_route_declared('/account/profile/')",
     'Sabri\\UniversalComposer\\Core\\Page_Resolver',
     'SPDB_Dashboard_Router',
@@ -30,9 +25,12 @@ foreach ([
     $check(str_contains($current, $marker), 'Post-614 native action marker missing: ' . $marker);
 }
 $check(str_contains($current, "if (in_array(\$action, ['appointment', 'message'], true))"), 'Professional lifecycle action suppression missing.');
-$check(str_contains($current, 'File 17 currently owns Follow/Connect state'), 'Follow owner-boundary rationale missing.');
-$check(str_contains($current, "empty(\$claim['available'])") && str_contains($current, "sanitize_key((string) (\$claim['action'] ?? '')) !== 'follow'"), 'Follow must fail closed unless File 17 publishes an available target-bound claim.');
-$check(! str_contains($current, "SN_Activator::network_url()"), 'File 25 must not mislabel a generic Network URL as a Follow action.');
+$check(str_contains($current, 'Current File 17 owns Follow/Connect state'), 'Follow owner-boundary rationale missing.');
+$check(str_contains($current, 'Current File 08') && str_contains($current, 'no owner API that maps a profile user'), 'File 08 appointment owner-boundary rationale missing.');
+$check(str_contains($current, "(\$action === 'follow' || \$action === 'appointment')") && str_contains($current, "return '';"), 'Follow/appointment must fail closed while owner destination contracts are unpublished.');
+foreach (['sabri_file17_profile_action_url_v1','sabri_network_message_profile_url','sabri_file08_public_clinic_projection_v1','SN_Activator::network_url()'] as $invented) {
+    $check(! str_contains($current, $invented), 'File 25 must not depend on unpublished or misleading owner action hooks: ' . $invented);
+}
 
 $deps = json_decode($read('config/staging-dependencies.json'), true);
 $check(is_array($deps), 'Dependency matrix JSON invalid.');

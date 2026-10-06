@@ -8,21 +8,23 @@ WordPress module for the **Sabri Social Homeopathy Platform**. This is the exist
 
 - Runtime: `0.15.0`
 - Schema: `2`
-- Branch: `fix/reviews-595-614-cross-file-completion-20261005`
-- Baseline main SHA reviewed: `59927df876dc92c7461351420c7b7c95c65c6a93`
-- Governing product plan: Master Plan `v3.0`
+- Fresh audit branch: `fix/reviews-615-634-fresh-cross-file-audit-20261006`
+- Baseline main SHA reviewed: `19009a0934970d63ca60fda1fe9df1ac7288d42a`
+- Baseline main exact-head CI: **PASS** — run `1540`
+- Governing product plan: Master Plan `v3.0` / consolidated governing addenda
 - Governing File 25 plan: Final Harmonized Specification `2.0`
-- Source correction status: **Reviews 595–614 corrected; post-review current-head/action reconciliation in progress**
-- Known unresolved source defects after the recorded corrections: **0**
+- Source correction status: **Reviews 615–634 corrected; current candidate exact-head CI pending**
+- Known unresolved File 25 source defects after the recorded corrections: **0**
+- Known cross-file owner-contract limitations: **2** — File 08 profile→booking destination; File 17 target-bound Follow destination
 - Hostinger staging accepted: **No**
 - Production approved: **No**
 - Live deployment verified: **No**
 
-Version `0.15.0` reopens the earlier source-completion declaration against current companion repository truth. It corrects File 00 and File 08 contract drift, restores default-deny high-risk authorization, preserves recoverable public profile routes in Safe Mode through a data-free 503 native-theme surface, restores release-documentation contracts, and records current repository heads separately from historical reviewed pins.
+The fresh Reviews `615–634` audit rechecked File 25 against its own final plan, the central governing plan, and current companion repository source. It found three defect rounds: `621`, `623`, and `634`.
 
 ## Source implementation status
 
-The governed File 25 source scope has been re-reviewed through **Reviews 595–614** against the Definitive Master Plan `v3.0`, File 25 Final Harmonized Specification `2.0`, and current companion repository source truth.
+File 25 source-owned scope is complete after the fresh corrections, but source completion does not imply that every companion owner already publishes every desired cross-file action contract.
 
 Machine-readable traceability:
 
@@ -30,45 +32,41 @@ Machine-readable traceability:
 config/source-completion-matrix.json
 config/all-chats-directive-matrix.json
 config/review595-614-twenty-round-cross-file-completeness-ledger.json
+config/review615-634-fresh-cross-file-audit-ledger.json
 config/staging-dependencies.json
 ```
 
-Current repository-head audit:
+Current fresh audit record:
 
 ```text
-docs/CROSS-FILE-HEAD-AUDIT-2026-10-05.md
+docs/REVIEWS-615-634-FRESH-CROSS-FILE-AUDIT-2026-10-06.md
 ```
 
-The candidate remains **pending exact-head CI**. Repository source evidence does not establish Hostinger staging, Founder acceptance, production approval, live deployment, deployed database/schema state, migration state, or operational acceptance.
+The **new candidate** remains pending its own exact-head CI until this branch is tested. The already-merged baseline main `19009a...` passed exact-head CI run `1540`. Neither fact establishes Hostinger staging, Founder acceptance, production approval, exact deployed-code parity, live database/schema state, live migration state, or operational acceptance.
 
 ## Current ownership and compatibility boundaries
 
-- **File 00:** current observed main runtime `1.2.44`, DB `1.4.5`, membership contract `1.2.3`. File 25 supports the reviewed `1.2.2` and current `1.2.3` assertion contracts without direct File 00 table reads.
-- **File 03:** current observed main `1.2.0-rc18`, contract `1.4.0`; profile master data, canonical URLs, public media and contact-consent truth remain File 03-owned.
-- **File 08:** current observed main `1.2.15`, schema `3.4.0`, public clinic projection `1.1.0`. File 25 supports reviewed projection contracts `1.0.0` and `1.1.0` only through the strict public DTO.
-- **File 09:** current observed `1.3.0`, integration contract `1.1.0`; Doctor verification truth remains File 09-owned.
+- **File 00:** identity, membership, suspension and public-profile authorization remain owner-native; File 25 consumes bounded assertions and reads no File 00 tables.
+- **File 03:** profile master/public projection, contact consent, report/edit/privacy destinations and canonical profile identity remain File 03-owned.
+- **File 08:** current main `70541974ce0ffb16aebef557c3016eb7447662f4`, runtime `1.2.15`, schema `3.4.0`, public clinic projection `1.1.0`. It publishes the bounded clinic read projection and booking routes, but no reviewed API that maps a File 25 profile user directly to a clinic public reference/booking destination. **Appointment action remains hidden** until File 08 publishes such an owner contract.
+- **File 09:** current main `9639f75ba046ac1a36e39d5e9aae56c7bae3279b`; Doctor verification truth remains File 09-owned.
+- **File 17:** current main `8ae656e51796d1f05865d8be5dca2480443d79ca`; relationships and messaging remain File 17-owned. Current reviewed source does not expose a target-bound Follow destination contract for File 25, so **Follow remains hidden**. Message is rendered only when a concrete owner-approved internal message URL is present in File 03's public projection.
 - **File 18:** seller/listing truth remains owner-native; File 25 consumes owner-executed public DTOs only.
-- **File 20:** current observed `1.4.17`, central-plan contract `1.0.0`; sole global shell/navigation/structural-layout owner.
-- **File 21:** current observed package `1.0.5`, runtime `1.0.3`, schema `1.0.0`; canonical publication/ProfileTimeline owner.
-- **File 22:** current observed `1.0.0-rc.3`; create/edit workflow owner.
-- **File 23:** current observed `1.2.0`; private publishing-operations owner.
-- **File 24:** current observed `0.99.0`; security, privacy, compliance, incident, audit-evidence and resilience owner.
-- **File 25:** public visual tokens, public profile/timeline presentation, reusable public components, accessibility/responsive refinement, SEO presentation and visual acceptance contracts.
+- **File 20:** current main `8a4dbcaf4fef8e926b9b834ecfde16c21a0f00ca`; sole structural shell/navigation/layout owner.
+- **File 21:** current main `f2eb7e95ddea327af36ea725ffb923b029f885e6`; canonical publication/ProfileTimeline owner.
+- **File 22:** current main `b7a7f2e69411cbd32f0574fd12d766fb70c01b7a`; create/edit workflow owner.
+- **File 23:** current main `dcae138e6073f4d0ff596623deb05b9940b8271b`; private publishing-operations owner.
+- **File 24:** current main `a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb`; security/privacy/compliance/resilience assurance owner.
+- **File 26:** current main `bbea3aad466792a4a6a62b53532bbd45c7c592de`; global search/discovery/ranking owner.
+- **File 25:** public profile/timeline/card visual presentation, component visual contracts, responsive/accessibility refinement, SEO presentation and visual acceptance.
 
-The current integrated staging candidate must satisfy at least **WordPress 7.0** and **PHP 8.1** because current companion requirements are stricter than File 25's standalone minima of WordPress 6.5/PHP 8.0.
+## Reviews 615–634 corrections
 
-## Version 0.15.0 corrections — Reviews 595–614
-
-- Reconciled File 00 current contract `1.2.3` while preserving exact reviewed `1.2.2` compatibility.
-- Reconciled File 08 current public clinic projection `1.1.0` while preserving exact reviewed `1.0.0` compatibility and the strict field/exclusion allow-list.
-- Changed high-risk timeline-index rebuild and migration execute/rollback authorization to **default deny** unless an explicit authoritative approval adapter returns true.
-- Added the Safe Mode public recovery surface: canonical profile routes remain recoverable with a data-free, no-store, noindex `503` native-theme template while optional providers, design assets, migrations and File 25 write paths stay disabled.
-- Added explicit root accessibility, performance, migration, rollback and staging-acceptance contracts required by the File 25 release structure.
-- Added a dated cross-file current-HEAD audit and current repository-head observations without replacing historical reviewed dependency pins.
-- Completed fail-closed owner-native profile actions: File 03 report/edit/privacy, File 17 Message, File 08 Appointment, File 22 Composer and File 23 Publishing Dashboard; Follow stays hidden until File 17 publishes a target-bound Follow URL contract.
-- Revalidated File 09 and File 23 current repository heads on 2026-10-06 after their source truth advanced during the audit window.
-- CI now syntax-checks both `assets/js/public.js` and `assets/js/future-public-experience.js`.
-- Recorded all twenty rounds and the six defect rounds in a machine-readable ledger.
+- Removed the unpublished File 08 profile-action hook assumption. File 25 no longer invents an Appointment destination; it hides the action until File 08 publishes an authoritative target-bound booking contract.
+- Removed unpublished File 17 Follow/Message URL-hook assumptions. Follow remains hidden; Message uses only a concrete URL already supplied through the canonical public profile projection.
+- Preserved File 03 report/edit/privacy, File 22 Composer and File 23 Publishing Dashboard owner destinations behind their current capability/contract checks.
+- Refreshed source-completion, dependency and staging-test truth so prior branch/CI statements are not represented as current candidate evidence.
+- Preserved every staging/live/production gate as false until actual environment evidence exists.
 
 ## Existing visual and public contracts retained
 

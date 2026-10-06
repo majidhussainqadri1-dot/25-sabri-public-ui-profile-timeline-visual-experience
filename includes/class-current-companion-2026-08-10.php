@@ -133,61 +133,23 @@ final class Current_Companion_2026_08_10
         }
 
         if ($action === 'message' && $viewer_id > 0 && ! $owner) {
+            // Current File 17 main owns messaging but does not publish a
+            // target-bound File 25 message-destination contract. Consume only
+            // the concrete owner-approved URL already present in File 03's
+            // public personal-site projection; otherwise hide the action.
             $source = self::personal_site($user_id);
-            $from_profile = Public_URL::sanitize_same_site((string) ($source['contacts']['internal_message_url'] ?? ''), false);
-            if ($from_profile !== '') {
-                return $from_profile;
-            }
-            try {
-                $resolved = apply_filters('sabri_network_message_profile_url', '', $user_id, $viewer_id, self::FILE_03_CONTRACT);
-            } catch (\Throwable) {
-                return '';
-            }
-            return is_string($resolved) ? Public_URL::sanitize_same_site($resolved, false) : '';
+            return Public_URL::sanitize_same_site((string) ($source['contacts']['internal_message_url'] ?? ''), false);
         }
 
-        // File 17 currently owns Follow/Connect state but does not publish a
-        // target-bound Follow URL contract. Do not turn its generic Network
-        // page into a misleading Follow action. A future owner contract may
-        // supply a same-site, current, target-bound destination here.
-        if ($action === 'follow' && $viewer_id > 0 && ! $owner) {
-            try {
-                $claim = apply_filters(
-                    'sabri_file17_profile_action_url_v1',
-                    null,
-                    'follow',
-                    $user_id,
-                    $viewer_id,
-                    self::FILE_03_CONTRACT
-                );
-            } catch (\Throwable) {
-                return '';
-            }
-            if (! is_array($claim)
-                || empty($claim['available'])
-                || sanitize_key((string) ($claim['action'] ?? '')) !== 'follow'
-                || (int) ($claim['target_user_id'] ?? 0) !== $user_id
-            ) {
-                return '';
-            }
-            return self::current_claim_url($claim, 'url', 300);
-        }
-
-        if ($action === 'appointment' && $viewer_id > 0 && ! $owner) {
-            try {
-                $claim = apply_filters('sabri_file08_public_clinic_projection_v1', null, $user_id, $viewer_id, self::FILE_03_CONTRACT);
-            } catch (\Throwable) {
-                return '';
-            }
-            if (! is_array($claim)
-                || ! hash_equals('1.0.0', trim((string) ($claim['contract_version'] ?? '')))
-                || (int) ($claim['doctor_user_id'] ?? 0) !== $user_id
-                || sanitize_key((string) ($claim['status'] ?? '')) !== 'active'
-                || sanitize_key((string) ($claim['visibility'] ?? '')) !== 'public'
-            ) {
-                return '';
-            }
-            return self::current_claim_url($claim, 'appointment_url', 300);
+        // Current File 17 owns Follow/Connect state but publishes no current
+        // target-bound public profile action URL contract. Current File 08
+        // 1.2.15 publishes a bounded clinic read projection and canonical
+        // booking routes, but no owner API that maps a profile user to a
+        // clinic public_ref/booking destination. File 25 must not infer either
+        // owner workflow from foreign storage or a guessed URL: missing owner
+        // action contracts are hidden, as required by the File 25 plan.
+        if (($action === 'follow' || $action === 'appointment') && $viewer_id > 0 && ! $owner) {
+            return '';
         }
 
         if (in_array($action, ['edit_profile', 'manage_privacy'], true)
@@ -231,25 +193,6 @@ final class Current_Companion_2026_08_10
         }
 
         return '';
-    }
-
-    /** @param array<string,mixed> $claim */
-    private static function current_claim_url(array $claim, string $field, int $max_age): string
-    {
-        $generated = trim((string) ($claim['generated_at'] ?? ''));
-        $valid_until = trim((string) ($claim['valid_until'] ?? ''));
-        $generated_ts = $generated !== '' ? strtotime($generated) : false;
-        $valid_ts = $valid_until !== '' ? strtotime($valid_until) : false;
-        $now = time();
-        if ($generated_ts === false
-            || $valid_ts === false
-            || $generated_ts > $now + 60
-            || $generated_ts < $now - max(60, $max_age)
-            || $valid_ts < $now
-        ) {
-            return '';
-        }
-        return Public_URL::sanitize_same_site((string) ($claim[$field] ?? ''), false);
     }
 
     private static function file03_route_declared(string $route): bool

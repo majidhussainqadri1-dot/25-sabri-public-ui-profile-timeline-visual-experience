@@ -22,14 +22,14 @@
     "production_accepted": false,
     "live_deployed": false,
     "operational": false,
-    "truthful_boundary": "Source-owned defects found in Reviews 595-614 have been corrected on the 0.15.0 candidate, including current File 00/File 08 contract drift, high-risk authorization, Safe Mode public recovery, release documentation, and current repository-truth metadata. Exact-head automated evidence is still required before source completion is re-declared; Hostinger staging, real browser/device/accessibility, Founder, production, live and operational acceptance remain separate deferred gates. Post-Reviews-595–614 revalidation additionally requires current owner-native profile-action routing and 2026-10-06 File 09/File 23 repository-head parity; these remain source evidence only.",
-    "latest_review_range": "595-614",
-    "exact_head_ci": "required-and-pending-at-source-declaration",
+    "truthful_boundary": "Reviews 615-634 freshly re-audited File 25 against its governing plan, central plan and current companion repository source. File 25 defects found in rounds 621, 623 and 634 were corrected: unpublished File 08/File 17 profile-action hooks were removed, missing owner action contracts now fail closed/hide, and stale repository/CI status metadata was refreshed. Current File 08/File 17 owner-contract gaps remain cross-file dependency limitations, not permission to infer foreign routes or data. Hostinger staging, Founder, production, deployed parity, live DB/schema, migration state and operational acceptance remain separate unverified gates.",
+    "latest_review_range": "615-634",
+    "exact_head_ci": "pending-for-current-615-634-candidate",
     "exact_deployed_code_verified": false,
     "db_version_verified_live": false,
     "migration_state_verified_live": false,
-    "review_ledger": "config/review595-614-twenty-round-cross-file-completeness-ledger.json",
-    "historical_review_lineage": "Reviews 515-594 preserved as the fifth-cycle historical ledger; Reviews 595-614 are the current twenty-round cross-file completion review."
+    "review_ledger": "config/review615-634-fresh-cross-file-audit-ledger.json",
+    "historical_review_lineage": "Reviews 515-594 and 595-614 remain preserved; Reviews 615-634 are the latest fresh cross-file completeness audit."
   },
   "requirements": [
     {
@@ -124,13 +124,15 @@
       "id": "F25-PROFILE-CLASSES-HERO-30-38",
       "source": "File 25 sections 30-38",
       "status": "implemented",
-      "summary": "Founder, verified Doctor and permitted Member presentation, profile hero, sections and actions are implemented from owner assertions/projections. Owner-native action URLs fail closed: missing or stale owner integration hides the action rather than creating a dead or misleading button.",
+      "summary": "Founder, verified Doctor and permitted Member presentation, profile hero, sections and actions are implemented from owner assertions/projections. Actions are shown only when a concrete current owner destination exists: current File 08 has no profile-user→booking destination contract and current File 17 has no target-bound Follow contract, so those actions hide rather than guess foreign routes.",
       "evidence": [
         "includes/class-profile-repository.php",
         "includes/class-profile-data.php",
         "includes/class-profile-renderer.php",
         "templates/public-profile.php",
-        "templates/partials/profile-hero.php"
+        "templates/partials/profile-hero.php",
+        "includes/class-current-companion-2026-08-10.php",
+        "tests/review615-634-fresh-cross-file-audit.php"
       ]
     },
     {
@@ -346,26 +348,27 @@
       "id": "REVIEW-CORRECTION-LINEAGE-20-93",
       "source": "Master Plan zero-known-defect/review-fix discipline and current File 25 completion addenda",
       "status": "implemented",
-      "summary": "Historical corrective cycles remain preserved and current source review lineage now extends through Reviews 515-594. The fifth cycle corrected File09 exact-source drift, File21 exact integration evidence, REST Last-Modified, bounded rate limiting and public REST contract metadata while keeping all external acceptance gates false.",
+      "summary": "Historical corrective cycles remain preserved and current source review lineage now extends through Reviews 615-634. The latest fresh audit corrected unpublished File 08/File 17 profile-action assumptions and stale repository/CI truth while keeping every external acceptance gate false.",
       "evidence": [
         "composer.json",
         "config/review515-594-fifth-eighty-current-truth-ledger.json",
         "tests/review515-594-fifth-eighty-current-truth.php",
-        "docs/REVIEWS-515-594-FIFTH-EIGHTY-CURRENT-TRUTH-2026-08-10.md"
+        "docs/REVIEWS-515-594-FIFTH-EIGHTY-CURRENT-TRUTH-2026-08-10.md",
+        "config/review615-634-fresh-cross-file-audit-ledger.json",
+        "tests/review615-634-fresh-cross-file-audit.php"
       ]
     }
   ],
   "current_repository_audit": {
-    "date": "2026-10-05",
-    "evidence": "docs/CROSS-FILE-HEAD-AUDIT-2026-10-05.md",
+    "date": "2026-10-06",
+    "baseline_main_sha": "19009a0934970d63ca60fda1fe9df1ac7288d42a",
+    "baseline_main_ci_run": 1540,
+    "evidence": "docs/REVIEWS-615-634-FRESH-CROSS-FILE-AUDIT-2026-10-06.md",
     "status": "repository-source-only",
     "defect_rounds": [
-      596,
-      599,
-      610,
-      611,
-      613,
-      614
+      621,
+      623,
+      634
     ]
   }
 }
