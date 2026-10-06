@@ -30,6 +30,7 @@ final class Timeline_Service
      */
     public function get_for_author(int $author_id, array $query = []): array
     {
+        $query_started = microtime(true);
         $per_page = self::exact_positive_integer($query['per_page'] ?? 20, self::MAX_PER_PAGE);
         $requested_page = self::exact_positive_integer($query['page'] ?? 1, PHP_INT_MAX);
         $content_type = self::exact_optional_key($query['content_type'] ?? '');
@@ -231,6 +232,19 @@ final class Timeline_Service
         $truncated = $requested_page > $max_page
             || $provider_limit_reached
             || ($candidate_limit === self::MAX_CANDIDATES_PER_PROVIDER && count($items) >= self::MAX_CANDIDATES_PER_PROVIDER);
+
+        $duration_ms = (int) round((microtime(true) - $query_started) * 1000);
+        $slow_threshold = function_exists('apply_filters')
+            ? (int) apply_filters('sabri_public_experience/timeline_slow_query_ms', 500)
+            : 500;
+        $slow_threshold = max(50, min(10000, $slow_threshold));
+        if ($duration_ms >= $slow_threshold) {
+            Observability::emit('slow_query', [
+                'operation' => 'timeline_read',
+                'duration_ms' => $duration_ms,
+                'reason_code' => 'timeline_threshold_exceeded',
+            ]);
+        }
 
         return [
             'items' => array_map(
