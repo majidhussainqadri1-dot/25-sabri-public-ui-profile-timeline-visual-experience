@@ -87,7 +87,9 @@
       "current_db_version_observed": "1.2.0",
       "current_contract_version_observed": "1.4.0",
       "current_wordpress_minimum_observed": "7.0",
-      "current_php_minimum_observed": "8.1"
+      "current_php_minimum_observed": "8.1",
+      "current_public_media_shape": "media.avatar/media.cover: url, alt, focal_x, focal_y; attachment_id is not required by current public DTO",
+      "file25_consumption": "bounded current public DTO only; same-origin URL plus canonical alt/focal metadata; no File 03 table or private-ID dependency"
     },
     {
       "file": 6,
@@ -463,6 +465,7 @@
       638,
       639,
       640,
+      641,
       652,
       653
     ],
@@ -472,6 +475,7 @@
     "file08_profile_appointment_contract": "owner-contract-pending-hide-action",
     "file17_follow_contract": "owner-contract-pending-hide-action",
     "file17_message_contract": "use-only-concrete-file03-public-projection-url-when-present",
-    "evidence_boundary": "Repository source/CI only; no staging/live/deployed parity claim."
+    "evidence_boundary": "Repository source/CI only; no staging/live/deployed parity claim.",
+    "file03_current_public_media": "contract 1.4.0 current DTO uses bounded same-origin url/alt/focal_x/focal_y; File 25 must not require attachment_id"
   }
 }
