@@ -121,7 +121,21 @@ final class Plan_Completion
     {
         $stored = function_exists('get_option') ? get_option(self::OPTION, []) : [];
         $stored = is_array($stored) ? $stored : [];
-        return self::normalize_preferences($stored, self::default_preferences(), true);
+        $clean = self::normalize_preferences($stored, self::default_preferences(), true);
+        if (function_exists('get_option')) {
+            $meta = get_option(self::OPTION_META, []);
+            $expected = is_array($meta) && is_string($meta['hash'] ?? null) ? $meta['hash'] : '';
+            if (preg_match('/^[a-f0-9]{64}$/', $expected) === 1 && $expected !== str_repeat('0', 64)) {
+                $actual = hash('sha256', (string) wp_json_encode(self::canonicalize_for_hash($clean)));
+                if (! hash_equals($expected, $actual)) {
+                    Observability::emit('cache_mismatch', [
+                        'operation' => 'preferences_read',
+                        'reason_code' => 'preference_hash_mismatch',
+                    ]);
+                }
+            }
+        }
+        return $clean;
     }
 
     /** @return array<string,mixed> */
@@ -313,17 +327,17 @@ final class Plan_Completion
         register_rest_route('sabri-public/v1', '/preferences', [
             'methods' => 'POST',
             'callback' => [$this, 'rest_preferences'],
-            'permission_callback' => static fn (): bool => self::can_operate('preferences'),
+            'permission_callback' => static fn (): bool => self::rest_permission('preferences'),
         ]);
         register_rest_route('sabri-public/v1', '/admin/rebuild-index', [
             'methods' => 'POST',
             'callback' => [$this, 'rest_rebuild_index'],
-            'permission_callback' => static fn (): bool => self::can_operate('rebuild_index'),
+            'permission_callback' => static fn (): bool => self::rest_permission('rebuild_index'),
         ]);
         register_rest_route('sabri-public/v1', '/admin/reconcile-profile', [
             'methods' => 'POST',
             'callback' => [$this, 'rest_reconcile_profile'],
-            'permission_callback' => static fn (): bool => self::can_operate('reconcile_profile'),
+            'permission_callback' => static fn (): bool => self::rest_permission('reconcile_profile'),
             'args' => ['user_id' => ['required' => true, 'type' => 'integer', 'minimum' => 1]],
         ]);
     }
@@ -343,6 +357,19 @@ final class Plan_Completion
             && preg_match('/^[a-z][a-z0-9_]{0,63}$/', $filtered) === 1
                 ? $filtered
                 : $default;
+    }
+
+    private static function rest_permission(string $operation): bool
+    {
+        $allowed = self::can_operate($operation);
+        if (! $allowed) {
+            Observability::emit('rest_authorization_rejection', [
+                'operation' => $operation,
+                'route' => 'sabri-public/v1',
+                'reason_code' => 'permission_denied',
+            ]);
+        }
+        return $allowed;
     }
 
     private static function can_operate(string $operation): bool
@@ -969,6 +996,11 @@ final class Plan_Completion
                 'updated_at_utc' => $failed,
                 'error_code' => 'builder_contract_unavailable',
             ];
+            Observability::emit('rebuild_failure', [
+                'operation' => 'timeline_index_rebuild',
+                'status' => 'failed',
+                'reason_code' => 'builder_contract_unavailable',
+            ]);
             do_action('sabri_public_experience/timeline_index_error', $state, $exception);
         } finally {
             delete_option(self::INDEX_LOCK_OPTION);
@@ -1012,6 +1044,11 @@ final class Plan_Completion
                 $index['error_code'] = 'stale_rebuild_reconciled';
                 $index['updated_at_utc'] = gmdate('Y-m-d H:i:s');
                 update_option(self::INDEX_OPTION, $index, false);
+                Observability::emit('stale_index', [
+                    'operation' => 'repair',
+                    'status' => 'reconciled',
+                    'reason_code' => 'stale_rebuild_reconciled',
+                ]);
             }
         }
         $operations['stale_index'] = true;
