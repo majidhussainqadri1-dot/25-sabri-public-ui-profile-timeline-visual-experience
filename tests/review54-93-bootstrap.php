@@ -111,10 +111,13 @@ namespace {
 namespace Sabri\PublicExperience\Tests54_93 {
     use Sabri\PublicExperience\Contracts\Profile_Section_Provider;
     use Sabri\PublicExperience\Contracts\Timeline_Provider;
+    use Sabri\PublicExperience\Contracts\Timeline_Provider_Plan_Defaults;
     use Sabri\PublicExperience\Normalized_Timeline_Item;
 
     final class TimelineProvider implements Timeline_Provider
     {
+        use Timeline_Provider_Plan_Defaults;
+
         public int $calls = 0;
         /** @param list<mixed> $items */
         public function __construct(
