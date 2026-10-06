@@ -50,3 +50,57 @@ interface Timeline_Provider
     /** @return array<string,mixed> */
     public function get_health_status(): array;
 }
+
+
+/**
+ * Compatibility defaults for the complete File 25 §46 provider contract.
+ *
+ * Real native providers should override normalize_public_item() where they
+ * receive owner-specific raw DTOs. The remaining methods are safe,
+ * presentation-only projections over an already-normalized item.
+ */
+trait Timeline_Provider_Plan_Defaults
+{
+    /** @param array<string,mixed> $item */
+    public function normalize_public_item(array $item, int $author_id): ?Normalized_Timeline_Item
+    {
+        unset($item, $author_id);
+        return null;
+    }
+
+    public function get_canonical_url(Normalized_Timeline_Item $item): string
+    {
+        return (string) $item->get('canonical_url');
+    }
+
+    public function get_visibility_state(Normalized_Timeline_Item $item): string
+    {
+        return (string) $item->get('visibility_state');
+    }
+
+    /** @return list<string> */
+    public function get_public_actions(Normalized_Timeline_Item $item): array
+    {
+        $actions = $item->get('available_actions');
+        return is_array($actions) ? array_values(array_filter($actions, 'is_string')) : [];
+    }
+
+    /** @return array<string,int|float|string> */
+    public function get_public_metrics(Normalized_Timeline_Item $item): array
+    {
+        unset($item);
+        return [];
+    }
+
+    public function get_correction_state(Normalized_Timeline_Item $item): string
+    {
+        return (string) $item->get('correction_state');
+    }
+
+    public function register_sync_events(): void
+    {
+        // Read-only providers have no synchronization event subscriptions by
+        // default. Native owners may override this with bounded invalidation
+        // hooks without transferring canonical ownership to File 25.
+    }
+}
