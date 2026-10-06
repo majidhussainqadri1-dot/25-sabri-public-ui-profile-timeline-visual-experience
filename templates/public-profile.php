@@ -25,12 +25,15 @@ $completion_assistant = (array) ($GLOBALS['sabri_public_experience_completion_as
 $section = sanitize_key((string) ($context['section'] ?? 'overview')) ?: 'overview';
 $sections = (array) ($profile['section_labels'] ?? []);
 $profile_class = sanitize_key((string) ($profile['class'] ?? 'member'));
+$profile_template = sanitize_key((string) ($profile['profile_template'] ?? 'standard')) ?: 'standard';
+$preview_mode = sanitize_key((string) ($context['preview_mode'] ?? ''));
+$preview_urls = is_array($context['preview_urls'] ?? null) ? $context['preview_urls'] : [];
 $breadcrumbs = array_values(array_filter(
     (array) ($context['breadcrumbs'] ?? []),
     'is_array'
 ));
 ?>
-<main id="sabri-main-content" class="spux-profile" tabindex="-1" data-spux-profile-class="<?php echo esc_attr($profile_class); ?>" data-spux-section="<?php echo esc_attr($section); ?>" data-spux-density="<?php echo esc_attr((string) ($profile['visual_density'] ?? 'comfortable')); ?>" data-spux-cover-focal-point="<?php echo esc_attr((string) ($profile['cover_focal_point'] ?? 'center')); ?>">
+<main id="sabri-main-content" class="spux-profile<?php echo $preview_mode !== '' ? ' spux-preview spux-preview--' . esc_attr($preview_mode) : ''; ?>" tabindex="-1" data-spux-profile-class="<?php echo esc_attr($profile_class); ?>" data-spux-section="<?php echo esc_attr($section); ?>" data-spux-density="<?php echo esc_attr((string) ($profile['visual_density'] ?? 'comfortable')); ?>" data-spux-template="<?php echo esc_attr($profile_template); ?>" data-spux-preview-mode="<?php echo esc_attr($preview_mode); ?>" data-spux-cover-focal-point="<?php echo esc_attr((string) ($profile['cover_focal_point'] ?? 'center')); ?>">
     <div class="spux-container sabri-ui-container">
         <?php if (is_404() || $profile === []) : ?>
             <?php
@@ -69,10 +72,63 @@ $breadcrumbs = array_values(array_filter(
 
             <?php require SABRI_PUBLIC_EXPERIENCE_DIR . 'templates/partials/profile-hero.php'; ?>
 
-            <?php if (! empty($context['preview_mode'])) : ?>
-                <div class="spux-notice spux-notice--warning" role="status">
-                    <p><?php echo esc_html(sprintf(__('Preview mode: %s. This response is private and not indexable.', 'sabri-public-experience'), (string) $context['preview_mode'])); ?></p>
-                </div>
+            <?php if ($preview_mode !== '') : ?>
+                <section class="spux-card spux-preview-toolbar" aria-labelledby="spux-preview-title">
+                    <h2 id="spux-preview-title"><?php esc_html_e('View as Public Preview', 'sabri-public-experience'); ?></h2>
+                    <p><?php echo esc_html(sprintf(__('Preview mode: %s. This is a private, noindex projection. Previewing never changes authorization or public data.', 'sabri-public-experience'), $preview_mode)); ?></p>
+                    <?php if ($preview_urls !== []) : ?>
+                        <nav class="spux-preview-modes" aria-label="<?php esc_attr_e('Public preview modes', 'sabri-public-experience'); ?>">
+                            <?php foreach ($preview_urls as $mode => $url) : ?>
+                                <?php
+                                $mode = sanitize_key((string) $mode);
+                                $url = SabriPublicExperiencePublic_URL::sanitize_same_site($url, false);
+                                if ($mode === '' || $url === '') { continue; }
+                                $active = $mode === $preview_mode;
+                                ?>
+                                <a class="spux-button spux-button--secondary<?php echo $active ? ' is-active' : ''; ?>" href="<?php echo esc_url($url); ?>"<?php echo $active ? ' aria-current="page"' : ''; ?>>
+                                    <?php echo esc_html(ucwords(str_replace('-', ' ', $mode))); ?>
+                                </a>
+                            <?php endforeach; ?>
+                        </nav>
+                    <?php endif; ?>
+                    <?php $exit_preview = SabriPublicExperiencePublic_URL::sanitize_same_site($profile['canonical_url'] ?? '', false); ?>
+                    <?php if ($exit_preview !== '') : ?>
+                        <a class="spux-text-link" href="<?php echo esc_url($exit_preview); ?>"><?php esc_html_e('Exit preview', 'sabri-public-experience'); ?></a>
+                    <?php endif; ?>
+                </section>
+
+                <?php if ($preview_mode === 'contact') : ?>
+                    <section class="spux-card spux-preview-card" aria-labelledby="spux-contact-preview-title">
+                        <h2 id="spux-contact-preview-title"><?php esc_html_e('Contact visibility preview', 'sabri-public-experience'); ?></h2>
+                        <?php if (empty($profile['contacts'])) : ?>
+                            <p><?php esc_html_e('No public contact values are currently exposed by the canonical privacy projection.', 'sabri-public-experience'); ?></p>
+                        <?php else : ?>
+                            <ul>
+                                <?php foreach ((array) $profile['contacts'] as $type => $value) : ?>
+                                    <?php if (is_scalar($value) && (string) $value !== '') : ?>
+                                        <li><strong><?php echo esc_html(ucwords((string) $type)); ?>:</strong> <?php echo esc_html((string) $value); ?></li>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
+                    </section>
+                <?php elseif ($preview_mode === 'search') : ?>
+                    <section class="spux-card spux-preview-card spux-search-preview" aria-labelledby="spux-search-preview-title">
+                        <h2 id="spux-search-preview-title"><?php esc_html_e('Search-engine preview', 'sabri-public-experience'); ?></h2>
+                        <p class="spux-search-preview__title"><?php echo esc_html((string) ($profile['display_name'] ?? '')); ?></p>
+                        <p class="spux-search-preview__url"><?php echo esc_html((string) ($profile['canonical_url'] ?? '')); ?></p>
+                        <p><?php echo esc_html(wp_trim_words((string) ($profile['bio'] ?? $profile['headline'] ?? ''), 30)); ?></p>
+                    </section>
+                <?php elseif ($preview_mode === 'social') : ?>
+                    <section class="spux-card spux-preview-card spux-social-preview" aria-labelledby="spux-social-preview-title">
+                        <h2 id="spux-social-preview-title"><?php esc_html_e('Social share-card preview', 'sabri-public-experience'); ?></h2>
+                        <?php if (! empty($profile['avatar_url'])) : ?>
+                            <img src="<?php echo esc_url((string) $profile['avatar_url']); ?>" alt="" width="160" height="160" loading="lazy">
+                        <?php endif; ?>
+                        <p class="spux-social-preview__title"><?php echo esc_html((string) ($profile['display_name'] ?? '')); ?></p>
+                        <p><?php echo esc_html(wp_trim_words((string) ($profile['bio'] ?? $profile['headline'] ?? ''), 24)); ?></p>
+                    </section>
+                <?php endif; ?>
             <?php endif; ?>
 
             <?php if ($metrics !== []) : ?>
@@ -107,6 +163,20 @@ $breadcrumbs = array_values(array_filter(
                     <?php $edit_url = \Sabri\PublicExperience\Public_URL::sanitize_same_site($completion_assistant['edit_url'] ?? '', false); ?>
                     <?php if ($edit_url !== '') : ?>
                         <a class="spux-button spux-button--secondary" href="<?php echo esc_url($edit_url); ?>"><?php esc_html_e('Edit profile with native owner', 'sabri-public-experience'); ?></a>
+                    <?php endif; ?>
+                    <?php $assistant_previews = is_array($completion_assistant['preview_urls'] ?? null) ? $completion_assistant['preview_urls'] : []; ?>
+                    <?php if ($assistant_previews !== []) : ?>
+                        <h3><?php esc_html_e('Preview public projection', 'sabri-public-experience'); ?></h3>
+                        <nav class="spux-preview-modes" aria-label="<?php esc_attr_e('Profile preview options', 'sabri-public-experience'); ?>">
+                            <?php foreach ($assistant_previews as $mode => $url) : ?>
+                                <?php
+                                $mode = sanitize_key((string) $mode);
+                                $url = SabriPublicExperiencePublic_URL::sanitize_same_site($url, false);
+                                if ($mode === '' || $url === '') { continue; }
+                                ?>
+                                <a class="spux-button spux-button--secondary" href="<?php echo esc_url($url); ?>"><?php echo esc_html(ucwords(str_replace('-', ' ', $mode))); ?></a>
+                            <?php endforeach; ?>
+                        </nav>
                     <?php endif; ?>
                 </aside>
             <?php endif; ?>
