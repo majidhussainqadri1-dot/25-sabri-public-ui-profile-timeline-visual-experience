@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.15.0 — Fresh Cross-File Audit Reviews 615–634 — 2026-10-06
+
+### Corrected
+
+- Removed reliance on the unpublished `sabri_file08_public_clinic_projection_v1` profile-action hook. Current File 08 `1.2.15` exposes a bounded clinic read projection and canonical booking routes, but no reviewed profile-user→booking-destination owner contract; File 25 now hides Appointment instead of inferring foreign truth.
+- Removed reliance on unpublished File 17 profile-action URL hooks. Follow remains hidden until File 17 publishes a target-bound owner destination. Message is rendered only from a concrete owner-approved URL present in File 03's public projection.
+- Refreshed source/dependency/release truth that still described the earlier Reviews 595–614 branch and pending baseline CI after main `19009a...` had already passed run `1540`.
+
+### Review result
+
+Twenty fresh scopes were reviewed. Defect rounds: **621, 623, 634**. Rounds **615–620, 622, 624–633** were clean within their assigned source scope after carrying forward prior corrections.
+
+### Acceptance boundary
+
+File 25 source-owned defects identified in this cycle are corrected. Cross-file owner-contract gaps are recorded rather than bypassed. The new candidate still requires exact-head CI; Hostinger staging, Founder acceptance, production/live deployment, deployed-code parity, live DB/schema, live migration state and operations remain unverified.
+
+
 ## 0.15.0 — Twenty-Round Current Cross-File Completion Review 595–614
 
 ### Post-review revalidation — 2026-10-06
