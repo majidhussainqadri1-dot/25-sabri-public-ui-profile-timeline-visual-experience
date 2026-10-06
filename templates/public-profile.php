@@ -30,7 +30,7 @@ $breadcrumbs = array_values(array_filter(
     'is_array'
 ));
 ?>
-<main id="sabri-main-content" class="spux-profile" tabindex="-1" data-spux-profile-class="<?php echo esc_attr($profile_class); ?>" data-spux-section="<?php echo esc_attr($section); ?>" data-spux-density="<?php echo esc_attr((string) ($profile['visual_density'] ?? 'comfortable')); ?>" data-spux-cover-focal-point="<?php echo esc_attr((string) ($profile['cover_focal_point'] ?? 'center')); ?>">
+<main id="sabri-main-content" class="spux-profile" tabindex="-1" data-spux-profile-class="<?php echo esc_attr($profile_class); ?>" data-spux-section="<?php echo esc_attr($section); ?>" data-spux-preview-mode="<?php echo esc_attr((string) ($context['preview_mode'] ?? '')); ?>" data-spux-density="<?php echo esc_attr((string) ($profile['visual_density'] ?? 'comfortable')); ?>" data-spux-cover-focal-point="<?php echo esc_attr((string) ($profile['cover_focal_point'] ?? 'center')); ?>">
     <div class="spux-container sabri-ui-container">
         <?php if (is_404() || $profile === []) : ?>
             <?php
@@ -103,6 +103,33 @@ $breadcrumbs = array_values(array_filter(
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </ul>
+                    <?php endif; ?>
+                    <?php
+                    $preview_labels = [
+                        'public' => __('Logged-out visitor', 'sabri-public-experience'),
+                        'member' => __('Registered member', 'sabri-public-experience'),
+                        'mobile' => __('Mobile preview', 'sabri-public-experience'),
+                        'desktop' => __('Desktop preview', 'sabri-public-experience'),
+                        'contact' => __('Contact visibility', 'sabri-public-experience'),
+                        'search' => __('Search-engine preview', 'sabri-public-experience'),
+                        'social' => __('Social share-card preview', 'sabri-public-experience'),
+                    ];
+                    $preview_urls = is_array($completion_assistant['preview_urls'] ?? null)
+                        ? $completion_assistant['preview_urls']
+                        : [];
+                    ?>
+                    <?php if ($preview_urls !== []) : ?>
+                        <nav class="spux-completion-assistant__previews" aria-label="<?php esc_attr_e('View public profile previews', 'sabri-public-experience'); ?>">
+                            <?php foreach ($preview_urls as $mode => $preview_url) : ?>
+                                <?php
+                                $preview_url = \Sabri\PublicExperience\Public_URL::sanitize_same_site($preview_url, false);
+                                if ($preview_url === '' || ! isset($preview_labels[$mode])) {
+                                    continue;
+                                }
+                                ?>
+                                <a class="spux-button spux-button--secondary" data-spux-preview-link="<?php echo esc_attr((string) $mode); ?>" href="<?php echo esc_url($preview_url); ?>"><?php echo esc_html($preview_labels[$mode]); ?></a>
+                            <?php endforeach; ?>
+                        </nav>
                     <?php endif; ?>
                     <?php $edit_url = \Sabri\PublicExperience\Public_URL::sanitize_same_site($completion_assistant['edit_url'] ?? '', false); ?>
                     <?php if ($edit_url !== '') : ?>
