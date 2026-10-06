@@ -92,6 +92,12 @@ final class Timeline_Service
                     || ! in_array($metadata['maturity'], ['read-only', 'staging-accepted', 'production-accepted'], true)
                     || ! $provider->is_available()
                 ) {
+                    Observability::emit('provider_unavailable', [
+                        'provider_id' => (string) $provider_id,
+                        'operation' => 'timeline_read',
+                        'status' => (string) $metadata['maturity'],
+                        'reason_code' => 'provider_not_publicly_usable',
+                    ]);
                     continue;
                 }
                 $provider_version = $metadata['version'];
@@ -125,7 +131,29 @@ final class Timeline_Service
                     if ($search !== '' && ! Plan_Completion::timeline_item_matches_search($item->to_public_array(), $search)) {
                         continue;
                     }
-                    if (! $this->canonical_is_allowed((string) $item->get('canonical_url'), $item)) {
+
+                    $provider_url = $provider->get_canonical_url($item);
+                    $visibility = $provider->get_visibility_state($item);
+                    $actions = $provider->get_public_actions($item);
+                    $metrics = $provider->get_public_metrics($item);
+                    $correction = $provider->get_correction_state($item);
+                    if (! is_string($provider_url)
+                        || ! hash_equals((string) $item->get('canonical_url'), $provider_url)
+                        || ! is_string($visibility)
+                        || ! hash_equals('public', $visibility)
+                        || ! is_array($actions)
+                        || ! is_array($metrics)
+                        || ! is_string($correction)
+                        || ! hash_equals((string) $item->get('correction_state'), $correction)
+                    ) {
+                        throw new \UnexpectedValueException('Timeline provider projection helpers disagreed with the normalized public item.');
+                    }
+                    if (! $this->canonical_is_allowed($provider_url, $item)) {
+                        Observability::emit('broken_canonical_url', [
+                            'provider_id' => (string) $provider_id,
+                            'operation' => 'timeline_read',
+                            'reason_code' => 'non_canonical_or_external',
+                        ]);
                         throw new \UnexpectedValueException('Timeline provider returned a non-canonical external destination.');
                     }
 
@@ -135,6 +163,11 @@ final class Timeline_Service
                         || isset($items[$key])
                         || ($canonical_key !== '' && (isset($provider_canonical_items[$canonical_key]) || isset($canonical_items[$canonical_key])))
                     ) {
+                        Observability::emit('duplicate_projection', [
+                            'provider_id' => (string) $provider_id,
+                            'operation' => 'timeline_deduplication',
+                            'reason_code' => 'native_or_canonical_duplicate',
+                        ]);
                         continue;
                     }
 
@@ -151,6 +184,11 @@ final class Timeline_Service
                 }
             } catch (\Throwable $exception) {
                 $errors[] = (string) $provider_id;
+                Observability::emit('normalization_failure', [
+                    'provider_id' => (string) $provider_id,
+                    'operation' => 'timeline_projection',
+                    'reason_code' => 'provider_contract_failure',
+                ]);
                 do_action('sabri_public_experience/provider_error', (string) $provider_id, $exception);
             }
         }
