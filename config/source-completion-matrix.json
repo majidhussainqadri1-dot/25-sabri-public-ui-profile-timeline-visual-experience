@@ -22,7 +22,7 @@
     "production_accepted": false,
     "live_deployed": false,
     "operational": false,
-    "truthful_boundary": "Reviews 635-654 freshly re-audited File 25 against the final File 25 plan, central governing plan and current companion repository source. Defects in rounds 638, 639, 640, 652 and 653 were corrected: View-as-Public now has real projection-only modes and suppresses owner/mutating controls; the Completion Assistant exposes usable preview destinations outside preview; timeline page size is governed 5..50 with browser-Back scroll restoration; profile_template now has observable token-based behavior; and stale release/status documentation was reconciled. File 08/File 17 owner-contract limitations remain cross-file dependencies, not permission to infer foreign routes. Hostinger staging, Founder, production, exact deployed parity, live DB/schema, migration state and operational acceptance remain separate unverified gates.",
+    "truthful_boundary": "Reviews 635-654 freshly re-audited File 25 against the final File 25 plan, central governing plan and current companion repository source. Defects in rounds 638, 639, 640, 641, 652 and 653 were corrected: View-as-Public now has real projection-only modes and suppresses owner/mutating controls; the Completion Assistant exposes usable preview destinations outside preview; timeline page size is governed 5..50 with browser-Back scroll restoration; current File 03 contract 1.4.0 media URL/alt/focal DTO is consumed without requiring an absent attachment_id; profile_template now has observable token-based behavior; and stale release/status documentation was reconciled. File 08/File 17 owner-contract limitations remain cross-file dependencies, not permission to infer foreign routes. Hostinger staging, Founder, production, exact deployed parity, live DB/schema, migration state and operational acceptance remain separate unverified gates.",
     "latest_review_range": "635-654",
     "exact_head_ci": "external-evidence-required-for-current-head-not-frozen-in-source",
     "exact_deployed_code_verified": false,
@@ -124,7 +124,7 @@
       "id": "F25-PROFILE-CLASSES-HERO-30-38",
       "source": "File 25 sections 30-38",
       "status": "implemented",
-      "summary": "Founder, verified Doctor and permitted Member presentation, hero, sections, native-owner actions and owner-only View-as-Public are implemented from authorized projections. Preview modes public/member/mobile/desktop/contact/search/social remain noindex projection-only surfaces and suppress owner/viewer-mutating actions; unavailable native actions hide rather than guess routes.",
+      "summary": "Founder, verified Doctor and permitted Member presentation, hero, current File 03 1.4.0 public-media URL/alt projection, sections, native-owner actions and owner-only View-as-Public are implemented from authorized projections. Preview modes public/member/mobile/desktop/contact/search/social remain noindex projection-only surfaces and suppress owner/viewer-mutating actions; unavailable native actions hide rather than guess routes.",
       "evidence": [
         "includes/class-profile-repository.php",
         "includes/class-profile-data.php",
@@ -134,7 +134,8 @@
         "includes/class-current-companion-2026-08-10.php",
         "tests/review615-634-fresh-cross-file-audit.php",
         "includes/class-plan-completion.php",
-        "tests/review635-654-plan-completeness.php"
+        "tests/review635-654-plan-completeness.php",
+        "includes/class-native-integration.php"
       ]
     },
     {
@@ -357,7 +358,7 @@
       "id": "REVIEW-CORRECTION-LINEAGE-20-93",
       "source": "Master Plan zero-known-defect/review-fix discipline and current File 25 completion addenda",
       "status": "implemented",
-      "summary": "Historical corrective cycles remain preserved and current source review lineage extends through Reviews 635-654. The latest audit corrected View-as-Public behavior, Completion Assistant preview access, timeline page-size/back-navigation completeness, profile-template dead configuration and stale status documentation while preserving all external acceptance gates.",
+      "summary": "Historical corrective cycles remain preserved and current source review lineage extends through Reviews 635-654. The latest audit corrected View-as-Public behavior, Completion Assistant preview access, timeline page-size/back-navigation completeness, current File 03 media DTO compatibility, profile-template dead configuration and stale status documentation while preserving all external acceptance gates.",
       "evidence": [
         "composer.json",
         "config/review515-594-fifth-eighty-current-truth-ledger.json",
@@ -382,6 +383,7 @@
       638,
       639,
       640,
+      641,
       652,
       653
     ]
