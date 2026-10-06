@@ -190,6 +190,9 @@ foreach ([
     'config/review615-634-fresh-cross-file-audit-ledger.json',
     'tests/review615-634-fresh-cross-file-audit.php',
     'docs/REVIEWS-615-634-FRESH-CROSS-FILE-AUDIT-2026-10-06.md',
+    'config/review635-654-plan-completeness-ledger.json',
+    'tests/review635-654-plan-completeness.php',
+    'docs/REVIEWS-635-654-PLAN-COMPLETENESS-2026-10-06.md',
 ] as $currentEvidence) {
     $assert(file_exists($root . '/' . $currentEvidence), 'Current review evidence is missing: ' . $currentEvidence);
 }
@@ -210,7 +213,7 @@ foreach ([
 $readme = file_get_contents($root . '/README.md');
 $assert(is_string($readme), 'README must be readable.');
 if (is_string($readme)) {
-    $assert(str_contains($readme, 'Reviews 615–634') && str_contains($readme, 'Known unresolved File 25 source defects after the recorded corrections: **0**'), 'README must declare current corrected source status.');
+    $assert(str_contains($readme, 'Reviews 635–654') && str_contains($readme, 'Known unresolved File 25 source defects after the recorded corrections: **0**'), 'README must declare current corrected source status.');
     $assert(str_contains($readme, 'Hostinger staging accepted: **No**'), 'README must retain the Hostinger staging boundary.');
     $assert(str_contains($readme, 'Production approved: **No**'), 'README must retain the production boundary.');
 }
