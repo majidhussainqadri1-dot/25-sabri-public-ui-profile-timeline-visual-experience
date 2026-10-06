@@ -20,7 +20,7 @@ WordPress module for the **Sabri Social Homeopathy Platform**. This is the exist
 - Production approved: **No**
 - Live deployment verified: **No**
 
-Reviews `635–654` performed a new plan-to-code and cross-file audit against the File 25 final plan, central governing plan and current related repository source. Five defect rounds were corrected: `638`, `639`, `640`, `652`, and `653`.
+Reviews `635–654` performed a new plan-to-code and cross-file audit against the File 25 final plan, central governing plan and current related repository source. Six defect rounds were corrected: `638`, `639`, `640`, `641`, `652`, and `653`.
 
 ## Source implementation status
 
@@ -66,6 +66,7 @@ The audited baseline main `210b4b...` passed exact-head CI run `1601`. The final
 - Implemented all seven governed View-as-Public modes: public, member, mobile, desktop, contact, search and social. Preview is noindex, projection-only and suppresses owner/viewer-mutating actions.
 - Completed the owner-only Completion Assistant with usable native edit and preview destinations while hiding completion controls inside preview itself.
 - Added governed `timeline_page_size` bounded to 5–50 and explicit browser-Back scroll restoration while keeping filters/search/page state URL-addressable.
+- Reconciled current File 03 contract `1.4.0` public media: File 25 now consumes owner-approved same-origin `url`/`alt`/focal fields without requiring an `attachment_id` that the current DTO does not publish.
 - Made `profile_template` an active standard/compact/institutional token-based presentation control instead of a dead setting.
 - Reconciled stale README/readme/dependency/source-status evidence and preserved all staging/live/production gates as unverified until real environment evidence exists.
 
