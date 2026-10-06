@@ -207,11 +207,13 @@ final class File_21_Provider implements Timeline_Provider
                 'available_actions' => ['view', 'share'],
             ]);
         } catch (\InvalidArgumentException) {
-            Observability::emit('normalization_failure', [
-                'provider_id' => self::PROVIDER_ID,
-                'operation' => 'normalize_public_item',
-                'reason_code' => 'invalid_public_item',
-            ]);
+            if (class_exists(Observability::class)) {
+                Observability::emit('normalization_failure', [
+                    'provider_id' => self::PROVIDER_ID,
+                    'operation' => 'normalize_public_item',
+                    'reason_code' => 'invalid_public_item',
+                ]);
+            }
             return null;
         }
     }
