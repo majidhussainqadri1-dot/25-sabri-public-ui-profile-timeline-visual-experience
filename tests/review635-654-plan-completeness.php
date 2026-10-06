@@ -85,7 +85,7 @@ $current = $read('includes/class-current-companion-2026-08-10.php');
 foreach (['sabri_file08_public_clinic_projection_v1','sabri_file17_profile_action_url_v1','sabri_network_message_profile_url'] as $invented) {
     $check(! str_contains($current, $invented), 'Unpublished profile-action dependency reintroduced: ' . $invented);
 }
-$check(str_contains($current, "($action === 'follow' || $action === 'appointment')"), 'File 08/File 17 fail-closed action boundary missing.');
+$check(str_contains($current, "(\$action === 'follow' || \$action === 'appointment')"), 'File 08/File 17 fail-closed action boundary missing.');
 
 try {
     $staging = json_decode($read('config/staging-test-plan.json'), true, 512, JSON_THROW_ON_ERROR);
