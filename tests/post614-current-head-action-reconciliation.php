@@ -30,7 +30,8 @@ foreach ([
     $check(str_contains($current, $marker), 'Post-614 native action marker missing: ' . $marker);
 }
 $check(str_contains($current, "if (in_array(\$action, ['appointment', 'message'], true))"), 'Professional lifecycle action suppression missing.');
-$check(str_contains($current, "return '';\n        }\n\n        // File 17 currently owns Follow/Connect state"), 'Missing owner integration must remain hidden before Follow fallback.');
+$check(str_contains($current, 'File 17 currently owns Follow/Connect state'), 'Follow owner-boundary rationale missing.');
+$check(str_contains($current, "empty(\$claim['available'])") && str_contains($current, "sanitize_key((string) (\$claim['action'] ?? '')) !== 'follow'"), 'Follow must fail closed unless File 17 publishes an available target-bound claim.');
 $check(! str_contains($current, "SN_Activator::network_url()"), 'File 25 must not mislabel a generic Network URL as a Follow action.');
 
 $deps = json_decode($read('config/staging-dependencies.json'), true);
