@@ -22,6 +22,7 @@
     638,
     639,
     640,
+    641,
     652,
     653
   ],
@@ -29,7 +30,6 @@
     635,
     636,
     637,
-    641,
     642,
     643,
     644,
@@ -82,8 +82,8 @@
     {
       "review": 641,
       "focus": "file03-public-profile-and-privacy-projection",
-      "status": "reviewed-clean",
-      "finding": "File 03 remains canonical profile/contact/visibility owner; preview continues from the anonymous public projection and does not widen authorization."
+      "status": "defect-found-corrected",
+      "finding": "Current File 03 contract 1.4.0 public media DTO publishes same-origin url/alt/focal fields but omits attachment_id; File 25 incorrectly required attachment_id and therefore could hide valid current avatar/cover media and falsely report missing alt text. Added bounded current DTO media consumption while retaining legacy attachment-id compatibility helper."
     },
     {
       "review": 642,
@@ -169,7 +169,8 @@
     "completion_assistant": "Added usable owner preview URLs and removed completion/edit controls from the projection-only preview surface.",
     "timeline_operability": "Added bounded timeline_page_size and explicit browser-Back scroll restoration while keeping filter/search/page state in the URL.",
     "profile_template": "Made the governed profile_template setting visibly affect token-based profile presentation without creating a second shell.",
-    "status_truth": "Refreshed documentation/review lineage and records exact-head CI as external evidence rather than a mutable frozen status in source."
+    "status_truth": "Refreshed documentation/review lineage and records exact-head CI as external evidence rather than a mutable frozen status in source.",
+    "file03_current_media": "Consume File 03 1.4.0 public media URL/alt/focal projection directly; do not require a private attachment_id absent from the current owner DTO. Avatar alt now remains canonical with descriptive render fallback."
   },
   "external_truth": {
     "hostinger_staging_accepted": false,
