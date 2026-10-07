@@ -6,6 +6,7 @@ namespace Sabri\PublicExperience;
 
 use InvalidArgumentException;
 use Sabri\PublicExperience\Contracts\Timeline_Provider;
+use Sabri\PublicExperience\Contracts\Timeline_Provider_V2;
 
 if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
     exit;
@@ -55,10 +56,12 @@ final class Timeline_Registry
             throw new InvalidArgumentException('Timeline provider registry reached its safe provider limit.');
         }
 
-        try {
-            $provider->register_sync_events();
-        } catch (\Throwable $exception) {
-            throw new InvalidArgumentException('Timeline provider synchronization contract could not be registered safely.', 0, $exception);
+        if ($provider instanceof Timeline_Provider_V2) {
+            try {
+                $provider->register_sync_events();
+            } catch (\Throwable $exception) {
+                throw new InvalidArgumentException('Timeline provider synchronization contract could not be registered safely.', 0, $exception);
+            }
         }
 
         $this->providers[$raw_id] = $provider;
