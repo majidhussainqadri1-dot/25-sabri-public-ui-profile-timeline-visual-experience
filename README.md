@@ -51,6 +51,8 @@ The audited baseline main `2d02c933...` passed exact-head CI run `1638`. The fin
 - **File 00:** identity, membership, suspension and public-profile authorization remain owner-native; File 25 consumes bounded assertions and reads no File 00 tables.
 - **File 03:** profile master/public projection, contact consent, canonical public media, report/edit/privacy destinations and canonical profile identity remain File 03-owned.
 - **File 08:** current main `70541974ce0ffb16aebef557c3016eb7447662f4`, runtime `1.2.15`, schema `3.4.0`, public clinic projection `1.1.0`. No reviewed profile-user→booking-destination API is published, so **Appointment remains hidden**.
+- **File 09:** current main `448d41f34586369ca5875693583b9cd8a6133167`, runtime `1.3.0`, schema `6`, integration contract `1.1.0`; Doctor-verification truth remains File 09-owned.
+- **File 14:** current main `f64e7d17268daff4e3097c18ad510116e6eaf105`, runtime `1.4.6`, schema `10005`; File 14 consumes File 25 visual contracts while clinic/directory/verification destination truth remains with native owners.
 - **File 17:** current main `8ae656e51796d1f05865d8be5dca2480443d79ca`; relationships and messaging remain File 17-owned. **Follow remains hidden** without a target-bound owner contract. Message appears only when File 03's public projection supplies a concrete same-site owner-approved destination.
 - **File 20:** current main `8a4dbcaf4fef8e926b9b834ecfde16c21a0f00ca`; sole structural shell/navigation/layout and canonical admin-parent owner.
 - **File 21:** current main `f2eb7e95ddea327af36ea725ffb923b029f885e6`; canonical publication/ProfileTimeline owner.
