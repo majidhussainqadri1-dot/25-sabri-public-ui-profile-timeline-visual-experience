@@ -37,20 +37,31 @@ final class Plan_Completion
         'overview', 'timeline', 'books-research', 'clinic-contact', 'clinic', 'about',
         'knowledge', 'media', 'videos', 'reels', 'pdfs', 'marketplace',
     ];
+    private const OPTIONAL_SECTION_PROVIDERS = [
+        'file-06-knowledge',
+        'file-10-video-media',
+        'file-11-reels-media',
+        'file-12-pdf-media',
+        'file-18-marketplace',
+    ];
 
-    /** @var array<string,array<string,mixed>> */
+    /**
+     * Only preferences with an observable, bounded File 25 effect belong here.
+     * Mandatory accessibility, Safe Mode and diagnostics cannot be disabled by
+     * presentation preferences; no-store profile caching has no TTL control
+     * until an accepted cache-partition contract exists.
+     *
+     * @var array<string,array<string,mixed>>
+     */
     private const PREFERENCE_SCHEMA = [
         'profile_template' => ['type' => 'enum', 'default' => 'standard', 'allowed' => ['standard', 'compact', 'institutional']],
-        'timeline_provider_mode' => ['type' => 'enum', 'default' => 'federated', 'allowed' => ['federated', 'indexed']],
         'public_visibility' => ['type' => 'bool', 'default' => true],
-        'responsive_preview' => ['type' => 'enum', 'default' => 'desktop', 'allowed' => ['mobile', 'tablet', 'desktop']],
-        'accessibility_mode' => ['type' => 'bool', 'default' => true],
+        'responsive_preview' => ['type' => 'enum', 'default' => 'desktop', 'allowed' => ['mobile', 'desktop']],
         'seo_enabled' => ['type' => 'bool', 'default' => true],
-        'cache_ttl' => ['type' => 'int', 'default' => 15, 'minimum' => 1, 'maximum' => 1440],
-        'safe_mode_controls' => ['type' => 'bool', 'default' => true],
-        'diagnostics_enabled' => ['type' => 'bool', 'default' => true],
         'visual_density' => ['type' => 'enum', 'default' => 'comfortable', 'allowed' => ['comfortable', 'compact']],
         'timeline_page_size' => ['type' => 'int', 'default' => 20, 'minimum' => 5, 'maximum' => 50],
+        'default_timeline_filter' => ['type' => 'key', 'default' => '', 'maximum' => 64],
+        'enabled_optional_providers' => ['type' => 'list', 'default' => self::OPTIONAL_SECTION_PROVIDERS, 'allowed' => self::OPTIONAL_SECTION_PROVIDERS, 'maximum' => 5],
         'featured_section_order' => ['type' => 'list', 'default' => ['overview', 'timeline', 'about'], 'allowed' => self::SECTIONS, 'maximum' => 12],
         'enabled_public_tabs' => ['type' => 'list', 'default' => self::SECTIONS, 'allowed' => self::SECTIONS, 'maximum' => 12],
         'cover_focal_point' => ['type' => 'enum', 'default' => 'center', 'allowed' => ['center', 'top', 'bottom', 'left', 'right']],
@@ -166,6 +177,16 @@ final class Plan_Completion
                 $clean[$key] = in_array($candidate, (array) $definition['allowed'], true)
                     ? $candidate
                     : (string) $definition['default'];
+                continue;
+            }
+            if ($type === 'key') {
+                $candidate = is_string($value) ? trim($value) : '';
+                $maximum = max(1, (int) ($definition['maximum'] ?? 64));
+                $clean[$key] = $candidate === '' || (
+                    strlen($candidate) <= $maximum
+                    && sanitize_key($candidate) === $candidate
+                    && preg_match('/^[a-z0-9][a-z0-9_-]*$/', $candidate) === 1
+                ) ? $candidate : (string) $definition['default'];
                 continue;
             }
             if ($type === 'list') {
@@ -295,8 +316,13 @@ final class Plan_Completion
             echo '</select>';
             return;
         }
+        if ($type === 'key') {
+            echo '<input id="spux-' . esc_attr($key) . '" type="text" maxlength="' . esc_attr((string) ($definition['maximum'] ?? 64)) . '" name="' . esc_attr($name) . '" value="' . esc_attr((string) $value) . '" aria-describedby="spux-' . esc_attr($key) . '-help">';
+            echo '<p id="spux-' . esc_attr($key) . '-help" class="description">' . esc_html__('Use an approved timeline filter key, or leave blank for All. Unknown keys fail back to All.', 'sabri-public-experience') . '</p>';
+            return;
+        }
         echo '<input id="spux-' . esc_attr($key) . '" type="text" class="large-text" name="' . esc_attr($name) . '" value="' . esc_attr(implode(',', (array) $value)) . '" aria-describedby="spux-' . esc_attr($key) . '-help">';
-        echo '<p id="spux-' . esc_attr($key) . '-help" class="description">' . esc_html__('Comma-separated approved section keys.', 'sabri-public-experience') . '</p>';
+        echo '<p id="spux-' . esc_attr($key) . '-help" class="description">' . esc_html__('Comma-separated approved keys only.', 'sabri-public-experience') . '</p>';
     }
 
     private function operation_form(string $action, string $label, bool $high_risk = false): void
@@ -753,6 +779,15 @@ final class Plan_Completion
             'default_responsive_preview' => (string) (self::preferences()['responsive_preview'] ?? 'desktop'),
             'edit_url' => self::action_url('edit_profile', $user_id),
         ];
+    }
+
+    public static function optional_provider_enabled(string $provider_id): bool
+    {
+        $provider_id = sanitize_key($provider_id);
+        if (! in_array($provider_id, self::OPTIONAL_SECTION_PROVIDERS, true)) {
+            return false;
+        }
+        return in_array($provider_id, (array) self::preferences()['enabled_optional_providers'], true);
     }
 
     /** @param array<string,mixed> $profile @return array<string,mixed> */
