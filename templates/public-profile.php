@@ -43,6 +43,9 @@ $breadcrumbs = array_values(array_filter(
 ));
 ?>
 <main id="sabri-main-content" class="spux-profile<?php echo $preview_mode !== '' ? ' spux-preview spux-preview--' . esc_attr($preview_mode) : ''; ?>" tabindex="-1" data-spux-profile-class="<?php echo esc_attr($profile_class); ?>" data-spux-section="<?php echo esc_attr($section); ?>" data-spux-density="<?php echo esc_attr((string) ($profile['visual_density'] ?? 'comfortable')); ?>" data-spux-template="<?php echo esc_attr($profile_template); ?>" data-spux-preview-mode="<?php echo esc_attr($preview_mode); ?>" data-spux-cover-focal-point="<?php echo esc_attr((string) ($profile['cover_focal_point'] ?? 'center')); ?>">
+    <div class="spux-connection-status" data-spux-connection-status role="status" aria-live="polite" hidden>
+        <?php esc_html_e('You are offline. The page remains available, but new network actions may not complete.', 'sabri-public-experience'); ?>
+    </div>
     <div class="spux-container sabri-ui-container">
         <?php if (is_404() || $profile === []) : ?>
             <?php
