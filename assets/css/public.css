@@ -338,6 +338,57 @@
     padding: 0.65rem 0.75rem;
 }
 
+
+.spux-timeline-secondary-filters {
+    margin-block: 1rem;
+}
+
+.spux-timeline-secondary-filters fieldset {
+    border: 1px solid var(--spux-border);
+    border-radius: var(--spux-radius-sm);
+    margin: 0;
+    padding: 1rem;
+}
+
+.spux-timeline-secondary-filters legend {
+    font-weight: 700;
+    padding-inline: 0.25rem;
+}
+
+.spux-filter-grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+}
+
+.spux-filter-grid label {
+    display: grid;
+    gap: 0.35rem;
+    min-inline-size: 0;
+}
+
+.spux-filter-grid input,
+.spux-filter-grid select {
+    border: 1px solid var(--spux-border);
+    border-radius: var(--spux-radius-sm);
+    inline-size: 100%;
+    min-block-size: 2.75rem;
+    padding: 0.55rem 0.65rem;
+}
+
+.spux-filter-actions,
+.spux-load-more {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block-start: 0.85rem;
+}
+
+.spux-load-more {
+    justify-content: center;
+}
+
 .spux-public-metrics {
     margin-block: 1rem;
 }
