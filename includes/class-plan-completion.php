@@ -24,6 +24,7 @@ final class Plan_Completion
     private const OPTION_HISTORY = 'sabri_public_experience_preferences_history';
     private const INDEX_OPTION = 'sabri_public_experience_timeline_index';
     private const INDEX_LOCK_OPTION = 'sabri_public_experience_timeline_index_lock';
+    private const INDEX_PAUSE_OPTION = 'sabri_public_experience_timeline_index_pause';
     private const MIGRATION_OPTION = 'sabri_public_experience_migration_state';
     private const MIGRATION_ACTIVE_OPTION = 'sabri_public_experience_legacy_redirects';
     private const REPAIR_OPTION = 'sabri_public_experience_repair_state';
@@ -63,6 +64,8 @@ final class Plan_Completion
         'preferences' => 'manage_options',
         'repair' => 'manage_options',
         'rebuild_index' => 'manage_options',
+        'pause_index' => 'manage_options',
+        'resume_index' => 'manage_options',
         'reconcile_profile' => 'manage_options',
         'migration_dry_run' => 'manage_options',
         'migration_execute' => 'manage_options',
@@ -77,6 +80,8 @@ final class Plan_Completion
         add_action('admin_post_spux_save_preferences', [$this, 'handle_save_preferences']);
         add_action('admin_post_spux_repair', [$this, 'handle_repair']);
         add_action('admin_post_spux_rebuild_index', [$this, 'handle_rebuild']);
+        add_action('admin_post_spux_pause_index', [$this, 'handle_pause_index']);
+        add_action('admin_post_spux_resume_index', [$this, 'handle_resume_index']);
         add_action('admin_post_spux_migration_dry_run', [$this, 'handle_migration_dry_run']);
         add_action('admin_post_spux_migration_execute', [$this, 'handle_migration_execute']);
         add_action('admin_post_spux_migration_rollback', [$this, 'handle_migration_rollback']);
@@ -262,6 +267,8 @@ final class Plan_Completion
 
             <h2><?php esc_html_e('Operations', 'sabri-public-experience'); ?></h2>
             <?php $this->operation_form('spux_rebuild_index', __('Rebuild Timeline Index', 'sabri-public-experience')); ?>
+            <?php $this->operation_form('spux_pause_index', __('Pause Index Rebuilds', 'sabri-public-experience')); ?>
+            <?php $this->operation_form('spux_resume_index', __('Resume Index Rebuilds', 'sabri-public-experience')); ?>
             <?php $this->operation_form('spux_repair', __('Run Safe Repair', 'sabri-public-experience')); ?>
             <?php $this->operation_form('spux_migration_dry_run', __('Migration Dry Run', 'sabri-public-experience')); ?>
             <?php $this->operation_form('spux_migration_execute', __('Execute Approved Migration', 'sabri-public-experience'), true); ?>
@@ -319,6 +326,16 @@ final class Plan_Completion
             'methods' => 'POST',
             'callback' => [$this, 'rest_rebuild_index'],
             'permission_callback' => static fn (): bool => self::can_operate('rebuild_index'),
+        ]);
+        register_rest_route('sabri-public/v1', '/admin/rebuild-index/pause', [
+            'methods' => 'POST',
+            'callback' => [$this, 'rest_pause_index'],
+            'permission_callback' => static fn (): bool => self::can_operate('pause_index'),
+        ]);
+        register_rest_route('sabri-public/v1', '/admin/rebuild-index/resume', [
+            'methods' => 'POST',
+            'callback' => [$this, 'rest_resume_index'],
+            'permission_callback' => static fn (): bool => self::can_operate('resume_index'),
         ]);
         register_rest_route('sabri-public/v1', '/admin/reconcile-profile', [
             'methods' => 'POST',
@@ -399,6 +416,30 @@ final class Plan_Completion
         $status = ($state['status'] ?? '') === 'complete' ? 200 : 503;
         $response = $this->response($state, $status, (string) ($state['updated_at_utc'] ?? gmdate('Y-m-d H:i:s')));
         $this->store_idempotent_response('rebuild_index', $request, $response);
+        return $response;
+    }
+
+    public function rest_pause_index(\WP_REST_Request $request): \WP_REST_Response
+    {
+        $preflight = $this->mutation_preflight('pause_index', $request);
+        if ($preflight instanceof \WP_REST_Response) {
+            return $preflight;
+        }
+        $state = $this->set_index_pause(true);
+        $response = $this->response($state, 200, (string) ($state['updated_at_utc'] ?? gmdate('Y-m-d H:i:s')));
+        $this->store_idempotent_response('pause_index', $request, $response);
+        return $response;
+    }
+
+    public function rest_resume_index(\WP_REST_Request $request): \WP_REST_Response
+    {
+        $preflight = $this->mutation_preflight('resume_index', $request);
+        if ($preflight instanceof \WP_REST_Response) {
+            return $preflight;
+        }
+        $state = $this->set_index_pause(false);
+        $response = $this->response($state, 200, (string) ($state['updated_at_utc'] ?? gmdate('Y-m-d H:i:s')));
+        $this->store_idempotent_response('resume_index', $request, $response);
         return $response;
     }
 
@@ -834,6 +875,20 @@ final class Plan_Completion
         $this->redirect_admin($result['status'] === 'conflict' ? 'revision_conflict' : 'preferences_saved');
     }
 
+    public function handle_pause_index(): void
+    {
+        $this->guard_admin_post('spux_pause_index', 'pause_index');
+        $this->set_index_pause(true);
+        $this->redirect_admin('index_rebuild_paused');
+    }
+
+    public function handle_resume_index(): void
+    {
+        $this->guard_admin_post('spux_resume_index', 'resume_index');
+        $this->set_index_pause(false);
+        $this->redirect_admin('index_rebuild_resumed');
+    }
+
     public function handle_repair(): void
     {
         $this->guard_admin_post('spux_repair', 'repair');
@@ -924,8 +979,62 @@ final class Plan_Completion
     }
 
     /** @return array<string,mixed> */
+    public static function index_rebuild_paused(): bool
+    {
+        $state = function_exists('get_option') ? get_option(self::INDEX_PAUSE_OPTION, []) : [];
+        return is_array($state) && ($state['paused'] ?? null) === true;
+    }
+
+    /** @return array<string,mixed> */
+    private function set_index_pause(bool $paused): array
+    {
+        $updated = gmdate('Y-m-d H:i:s');
+        if ($paused) {
+            update_option(self::INDEX_PAUSE_OPTION, [
+                'paused' => true,
+                'requested_at_utc' => $updated,
+                'requested_by' => get_current_user_id(),
+            ], false);
+        } else {
+            delete_option(self::INDEX_PAUSE_OPTION);
+        }
+
+        $index = get_option(self::INDEX_OPTION, []);
+        $index = is_array($index) ? $index : [];
+        $running = ($index['status'] ?? '') === 'running';
+        if ($paused) {
+            $index['status'] = $running ? 'pause-requested' : 'paused';
+            $index['rebuildable'] = true;
+            $index['updated_at_utc'] = $updated;
+            update_option(self::INDEX_OPTION, $index, false);
+        } elseif (in_array((string) ($index['status'] ?? ''), ['paused', 'pause-requested'], true)) {
+            $index['status'] = 'ready';
+            $index['rebuildable'] = true;
+            $index['updated_at_utc'] = $updated;
+            update_option(self::INDEX_OPTION, $index, false);
+        }
+
+        $state = [
+            'status' => $paused ? ($running ? 'pause-requested' : 'paused') : 'resumed',
+            'paused' => $paused,
+            'updated_at_utc' => $updated,
+            'foreign_owner_data_touched' => false,
+        ];
+        do_action('sabri_public_experience/timeline_index_pause_changed', $state);
+        return $state;
+    }
+
+    /** @return array<string,mixed> */
     private function rebuild_index(): array
     {
+        if (self::index_rebuild_paused()) {
+            return [
+                'status' => 'paused',
+                'rebuildable' => true,
+                'updated_at_utc' => gmdate('Y-m-d H:i:s'),
+                'foreign_owner_data_touched' => false,
+            ];
+        }
         $now = time();
         $lock = get_option(self::INDEX_LOCK_OPTION, []);
         if (is_array($lock) && (int) ($lock['expires'] ?? 0) > $now) {
@@ -945,7 +1054,10 @@ final class Plan_Completion
                 'items' => 0,
                 'checksum' => '',
                 'source_versions' => [],
-            ], $generation);
+            ], $generation, [
+                'pause_option' => self::INDEX_PAUSE_OPTION,
+                'paused' => self::index_rebuild_paused(),
+            ]);
             if (! is_array($result)
                 || ($result['accepted'] ?? null) !== true
                 || ! is_int($result['items'] ?? null)
@@ -958,8 +1070,9 @@ final class Plan_Completion
                 throw new \UnexpectedValueException('No accepted timeline-index builder contract was available.');
             }
             $completed = gmdate('Y-m-d H:i:s');
+            $pause_requested = self::index_rebuild_paused();
             $state = [
-                'status' => 'complete',
+                'status' => $pause_requested ? 'paused' : 'complete',
                 'rebuildable' => true,
                 'generation' => $generation,
                 'started_at_utc' => $started,
@@ -969,6 +1082,7 @@ final class Plan_Completion
                 'checksum' => $result['checksum'],
                 'source_versions' => self::canonical_source_versions($result['source_versions']),
                 'source' => 'federated-provider-pointers',
+                'paused' => $pause_requested,
             ];
         } catch (\Throwable $exception) {
             $failed = gmdate('Y-m-d H:i:s');
@@ -1169,7 +1283,7 @@ final class Plan_Completion
             'schema' => 1,
             'generated_at_utc' => gmdate('Y-m-d H:i:s'),
             'preserved_canonical_data' => true,
-            'rebuildable_options' => [self::INDEX_OPTION, self::INDEX_LOCK_OPTION, self::REPAIR_OPTION],
+            'rebuildable_options' => [self::INDEX_OPTION, self::INDEX_LOCK_OPTION, self::INDEX_PAUSE_OPTION, self::REPAIR_OPTION],
             'reversible_migration_options' => [self::MIGRATION_OPTION, self::MIGRATION_ACTIVE_OPTION],
             'preferences_preserved' => true,
             'foreign_owner_data_touched' => false,
