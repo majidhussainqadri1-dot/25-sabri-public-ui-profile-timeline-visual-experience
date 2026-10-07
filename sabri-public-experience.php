@@ -79,6 +79,7 @@ $spux_files = [
     'includes/class-upgrade-manager.php',
     'includes/class-design-system.php',
     'includes/contracts/interface-timeline-provider.php',
+    'includes/contracts/interface-timeline-provider-v2.php',
     'includes/contracts/interface-profile-section-provider.php',
     'includes/class-normalized-timeline-item.php',
     'includes/class-file-24-integration.php',
