@@ -313,6 +313,19 @@
     }
 }
 
+
+.spux-connection-status {
+    background: var(--spux-surface);
+    border: 2px solid var(--spux-border);
+    border-radius: var(--spux-radius-sm);
+    margin-block-end: 1rem;
+    padding: 0.75rem 1rem;
+}
+
+.spux-connection-status[data-state="offline"] {
+    font-weight: 700;
+}
+
 .spux-timeline-search {
     margin-block: 1rem;
 }
