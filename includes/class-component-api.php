@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Sabri\PublicExperience;
 
 use Sabri\PublicExperience\Contracts\Timeline_Provider;
+use Sabri\PublicExperience\Contracts\Timeline_Provider_V2;
 
 if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
     exit;
@@ -83,6 +84,8 @@ final class Component_API
             'contract_version' => self::CONTRACT_VERSION,
             'owner' => 'file-25',
             'timeline_provider_interface' => Timeline_Provider::class,
+            'timeline_provider_v2_interface' => Timeline_Provider_V2::class,
+            'timeline_provider_v2_capabilities' => ['normalize', 'canonical_url', 'visibility', 'actions', 'metrics', 'correction_state', 'sync_events'],
             'timeline_provider_queue_limit' => self::MAX_PENDING_TIMELINE_PROVIDERS,
             'timeline_registry_owner' => 'file-25-read-projection-registry',
             'card_variant_registry' => 'bounded-request-local',
