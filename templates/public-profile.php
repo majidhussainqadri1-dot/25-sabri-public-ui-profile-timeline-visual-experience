@@ -28,6 +28,15 @@ $profile_class = sanitize_key((string) ($profile['class'] ?? 'member'));
 $profile_template = sanitize_key((string) ($profile['profile_template'] ?? 'standard')) ?: 'standard';
 $preview_mode = sanitize_key((string) ($context['preview_mode'] ?? ''));
 $preview_urls = is_array($context['preview_urls'] ?? null) ? $context['preview_urls'] : [];
+$preview_mode_labels = [
+    'public' => __('Public', 'sabri-public-experience'),
+    'member' => __('Member', 'sabri-public-experience'),
+    'mobile' => __('Mobile', 'sabri-public-experience'),
+    'desktop' => __('Desktop', 'sabri-public-experience'),
+    'contact' => __('Contact visibility', 'sabri-public-experience'),
+    'search' => __('Search engine', 'sabri-public-experience'),
+    'social' => __('Social share card', 'sabri-public-experience'),
+];
 $breadcrumbs = array_values(array_filter(
     (array) ($context['breadcrumbs'] ?? []),
     'is_array'
@@ -81,17 +90,17 @@ $breadcrumbs = array_values(array_filter(
                             <?php foreach ($preview_urls as $mode => $url) : ?>
                                 <?php
                                 $mode = sanitize_key((string) $mode);
-                                $url = SabriPublicExperiencePublic_URL::sanitize_same_site($url, false);
+                                $url = \Sabri\PublicExperience\Public_URL::sanitize_same_site($url, false);
                                 if ($mode === '' || $url === '') { continue; }
                                 $active = $mode === $preview_mode;
                                 ?>
                                 <a class="spux-button spux-button--secondary<?php echo $active ? ' is-active' : ''; ?>" href="<?php echo esc_url($url); ?>"<?php echo $active ? ' aria-current="page"' : ''; ?>>
-                                    <?php echo esc_html(ucwords(str_replace('-', ' ', $mode))); ?>
+                                    <?php echo esc_html($preview_mode_labels[$mode] ?? $mode); ?>
                                 </a>
                             <?php endforeach; ?>
                         </nav>
                     <?php endif; ?>
-                    <?php $exit_preview = SabriPublicExperiencePublic_URL::sanitize_same_site($profile['canonical_url'] ?? '', false); ?>
+                    <?php $exit_preview = \Sabri\PublicExperience\Public_URL::sanitize_same_site($profile['canonical_url'] ?? '', false); ?>
                     <?php if ($exit_preview !== '') : ?>
                         <a class="spux-text-link" href="<?php echo esc_url($exit_preview); ?>"><?php esc_html_e('Exit preview', 'sabri-public-experience'); ?></a>
                     <?php endif; ?>
@@ -171,7 +180,7 @@ $breadcrumbs = array_values(array_filter(
                             <?php foreach ($assistant_previews as $mode => $url) : ?>
                                 <?php
                                 $mode = sanitize_key((string) $mode);
-                                $url = SabriPublicExperiencePublic_URL::sanitize_same_site($url, false);
+                                $url = \Sabri\PublicExperience\Public_URL::sanitize_same_site($url, false);
                                 if ($mode === '' || $url === '') { continue; }
                                 ?>
                                 <a class="spux-button spux-button--secondary" href="<?php echo esc_url($url); ?>"><?php echo esc_html(ucwords(str_replace('-', ' ', $mode))); ?></a>
