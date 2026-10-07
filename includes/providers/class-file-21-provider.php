@@ -128,7 +128,7 @@ final class File_21_Provider implements Timeline_Provider
                 if (! is_array($native_item)) {
                     continue;
                 }
-                $normalized = $this->normalize($native_item, $author_id);
+                $normalized = $this->normalize_public_item($native_item, $author_id);
                 if ($normalized !== null) {
                     $items[] = $normalized;
                 }
@@ -162,12 +162,17 @@ final class File_21_Provider implements Timeline_Provider
             'contract' => 'Sabri\\HomeNewsFeed\\ProfileTimeline::query',
             'read_only' => true,
             'owns_native_content' => false,
+            'provider_contract_complete' => true,
+            'sync_mode' => 'on-demand-read-through',
         ];
     }
 
-    /** @param array<string,mixed> $item */
-    private function normalize(array $item, int $author_id): ?Normalized_Timeline_Item
+    public function normalize_public_item(mixed $native_item, int $author_id): ?Normalized_Timeline_Item
     {
+        if (! is_array($native_item)) {
+            return null;
+        }
+        $item = $native_item;
         $id = isset($item['id']) ? (int) $item['id'] : 0;
         $title = isset($item['title']) && is_scalar($item['title']) ? (string) $item['title'] : '';
         $excerpt = isset($item['excerpt']) && is_scalar($item['excerpt']) ? (string) $item['excerpt'] : '';
@@ -203,4 +208,50 @@ final class File_21_Provider implements Timeline_Provider
             return null;
         }
     }
+    public function get_canonical_url(Normalized_Timeline_Item $item): string
+    {
+        return (string) $item->get('canonical_url');
+    }
+
+    public function get_visibility_state(Normalized_Timeline_Item $item): string
+    {
+        return (string) $item->get('visibility_state');
+    }
+
+    /** @return list<string> */
+    public function get_public_actions(Normalized_Timeline_Item $item): array
+    {
+        $actions = $item->get('available_actions');
+        return is_array($actions) ? array_values(array_filter($actions, 'is_string')) : [];
+    }
+
+    /** @return array<string,int> */
+    public function get_public_metrics(Normalized_Timeline_Item $item): array
+    {
+        $metrics = function_exists('apply_filters')
+            ? apply_filters('sabri_public_experience/file_21_public_metrics', [], $item)
+            : [];
+        if (! is_array($metrics)) {
+            return [];
+        }
+        $clean = [];
+        foreach (['views', 'saves'] as $key) {
+            if (isset($metrics[$key]) && is_int($metrics[$key]) && $metrics[$key] >= 0 && $metrics[$key] <= 1000000000) {
+                $clean[$key] = $metrics[$key];
+            }
+        }
+        return $clean;
+    }
+
+    public function get_correction_state(Normalized_Timeline_Item $item): string
+    {
+        return (string) $item->get('correction_state');
+    }
+
+    public function register_sync_events(): void
+    {
+        // Current File 21 provider is a bounded read-through projection and
+        // keeps no File 25-owned copy requiring event-driven synchronization.
+    }
+
 }
