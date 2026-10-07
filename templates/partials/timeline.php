@@ -239,7 +239,7 @@ if (! isset($filters[''])) {
                 </a>
             <?php endif; ?>
         </nav>
-        <p id="spux-pagination-status" class="screen-reader-text" role="status" aria-live="polite">
+        <p id="spux-pagination-status" class="spux-sr-only" role="status" aria-live="polite">
             <?php echo esc_html(sprintf(__('Page %1$d. %2$d public items shown on this page.', 'sabri-public-experience'), $page, count($items))); ?>
         </p>
     <?php endif; ?>
