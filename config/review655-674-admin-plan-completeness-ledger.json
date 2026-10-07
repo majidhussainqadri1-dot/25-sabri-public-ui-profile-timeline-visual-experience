@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "file": 25,
+  "review_range": {
+    "first": 655,
+    "last": 674,
+    "count": 20
+  },
+  "basis": {
+    "baseline_main_sha": "2d02c93356b050313e30e29aeceb57080771c2a5",
+    "baseline_main_ci": {
+      "run_number": 1638,
+      "run_id": 37508519545,
+      "conclusion": "success"
+    },
+    "candidate_branch": "fix/reviews-655-674-admin-plan-completeness-20261007",
+    "file25_plan": "Complete Public UI, Profile Timeline and Visual Experience — Final Harmonized Specification 2.0 plus governing addenda",
+    "central_plan": "Sabri Social Homeopathy Platform Definitive/Consolidated Governing Master Plan 2026",
+    "method": "Fresh twenty-scope plan-to-code and cross-file audit focused on administrator configuration truth, runtime observability of settings, timeline defaults, optional provider enablement and current companion ownership."
+  },
+  "defect_rounds": [
+    657,
+    658,
+    659,
+    660,
+    662,
+    673
+  ],
+  "clean_rounds": [
+    655,
+    656,
+    661,
+    663,
+    664,
+    665,
+    666,
+    667,
+    668,
+    669,
+    670,
+    671,
+    672,
+    674
+  ],
+  "reviews": [
+    {
+      "review": 655,
+      "focus": "repository-baseline-and-exact-main-ci",
+      "status": "reviewed-clean",
+      "finding": "Baseline main 2d02c93356b050313e30e29aeceb57080771c2a5 and exact main CI run 1638 were verified as repository/CI evidence only."
+    },
+    {
+      "review": 656,
+      "focus": "file25-final-plan-central-ownership",
+      "status": "reviewed-clean",
+      "finding": "File 25 remains bounded public visual/profile/timeline presentation; no second shell, profile master, publication backend, security center or global search backend was introduced."
+    },
+    {
+      "review": 657,
+      "focus": "admin-configuration-observable-controls",
+      "status": "defect-found-corrected",
+      "finding": "Several administrator preferences were visible but had no runtime effect: timeline_provider_mode, accessibility_mode, cache_ttl, safe_mode_controls and diagnostics_enabled. Removed false configurability, kept mandatory accessibility/Safe Mode/diagnostics always available, and grouped the control center by the File 25 plan sections."
+    },
+    {
+      "review": 658,
+      "focus": "responsive-preview-setting-parity",
+      "status": "defect-found-corrected",
+      "finding": "responsive_preview offered tablet although the governed View-as-Public contract exposes mobile/desktop responsive modes. Removed the unsupported tablet preference so every selectable value has a real preview destination."
+    },
+    {
+      "review": 659,
+      "focus": "completion-assistant-alt-evidence",
+      "status": "defect-found-corrected",
+      "finding": "The renderer fabricated avatar_alt for the Completion Assistant whenever an avatar existed, preventing the required missing-alt-text finding. Assistant evidence now stays bound to canonical File 03 alt metadata; the public renderer may still use an accessible descriptive fallback."
+    },
+    {
+      "review": 660,
+      "focus": "timeline-default-filter-setting",
+      "status": "defect-found-corrected",
+      "finding": "The plan allows a default filter but no governed setting existed. Added bounded default_timeline_filter and apply it only when it matches the current approved filter registry; unknown values fail to All."
+    },
+    {
+      "review": 661,
+      "focus": "fallback-image-behavior",
+      "status": "reviewed-clean",
+      "finding": "The public hero already provides a deterministic initials fallback when canonical avatar media is absent without inventing third-party media."
+    },
+    {
+      "review": 662,
+      "focus": "optional-provider-enablement",
+      "status": "defect-found-corrected",
+      "finding": "The plan allows optional provider enablement but built-in optional section providers were always registered. Added a bounded allowlist preference, including explicit disable-all, and File 25 now registers each optional provider only when enabled."
+    },
+    {
+      "review": 663,
+      "focus": "file03-profile-public-media-contract",
+      "status": "reviewed-clean",
+      "finding": "Current File 03 main/contract remains compatible with the corrected URL/alt/focal public media DTO consumer; no File 03 table/private-ID dependency was reintroduced."
+    },
+    {
+      "review": 664,
+      "focus": "file08-clinic-appointment-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 08 remains clinic/appointment owner; Appointment remains hidden without an authoritative profile-user booking destination contract."
+    },
+    {
+      "review": 665,
+      "focus": "file17-relationship-message-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 17 remains relationships/messaging owner; Follow remains hidden without a target-bound owner destination and Message remains bounded to a concrete File 03 public projection URL."
+    },
+    {
+      "review": 666,
+      "focus": "file20-shell-admin-architecture",
+      "status": "reviewed-clean",
+      "finding": "File 20 remains structural shell/admin parent owner; File 25 control sections stay nested under compatible File 20 with degraded standalone fallback only."
+    },
+    {
+      "review": 667,
+      "focus": "file21-timeline-publication-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 21 remains publication/ProfileTimeline owner; File 25 retains read-only federated timeline presentation and optional rebuild state only."
+    },
+    {
+      "review": 668,
+      "focus": "file22-file23-authoring-management-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 22 Composer and File 23 private Publishing Dashboard remain native owners; File 25 exposes only guarded canonical destinations."
+    },
+    {
+      "review": 669,
+      "focus": "file24-security-privacy-assurance",
+      "status": "reviewed-clean",
+      "finding": "File 24 remains assurance/governance owner; File 25 mandatory accessibility/Safe Mode/diagnostics controls cannot be weakened by presentation preferences."
+    },
+    {
+      "review": 670,
+      "focus": "file26-global-search-ranking-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 26 remains global search/discovery/ranking owner; File 25 default filter and search remain profile-local presentation only."
+    },
+    {
+      "review": 671,
+      "focus": "rest-component-api-and-preference-validation",
+      "status": "reviewed-clean",
+      "finding": "REST preferences remain strict allowlisted/versioned with bounded values; removed preference keys are rejected as unknown rather than silently creating dead controls."
+    },
+    {
+      "review": 672,
+      "focus": "accessibility-cache-safe-mode-diagnostics-law",
+      "status": "reviewed-clean",
+      "finding": "Accessibility remains mandatory; profile responses remain no-store until an accepted cache-partition contract exists; Safe Mode and diagnostics remain recovery/operations features rather than disableable presentation flags."
+    },
+    {
+      "review": 673,
+      "focus": "release-documentation-status-lineage",
+      "status": "defect-found-corrected",
+      "finding": "Source/readme/dependency/review metadata still described Reviews 635-654 as latest. Advanced lineage through Reviews 655-674 while keeping mutable exact-head CI and all staging/live gates external."
+    },
+    {
+      "review": 674,
+      "focus": "final-cross-file-parity-and-external-truth",
+      "status": "reviewed-clean",
+      "finding": "Current relevant companion repository heads were rechecked; repository source completion is separate from Hostinger staging, deployed package, live DB/schema, migration and operational truth."
+    }
+  ],
+  "corrections": {
+    "admin_truth": "Removed dead/no-op presentation preferences and grouped controls by the governed File 25 admin sections.",
+    "responsive_preview": "Removed unsupported tablet choice; selectable responsive preview values are mobile/desktop only.",
+    "completion_alt": "Stopped fabricating avatar alt evidence for the Completion Assistant.",
+    "default_filter": "Added bounded default_timeline_filter with fail-safe validation against active filters.",
+    "optional_providers": "Added bounded enabled_optional_providers with explicit disable-all and runtime registration enforcement.",
+    "status_truth": "Advanced source/release lineage without self-certifying current-head CI or staging/live acceptance."
+  },
+  "external_truth": {
+    "hostinger_staging_accepted": false,
+    "founder_staging_acceptance": false,
+    "production_accepted": false,
+    "live_deployed": false,
+    "operational": false,
+    "exact_deployed_code_verified": false,
+    "db_version_verified_live": false,
+    "migration_state_verified_live": false
+  },
+  "unresolved_cross_file_dependencies": [
+    "File 08 current main does not publish an authoritative profile-user-to-booking-destination contract for File 25.",
+    "File 17 current main does not publish an authoritative target-bound Follow destination contract for File 25."
+  ],
+  "source_candidate": {
+    "runtime": "0.15.0",
+    "known_unresolved_file25_source_defects_after_corrections": 0,
+    "exact_current_head_ci": "external-evidence-required-not-frozen-in-source"
+  }
+}
