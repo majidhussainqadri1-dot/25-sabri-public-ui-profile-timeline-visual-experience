@@ -138,6 +138,7 @@ final class Profile_Renderer
         if ($requested_section === 'timeline') {
             $timeline_filters = $this->timeline_filters($profile);
             $content_type = $this->requested_timeline_content_type($timeline_filters);
+            $secondary_filters = $this->requested_timeline_secondary_filters();
             $search_query = '';
             $search_error = '';
             if (isset($_GET['profile_q'])) {
@@ -157,14 +158,21 @@ final class Profile_Renderer
             }
             $context['timeline_filters'] = $timeline_filters;
             $context['timeline_content_type'] = $content_type;
+            $context['timeline_secondary_filters'] = $secondary_filters;
             $context['timeline_search_query'] = $search_query;
             $context['timeline_search_error'] = $search_error;
-            $timeline = $this->timeline->get_for_author((int) $user->ID, [
+            $timeline = $this->timeline->get_for_author((int) $user->ID, array_merge([
                 'page' => max(1, (int) get_query_var('paged')),
                 'per_page' => $timeline_page_size,
                 'content_type' => $content_type,
                 'search' => $search_query,
-            ]);
+            ], $secondary_filters));
+            $context['timeline_available_sorts'] = is_array($timeline['available_sorts'] ?? null)
+                ? array_values(array_filter($timeline['available_sorts'], 'is_string'))
+                : ['latest', 'oldest'];
+            $context['timeline_effective_sort'] = is_string($timeline['effective_sort'] ?? null)
+                ? (string) $timeline['effective_sort']
+                : 'latest';
             $context['timeline_search_result_count'] = count((array) ($timeline['items'] ?? []));
         }
 
@@ -365,6 +373,16 @@ final class Profile_Renderer
         $base = [
             '' => __('All', 'sabri-public-experience'),
             'post' => __('Posts', 'sabri-public-experience'),
+            'article' => __('Articles', 'sabri-public-experience'),
+            'knowledge' => __('Knowledge', 'sabri-public-experience'),
+            'lesson' => __('Lessons', 'sabri-public-experience'),
+            'research' => __('Research', 'sabri-public-experience'),
+            'case' => __('Successful cases', 'sabri-public-experience'),
+            'video' => __('Videos', 'sabri-public-experience'),
+            'reel' => __('Reels', 'sabri-public-experience'),
+            'pdf' => __('PDFs', 'sabri-public-experience'),
+            'clinic-update' => __('Clinic Updates', 'sabri-public-experience'),
+            'correction' => __('Corrections', 'sabri-public-experience'),
         ];
         $requested = (array) apply_filters(
             'sabri_public_experience/timeline_filters',
@@ -407,6 +425,67 @@ final class Profile_Renderer
         }
 
         return array_key_exists($requested, $filters) ? $requested : '';
+    }
+
+    /** @return array{topic:string,year:int,language:string,provider:string,sort:string,review_state:string,source_state:string} */
+    private function requested_timeline_secondary_filters(): array
+    {
+        $value = static function (string $key): string {
+            if (! isset($_GET[$key]) || ! is_scalar($_GET[$key])) {
+                return '';
+            }
+            return (string) wp_unslash($_GET[$key]);
+        };
+
+        $topic_raw = $value('topic');
+        $topic = trim(wp_strip_all_tags($topic_raw));
+        if (strlen($topic) > 120 || preg_match('/[\x00-\x1F\x7F]/', $topic) === 1) {
+            $topic = '';
+        }
+
+        $year_raw = $value('year');
+        $year = preg_match('/^[12][0-9]{3}$/', $year_raw) === 1 ? (int) $year_raw : 0;
+        if ($year < 1900 || $year > (int) gmdate('Y') + 1) {
+            $year = 0;
+        }
+
+        $language_raw = $value('language');
+        $language = $language_raw !== '' && strlen($language_raw) <= 35
+            && preg_match('/^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$/', $language_raw) === 1
+                ? $language_raw
+                : '';
+
+        $provider_raw = $value('provider');
+        $provider = sanitize_key($provider_raw);
+        if ($provider_raw === '' || $provider !== $provider_raw || strlen($provider) > 64) {
+            $provider = '';
+        }
+
+        $sort_raw = $value('sort');
+        $sort = in_array($sort_raw, ['latest', 'oldest', 'most-viewed', 'most-saved'], true)
+            ? $sort_raw
+            : 'latest';
+
+        $review_raw = $value('review_state');
+        $review_state = sanitize_key($review_raw);
+        if ($review_raw === '' || $review_state !== $review_raw || strlen($review_state) > 64) {
+            $review_state = '';
+        }
+
+        $source_raw = $value('source_state');
+        $source_state = in_array($source_raw, ['', 'detected', 'read-only', 'staging-accepted', 'production-accepted', 'degraded'], true)
+            ? $source_raw
+            : '';
+
+        return [
+            'topic' => $topic,
+            'year' => $year,
+            'language' => $language,
+            'provider' => $provider,
+            'sort' => $sort,
+            'review_state' => $review_state,
+            'source_state' => $source_state,
+        ];
     }
 
     private function resolve_user(): ?WP_User
