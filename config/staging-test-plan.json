@@ -229,6 +229,26 @@
       "id": "profile-template-setting",
       "category": "visual",
       "requirement": "The governed profile_template preference has observable token-based standard/compact/institutional presentation behavior and never creates a second shell or unsafe CSS injection path."
+    },
+    {
+      "id": "admin-config-observable-controls",
+      "category": "admin",
+      "requirement": "File 25 admin sections expose only controls with an observable bounded runtime effect. Accessibility, Safe Mode and diagnostics are mandatory operational features rather than disableable presentation flags; public profile responses remain no-store until a separately accepted cache-partition contract exists."
+    },
+    {
+      "id": "timeline-default-filter",
+      "category": "timeline",
+      "requirement": "default_timeline_filter is a bounded key and applies only when no explicit type query exists and the key is present in the current approved filter registry; unknown/stale values resolve to All."
+    },
+    {
+      "id": "optional-provider-enablement",
+      "category": "integration",
+      "requirement": "Built-in optional File 06/10/11/12/18 profile-section providers register only when listed in enabled_optional_providers. An explicit empty list disables all optional section providers without disabling required File 21 timeline ownership."
+    },
+    {
+      "id": "completion-assistant-alt-evidence",
+      "category": "accessibility",
+      "requirement": "The owner Completion Assistant reports missing canonical avatar alt metadata instead of accepting a renderer-generated fallback as completion evidence; public rendering may still provide an accessible descriptive fallback."
     }
   ]
 }
