@@ -26,7 +26,7 @@ final class Timeline_Service
      * item. File 25 performs the global cross-provider sort and pagination.
      *
      * @param array<string,mixed> $query
-     * @return array{items:list<array<string,mixed>>,page:int,per_page:int,has_more:bool,truncated:bool,provider_errors:list<string>}
+     * @return array{items:list<array<string,mixed>>,page:int,per_page:int,has_more:bool,truncated:bool,provider_errors:list<string>,available_sorts:list<string>,effective_sort:string}
      */
     public function get_for_author(int $author_id, array $query = []): array
     {
@@ -255,7 +255,7 @@ final class Timeline_Service
             }
         );
 
-        $slice =        $slice = $requested_page > $max_page ? [] : array_slice($items, $offset, $per_page + 1);
+        $slice = $requested_page > $max_page ? [] : array_slice($items, $offset, $per_page + 1);
         $has_more = count($slice) > $per_page;
         if ($has_more) {
             array_pop($slice);
