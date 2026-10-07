@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "file": 25,
+  "audit_id": "F25-2026-10-07-REVIEWS-655-674",
+  "review_range": {
+    "first": 655,
+    "last": 674,
+    "count": 20
+  },
+  "basis": {
+    "baseline_main_sha": "2d02c93356b050313e30e29aeceb57080771c2a5",
+    "baseline_main_ci": {
+      "run_number": 1638,
+      "run_id": 37508519545,
+      "conclusion": "success"
+    },
+    "file25_plan": "Complete Public UI, Profile Timeline and Visual Experience — Final Harmonized Specification 2.0 plus governing addenda",
+    "central_plan": "Sabri Social Homeopathy Platform Definitive/Consolidated Governing Master Plan 2026",
+    "method": "Twenty sequential plan-to-code and cross-file review scopes. Each scope was completed before its correction set was applied; the next scope began only after the previous scope's source defects were corrected."
+  },
+  "defect_rounds": [
+    657,
+    658,
+    659,
+    660,
+    661,
+    662,
+    663,
+    664
+  ],
+  "clean_rounds": [
+    655,
+    656,
+    665,
+    666,
+    667,
+    668,
+    669,
+    670,
+    671,
+    672,
+    673,
+    674
+  ],
+  "reviews": [
+    {
+      "review": 655,
+      "focus": "exact-main-baseline-and-ci-truth",
+      "status": "reviewed-clean",
+      "finding": "Baseline main 2d02c93356b050313e30e29aeceb57080771c2a5 and main CI run 1638 were verified as repository/CI evidence only."
+    },
+    {
+      "review": 656,
+      "focus": "file25-plan-central-ownership-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 25 remains public visual/profile/timeline presentation owner; File 20 shell, File 21 publication, File 24 assurance and File 26 global search/ranking ownership remain separate."
+    },
+    {
+      "review": 657,
+      "focus": "current-companion-repository-parity",
+      "status": "defect-found-corrected",
+      "finding": "Current source observations lagged File 09 main R25 and File 14 v1.4.5, and File 25's own observed baseline needed refreshing.",
+      "correction": "Refreshed source-only observations to current main heads without changing historical reviewed pins or promoting staging/live truth."
+    },
+    {
+      "review": 658,
+      "focus": "view-as-public-runtime-and-i18n",
+      "status": "defect-found-corrected",
+      "finding": "Three preview paths referenced a non-existent PHP class name SabriPublicExperiencePublic_URL, creating a runtime fatal despite syntax-green CI; preview mode labels were generated rather than translated.",
+      "correction": "Replaced all three references with the canonical namespaced Public_URL class and added translation-ready preview labels."
+    },
+    {
+      "review": 659,
+      "focus": "timeline-provider-contract-completeness",
+      "status": "defect-found-corrected",
+      "finding": "The File 25 plan requires normalization, canonical URL, visibility, actions, metrics, correction-state and sync-event provider capabilities, but the published PHP provider interface omitted them.",
+      "correction": "Added a backwards-compatible Timeline Provider v2 contract; File 21 and WordPress providers implement it, while v1 remains loadable for existing integrations. Registry sync and metric use are capability-gated."
+    },
+    {
+      "review": 660,
+      "focus": "timeline-filters-and-sorts",
+      "status": "defect-found-corrected",
+      "finding": "Primary filters were limited to All/Posts and secondary topic/year/language/provider/review/source-state filters plus oldest/metric sorts were not wired end to end.",
+      "correction": "Implemented governed primary and secondary filters, latest/oldest sorting and conditional most-viewed/most-saved sorting only when true provider metrics exist."
+    },
+    {
+      "review": 661,
+      "focus": "timeline-pagination-load-more-accessibility",
+      "status": "defect-found-corrected",
+      "finding": "Numbered Previous/Next pagination existed, but the plan's accessible Load More enhancement and live page/item announcement were absent.",
+      "correction": "Added progressive Load More, preserved numbered pagination as fallback and added aria-live screen-reader status while retaining URL state."
+    },
+    {
+      "review": 662,
+      "focus": "index-rebuild-pause-resume",
+      "status": "defect-found-corrected",
+      "finding": "Timeline derivative index rebuild supported locking/rebuild but not the required governed pause/resume controls.",
+      "correction": "Added admin and REST pause/resume operations, idempotent/rate-limited mutation preflight, pause state and rebuild cooperation without touching canonical owner data."
+    },
+    {
+      "review": 663,
+      "focus": "admin-configuration-i18n",
+      "status": "defect-found-corrected",
+      "finding": "Admin preference labels and enum option labels were generated from internal keys and therefore were not fully translation-ready.",
+      "correction": "Replaced generated labels with explicit translatable strings and a translated bounded fallback."
+    },
+    {
+      "review": 664,
+      "focus": "weak-connection-public-resilience",
+      "status": "defect-found-corrected",
+      "finding": "The public profile had no explicit offline/connection-restored status despite the weak-connection requirement.",
+      "correction": "Added progressive online/offline detection, localized aria-live status and non-blocking presentation; base HTML remains usable without JavaScript."
+    },
+    {
+      "review": 665,
+      "focus": "file03-profile-privacy-media",
+      "status": "reviewed-clean",
+      "finding": "Current File 03 public profile/media projection remains bounded, same-site and privacy-minimized; no foreign table reads were introduced."
+    },
+    {
+      "review": 666,
+      "focus": "file08-clinic-appointment-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 08 remains clinic/appointment owner. Appointment stays hidden because no authoritative profile-user-to-booking-destination contract is currently published for File 25."
+    },
+    {
+      "review": 667,
+      "focus": "file17-follow-message-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 17 remains relationship/messaging owner. Follow stays hidden without a target-bound owner contract; Message is shown only from a concrete owner-approved same-site projection."
+    },
+    {
+      "review": 668,
+      "focus": "file21-publication-timeline-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 21 remains canonical publication/ProfileTimeline owner; File 25 performs bounded projection, normalization, filtering and presentation only."
+    },
+    {
+      "review": 669,
+      "focus": "file22-composer-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 22 remains create/edit owner and File 25 uses only owner-native Composer routing."
+    },
+    {
+      "review": 670,
+      "focus": "file23-publishing-dashboard-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 23 remains private publishing-operations owner; File 25 uses only guarded owner-native dashboard routing."
+    },
+    {
+      "review": 671,
+      "focus": "file24-security-privacy-assurance",
+      "status": "reviewed-clean",
+      "finding": "File 24 remains cross-cutting security/privacy/compliance/resilience owner; File 25 retains local secure presentation controls only."
+    },
+    {
+      "review": 672,
+      "focus": "file26-search-discovery-ranking",
+      "status": "reviewed-clean",
+      "finding": "File 26 remains global Search/Discovery/Recommendations/Knowledge Graph/Classification owner; File 25 timeline filtering/search is profile-local presentation only."
+    },
+    {
+      "review": 673,
+      "focus": "rest-component-migration-uninstall-release-boundaries",
+      "status": "reviewed-clean",
+      "finding": "REST mutation guards, component API, fail-closed Safe Mode, non-destructive migration/rollback/uninstall and deterministic package verification remain bounded to File 25."
+    },
+    {
+      "review": 674,
+      "focus": "final-cross-file-parity-and-truth-boundary",
+      "status": "reviewed-clean",
+      "finding": "After corrections, no known File 25-owned source defect remains in the reviewed scope; Hostinger staging, deployed parity, live DB/schema/migration and operational acceptance remain unverified."
+    }
+  ],
+  "unresolved_cross_file_dependencies": [
+    "File 08 current owner source does not publish an authoritative profile-user-to-booking-destination contract consumable by File 25; Appointment therefore remains hidden.",
+    "File 17 current owner source does not publish an authoritative target-bound Follow destination contract consumable by File 25; Follow therefore remains hidden."
+  ],
+  "external_truth": {
+    "hostinger_staging_accepted": false,
+    "founder_staging_acceptance": false,
+    "production_accepted": false,
+    "live_deployed": false,
+    "operational": false,
+    "exact_deployed_code_verified": false,
+    "db_version_verified_live": false,
+    "migration_state_verified_live": false
+  },
+  "source_candidate": {
+    "runtime": "0.15.0",
+    "known_unresolved_file25_source_defects_after_corrections": 0,
+    "exact_current_head_ci": "external-evidence-required-not-frozen-in-source"
+  }
+}
