@@ -66,6 +66,39 @@
         }
     }
 
+    const connectionStatus = document.querySelector('[data-spux-connection-status]');
+    if (connectionStatus) {
+        let restoredTimer = null;
+        const renderConnection = () => {
+            if (! navigator.onLine) {
+                if (restoredTimer !== null) {
+                    window.clearTimeout(restoredTimer);
+                    restoredTimer = null;
+                }
+                connectionStatus.textContent = settings.offline
+                    || 'You are offline. The page remains available, but new network actions may not complete.';
+                connectionStatus.hidden = false;
+                connectionStatus.setAttribute('data-state', 'offline');
+                return;
+            }
+
+            if (connectionStatus.getAttribute('data-state') === 'offline') {
+                connectionStatus.textContent = settings.onlineRestored || 'Connection restored.';
+                connectionStatus.hidden = false;
+                connectionStatus.setAttribute('data-state', 'online');
+                restoredTimer = window.setTimeout(() => {
+                    connectionStatus.hidden = true;
+                    connectionStatus.removeAttribute('data-state');
+                }, 3000);
+                return;
+            }
+            connectionStatus.hidden = true;
+        };
+        window.addEventListener('offline', renderConnection);
+        window.addEventListener('online', renderConnection);
+        renderConnection();
+    }
+
     document.querySelectorAll('[data-spux-share]').forEach((button) => {
         button.addEventListener('click', async () => {
             if (button.disabled) {
