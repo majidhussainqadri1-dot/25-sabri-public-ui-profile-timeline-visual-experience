@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.15.0 — Admin/Plan/Cross-File Completeness Reviews 655–674 — 2026-10-07
+
+### Corrected
+
+- Removed five administrator preferences that had no observable runtime effect: `timeline_provider_mode`, `accessibility_mode`, `cache_ttl`, `safe_mode_controls`, and `diagnostics_enabled`.
+- Kept accessibility, Safe Mode and diagnostics mandatory/non-disableable and kept public profile responses no-store until an accepted cache-partition contract exists.
+- Reorganized the control center under the governed File 25 §71 sections.
+- Removed unsupported `tablet` from the responsive-preview preference family.
+- Stopped fabricating avatar alt evidence before Completion Assistant evaluation; canonical File 03 alt metadata now determines completion, while public rendering retains an accessible descriptive fallback.
+- Added bounded `default_timeline_filter` with runtime validation against active approved filters.
+- Added bounded `enabled_optional_providers` with explicit disable-all and runtime enforcement for built-in File 06/10/11/12/18 section providers.
+- Advanced review/source/release documentation through Reviews 655–674 without self-certifying current-head CI or any staging/live gate.
+
+### Review result
+
+Defect rounds: **657, 658, 659, 660, 662, 673**. The other fourteen review scopes were clean after carrying forward prior corrections.
+
+### Acceptance boundary
+
+These corrections establish File 25 repository-source completeness only. Exact current-head CI must be checked externally after the final commit. Hostinger staging, Founder acceptance, production/live deployment, exact deployed-code parity, live DB/schema, migration state and operations remain separate unverified gates.
+
+
 ## 0.15.0 — Plan/Code/Cross-File Completeness Reviews 635–654 — 2026-10-06
 
 ### Corrected
