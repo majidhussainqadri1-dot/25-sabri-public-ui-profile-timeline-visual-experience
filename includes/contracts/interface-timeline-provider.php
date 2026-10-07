@@ -47,30 +47,6 @@ interface Timeline_Provider
      */
     public function get_public_author_items(int $author_id, array $query): array;
 
-    /**
-     * Convert one native owner item into File 25's bounded immutable projection.
-     * Returning null means the native item is not public/eligible.
-     */
-    public function normalize_public_item(mixed $native_item, int $author_id): ?Normalized_Timeline_Item;
-
-    public function get_canonical_url(Normalized_Timeline_Item $item): string;
-
-    public function get_visibility_state(Normalized_Timeline_Item $item): string;
-
-    /** @return list<string> */
-    public function get_public_actions(Normalized_Timeline_Item $item): array;
-
-    /** @return array<string,int> */
-    public function get_public_metrics(Normalized_Timeline_Item $item): array;
-
-    public function get_correction_state(Normalized_Timeline_Item $item): string;
-
-    /**
-     * Register only owner-published synchronization hooks when they exist.
-     * Read-through providers may intentionally remain no-op.
-     */
-    public function register_sync_events(): void;
-
     /** @return array<string,mixed> */
     public function get_health_status(): array;
 }
