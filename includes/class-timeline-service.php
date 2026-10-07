@@ -34,10 +34,19 @@ final class Timeline_Service
         $requested_page = self::exact_positive_integer($query['page'] ?? 1, PHP_INT_MAX);
         $content_type = self::exact_optional_key($query['content_type'] ?? '');
         $provider_filter = self::exact_optional_key($query['provider'] ?? '');
+        $topic = self::exact_optional_text($query['topic'] ?? '', 120);
+        $year = self::exact_optional_year($query['year'] ?? '');
+        $language = self::exact_optional_language($query['language'] ?? '');
+        $sort = self::exact_optional_choice($query['sort'] ?? 'latest', ['latest', 'oldest', 'most-viewed', 'most-saved']);
+        $review_state = self::exact_optional_key($query['review_state'] ?? '');
+        $source_state = self::exact_optional_choice($query['source_state'] ?? '', ['', 'detected', 'read-only', 'staging-accepted', 'production-accepted', 'degraded']);
         $raw_search = $query['search'] ?? '';
         $search = is_string($raw_search) ? Plan_Completion::normalize_search_query($raw_search) : '';
         $search_invalid = $raw_search !== '' && (! is_string($raw_search) || $search === '');
-        if ($per_page === null || $requested_page === null || $content_type === null || $provider_filter === null || $search_invalid) {
+        if ($per_page === null || $requested_page === null || $content_type === null || $provider_filter === null
+            || $topic === null || $year === null || $language === null || $sort === null
+            || $review_state === null || $source_state === null || $search_invalid
+        ) {
             return [
                 'items' => [],
                 'page' => 1,
@@ -45,6 +54,8 @@ final class Timeline_Service
                 'has_more' => false,
                 'truncated' => false,
                 'provider_errors' => [],
+                'available_sorts' => ['latest', 'oldest'],
+                'effective_sort' => 'latest',
             ];
         }
         $max_page = max(1, intdiv(self::MAX_CANDIDATES_PER_PROVIDER - 1, $per_page) + 1);
@@ -57,6 +68,8 @@ final class Timeline_Service
         $canonical_items = [];
         $errors = [];
         $provider_limit_reached = false;
+        $metric_cache = [];
+        $available_sorts = ['latest', 'oldest'];
 
         if ($author_id <= 0) {
             return [
@@ -66,6 +79,8 @@ final class Timeline_Service
                 'has_more' => false,
                 'truncated' => false,
                 'provider_errors' => [],
+                'available_sorts' => ['latest', 'oldest'],
+                'effective_sort' => 'latest',
             ];
         }
 
@@ -75,6 +90,12 @@ final class Timeline_Service
             'candidate_limit' => $candidate_limit,
             'requested_page' => $requested_page,
             'content_type' => $content_type,
+            'topic' => $topic,
+            'year' => $year,
+            'language' => $language,
+            'sort' => $sort,
+            'review_state' => $review_state,
+            'source_state' => $source_state,
             'search' => $search,
         ];
 
@@ -90,6 +111,7 @@ final class Timeline_Service
                 }
                 if ($metadata['maturity'] === 'disabled'
                     || ! in_array($metadata['maturity'], ['read-only', 'staging-accepted', 'production-accepted'], true)
+                    || ($source_state !== '' && $metadata['maturity'] !== $source_state)
                     || ! $provider->is_available()
                 ) {
                     continue;
@@ -122,6 +144,18 @@ final class Timeline_Service
                     if ($content_type !== '' && $item->get('content_type') !== $content_type) {
                         continue;
                     }
+                    if ($topic !== '' && ! self::text_equals((string) $item->get('topic'), $topic)) {
+                        continue;
+                    }
+                    if ($year > 0 && substr((string) $item->get('published_at'), 0, 4) !== (string) $year) {
+                        continue;
+                    }
+                    if ($language !== '' && strcasecmp((string) $item->get('language'), $language) !== 0) {
+                        continue;
+                    }
+                    if ($review_state !== '' && (string) $item->get('review_state') !== $review_state) {
+                        continue;
+                    }
                     if ($search !== '' && ! Plan_Completion::timeline_item_matches_search($item->to_public_array(), $search)) {
                         continue;
                     }
@@ -139,6 +173,24 @@ final class Timeline_Service
                     }
 
                     $provider_items_by_key[$key] = $item;
+                    try {
+                        $metrics = $provider->get_public_metrics($item);
+                    } catch (\Throwable) {
+                        $metrics = [];
+                    }
+                    $clean_metrics = [];
+                    foreach (['views', 'saves'] as $metric_key) {
+                        if (isset($metrics[$metric_key]) && is_int($metrics[$metric_key]) && $metrics[$metric_key] >= 0 && $metrics[$metric_key] <= 1000000000) {
+                            $clean_metrics[$metric_key] = $metrics[$metric_key];
+                            $sort_key = $metric_key === 'views' ? 'most-viewed' : 'most-saved';
+                            if (! in_array($sort_key, $available_sorts, true)) {
+                                $available_sorts[] = $sort_key;
+                            }
+                        }
+                    }
+                    if ($clean_metrics !== []) {
+                        $metric_cache[$key] = $clean_metrics;
+                    }
                     if ($canonical_key !== '') {
                         $provider_canonical_items[$canonical_key] = $key;
                     }
@@ -155,15 +207,33 @@ final class Timeline_Service
             }
         }
 
-        usort(
+        $effective_sort = in_array($sort, $available_sorts, true) ? $sort : 'latest';
+        $metric_name = $effective_sort === 'most-viewed' ? 'views' : ($effective_sort === 'most-saved' ? 'saves' : '');
+
+        uasort(
             $items,
-            function (Normalized_Timeline_Item $left, Normalized_Timeline_Item $right): int {
+            function (Normalized_Timeline_Item $left, Normalized_Timeline_Item $right) use ($effective_sort, $metric_name, $metric_cache): int {
+                if ($metric_name !== '') {
+                    $left_key = (string) $left->get('provider_id') . ':' . (string) $left->get('native_object_type') . ':' . (string) $left->get('native_object_id');
+                    $right_key = (string) $right->get('provider_id') . ':' . (string) $right->get('native_object_type') . ':' . (string) $right->get('native_object_id');
+                    $left_metric = $metric_cache[$left_key][$metric_name] ?? null;
+                    $right_metric = $metric_cache[$right_key][$metric_name] ?? null;
+                    if ($left_metric !== null || $right_metric !== null) {
+                        if ($left_metric === null) { return 1; }
+                        if ($right_metric === null) { return -1; }
+                        $metric_cmp = $right_metric <=> $left_metric;
+                        if ($metric_cmp !== 0) { return $metric_cmp; }
+                    }
+                }
+
                 $pin = (int) $right->get('pin_weight') <=> (int) $left->get('pin_weight');
                 if ($pin !== 0) {
                     return $pin;
                 }
 
-                $date = strcmp((string) $right->get('published_at'), (string) $left->get('published_at'));
+                $date = $effective_sort === 'oldest'
+                    ? strcmp((string) $left->get('published_at'), (string) $right->get('published_at'))
+                    : strcmp((string) $right->get('published_at'), (string) $left->get('published_at'));
                 if ($date !== 0) {
                     return $date;
                 }
@@ -185,7 +255,7 @@ final class Timeline_Service
             }
         );
 
-        $slice = $requested_page > $max_page ? [] : array_slice($items, $offset, $per_page + 1);
+        $slice =        $slice = $requested_page > $max_page ? [] : array_slice($items, $offset, $per_page + 1);
         $has_more = count($slice) > $per_page;
         if ($has_more) {
             array_pop($slice);
@@ -204,6 +274,8 @@ final class Timeline_Service
             'has_more' => $has_more,
             'truncated' => $truncated,
             'provider_errors' => array_values(array_unique($errors)),
+            'available_sorts' => array_values($available_sorts),
+            'effective_sort' => $effective_sort,
         ];
     }
 
@@ -237,6 +309,60 @@ final class Timeline_Service
             : trim(preg_replace('/[^a-z0-9_-]/', '-', strtolower(trim($value))) ?? '', '-');
 
         return hash_equals($canonical, $value) ? $value : null;
+    }
+
+    private static function exact_optional_text(mixed $value, int $maximum): ?string
+    {
+        if (! is_string($value) || strlen($value) > $maximum) {
+            return null;
+        }
+        $clean = trim(function_exists('wp_strip_all_tags') ? wp_strip_all_tags($value, true) : strip_tags($value));
+        if ($clean === '') {
+            return '';
+        }
+        return preg_match('/[\x00-\x1F\x7F]/', $clean) === 1 ? null : $clean;
+    }
+
+    private static function exact_optional_year(mixed $value): ?int
+    {
+        if ($value === '' || $value === null) {
+            return 0;
+        }
+        if (is_int($value)) {
+            $year = $value;
+        } elseif (is_string($value) && preg_match('/^[12][0-9]{3}$/', $value) === 1) {
+            $year = (int) $value;
+        } else {
+            return null;
+        }
+        return $year >= 1900 && $year <= (int) gmdate('Y') + 1 ? $year : null;
+    }
+
+    private static function exact_optional_language(mixed $value): ?string
+    {
+        if (! is_string($value) || strlen($value) > 35) {
+            return null;
+        }
+        if ($value === '') {
+            return '';
+        }
+        return preg_match('/^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$/', $value) === 1 ? $value : null;
+    }
+
+    /** @param list<string> $allowed */
+    private static function exact_optional_choice(mixed $value, array $allowed): ?string
+    {
+        return is_string($value) && in_array($value, $allowed, true) ? $value : null;
+    }
+
+    private static function text_equals(string $left, string $right): bool
+    {
+        $left = trim($left);
+        $right = trim($right);
+        if (function_exists('mb_strtolower')) {
+            return mb_strtolower($left, 'UTF-8') === mb_strtolower($right, 'UTF-8');
+        }
+        return strtolower($left) === strtolower($right);
     }
 
     private function canonical_is_allowed(string $url, Normalized_Timeline_Item $item): bool
