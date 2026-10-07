@@ -263,32 +263,67 @@ final class Plan_Completion
         $index = get_option(self::INDEX_OPTION, []);
         $migration = get_option(self::MIGRATION_OPTION, []);
         $repair = get_option(self::REPAIR_OPTION, []);
+        $preference_groups = [
+            ['title' => __('Profile Templates', 'sabri-public-experience'), 'keys' => ['profile_template', 'featured_section_order', 'enabled_public_tabs', 'cover_focal_point']],
+            ['title' => __('Timeline Providers', 'sabri-public-experience'), 'keys' => ['timeline_page_size', 'default_timeline_filter', 'enabled_optional_providers', 'profile_local_search']],
+            ['title' => __('Content Cards', 'sabri-public-experience'), 'keys' => ['visual_density']],
+            ['title' => __('Public Visibility', 'sabri-public-experience'), 'keys' => ['public_visibility', 'public_metrics']],
+            ['title' => __('Responsive Preview', 'sabri-public-experience'), 'keys' => ['responsive_preview']],
+            ['title' => __('SEO Presentation', 'sabri-public-experience'), 'keys' => ['seo_enabled']],
+        ];
         ?>
         <div class="wrap">
             <h1><?php esc_html_e('File 25 — Visual Experience Control Center', 'sabri-public-experience'); ?></h1>
+
+            <h2><?php esc_html_e('Public Experience Overview', 'sabri-public-experience'); ?></h2>
+            <p><?php esc_html_e('File 25 controls bounded presentation only. File 20 remains the shell owner; native profile, publication, security and search owners remain authoritative.', 'sabri-public-experience'); ?></p>
+
             <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                 <input type="hidden" name="action" value="spux_save_preferences">
                 <input type="hidden" name="revision" value="<?php echo esc_attr((string) $meta['revision']); ?>">
                 <?php wp_nonce_field('spux_save_preferences'); ?>
-                <table class="form-table" role="presentation">
-                    <?php foreach (self::PREFERENCE_SCHEMA as $key => $definition) : ?>
-                        <tr>
-                            <th scope="row"><label for="spux-<?php echo esc_attr($key); ?>"><?php echo esc_html(ucwords(str_replace('_', ' ', $key))); ?></label></th>
-                            <td><?php $this->render_preference_control($key, $definition, $preferences[$key]); ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </table>
+                <?php foreach ($preference_groups as $group) : ?>
+                    <h2><?php echo esc_html((string) $group['title']); ?></h2>
+                    <table class="form-table" role="presentation">
+                        <?php foreach ((array) $group['keys'] as $key) : ?>
+                            <?php if (! isset(self::PREFERENCE_SCHEMA[$key])) { continue; } ?>
+                            <?php $definition = self::PREFERENCE_SCHEMA[$key]; ?>
+                            <tr>
+                                <th scope="row"><label for="spux-<?php echo esc_attr($key); ?>"><?php echo esc_html(ucwords(str_replace('_', ' ', $key))); ?></label></th>
+                                <td><?php $this->render_preference_control($key, $definition, $preferences[$key]); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </table>
+                <?php endforeach; ?>
+
+                <h2><?php esc_html_e('Accessibility', 'sabri-public-experience'); ?></h2>
+                <p><?php esc_html_e('WCAG-oriented keyboard, focus, reduced-motion, contrast and semantic behavior are mandatory presentation requirements and cannot be disabled by a preference.', 'sabri-public-experience'); ?></p>
+
                 <?php submit_button(__('Save audited preferences', 'sabri-public-experience')); ?>
             </form>
 
-            <h2><?php esc_html_e('Operations', 'sabri-public-experience'); ?></h2>
+            <h2><?php esc_html_e('Cache and Index', 'sabri-public-experience'); ?></h2>
+            <p><?php esc_html_e('Public profile responses remain no-store until an accepted cache-partition contract exists. The optional timeline index is rebuildable File 25 projection state.', 'sabri-public-experience'); ?></p>
             <?php $this->operation_form('spux_rebuild_index', __('Rebuild Timeline Index', 'sabri-public-experience')); ?>
-            <?php $this->operation_form('spux_repair', __('Run Safe Repair', 'sabri-public-experience')); ?>
+
+            <h2><?php esc_html_e('Adapter Health', 'sabri-public-experience'); ?></h2>
+            <p><a href="<?php echo esc_url(admin_url('site-health.php')); ?>"><?php esc_html_e('Open File 25 Site Health checks', 'sabri-public-experience'); ?></a></p>
+
+            <h2><?php esc_html_e('Migration', 'sabri-public-experience'); ?></h2>
             <?php $this->operation_form('spux_migration_dry_run', __('Migration Dry Run', 'sabri-public-experience')); ?>
             <?php $this->operation_form('spux_migration_execute', __('Execute Approved Migration', 'sabri-public-experience'), true); ?>
             <?php $this->operation_form('spux_migration_rollback', __('Rollback Migration', 'sabri-public-experience'), true); ?>
 
-            <h2><?php esc_html_e('Current Evidence', 'sabri-public-experience'); ?></h2>
+            <h2><?php esc_html_e('System Check', 'sabri-public-experience'); ?></h2>
+            <p><a href="<?php echo esc_url(admin_url('site-health.php')); ?>"><?php esc_html_e('Run current dependency, provider, File 24 and staging preflight checks', 'sabri-public-experience'); ?></a></p>
+
+            <h2><?php esc_html_e('Repair', 'sabri-public-experience'); ?></h2>
+            <?php $this->operation_form('spux_repair', __('Run Safe Repair', 'sabri-public-experience')); ?>
+
+            <h2><?php esc_html_e('Safe Mode', 'sabri-public-experience'); ?></h2>
+            <p><?php esc_html_e('Safe Mode recovery is mandatory and cannot be disabled by a presentation setting. Use the audited administrator Safe Mode controls when recovery is required.', 'sabri-public-experience'); ?></p>
+
+            <h2><?php esc_html_e('Diagnostics', 'sabri-public-experience'); ?></h2>
             <pre><?php echo esc_html((string) wp_json_encode(['preferences_meta' => $meta, 'index' => $index, 'migration' => $migration, 'repair' => $repair], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)); ?></pre>
         </div>
         <?php
