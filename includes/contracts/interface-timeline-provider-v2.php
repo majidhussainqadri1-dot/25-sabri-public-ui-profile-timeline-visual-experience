@@ -6,6 +6,10 @@ namespace Sabri\PublicExperience\Contracts;
 
 use Sabri\PublicExperience\Normalized_Timeline_Item;
 
+if (! interface_exists(Timeline_Provider::class)) {
+    require_once __DIR__ . '/interface-timeline-provider.php';
+}
+
 if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
     exit;
 }
