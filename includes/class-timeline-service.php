@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Sabri\PublicExperience;
 
+use Sabri\PublicExperience\Contracts\Timeline_Provider_V2;
+
 if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
     exit;
 }
@@ -173,10 +175,13 @@ final class Timeline_Service
                     }
 
                     $provider_items_by_key[$key] = $item;
-                    try {
-                        $metrics = $provider->get_public_metrics($item);
-                    } catch (\Throwable) {
-                        $metrics = [];
+                    $metrics = [];
+                    if ($provider instanceof Timeline_Provider_V2) {
+                        try {
+                            $metrics = $provider->get_public_metrics($item);
+                        } catch (\Throwable) {
+                            $metrics = [];
+                        }
                     }
                     $clean_metrics = [];
                     foreach (['views', 'saves'] as $metric_key) {
