@@ -35,7 +35,7 @@ foreach (['sabri_file17_profile_action_url_v1','sabri_network_message_profile_ur
 $deps = json_decode($read('config/staging-dependencies.json'), true);
 $check(is_array($deps), 'Dependency matrix JSON invalid.');
 $heads = (array) ($deps['observed_repository_heads'] ?? []);
-$check(($heads['09'] ?? '') === '9639f75ba046ac1a36e39d5e9aae56c7bae3279b', 'Current File 09 head drift.');
+$check(($heads['09'] ?? '') === '448d41f34586369ca5875693583b9cd8a6133167', 'Current File 09 head drift.');
 $check(($heads['23'] ?? '') === 'dcae138e6073f4d0ff596623deb05b9940b8271b', 'Current File 23 head drift.');
 $check(($heads['17'] ?? '') === '8ae656e51796d1f05865d8be5dca2480443d79ca', 'Current File 17 head drift.');
 $check(($heads['19'] ?? '') === '04078025b643ab7696e4cb4e37826bf152defa18', 'Current File 19 head drift.');
@@ -46,7 +46,7 @@ $modules = [];
 foreach ((array) ($deps['modules'] ?? []) as $module) {
     if (is_array($module) && isset($module['file'])) { $modules[(int) $module['file']] = $module; }
 }
-$check(($modules[9]['current_repository_head'] ?? '') === '9639f75ba046ac1a36e39d5e9aae56c7bae3279b', 'File 09 module current head mismatch.');
+$check(($modules[9]['current_repository_head'] ?? '') === '448d41f34586369ca5875693583b9cd8a6133167', 'File 09 module current head mismatch.');
 $check(($modules[23]['current_repository_head'] ?? '') === 'dcae138e6073f4d0ff596623deb05b9940b8271b', 'File 23 module current head mismatch.');
 $check(str_contains((string) ($modules[23]['current_future_intelligence_status'] ?? ''), 'merged to current main'), 'File 23 Future Publishing Intelligence current source status missing.');
 
