@@ -9,6 +9,10 @@ use Sabri\PublicExperience\Normalized_Timeline_Item;
 use WP_Post;
 use WP_Query;
 
+if (! interface_exists(Timeline_Provider_V2::class)) {
+    require_once dirname(__DIR__) . '/contracts/interface-timeline-provider-v2.php';
+}
+
 if (! defined('ABSPATH')) {
     exit;
 }
