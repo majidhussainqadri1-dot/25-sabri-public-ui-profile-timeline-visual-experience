@@ -257,7 +257,7 @@ final class Plan_Completion
                 <table class="form-table" role="presentation">
                     <?php foreach (self::PREFERENCE_SCHEMA as $key => $definition) : ?>
                         <tr>
-                            <th scope="row"><label for="spux-<?php echo esc_attr($key); ?>"><?php echo esc_html(ucwords(str_replace('_', ' ', $key))); ?></label></th>
+                            <th scope="row"><label for="spux-<?php echo esc_attr($key); ?>"><?php echo esc_html(self::preference_label($key)); ?></label></th>
                             <td><?php $this->render_preference_control($key, $definition, $preferences[$key]); ?></td>
                         </tr>
                     <?php endforeach; ?>
@@ -280,6 +280,50 @@ final class Plan_Completion
         <?php
     }
 
+    private static function preference_label(string $key): string
+    {
+        $labels = [
+            'profile_template' => __('Profile template', 'sabri-public-experience'),
+            'timeline_provider_mode' => __('Timeline provider mode', 'sabri-public-experience'),
+            'public_visibility' => __('Public visibility', 'sabri-public-experience'),
+            'responsive_preview' => __('Responsive preview', 'sabri-public-experience'),
+            'accessibility_mode' => __('Accessibility mode', 'sabri-public-experience'),
+            'seo_enabled' => __('SEO presentation', 'sabri-public-experience'),
+            'cache_ttl' => __('Cache lifetime', 'sabri-public-experience'),
+            'safe_mode_controls' => __('Safe Mode controls', 'sabri-public-experience'),
+            'diagnostics_enabled' => __('Diagnostics', 'sabri-public-experience'),
+            'visual_density' => __('Visual density', 'sabri-public-experience'),
+            'timeline_page_size' => __('Timeline page size', 'sabri-public-experience'),
+            'featured_section_order' => __('Featured section order', 'sabri-public-experience'),
+            'enabled_public_tabs' => __('Enabled public tabs', 'sabri-public-experience'),
+            'cover_focal_point' => __('Cover focal point', 'sabri-public-experience'),
+            'profile_local_search' => __('Profile-local search', 'sabri-public-experience'),
+            'public_metrics' => __('Public metrics', 'sabri-public-experience'),
+        ];
+        return $labels[$key] ?? __('File 25 setting', 'sabri-public-experience');
+    }
+
+    private static function preference_option_label(string $key, string $option): string
+    {
+        $labels = [
+            'standard' => __('Standard', 'sabri-public-experience'),
+            'compact' => __('Compact', 'sabri-public-experience'),
+            'institutional' => __('Institutional', 'sabri-public-experience'),
+            'federated' => __('Federated', 'sabri-public-experience'),
+            'indexed' => __('Indexed', 'sabri-public-experience'),
+            'mobile' => __('Mobile', 'sabri-public-experience'),
+            'tablet' => __('Tablet', 'sabri-public-experience'),
+            'desktop' => __('Desktop', 'sabri-public-experience'),
+            'comfortable' => __('Comfortable', 'sabri-public-experience'),
+            'center' => __('Center', 'sabri-public-experience'),
+            'top' => __('Top', 'sabri-public-experience'),
+            'bottom' => __('Bottom', 'sabri-public-experience'),
+            'left' => __('Left', 'sabri-public-experience'),
+            'right' => __('Right', 'sabri-public-experience'),
+        ];
+        return $labels[$option] ?? sprintf(__('Option: %s', 'sabri-public-experience'), $option);
+    }
+
     /** @param array<string,mixed> $definition @param mixed $value */
     private function render_preference_control(string $key, array $definition, $value): void
     {
@@ -297,7 +341,7 @@ final class Plan_Completion
         if ($type === 'enum') {
             echo '<select id="spux-' . esc_attr($key) . '" name="' . esc_attr($name) . '">';
             foreach ((array) $definition['allowed'] as $option) {
-                echo '<option value="' . esc_attr((string) $option) . '" ' . selected($value, $option, false) . '>' . esc_html(ucwords(str_replace('-', ' ', (string) $option))) . '</option>';
+                echo '<option value="' . esc_attr((string) $option) . '" ' . selected($value, $option, false) . '>' . esc_html(self::preference_option_label($key, (string) $option)) . '</option>';
             }
             echo '</select>';
             return;
