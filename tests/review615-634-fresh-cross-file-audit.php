@@ -63,7 +63,7 @@ try {
     $failures[] = 'Source matrix invalid: ' . $e->getMessage();
 }
 $latestRange = (string) ($matrix['declaration']['latest_review_range'] ?? '');
-$check(in_array($latestRange, ['615-634', '635-654'], true), 'Source matrix must preserve or advance beyond Reviews 615-634.');
+$check(in_array($latestRange, ['615-634', '635-654', '655-674'], true), 'Source matrix must preserve or advance beyond Reviews 615-634.');
 $check(($matrix['declaration']['known_unresolved_source_defects'] ?? null) === 0, 'File 25 known unresolved source defects must remain zero after corrections.');
 foreach (['hostinger_staging_accepted','founder_acceptance','production_accepted','live_deployed','operational'] as $gate) {
     $check(($matrix['declaration'][$gate] ?? null) === false, 'Source matrix promoted external gate: ' . $gate);
@@ -72,7 +72,7 @@ foreach (['hostinger_staging_accepted','founder_acceptance','production_accepted
 $deps = json_decode($read('config/staging-dependencies.json'), true);
 $check(is_array($deps), 'Dependency matrix invalid.');
 $heads = (array) ($deps['observed_repository_heads'] ?? []);
-$check(($heads['25'] ?? '') === '19009a0934970d63ca60fda1fe9df1ac7288d42a', 'Fresh audit baseline File 25 main SHA missing.');
+$check(($ledger['basis']['baseline_main_sha'] ?? '') === '19009a0934970d63ca60fda1fe9df1ac7288d42a', 'Historical Reviews 615-634 baseline File 25 SHA missing from its ledger.');
 $check(($heads['08'] ?? '') === '70541974ce0ffb16aebef557c3016eb7447662f4', 'File 08 current main SHA drift.');
 $check(($heads['17'] ?? '') === '8ae656e51796d1f05865d8be5dca2480443d79ca', 'File 17 current main SHA drift.');
 $check(($heads['evidence_class'] ?? '') === 'repository-source-only-not-staging-live', 'Repository observations must stay non-live evidence.');

@@ -20,7 +20,7 @@ The reviewed 0.15.0 source correction includes:
 * canonical File 03 contact preservation with monotonic revoke-only filters and substitution denial;
 * fail-closed high-risk rebuild/migration authorization requiring strict explicit approval;
 * data-free recoverable Safe Mode public profile routes using a no-store/noindex 503 native-theme surface;
-* Reviews 635–654 fresh plan-to-code/cross-file completion, including functional View-as-Public modes, Completion Assistant preview links, governed timeline page size, browser-Back scroll restoration, active profile-template presentation, and release-status reconciliation;
+* Reviews 655–674 fresh admin/plan/cross-file completion, including removal of dead controls, governed admin sections, responsive-preview parity, truthful Completion Assistant alt evidence, bounded default timeline filter, optional provider enablement, and release-status reconciliation;
 * `CHAT-UX-001` accessible green welcome visual presentation with File 20 retaining the 30-day frequency owner;
 * Master Plan v3.0 and File 20 plan v4.1 ownership reconciliation;
 * current File 00 membership contract `1.2.3` with reviewed `1.2.2` compatibility as the sole membership, Founder, suspension, eligibility, guardian-policy and public-profile assertion authority;
@@ -59,14 +59,15 @@ This candidate is not production-complete. Exact multi-plugin Hostinger staging,
 == Changelog ==
 
 = 0.15.0 =
-* Reviews 635–654 completed a fresh File 25 plan-to-code and companion-boundary audit.
-* Implemented all seven owner-only View-as-Public projection modes and hid owner/viewer-mutating actions while previewing.
-* Added usable Completion Assistant preview destinations without editing File 00/File 03 truth.
-* Added bounded `timeline_page_size` (5–50) and explicit browser-Back scroll restoration for URL-addressable timeline filters/pages.
-* Reconciled current File 03 public media DTO compatibility so valid avatar/cover media and canonical alt metadata no longer disappear when `attachment_id` is absent.
-* Made the governed standard/compact/institutional profile-template setting visibly affect token-based presentation without creating a second shell.
-* Preserved File 08 Appointment and File 17 Follow as fail-closed hidden actions until their canonical owners publish authoritative target-bound destinations.
-* Refreshed repository/dependency documentation without claiming Hostinger staging, production, deployed parity, live DB/schema, migration state or operations.
+* Reviews 655–674 completed a fresh File 25 administrator-configuration, plan-to-code and companion-boundary audit.
+* Removed no-op `timeline_provider_mode`, `accessibility_mode`, `cache_ttl`, `safe_mode_controls`, and `diagnostics_enabled` preferences; mandatory accessibility, Safe Mode and diagnostics remain non-disableable.
+* Grouped the control center under the governed File 25 admin sections.
+* Removed unsupported tablet from responsive-preview preferences.
+* Preserved canonical File 03 avatar alt evidence for the Completion Assistant so missing alt metadata is reportable.
+* Added bounded `default_timeline_filter`, applied only to approved current filters.
+* Added bounded `enabled_optional_providers` with explicit disable-all for built-in File 06/10/11/12/18 section providers.
+* Preserved File 08 Appointment and File 17 Follow as fail-closed hidden actions until canonical owners publish authoritative target-bound destinations.
+* Repository/source completion does not imply Hostinger staging, production/live deployment, deployed parity, live DB/schema, migration state or operations.
 
 = 0.14.0 =
 * Added All-Chats v2.1 traceability and the File 25 welcome visual primitive while preserving File 20 frequency ownership.

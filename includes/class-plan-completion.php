@@ -37,20 +37,31 @@ final class Plan_Completion
         'overview', 'timeline', 'books-research', 'clinic-contact', 'clinic', 'about',
         'knowledge', 'media', 'videos', 'reels', 'pdfs', 'marketplace',
     ];
+    private const OPTIONAL_SECTION_PROVIDERS = [
+        'file-06-knowledge',
+        'file-10-video-media',
+        'file-11-reels-media',
+        'file-12-pdf-media',
+        'file-18-marketplace',
+    ];
 
-    /** @var array<string,array<string,mixed>> */
+    /**
+     * Only preferences with an observable, bounded File 25 effect belong here.
+     * Mandatory accessibility, Safe Mode and diagnostics cannot be disabled by
+     * presentation preferences; no-store profile caching has no TTL control
+     * until an accepted cache-partition contract exists.
+     *
+     * @var array<string,array<string,mixed>>
+     */
     private const PREFERENCE_SCHEMA = [
         'profile_template' => ['type' => 'enum', 'default' => 'standard', 'allowed' => ['standard', 'compact', 'institutional']],
-        'timeline_provider_mode' => ['type' => 'enum', 'default' => 'federated', 'allowed' => ['federated', 'indexed']],
         'public_visibility' => ['type' => 'bool', 'default' => true],
-        'responsive_preview' => ['type' => 'enum', 'default' => 'desktop', 'allowed' => ['mobile', 'tablet', 'desktop']],
-        'accessibility_mode' => ['type' => 'bool', 'default' => true],
+        'responsive_preview' => ['type' => 'enum', 'default' => 'desktop', 'allowed' => ['mobile', 'desktop']],
         'seo_enabled' => ['type' => 'bool', 'default' => true],
-        'cache_ttl' => ['type' => 'int', 'default' => 15, 'minimum' => 1, 'maximum' => 1440],
-        'safe_mode_controls' => ['type' => 'bool', 'default' => true],
-        'diagnostics_enabled' => ['type' => 'bool', 'default' => true],
         'visual_density' => ['type' => 'enum', 'default' => 'comfortable', 'allowed' => ['comfortable', 'compact']],
         'timeline_page_size' => ['type' => 'int', 'default' => 20, 'minimum' => 5, 'maximum' => 50],
+        'default_timeline_filter' => ['type' => 'key', 'default' => '', 'maximum' => 64],
+        'enabled_optional_providers' => ['type' => 'list', 'default' => self::OPTIONAL_SECTION_PROVIDERS, 'allowed' => self::OPTIONAL_SECTION_PROVIDERS, 'maximum' => 5, 'allow_empty' => true],
         'featured_section_order' => ['type' => 'list', 'default' => ['overview', 'timeline', 'about'], 'allowed' => self::SECTIONS, 'maximum' => 12],
         'enabled_public_tabs' => ['type' => 'list', 'default' => self::SECTIONS, 'allowed' => self::SECTIONS, 'maximum' => 12],
         'cover_focal_point' => ['type' => 'enum', 'default' => 'center', 'allowed' => ['center', 'top', 'bottom', 'left', 'right']],
@@ -168,8 +179,23 @@ final class Plan_Completion
                     : (string) $definition['default'];
                 continue;
             }
+            if ($type === 'key') {
+                $candidate = is_string($value) ? trim($value) : '';
+                $maximum = max(1, (int) ($definition['maximum'] ?? 64));
+                $clean[$key] = $candidate === '' || (
+                    strlen($candidate) <= $maximum
+                    && sanitize_key($candidate) === $candidate
+                    && preg_match('/^[a-z0-9][a-z0-9_-]*$/', $candidate) === 1
+                ) ? $candidate : (string) $definition['default'];
+                continue;
+            }
             if ($type === 'list') {
-                $clean[$key] = self::normalize_key_list(
+                $allow_empty = ($definition['allow_empty'] ?? false) === true;
+                $explicit_empty = $allow_empty && (
+                    (is_array($value) && $value === [])
+                    || (is_string($value) && trim($value) === '')
+                );
+                $clean[$key] = $explicit_empty ? [] : self::normalize_key_list(
                     $value,
                     (array) $definition['allowed'],
                     (int) $definition['maximum'],
@@ -242,32 +268,67 @@ final class Plan_Completion
         $index = get_option(self::INDEX_OPTION, []);
         $migration = get_option(self::MIGRATION_OPTION, []);
         $repair = get_option(self::REPAIR_OPTION, []);
+        $preference_groups = [
+            ['title' => __('Profile Templates', 'sabri-public-experience'), 'keys' => ['profile_template', 'featured_section_order', 'enabled_public_tabs', 'cover_focal_point']],
+            ['title' => __('Timeline Providers', 'sabri-public-experience'), 'keys' => ['timeline_page_size', 'default_timeline_filter', 'enabled_optional_providers', 'profile_local_search']],
+            ['title' => __('Content Cards', 'sabri-public-experience'), 'keys' => ['visual_density']],
+            ['title' => __('Public Visibility', 'sabri-public-experience'), 'keys' => ['public_visibility', 'public_metrics']],
+            ['title' => __('Responsive Preview', 'sabri-public-experience'), 'keys' => ['responsive_preview']],
+            ['title' => __('SEO Presentation', 'sabri-public-experience'), 'keys' => ['seo_enabled']],
+        ];
         ?>
         <div class="wrap">
             <h1><?php esc_html_e('File 25 — Visual Experience Control Center', 'sabri-public-experience'); ?></h1>
+
+            <h2><?php esc_html_e('Public Experience Overview', 'sabri-public-experience'); ?></h2>
+            <p><?php esc_html_e('File 25 controls bounded presentation only. File 20 remains the shell owner; native profile, publication, security and search owners remain authoritative.', 'sabri-public-experience'); ?></p>
+
             <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                 <input type="hidden" name="action" value="spux_save_preferences">
                 <input type="hidden" name="revision" value="<?php echo esc_attr((string) $meta['revision']); ?>">
                 <?php wp_nonce_field('spux_save_preferences'); ?>
-                <table class="form-table" role="presentation">
-                    <?php foreach (self::PREFERENCE_SCHEMA as $key => $definition) : ?>
-                        <tr>
-                            <th scope="row"><label for="spux-<?php echo esc_attr($key); ?>"><?php echo esc_html(ucwords(str_replace('_', ' ', $key))); ?></label></th>
-                            <td><?php $this->render_preference_control($key, $definition, $preferences[$key]); ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </table>
+                <?php foreach ($preference_groups as $group) : ?>
+                    <h2><?php echo esc_html((string) $group['title']); ?></h2>
+                    <table class="form-table" role="presentation">
+                        <?php foreach ((array) $group['keys'] as $key) : ?>
+                            <?php if (! isset(self::PREFERENCE_SCHEMA[$key])) { continue; } ?>
+                            <?php $definition = self::PREFERENCE_SCHEMA[$key]; ?>
+                            <tr>
+                                <th scope="row"><label for="spux-<?php echo esc_attr($key); ?>"><?php echo esc_html(ucwords(str_replace('_', ' ', $key))); ?></label></th>
+                                <td><?php $this->render_preference_control($key, $definition, $preferences[$key]); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </table>
+                <?php endforeach; ?>
+
+                <h2><?php esc_html_e('Accessibility', 'sabri-public-experience'); ?></h2>
+                <p><?php esc_html_e('WCAG-oriented keyboard, focus, reduced-motion, contrast and semantic behavior are mandatory presentation requirements and cannot be disabled by a preference.', 'sabri-public-experience'); ?></p>
+
                 <?php submit_button(__('Save audited preferences', 'sabri-public-experience')); ?>
             </form>
 
-            <h2><?php esc_html_e('Operations', 'sabri-public-experience'); ?></h2>
+            <h2><?php esc_html_e('Cache and Index', 'sabri-public-experience'); ?></h2>
+            <p><?php esc_html_e('Public profile responses remain no-store until an accepted cache-partition contract exists. The optional timeline index is rebuildable File 25 projection state.', 'sabri-public-experience'); ?></p>
             <?php $this->operation_form('spux_rebuild_index', __('Rebuild Timeline Index', 'sabri-public-experience')); ?>
-            <?php $this->operation_form('spux_repair', __('Run Safe Repair', 'sabri-public-experience')); ?>
+
+            <h2><?php esc_html_e('Adapter Health', 'sabri-public-experience'); ?></h2>
+            <p><a href="<?php echo esc_url(admin_url('site-health.php')); ?>"><?php esc_html_e('Open File 25 Site Health checks', 'sabri-public-experience'); ?></a></p>
+
+            <h2><?php esc_html_e('Migration', 'sabri-public-experience'); ?></h2>
             <?php $this->operation_form('spux_migration_dry_run', __('Migration Dry Run', 'sabri-public-experience')); ?>
             <?php $this->operation_form('spux_migration_execute', __('Execute Approved Migration', 'sabri-public-experience'), true); ?>
             <?php $this->operation_form('spux_migration_rollback', __('Rollback Migration', 'sabri-public-experience'), true); ?>
 
-            <h2><?php esc_html_e('Current Evidence', 'sabri-public-experience'); ?></h2>
+            <h2><?php esc_html_e('System Check', 'sabri-public-experience'); ?></h2>
+            <p><a href="<?php echo esc_url(admin_url('site-health.php')); ?>"><?php esc_html_e('Run current dependency, provider, File 24 and staging preflight checks', 'sabri-public-experience'); ?></a></p>
+
+            <h2><?php esc_html_e('Repair', 'sabri-public-experience'); ?></h2>
+            <?php $this->operation_form('spux_repair', __('Run Safe Repair', 'sabri-public-experience')); ?>
+
+            <h2><?php esc_html_e('Safe Mode', 'sabri-public-experience'); ?></h2>
+            <p><?php esc_html_e('Safe Mode recovery is mandatory and cannot be disabled by a presentation setting. Use the audited administrator Safe Mode controls when recovery is required.', 'sabri-public-experience'); ?></p>
+
+            <h2><?php esc_html_e('Diagnostics', 'sabri-public-experience'); ?></h2>
             <pre><?php echo esc_html((string) wp_json_encode(['preferences_meta' => $meta, 'index' => $index, 'migration' => $migration, 'repair' => $repair], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)); ?></pre>
         </div>
         <?php
@@ -295,8 +356,13 @@ final class Plan_Completion
             echo '</select>';
             return;
         }
+        if ($type === 'key') {
+            echo '<input id="spux-' . esc_attr($key) . '" type="text" maxlength="' . esc_attr((string) ($definition['maximum'] ?? 64)) . '" name="' . esc_attr($name) . '" value="' . esc_attr((string) $value) . '" aria-describedby="spux-' . esc_attr($key) . '-help">';
+            echo '<p id="spux-' . esc_attr($key) . '-help" class="description">' . esc_html__('Use an approved timeline filter key, or leave blank for All. Unknown keys fail back to All.', 'sabri-public-experience') . '</p>';
+            return;
+        }
         echo '<input id="spux-' . esc_attr($key) . '" type="text" class="large-text" name="' . esc_attr($name) . '" value="' . esc_attr(implode(',', (array) $value)) . '" aria-describedby="spux-' . esc_attr($key) . '-help">';
-        echo '<p id="spux-' . esc_attr($key) . '-help" class="description">' . esc_html__('Comma-separated approved section keys.', 'sabri-public-experience') . '</p>';
+        echo '<p id="spux-' . esc_attr($key) . '-help" class="description">' . esc_html__('Comma-separated approved keys only.', 'sabri-public-experience') . '</p>';
     }
 
     private function operation_form(string $action, string $label, bool $high_risk = false): void
@@ -753,6 +819,15 @@ final class Plan_Completion
             'default_responsive_preview' => (string) (self::preferences()['responsive_preview'] ?? 'desktop'),
             'edit_url' => self::action_url('edit_profile', $user_id),
         ];
+    }
+
+    public static function optional_provider_enabled(string $provider_id): bool
+    {
+        $provider_id = sanitize_key($provider_id);
+        if (! in_array($provider_id, self::OPTIONAL_SECTION_PROVIDERS, true)) {
+            return false;
+        }
+        return in_array($provider_id, (array) self::preferences()['enabled_optional_providers'], true);
     }
 
     /** @param array<string,mixed> $profile @return array<string,mixed> */

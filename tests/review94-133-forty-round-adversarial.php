@@ -81,7 +81,7 @@ $assert(str_contains($source, 'OPTION_HISTORY'), 'Review 99: prior preference sn
 $assert(str_contains($source, 'preferences_updated'), 'Review 100: preference changes emit an audit event.');
 $assert(str_contains($source, 'OPERATION_CAPABILITIES'), 'Review 101: operations have explicit capability mapping.');
 $assert(str_contains($source, 'high_risk_authorized'), 'Review 102: high-risk operations require a step-up contract.');
-$assert(str_contains($source, "'minimum' => 1, 'maximum' => 1440"), 'Review 103: cache TTL is bounded.');
+$assert(! str_contains($source, "'cache_ttl' =>") && str_contains($renderer, 'nocache_headers()'), 'Review 103: public profile cache policy remains explicit no-store/no-cache until a real partition contract exists.');
 
 // Reviews 104–113: mutation safety, response integrity, and reconciliation.
 $assert(str_contains($source, 'Idempotency-Key'), 'Review 104: mutation idempotency key is required.');

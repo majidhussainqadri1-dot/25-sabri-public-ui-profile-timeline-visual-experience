@@ -1,6 +1,6 @@
 {
   "name": "sabri/file-25-global-visual-experience",
-  "description": "File 25 public visual/profile/timeline presentation with current owner-contract boundaries, functional owner previews, governed timeline operability, deterministic release engineering, and Reviews 635-654 plan completeness governance for the Sabri Social Homeopathy Platform.",
+  "description": "File 25 public visual/profile/timeline presentation with current owner-contract boundaries, observable governed administrator controls, bounded timeline/default-filter and optional-provider settings, deterministic release engineering, and Reviews 655-674 governance for the Sabri Social Homeopathy Platform.",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
   "require": {
@@ -44,7 +44,8 @@
       "tools/verify-provider-metadata.php",
       "tests/post614-current-head-action-reconciliation.php",
       "tests/review615-634-fresh-cross-file-audit.php",
-      "tests/review635-654-plan-completeness.php"
+      "tests/review635-654-plan-completeness.php",
+      "tests/review655-674-admin-plan-completeness.php"
     ]
   }
 }

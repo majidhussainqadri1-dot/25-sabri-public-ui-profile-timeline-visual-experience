@@ -8,19 +8,19 @@ WordPress module for the **Sabri Social Homeopathy Platform**. This is the exist
 
 - Runtime: `0.15.0`
 - Schema: `2`
-- Fresh audit branch: `fix/reviews-635-654-plan-completeness-20261006`
-- Baseline main SHA reviewed: `210b4b250fd0f996b1fb6b9eb5471dec831f6dfa`
-- Baseline main exact-head CI: **PASS** — run `1601`
+- Fresh audit branch: `fix/reviews-655-674-admin-plan-completeness-20261007`
+- Baseline main SHA reviewed: `2d02c93356b050313e30e29aeceb57080771c2a5`
+- Baseline main exact-head CI: **PASS** — run `1638`
 - Governing product plan: Master Plan `v3.0` / consolidated governing addenda
 - Governing File 25 plan: Final Harmonized Specification `2.0`
-- Source correction status: **Reviews 635–654 corrected**
+- Source correction status: **Reviews 655–674 corrected**
 - Known unresolved File 25 source defects after the recorded corrections: **0**
 - Known cross-file owner-contract limitations: **2** — File 08 profile→booking destination; File 17 target-bound Follow destination
 - Hostinger staging accepted: **No**
 - Production approved: **No**
 - Live deployment verified: **No**
 
-Reviews `635–654` performed a new plan-to-code and cross-file audit against the File 25 final plan, central governing plan and current related repository source. Six defect rounds were corrected: `638`, `639`, `640`, `641`, `652`, and `653`.
+Reviews `655–674` performed a new plan-to-code and cross-file audit focused on administrator configuration truth, timeline defaults, optional provider enablement, Completion Assistant evidence and current owner boundaries. Six defect rounds were corrected: `657`, `658`, `659`, `660`, `662`, and `673`.
 
 ## Source implementation status
 
@@ -34,41 +34,43 @@ config/all-chats-directive-matrix.json
 config/review595-614-twenty-round-cross-file-completeness-ledger.json
 config/review615-634-fresh-cross-file-audit-ledger.json
 config/review635-654-plan-completeness-ledger.json
+config/review655-674-admin-plan-completeness-ledger.json
 config/staging-dependencies.json
 ```
 
 Current fresh audit record:
 
 ```text
-docs/REVIEWS-635-654-PLAN-COMPLETENESS-2026-10-06.md
+docs/REVIEWS-655-674-ADMIN-PLAN-COMPLETENESS-2026-10-07.md
 ```
 
-The audited baseline main `210b4b...` passed exact-head CI run `1601`. The final current-head CI status for any later corrective commit is external evidence and must be queried from GitHub; it is not self-certified by this README. Hostinger staging, Founder acceptance, production approval, exact deployed-code parity, live database/schema state, live migration state and operational acceptance remain separate gates.
+The audited baseline main `2d02c933...` passed exact-head CI run `1638`. The final current-head CI status for any later corrective commit is external evidence and must be queried from GitHub; it is not self-certified by this README. Hostinger staging, Founder acceptance, production approval, exact deployed-code parity, live database/schema state, live migration state and operational acceptance remain separate gates.
 
 ## Current ownership and compatibility boundaries
 
 - **File 00:** identity, membership, suspension and public-profile authorization remain owner-native; File 25 consumes bounded assertions and reads no File 00 tables.
-- **File 03:** profile master/public projection, contact consent, report/edit/privacy destinations and canonical profile identity remain File 03-owned. View-as-Public consumes the authorized public projection and does not widen its audience.
+- **File 03:** profile master/public projection, contact consent, canonical public media, report/edit/privacy destinations and canonical profile identity remain File 03-owned.
 - **File 08:** current main `70541974ce0ffb16aebef557c3016eb7447662f4`, runtime `1.2.15`, schema `3.4.0`, public clinic projection `1.1.0`. No reviewed profile-user→booking-destination API is published, so **Appointment remains hidden**.
-- **File 09:** current main `9639f75ba046ac1a36e39d5e9aae56c7bae3279b`; Doctor verification truth remains File 09-owned.
+- **File 09:** current main `448d41f34586369ca5875693583b9cd8a6133167`, runtime `1.3.0`, schema `6`, integration contract `1.1.0`; Doctor-verification truth remains File 09-owned.
+- **File 14:** current main `f64e7d17268daff4e3097c18ad510116e6eaf105`, runtime `1.4.6`, schema `10005`; File 14 consumes File 25 visual contracts while clinic/directory/verification destination truth remains with native owners.
 - **File 17:** current main `8ae656e51796d1f05865d8be5dca2480443d79ca`; relationships and messaging remain File 17-owned. **Follow remains hidden** without a target-bound owner contract. Message appears only when File 03's public projection supplies a concrete same-site owner-approved destination.
-- **File 18:** seller/listing truth remains owner-native; File 25 consumes owner-executed public DTOs only.
-- **File 20:** current main `8a4dbcaf4fef8e926b9b834ecfde16c21a0f00ca`; sole structural shell/navigation/layout owner.
+- **File 20:** current main `8a4dbcaf4fef8e926b9b834ecfde16c21a0f00ca`; sole structural shell/navigation/layout and canonical admin-parent owner.
 - **File 21:** current main `f2eb7e95ddea327af36ea725ffb923b029f885e6`; canonical publication/ProfileTimeline owner.
 - **File 22:** current main `b7a7f2e69411cbd32f0574fd12d766fb70c01b7a`; create/edit workflow owner.
 - **File 23:** current main `dcae138e6073f4d0ff596623deb05b9940b8271b`; private publishing-operations owner.
 - **File 24:** current main `a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb`; security/privacy/compliance/resilience assurance owner.
 - **File 26:** current main `bbea3aad466792a4a6a62b53532bbd45c7c592de`; global search/discovery/ranking owner.
-- **File 25:** public profile/timeline/card visual presentation, component visual contracts, responsive/accessibility refinement, SEO presentation and visual acceptance.
+- **File 25:** public profile/timeline/card visual presentation, component visual contracts, responsive/accessibility refinement, profile-local filtering/search, SEO presentation and visual acceptance.
 
-## Reviews 635–654 corrections
+## Reviews 655–674 corrections
 
-- Implemented all seven governed View-as-Public modes: public, member, mobile, desktop, contact, search and social. Preview is noindex, projection-only and suppresses owner/viewer-mutating actions.
-- Completed the owner-only Completion Assistant with usable native edit and preview destinations while hiding completion controls inside preview itself.
-- Added governed `timeline_page_size` bounded to 5–50 and explicit browser-Back scroll restoration while keeping filters/search/page state URL-addressable.
-- Reconciled current File 03 contract `1.4.0` public media: File 25 now consumes owner-approved same-origin `url`/`alt`/focal fields without requiring an `attachment_id` that the current DTO does not publish.
-- Made `profile_template` an active standard/compact/institutional token-based presentation control instead of a dead setting.
-- Reconciled stale README/readme/dependency/source-status evidence and preserved all staging/live/production gates as unverified until real environment evidence exists.
+- Removed five misleading no-op preferences: `timeline_provider_mode`, `accessibility_mode`, `cache_ttl`, `safe_mode_controls`, and `diagnostics_enabled`. Mandatory accessibility, Safe Mode and diagnostics cannot be disabled by presentation preferences; profile responses remain no-store until an accepted cache-partition contract exists.
+- Grouped the administrator control center under the governed File 25 sections instead of one undifferentiated settings table.
+- Removed the unsupported `tablet` responsive-preview preference; every selectable value now maps to a real governed preview mode.
+- Stopped fabricating avatar alt evidence before the Completion Assistant, so missing canonical File 03 alt metadata can be reported while public rendering still has an accessible descriptive fallback.
+- Added bounded `default_timeline_filter`, applied only when the key exists in the active approved filter registry.
+- Added bounded `enabled_optional_providers`; the five built-in File 06/10/11/12/18 section providers can be individually disabled or all disabled without affecting required File 21 timeline ownership.
+- Reconciled source/dependency/release documentation and preserved every staging/live/production gate as unverified until actual environment evidence exists.
 
 ## Existing visual and public contracts retained
 
