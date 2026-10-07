@@ -79,6 +79,16 @@ foreach ((array) ($staging['scenarios'] ?? []) as $scenario) {
 foreach (['admin-config-observable-controls','timeline-default-filter','optional-provider-enablement','completion-assistant-alt-evidence'] as $id) {
     $check(in_array($id, $scenarioIds, true), 'Fresh staging scenario missing: ' . $id);
 }
+$scenarioById = [];
+foreach ((array) ($staging['scenarios'] ?? []) as $scenario) {
+    if (is_array($scenario) && is_string($scenario['id'] ?? null)) { $scenarioById[$scenario['id']] = (string) ($scenario['requirement'] ?? ''); }
+}
+$check(str_contains($scenarioById['file09-doctor-decision'] ?? '', '448d41f34586369ca5875693583b9cd8a6133167'), 'File 09 current staging scenario is stale.');
+$check(str_contains($scenarioById['file14-visual-consumer'] ?? '', 'f64e7d17268daff4e3097c18ad510116e6eaf105'), 'File 14 current staging scenario is stale.');
+$check(str_contains($scenarioById['file20-current-shell-contract'] ?? '', '8a4dbcaf4fef8e926b9b834ecfde16c21a0f00ca'), 'File 20 current staging scenario is stale.');
+$check(str_contains($scenarioById['file21-current-profile-timeline-contract'] ?? '', 'f2eb7e95ddea327af36ea725ffb923b029f885e6'), 'File 21 current staging scenario is stale.');
+$check(str_contains($scenarioById['file22-create-edit-contract'] ?? '', 'b7a7f2e69411cbd32f0574fd12d766fb70c01b7a'), 'File 22 current staging scenario is stale.');
+$check(str_contains($scenarioById['file24-current-assurance-contract'] ?? '', 'a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb'), 'File 24 current staging scenario is stale.');
 
 try {
     $matrix = json_decode($read('config/source-completion-matrix.json'), true, 512, JSON_THROW_ON_ERROR);
@@ -109,6 +119,8 @@ $heads = (array) ($deps['observed_repository_heads'] ?? []);
 foreach ([
     '03'=>'636e3ef965423887f810718abec3cd1c11c3659d',
     '08'=>'70541974ce0ffb16aebef557c3016eb7447662f4',
+    '09'=>'448d41f34586369ca5875693583b9cd8a6133167',
+    '14'=>'f64e7d17268daff4e3097c18ad510116e6eaf105',
     '17'=>'8ae656e51796d1f05865d8be5dca2480443d79ca',
     '20'=>'8a4dbcaf4fef8e926b9b834ecfde16c21a0f00ca',
     '21'=>'f2eb7e95ddea327af36ea725ffb923b029f885e6',
