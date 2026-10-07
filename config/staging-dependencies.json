@@ -177,11 +177,11 @@
       "foreign_table_reads_allowed": false,
       "bundled_with_file_25": false,
       "staging_status": "pending",
-      "current_repository_head": "9639f75ba046ac1a36e39d5e9aae56c7bae3279b",
+      "current_repository_head": "448d41f34586369ca5875693583b9cd8a6133167",
       "current_source_version_observed": "1.3.0",
       "current_schema_version_observed": 6,
       "current_contract_version_observed": "1.1.0",
-      "current_repository_review": "compatible-current-main-after-R24-2026-10-06; repository-source-only"
+      "current_repository_review": "compatible-current-main-after-R25-2026-10-07; repository-source-only"
     },
     {
       "file": 10,
@@ -241,9 +241,10 @@
       "source_lifecycle": "fifth-80-review-feature-branch-candidate-pending-merge-and-hostinger-staging",
       "bundled_with_file_25": false,
       "staging_status": "pending",
-      "current_repository_head": "db60c4bc5c37a5c88126b78c31b34c75236f33d7",
-      "current_source_version_observed": "1.4.4",
-      "current_schema_version_observed": 10005
+      "current_repository_head": "55e44d38b23304d50fad22b4d3a2c67fe4721209",
+      "current_source_version_observed": "1.4.5",
+      "current_schema_version_observed": 10005,
+      "current_repository_review": "compatible-current-main-v1.4.5-2026-10-06; repository-source-only"
     },
     {
       "file": 18,
@@ -396,9 +397,9 @@
       "package_status": "build-input-not-acceptance",
       "schema_version": "2",
       "installed_preflight": "wp sabri file25 staging-probe --expected-commit=<sha>",
-      "source_branch": "fix/reviews-635-654-plan-completeness-20261006",
-      "source_status": "reviews-635-654-source-corrected; exact current HEAD CI must be queried externally",
-      "baseline_main_sha": "210b4b250fd0f996b1fb6b9eb5471dec831f6dfa"
+      "source_branch": "fix/reviews-655-674-plan-code-crossfile-20261007",
+      "source_status": "reviews-655-674-in-progress; exact candidate-head CI is external mutable evidence",
+      "baseline_main_sha": "2d02c93356b050313e30e29aeceb57080771c2a5"
     }
   ],
   "acceptance_rule": "No module is staging-accepted or production-accepted merely because this matrix, source code, a ZIP or green CI exists.",
@@ -415,7 +416,7 @@
     "10": "4b8a3dda140186c01b05d998e729cb1aeeed2cf3",
     "11": "c2df8e72bad76dc1a7fb83cbe039541f7aa1fd8b",
     "12": "2b369ef2d609247896e1ab32118f1dc498407f51",
-    "14": "db60c4bc5c37a5c88126b78c31b34c75236f33d7",
+    "14": "55e44d38b23304d50fad22b4d3a2c67fe4721209",
     "15": "4e5d768d637052063bf37a038592b8f7b27f120a",
     "17": "8ae656e51796d1f05865d8be5dca2480443d79ca",
     "18": "04a5872e3e2e170ee400e7c607e39abd5484df65",
@@ -425,15 +426,15 @@
     "22": "b7a7f2e69411cbd32f0574fd12d766fb70c01b7a",
     "23": "dcae138e6073f4d0ff596623deb05b9940b8271b",
     "24": "a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb",
-    "25": "19009a0934970d63ca60fda1fe9df1ac7288d42a",
+    "25": "2d02c93356b050313e30e29aeceb57080771c2a5",
     "26": "bbea3aad466792a4a6a62b53532bbd45c7c592de",
-    "observed_at": "2026-10-06",
+    "observed_at": "2026-10-07",
     "evidence_class": "repository-source-only-not-staging-live",
     "00": "2fa7c022ee9cd1b65432e900579512f304532442",
     "03": "636e3ef965423887f810718abec3cd1c11c3659d",
     "07": "67c32ec4af45a7de6e3d9c1dbf0f8614d6b5a844",
     "08": "70541974ce0ffb16aebef557c3016eb7447662f4",
-    "09": "9639f75ba046ac1a36e39d5e9aae56c7bae3279b",
+    "09": "448d41f34586369ca5875693583b9cd8a6133167",
     "action_integration_note": "File 25 resolves only published owner-native profile destinations. File 08 Appointment and File 17 Follow remain hidden until authoritative target-bound owner contracts exist; Message is shown only when File 03 public projection supplies a concrete same-site destination."
   },
   "file25_fresh_audit": {
@@ -477,5 +478,17 @@
     "file17_message_contract": "use-only-concrete-file03-public-projection-url-when-present",
     "evidence_boundary": "Repository source/CI only; no staging/live/deployed parity claim.",
     "file03_current_public_media": "contract 1.4.0 current DTO uses bounded same-origin url/alt/focal_x/focal_y; File 25 must not require attachment_id"
+  },
+  "file25_review655_674_audit": {
+    "baseline_main_sha": "2d02c93356b050313e30e29aeceb57080771c2a5",
+    "baseline_main_ci": {
+      "run_number": 1638,
+      "run_id": 37508519545,
+      "conclusion": "success"
+    },
+    "review_range": "655-674",
+    "candidate_branch": "fix/reviews-655-674-plan-code-crossfile-20261007",
+    "exact_current_head_ci": "external-evidence-required-not-frozen-in-source",
+    "evidence_boundary": "Repository source/CI only; no staging/live/deployed parity claim."
   }
 }
