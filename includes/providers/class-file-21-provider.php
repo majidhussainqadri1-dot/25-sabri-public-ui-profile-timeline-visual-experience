@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Sabri\PublicExperience\Providers;
 
-use Sabri\PublicExperience\Contracts\Timeline_Provider;
+use Sabri\PublicExperience\Contracts\Timeline_Provider_V2;
 use Sabri\PublicExperience\Normalized_Timeline_Item;
 
 if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
@@ -20,7 +20,7 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
  * pointer. No post body, private metadata, interaction ledger, or write path is
  * copied into File 25.
  */
-final class File_21_Provider implements Timeline_Provider
+final class File_21_Provider implements Timeline_Provider_V2
 {
     private const PROVIDER_ID = 'file-21';
     private const MINIMUM_SUPPORTED_VERSION = '1.0.3';
