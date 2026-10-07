@@ -107,32 +107,10 @@ final class WordPress_Posts_Provider implements Timeline_Provider
             }
 
             try {
-                $items[] = new Normalized_Timeline_Item([
-                    'provider_id' => $this->get_provider_id(),
-                    'provider_version' => $this->get_provider_version(),
-                    'native_object_type' => $post->post_type,
-                    'native_object_id' => (string) $post->ID,
-                    'author_id' => (int) $post->post_author,
-                    'public_profile_id' => $author_id,
-                    'title' => get_the_title($post),
-                    'safe_excerpt' => wp_trim_words(wp_strip_all_tags(get_the_excerpt($post)), 36),
-                    'canonical_url' => $url,
-                    'published_at' => get_post_time(DATE_ATOM, true, $post),
-                    'updated_at' => get_post_modified_time(DATE_ATOM, true, $post),
-                    'visibility_state' => 'public',
-                    'native_status' => 'publish',
-                    'content_type' => $post->post_type,
-                    'topic' => '',
-                    'language' => str_replace('_', '-', (string) get_locale()),
-                    'thumbnail_reference' => function_exists('get_the_post_thumbnail_url')
-                        ? (string) (get_the_post_thumbnail_url($post, 'medium_large') ?: '')
-                        : '',
-                    'media_type' => has_post_thumbnail($post) ? 'image' : 'none',
-                    'verification_state' => 'native',
-                    'review_state' => 'published',
-                    'correction_state' => 'none',
-                    'available_actions' => ['read', 'share'],
-                ]);
+                $normalized = $this->normalize_public_item($post, $author_id);
+                if ($normalized instanceof Normalized_Timeline_Item) {
+                    $items[] = $normalized;
+                }
             } catch (\Throwable $exception) {
                 do_action('sabri_public_experience/provider_item_error', $this->get_provider_id(), (int) $post->ID, $exception);
             }
@@ -149,4 +127,90 @@ final class WordPress_Posts_Provider implements Timeline_Provider
             'maturity' => $this->get_maturity_level(),
         ];
     }
+    public function normalize_public_item(mixed $native_item, int $author_id): ?Normalized_Timeline_Item
+    {
+        if (! $native_item instanceof WP_Post
+            || (int) $native_item->post_author !== $author_id
+            || $native_item->post_password !== ''
+            || (string) $native_item->post_status !== 'publish'
+            || (string) $native_item->post_type !== 'post'
+        ) {
+            return null;
+        }
+        $url = get_permalink($native_item);
+        if (! is_string($url) || $url === '') {
+            return null;
+        }
+        return new Normalized_Timeline_Item([
+            'provider_id' => $this->get_provider_id(),
+            'provider_version' => $this->get_provider_version(),
+            'native_object_type' => $native_item->post_type,
+            'native_object_id' => (string) $native_item->ID,
+            'author_id' => (int) $native_item->post_author,
+            'public_profile_id' => $author_id,
+            'title' => get_the_title($native_item),
+            'safe_excerpt' => wp_trim_words(wp_strip_all_tags(get_the_excerpt($native_item)), 36),
+            'canonical_url' => $url,
+            'published_at' => get_post_time(DATE_ATOM, true, $native_item),
+            'updated_at' => get_post_modified_time(DATE_ATOM, true, $native_item),
+            'visibility_state' => 'public',
+            'native_status' => 'publish',
+            'content_type' => 'post',
+            'topic' => '',
+            'language' => str_replace('_', '-', (string) get_locale()),
+            'thumbnail_reference' => function_exists('get_the_post_thumbnail_url')
+                ? (string) (get_the_post_thumbnail_url($native_item, 'medium_large') ?: '')
+                : '',
+            'media_type' => has_post_thumbnail($native_item) ? 'image' : 'none',
+            'verification_state' => 'native',
+            'review_state' => 'published',
+            'correction_state' => 'none',
+            'available_actions' => ['read', 'share'],
+        ]);
+    }
+
+    public function get_canonical_url(Normalized_Timeline_Item $item): string
+    {
+        return (string) $item->get('canonical_url');
+    }
+
+    public function get_visibility_state(Normalized_Timeline_Item $item): string
+    {
+        return (string) $item->get('visibility_state');
+    }
+
+    /** @return list<string> */
+    public function get_public_actions(Normalized_Timeline_Item $item): array
+    {
+        $actions = $item->get('available_actions');
+        return is_array($actions) ? array_values(array_filter($actions, 'is_string')) : [];
+    }
+
+    /** @return array<string,int> */
+    public function get_public_metrics(Normalized_Timeline_Item $item): array
+    {
+        $metrics = apply_filters('sabri_public_experience/wordpress_post_public_metrics', [], $item);
+        if (! is_array($metrics)) {
+            return [];
+        }
+        $clean = [];
+        foreach (['views', 'saves'] as $key) {
+            if (isset($metrics[$key]) && is_int($metrics[$key]) && $metrics[$key] >= 0 && $metrics[$key] <= 1000000000) {
+                $clean[$key] = $metrics[$key];
+            }
+        }
+        return $clean;
+    }
+
+    public function get_correction_state(Normalized_Timeline_Item $item): string
+    {
+        return (string) $item->get('correction_state');
+    }
+
+    public function register_sync_events(): void
+    {
+        // Fallback provider is request-local read-through and owns no derivative
+        // index requiring a second synchronization backend.
+    }
+
 }
