@@ -140,7 +140,7 @@ $check(($heads['evidence_class'] ?? '') === 'repository-source-only-not-staging-
 
 $readme = $read('README.md');
 $check(str_contains($readme, 'Reviews 655–674') || str_contains($readme, 'Reviews 635–654'), 'README review lineage missing.');
-$check(str_contains($readme, 'Baseline main exact-head CI: **PASS** — run `1601`'), 'README audited baseline CI evidence missing.');
+$check(($ledger['basis']['baseline_main_ci']['run_number'] ?? null) === 1601 && ($ledger['basis']['baseline_main_ci']['conclusion'] ?? '') === 'success', 'Historical Reviews 635-654 baseline CI evidence missing from its ledger.');
 $check(str_contains($readme, 'exact current GitHub HEAD must be checked against its current CI run'), 'README current-head CI evidence boundary missing.');
 $check(! str_contains($readme, 'current candidate exact-head CI pending'), 'README contains stale pending-CI claim.');
 
