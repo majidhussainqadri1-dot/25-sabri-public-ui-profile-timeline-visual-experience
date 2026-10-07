@@ -180,14 +180,12 @@ final class Profile_Renderer
             $provider_section = $this->sections->get_section((int) $user->ID, $profile, $requested_section);
         }
 
-        // The canonical template generates deterministic avatar alt text from the
-        // display name, and an intentionally private contact choice is not an
-        // incomplete profile. Feed those presentation facts only to the assistant;
-        // never add fake public contact data to the rendered profile itself.
+        // The Completion Assistant must report missing owner-authored alt text
+        // rather than fabricating it. The render template may use an accessible
+        // descriptive fallback, but completion evidence stays bound to File 03's
+        // canonical public media metadata. An intentionally private contact choice
+        // remains a privacy state rather than fabricated public contact data.
         $completion_profile = $profile;
-        if (! empty($completion_profile['avatar_url'])) {
-            $completion_profile['avatar_alt'] = (string) ($completion_profile['display_name'] ?? 'profile');
-        }
         if (empty($completion_profile['contacts'])) {
             $completion_profile['contacts'] = ['_privacy_state' => 'not-public'];
         }
@@ -292,11 +290,15 @@ final class Profile_Renderer
         echo '<meta property="og:url" content="' . esc_url($canonical) . '">' . "\n";
         $avatar = Public_URL::sanitize_same_site($profile['avatar_url'] ?? '', false);
         if ($avatar !== '') {
+            $avatar_alt = trim((string) ($profile['avatar_alt'] ?? ''));
+            if ($avatar_alt === '') {
+                $avatar_alt = sprintf(
+                    __('%s profile photograph', 'sabri-public-experience'),
+                    (string) ($profile['display_name'] ?? '')
+                );
+            }
             echo '<meta property="og:image" content="' . esc_url($avatar) . '">' . "\n";
-            echo '<meta property="og:image:alt" content="' . esc_attr(sprintf(
-                __('%s profile photograph', 'sabri-public-experience'),
-                (string) ($profile['display_name'] ?? '')
-            )) . '">' . "\n";
+            echo '<meta property="og:image:alt" content="' . esc_attr($avatar_alt) . '">' . "\n";
         }
 
         $profile_class = sanitize_key((string) ($profile['class'] ?? 'member'));
@@ -397,10 +399,17 @@ final class Profile_Renderer
     /** @param array<string,string> $filters */
     private function requested_timeline_content_type(array $filters): string
     {
-        if (! isset($_GET['type']) || ! is_scalar($_GET['type'])) {
+        if (! isset($_GET['type'])) {
+            $default = sanitize_key((string) (Plan_Completion::preferences()['default_timeline_filter'] ?? ''));
+            return $default !== '' && array_key_exists($default, $filters) ? $default : '';
+        }
+        if (! is_scalar($_GET['type'])) {
             return '';
         }
         $raw = (string) wp_unslash($_GET['type']);
+        if ($raw === '') {
+            return '';
+        }
         $requested = sanitize_key($raw);
         if ($requested === '' || $requested !== $raw || strlen($requested) > 64) {
             return '';
