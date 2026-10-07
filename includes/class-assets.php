@@ -76,6 +76,8 @@ final class Assets
             'linkCopied' => __('Link copied.', 'sabri-public-experience'),
             'shareSucceeded' => __('Profile shared.', 'sabri-public-experience'),
             'shareFailed' => __('Unable to share this profile.', 'sabri-public-experience'),
+            'offline' => __('You are offline. The page remains available, but new network actions may not complete.', 'sabri-public-experience'),
+            'onlineRestored' => __('Connection restored.', 'sabri-public-experience'),
         ]);
     }
 }
