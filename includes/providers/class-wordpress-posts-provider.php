@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Sabri\PublicExperience\Providers;
 
-use Sabri\PublicExperience\Contracts\Timeline_Provider;
+use Sabri\PublicExperience\Contracts\Timeline_Provider_V2;
 use Sabri\PublicExperience\Normalized_Timeline_Item;
 use WP_Post;
 use WP_Query;
@@ -20,7 +20,7 @@ if (! defined('ABSPATH')) {
  * safe baseline for already-public WordPress posts until File 21 registers its
  * richer production provider.
  */
-final class WordPress_Posts_Provider implements Timeline_Provider
+final class WordPress_Posts_Provider implements Timeline_Provider_V2
 {
     public function get_provider_id(): string
     {
