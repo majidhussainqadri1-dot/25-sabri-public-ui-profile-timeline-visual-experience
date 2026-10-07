@@ -177,11 +177,11 @@
       "foreign_table_reads_allowed": false,
       "bundled_with_file_25": false,
       "staging_status": "pending",
-      "current_repository_head": "9639f75ba046ac1a36e39d5e9aae56c7bae3279b",
+      "current_repository_head": "448d41f34586369ca5875693583b9cd8a6133167",
       "current_source_version_observed": "1.3.0",
       "current_schema_version_observed": 6,
       "current_contract_version_observed": "1.1.0",
-      "current_repository_review": "compatible-current-main-after-R24-2026-10-06; repository-source-only"
+      "current_repository_review": "compatible-current-main-after-R25-2026-10-07; repository-source-only"
     },
     {
       "file": 10,
@@ -241,9 +241,10 @@
       "source_lifecycle": "fifth-80-review-feature-branch-candidate-pending-merge-and-hostinger-staging",
       "bundled_with_file_25": false,
       "staging_status": "pending",
-      "current_repository_head": "db60c4bc5c37a5c88126b78c31b34c75236f33d7",
-      "current_source_version_observed": "1.4.4",
-      "current_schema_version_observed": 10005
+      "current_repository_head": "f64e7d17268daff4e3097c18ad510116e6eaf105",
+      "current_source_version_observed": "1.4.6",
+      "current_schema_version_observed": 10005,
+      "current_repository_review": "compatible-current-main-second-twenty-pass-2026-10-07; repository-source-only"
     },
     {
       "file": 18,
@@ -415,7 +416,7 @@
     "10": "4b8a3dda140186c01b05d998e729cb1aeeed2cf3",
     "11": "c2df8e72bad76dc1a7fb83cbe039541f7aa1fd8b",
     "12": "2b369ef2d609247896e1ab32118f1dc498407f51",
-    "14": "db60c4bc5c37a5c88126b78c31b34c75236f33d7",
+    "14": "f64e7d17268daff4e3097c18ad510116e6eaf105",
     "15": "4e5d768d637052063bf37a038592b8f7b27f120a",
     "17": "8ae656e51796d1f05865d8be5dca2480443d79ca",
     "18": "04a5872e3e2e170ee400e7c607e39abd5484df65",
@@ -425,7 +426,7 @@
     "22": "b7a7f2e69411cbd32f0574fd12d766fb70c01b7a",
     "23": "dcae138e6073f4d0ff596623deb05b9940b8271b",
     "24": "a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb",
-    "25": "19009a0934970d63ca60fda1fe9df1ac7288d42a",
+    "25": "2d02c93356b050313e30e29aeceb57080771c2a5",
     "26": "bbea3aad466792a4a6a62b53532bbd45c7c592de",
     "observed_at": "2026-10-07",
     "evidence_class": "repository-source-only-not-staging-live",
@@ -433,8 +434,11 @@
     "03": "636e3ef965423887f810718abec3cd1c11c3659d",
     "07": "67c32ec4af45a7de6e3d9c1dbf0f8614d6b5a844",
     "08": "70541974ce0ffb16aebef557c3016eb7447662f4",
-    "09": "9639f75ba046ac1a36e39d5e9aae56c7bae3279b",
-    "action_integration_note": "File 25 resolves only published owner-native profile destinations. File 08 Appointment and File 17 Follow remain hidden until authoritative target-bound owner contracts exist; Message is shown only when File 03 public projection supplies a concrete same-site destination."
+    "09": "448d41f34586369ca5875693583b9cd8a6133167",
+    "action_integration_note": "File 25 resolves only published owner-native profile destinations. File 08 Appointment and File 17 Follow remain hidden until authoritative target-bound owner contracts exist; Message is shown only when File 03 public projection supplies a concrete same-site destination.",
+    "02": "224c39bcb8c28f77504c7348dbad41226753c7e8",
+    "05": "e2667d69d43d655e3d86b0a358dec5f28b61dd96",
+    "06": "c6f44e923f2a6f2ed82d967d18422624169b2770"
   },
   "file25_fresh_audit": {
     "baseline_main_sha": "19009a0934970d63ca60fda1fe9df1ac7288d42a",
