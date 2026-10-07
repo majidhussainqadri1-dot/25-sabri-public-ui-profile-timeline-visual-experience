@@ -61,7 +61,7 @@ final class Plan_Completion
         'visual_density' => ['type' => 'enum', 'default' => 'comfortable', 'allowed' => ['comfortable', 'compact']],
         'timeline_page_size' => ['type' => 'int', 'default' => 20, 'minimum' => 5, 'maximum' => 50],
         'default_timeline_filter' => ['type' => 'key', 'default' => '', 'maximum' => 64],
-        'enabled_optional_providers' => ['type' => 'list', 'default' => self::OPTIONAL_SECTION_PROVIDERS, 'allowed' => self::OPTIONAL_SECTION_PROVIDERS, 'maximum' => 5],
+        'enabled_optional_providers' => ['type' => 'list', 'default' => self::OPTIONAL_SECTION_PROVIDERS, 'allowed' => self::OPTIONAL_SECTION_PROVIDERS, 'maximum' => 5, 'allow_empty' => true],
         'featured_section_order' => ['type' => 'list', 'default' => ['overview', 'timeline', 'about'], 'allowed' => self::SECTIONS, 'maximum' => 12],
         'enabled_public_tabs' => ['type' => 'list', 'default' => self::SECTIONS, 'allowed' => self::SECTIONS, 'maximum' => 12],
         'cover_focal_point' => ['type' => 'enum', 'default' => 'center', 'allowed' => ['center', 'top', 'bottom', 'left', 'right']],
@@ -190,7 +190,12 @@ final class Plan_Completion
                 continue;
             }
             if ($type === 'list') {
-                $clean[$key] = self::normalize_key_list(
+                $allow_empty = ($definition['allow_empty'] ?? false) === true;
+                $explicit_empty = $allow_empty && (
+                    (is_array($value) && $value === [])
+                    || (is_string($value) && trim($value) === '')
+                );
+                $clean[$key] = $explicit_empty ? [] : self::normalize_key_list(
                     $value,
                     (array) $definition['allowed'],
                     (int) $definition['maximum'],
