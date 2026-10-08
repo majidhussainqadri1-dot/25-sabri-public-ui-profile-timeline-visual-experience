@@ -17,7 +17,8 @@ final class File_11_Reels_Media_Provider implements Profile_Section_Provider
     private const MAXIMUM_VERSION = '0.2.0';
     private const FILE_10_MINIMUM = '0.1.0';
     private const FILE_10_MAXIMUM = '0.2.0';
-    private const MAX_ITEMS = 500;
+    private const MAX_ITEMS = 24;
+    private const MAX_TIMELINE_ITEMS = 500;
 
     public function get_id(): string { return 'file-11-reels-media'; }
     public function get_version(): string { return defined('SRL_VERSION') ? trim((string) SRL_VERSION) : '0.0.0'; }
@@ -51,8 +52,13 @@ final class File_11_Reels_Media_Provider implements Profile_Section_Provider
         if ($user_id <= 0 || ! $this->supports_profile($profile) || ! function_exists('get_posts')) {
             return [];
         }
-        $requested = isset($context['limit']) && is_scalar($context['limit']) ? (int) $context['limit'] : self::MAX_ITEMS;
-        $limit = max(1, min(self::MAX_ITEMS, $requested));
+        $maximum = (($context['surface'] ?? '') === 'timeline')
+            ? self::MAX_TIMELINE_ITEMS
+            : self::MAX_ITEMS;
+        $requested = isset($context['limit']) && is_scalar($context['limit'])
+            ? (int) $context['limit']
+            : self::MAX_ITEMS;
+        $limit = max(1, min($maximum, $requested));
         $posts = get_posts([
             'post_type' => (string) \SVW_Helpers::TYPE,
             'post_status' => 'publish',
