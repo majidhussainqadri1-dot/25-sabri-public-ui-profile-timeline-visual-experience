@@ -28,12 +28,19 @@ $profile_class = sanitize_key((string) ($profile['class'] ?? 'member'));
 $profile_template = sanitize_key((string) ($profile['profile_template'] ?? 'standard')) ?: 'standard';
 $preview_mode = sanitize_key((string) ($context['preview_mode'] ?? ''));
 $preview_urls = is_array($context['preview_urls'] ?? null) ? $context['preview_urls'] : [];
+$rtl_preview = $preview_mode === 'rtl';
+$cover_focal_style = '';
+if (($profile['cover_has_focal'] ?? false) === true) {
+    $focal_x = max(0.0, min(100.0, (float) ($profile['cover_focal_x'] ?? 50.0)));
+    $focal_y = max(0.0, min(100.0, (float) ($profile['cover_focal_y'] ?? 50.0)));
+    $cover_focal_style = sprintf('--spux-cover-focal-x:%.2f%%;--spux-cover-focal-y:%.2f%%;', $focal_x, $focal_y);
+}
 $breadcrumbs = array_values(array_filter(
     (array) ($context['breadcrumbs'] ?? []),
     'is_array'
 ));
 ?>
-<main id="sabri-main-content" class="spux-profile<?php echo $preview_mode !== '' ? ' spux-preview spux-preview--' . esc_attr($preview_mode) : ''; ?>" tabindex="-1" data-spux-profile-class="<?php echo esc_attr($profile_class); ?>" data-spux-section="<?php echo esc_attr($section); ?>" data-spux-density="<?php echo esc_attr((string) ($profile['visual_density'] ?? 'comfortable')); ?>" data-spux-template="<?php echo esc_attr($profile_template); ?>" data-spux-preview-mode="<?php echo esc_attr($preview_mode); ?>" data-spux-cover-focal-point="<?php echo esc_attr((string) ($profile['cover_focal_point'] ?? 'center')); ?>">
+<main id="sabri-main-content" class="spux-profile<?php echo $preview_mode !== '' ? ' spux-preview spux-preview--' . esc_attr($preview_mode) : ''; ?>" tabindex="-1"<?php echo $rtl_preview ? ' dir="rtl"' : ''; ?> data-spux-profile-class="<?php echo esc_attr($profile_class); ?>" data-spux-section="<?php echo esc_attr($section); ?>" data-spux-density="<?php echo esc_attr((string) ($profile['visual_density'] ?? 'comfortable')); ?>" data-spux-template="<?php echo esc_attr($profile_template); ?>" data-spux-preview-mode="<?php echo esc_attr($preview_mode); ?>" data-spux-cover-focal-point="<?php echo esc_attr((string) ($profile['cover_focal_point'] ?? 'center')); ?>"<?php echo $cover_focal_style !== '' ? ' style="' . esc_attr($cover_focal_style) . '"' : ''; ?>>
     <div class="spux-container sabri-ui-container">
         <?php if (is_404() || $profile === []) : ?>
             <?php
