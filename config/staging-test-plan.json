@@ -38,7 +38,7 @@
     {
       "id": "file03-current-public-dto",
       "category": "integration",
-      "requirement": "Current File 03 main at 636e3ef965423887f810718abec3cd1c11c3659d is runtime 1.2.0-rc18 / DB 1.2.0 / contract 1.4.0 and exposes spd_get_public_profile, spd_get_personal_site_profile and spd_get_profile_contract_manifest. Current public media rows expose bounded same-origin url/alt/focal_x/focal_y and do not require attachment_id. File 25 must render valid owner-approved media from that DTO, retain canonical alt metadata with a descriptive render fallback, never read File 03 tables, and fail closed on malformed/non-same-site media."
+      "requirement": "Current File 03 main at 636e3ef965423887f810718abec3cd1c11c3659d is runtime 1.2.0-rc18 / DB 1.2.0 / contract 1.4.0 and exposes spd_get_public_profile, spd_get_personal_site_profile and spd_get_profile_contract_manifest. Public avatar/cover media exposes same-origin url/alt/focal_x/focal_y. File 25 must preserve owner focal coordinates into cover object-position, use the administrator focal preset only when owner focal metadata is absent, retain canonical alt metadata with a descriptive render fallback, never read File 03 tables, and fail closed on malformed/non-same-site media."
     },
     {
       "id": "file03-future-public-experience",
@@ -58,7 +58,7 @@
     {
       "id": "file07-directory-visual-contract",
       "category": "integration",
-      "requirement": "Exact current File 07 1.2.0 / DB 1.1.0 / contract 1.2.0 / projection schema 2 branch fix/file-07-second-fresh-80-review-20260810 at b37c7c7b46f3f57b7325e075601c10bf3ced72ba retains directory/discovery/ranking truth while File 25 supplies visual presentation only. Feature-branch source truth is not staging/live truth."
+      "requirement": "Current File 07 main 2f4a89707724fd2b9946600afe10ddab27ec3c2d is runtime 1.2.1 / DB 1.1.1 / contract 1.2.1 / projection schema 3 and retains directory/discovery/ranking truth while File 25 supplies visual presentation only. Repository source truth is not staging/live truth."
     },
     {
       "id": "file08-clinic-projection",
@@ -68,7 +68,7 @@
     {
       "id": "file09-doctor-decision",
       "category": "integration",
-      "requirement": "Current File 09 main 448d41f34586369ca5875693583b9cd8a6133167 is runtime 1.3.0/schema 6 with integration contract 1.1.0, which remains within File 25's accepted >=1.3.0 <1.4.0 family. On staging, expired/revoked/suspended/malformed/ineligible decisions must remove Doctor verification. Repository truth is not deployed truth."
+      "requirement": "Current File 09 main cfc5f781a766330314dc98c42abeca0eb7786eba is runtime 1.3.0/schema 6 with integration contract 1.1.0, within File 25's accepted >=1.3.0 <1.4.0 family. On staging, expired/revoked/suspended/malformed/ineligible decisions must remove Doctor verification. Repository truth is not deployed truth."
     },
     {
       "id": "file14-visual-consumer",
@@ -249,6 +249,36 @@
       "id": "completion-assistant-alt-evidence",
       "category": "accessibility",
       "requirement": "The owner Completion Assistant reports missing canonical avatar alt metadata instead of accepting a renderer-generated fallback as completion evidence; public rendering may still provide an accessible descriptive fallback."
+    },
+    {
+      "id": "profile-cover-owner-focal-point",
+      "category": "profile",
+      "requirement": "File 03 owner-approved cover focal_x/focal_y controls File 25 cover object-position when present; the admin center/top/bottom/left/right preset is fallback-only and cannot substitute canonical owner focal metadata."
+    },
+    {
+      "id": "owner-rtl-preview",
+      "category": "accessibility",
+      "requirement": "Authorized profile owner/admin can open a private noindex RTL preview in addition to mobile/desktop/public/member/contact/search/social modes; preview changes direction/presentation only and never widens public authorization or exposes unpublished data."
+    },
+    {
+      "id": "portfolio-timeline-federation",
+      "category": "timeline",
+      "requirement": "When approved optional providers are enabled and available, File 06 Knowledge, File 10 Video, File 11 Reels and File 12 PDFs participate in the author-centric Profile Timeline through bounded read-only public projections. Native owner data is not copied into a second backend and File 18 Marketplace remains outside the portfolio timeline."
+    },
+    {
+      "id": "timeline-plan-contract",
+      "category": "integration",
+      "requirement": "Built-in File 21, WordPress fallback and File 06/10/11/12 portfolio timeline adapters implement the complete File 25 §46 provider surface: identity/version/availability/maturity/query/normalize/canonical/visibility/actions/metrics/correction/sync/health. Legacy Timeline_Provider remains a compatibility floor and is reported rather than silently treated as a complete plan contract."
+    },
+    {
+      "id": "timeline-audited-pinning",
+      "category": "timeline",
+      "requirement": "Any non-zero timeline pin requires bounded audit reference, actor, reason, surface, start and end timestamps; future/expired pins have zero effective pin weight and pin audit metadata is not exposed in the public timeline DTO."
+    },
+    {
+      "id": "profile-hero-introduction-status",
+      "category": "profile",
+      "requirement": "Profile Hero renders a bounded brief introduction when biography exists and supports truthful public lifecycle/degraded status messaging without fabricating online, verification or success state."
     }
   ]
 }
