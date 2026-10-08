@@ -20,7 +20,7 @@ final class File_06_Knowledge_Provider implements Profile_Section_Provider
 {
     private const MINIMUM_VERSION = '0.1.0';
     private const MAXIMUM_VERSION = '0.2.0';
-    private const MAX_ITEMS = 24;
+    private const MAX_ITEMS = 500;
 
     public function get_id(): string
     {
@@ -150,6 +150,8 @@ final class File_06_Knowledge_Provider implements Profile_Section_Provider
             $meta = $body_system !== '' ? [$body_system] : [];
 
             $items[] = [
+                'native_object_type' => 'he_entry',
+                'native_object_id' => (string) $post_id,
                 'type' => 'article',
                 'title' => $title,
                 'url' => $url,
