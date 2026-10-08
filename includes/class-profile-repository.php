@@ -152,6 +152,7 @@ final class Profile_Repository
             'clinic' => $clinic,
             'file03_contract_version' => (string) ($source_projection['contract_version'] ?? ''),
             'file03_public_id' => (string) ($source_projection['public_id'] ?? ''),
+            'profile_state' => sanitize_key((string) ($source_projection['state'] ?? 'public')) ?: 'public',
         ];
 
         /** @var array<string,mixed> $filtered */
