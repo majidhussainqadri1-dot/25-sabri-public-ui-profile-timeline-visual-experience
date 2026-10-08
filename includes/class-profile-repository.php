@@ -135,6 +135,9 @@ final class Profile_Repository
             'avatar_url' => $avatar,
             'avatar_alt' => $avatar_alt,
             'cover_url' => $cover,
+            'cover_focal_x' => (float) ($cover_media['focal_x'] ?? 50.0),
+            'cover_focal_y' => (float) ($cover_media['focal_y'] ?? 50.0),
+            'cover_has_focal' => ($cover_media['has_focal'] ?? false) === true,
             'headline' => $headline,
             'bio' => $bio,
             'country' => $country,
@@ -174,6 +177,13 @@ final class Profile_Repository
         // filters may not substitute it; the template supplies a descriptive
         // fallback only when the canonical owner has no alt value.
         $profile['avatar_alt'] = $avatar_alt;
+        // Focal coordinates are immutable public File 03 media metadata. They
+        // are clamped by the native adapter and cannot be substituted by a
+        // presentation filter. File 25 uses the administrator focal preset only
+        // when the owner projection does not publish coordinates.
+        $profile['cover_focal_x'] = max(0.0, min(100.0, (float) ($cover_media['focal_x'] ?? 50.0)));
+        $profile['cover_focal_y'] = max(0.0, min(100.0, (float) ($cover_media['focal_y'] ?? 50.0)));
+        $profile['cover_has_focal'] = ($cover_media['has_focal'] ?? false) === true;
         $profile['country'] = $this->plain_text((string) $profile['country'], 100);
         $profile['city'] = $this->plain_text((string) $profile['city'], 100);
         $profile['location_text'] = $this->plain_text((string) $profile['location_text'], 240);
