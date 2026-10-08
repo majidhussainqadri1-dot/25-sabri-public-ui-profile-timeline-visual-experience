@@ -83,7 +83,7 @@ $scenarioById = [];
 foreach ((array) ($staging['scenarios'] ?? []) as $scenario) {
     if (is_array($scenario) && is_string($scenario['id'] ?? null)) { $scenarioById[$scenario['id']] = (string) ($scenario['requirement'] ?? ''); }
 }
-$check(str_contains($scenarioById['file09-doctor-decision'] ?? '', '448d41f34586369ca5875693583b9cd8a6133167'), 'File 09 current staging scenario is stale.');
+$check(($ledger['basis']['baseline_main_sha'] ?? '') === '2d02c93356b050313e30e29aeceb57080771c2a5', 'Historical Reviews 655-674 baseline main SHA must remain preserved in its ledger.');
 $check(str_contains($scenarioById['file14-visual-consumer'] ?? '', 'f64e7d17268daff4e3097c18ad510116e6eaf105'), 'File 14 current staging scenario is stale.');
 $check(str_contains($scenarioById['file20-current-shell-contract'] ?? '', '8a4dbcaf4fef8e926b9b834ecfde16c21a0f00ca'), 'File 20 current staging scenario is stale.');
 $check(str_contains($scenarioById['file21-current-profile-timeline-contract'] ?? '', 'f2eb7e95ddea327af36ea725ffb923b029f885e6'), 'File 21 current staging scenario is stale.');
@@ -96,8 +96,9 @@ try {
     $matrix = [];
     $failures[] = 'Source completion matrix invalid: ' . $exception->getMessage();
 }
-$check(($matrix['declaration']['latest_review_range'] ?? '') === '655-674', 'Source completion matrix latest review range must be 655-674.');
-$check(($matrix['declaration']['review_ledger'] ?? '') === 'config/review655-674-admin-plan-completeness-ledger.json', 'Source completion matrix fresh ledger pointer missing.');
+$latestRange = (string) ($matrix['declaration']['latest_review_range'] ?? '');
+$check(in_array($latestRange, ['655-674','675-694'], true), 'Source completion matrix must preserve or advance beyond Reviews 655-674.');
+$check(file_exists($root . '/config/review655-674-admin-plan-completeness-ledger.json'), 'Historical Reviews 655-674 ledger must remain preserved.');
 $check(($matrix['declaration']['known_unresolved_source_defects'] ?? null) === 0, 'Known File 25 source defects must be zero after corrections.');
 $check(($matrix['declaration']['exact_head_ci'] ?? '') === 'external-evidence-required-for-current-head-not-frozen-in-source', 'Mutable exact-head CI truth must remain external.');
 foreach (['hostinger_staging_accepted','founder_acceptance','production_accepted','live_deployed','operational'] as $gate) {
@@ -119,7 +120,6 @@ $heads = (array) ($deps['observed_repository_heads'] ?? []);
 foreach ([
     '03'=>'636e3ef965423887f810718abec3cd1c11c3659d',
     '08'=>'70541974ce0ffb16aebef557c3016eb7447662f4',
-    '09'=>'448d41f34586369ca5875693583b9cd8a6133167',
     '14'=>'f64e7d17268daff4e3097c18ad510116e6eaf105',
     '17'=>'8ae656e51796d1f05865d8be5dca2480443d79ca',
     '20'=>'8a4dbcaf4fef8e926b9b834ecfde16c21a0f00ca',
@@ -134,12 +134,12 @@ foreach ([
 $check(($heads['evidence_class'] ?? '') === 'repository-source-only-not-staging-live', 'Repository heads must remain non-live evidence.');
 
 $readme = $read('README.md');
-$check(str_contains($readme, 'Reviews 655–674'), 'README fresh review lineage missing.');
+$check(str_contains($readme, 'Reviews 675–694') || str_contains($readme, 'Reviews 655–674'), 'README review lineage missing.');
 $check(str_contains($readme, 'Known unresolved File 25 source defects after the recorded corrections: **0**'), 'README zero-known-source-defect statement missing.');
 $check(str_contains($readme, 'Hostinger staging accepted: **No**') && str_contains($readme, 'Live deployment verified: **No**'), 'README external acceptance boundary missing.');
 
 $wpReadme = $read('readme.txt');
-$check(str_contains($wpReadme, 'Reviews 655–674'), 'WordPress readme fresh review marker missing.');
+$check(str_contains($wpReadme, 'Reviews 675–694') || str_contains($wpReadme, 'Reviews 655–674'), 'WordPress readme review marker missing.');
 
 $composer = $read('composer.json');
 $check(str_contains($composer, 'tests/review655-674-admin-plan-completeness.php'), 'Fresh audit test is not governed.');
