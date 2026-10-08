@@ -20,7 +20,7 @@ The reviewed 0.15.0 source correction includes:
 * canonical File 03 contact preservation with monotonic revoke-only filters and substitution denial;
 * fail-closed high-risk rebuild/migration authorization requiring strict explicit approval;
 * data-free recoverable Safe Mode public profile routes using a no-store/noindex 503 native-theme surface;
-* Reviews 655–674 fresh admin/plan/cross-file completion, including removal of dead controls, governed admin sections, responsive-preview parity, truthful Completion Assistant alt evidence, bounded default timeline filter, optional provider enablement, and release-status reconciliation;
+* Reviews 675–694 fresh portfolio/preview/media completion, including File 03 focal rendering, Hero introduction/status, private RTL preview, complete built-in timeline provider contracts, Knowledge/Video/Reel/PDF Timeline federation, audited time-bounded pinning, and current companion reconciliation;
 * `CHAT-UX-001` accessible green welcome visual presentation with File 20 retaining the 30-day frequency owner;
 * Master Plan v3.0 and File 20 plan v4.1 ownership reconciliation;
 * current File 00 membership contract `1.2.3` with reviewed `1.2.2` compatibility as the sole membership, Founder, suspension, eligibility, guardian-policy and public-profile assertion authority;
@@ -59,13 +59,14 @@ This candidate is not production-complete. Exact multi-plugin Hostinger staging,
 == Changelog ==
 
 = 0.15.0 =
-* Reviews 655–674 completed a fresh File 25 administrator-configuration, plan-to-code and companion-boundary audit.
-* Removed no-op `timeline_provider_mode`, `accessibility_mode`, `cache_ttl`, `safe_mode_controls`, and `diagnostics_enabled` preferences; mandatory accessibility, Safe Mode and diagnostics remain non-disableable.
-* Grouped the control center under the governed File 25 admin sections.
-* Removed unsupported tablet from responsive-preview preferences.
-* Preserved canonical File 03 avatar alt evidence for the Completion Assistant so missing alt metadata is reportable.
-* Added bounded `default_timeline_filter`, applied only to approved current filters.
-* Added bounded `enabled_optional_providers` with explicit disable-all for built-in File 06/10/11/12/18 section providers.
+* Reviews 675–694 completed a fresh File 25 plan-to-code and current-companion audit.
+* Preserved File 03 cover focal coordinates through public rendering; administrator focal presets are fallback-only.
+* Completed the Profile Hero brief introduction and truthful public lifecycle/status banner.
+* Added an authorized noindex RTL profile preview.
+* Added the complete File 25 §46 built-in Timeline Provider plan contract while preserving a legacy compatibility floor.
+* Federated approved File 06 Knowledge, File 10 Video, File 11 Reels and File 12 PDF projections into Profile Timeline with conditional filters.
+* Required private audit metadata and active time bounds for all non-zero Timeline pins.
+* Refreshed current File 07 1.2.1 and File 09 R26 repository-source evidence.
 * Preserved File 08 Appointment and File 17 Follow as fail-closed hidden actions until canonical owners publish authoritative target-bound destinations.
 * Repository/source completion does not imply Hostinger staging, production/live deployment, deployed parity, live DB/schema, migration state or operations.
 
