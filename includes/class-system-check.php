@@ -193,6 +193,7 @@ final class System_Check
     {
         $available = [];
         $production = [];
+        $legacy_contracts = [];
         $errors = [];
         foreach ($this->timeline_registry->all() as $id => $provider) {
             try {
@@ -205,6 +206,9 @@ final class System_Check
                     continue;
                 }
                 $available[] = (string) $id;
+                if (($metadata['plan_contract'] ?? false) !== true) {
+                    $legacy_contracts[] = (string) $id;
+                }
                 if ($metadata['maturity'] === 'production-accepted') {
                     $production[] = (string) $id;
                 }
@@ -219,6 +223,17 @@ final class System_Check
                 __('One or more timeline providers failed immutable health inspection', 'sabri-public-experience'),
                 'critical',
                 sprintf(__('Failed provider count: %d', 'sabri-public-experience'), count(array_unique($errors)))
+            );
+        }
+        if ($legacy_contracts !== []) {
+            return $this->result(
+                'providers',
+                __('One or more timeline providers use the compatibility-floor contract', 'sabri-public-experience'),
+                'recommended',
+                sprintf(
+                    __('Legacy provider count: %d. Built-in providers use the complete File 25 §46 contract; compatible extensions should migrate during the documented compatibility window.', 'sabri-public-experience'),
+                    count(array_unique($legacy_contracts))
+                )
             );
         }
         if (! in_array('file-21', $production, true)) {
