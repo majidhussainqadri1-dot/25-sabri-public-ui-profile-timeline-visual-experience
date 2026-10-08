@@ -6,6 +6,7 @@ namespace Sabri\PublicExperience;
 
 use InvalidArgumentException;
 use Sabri\PublicExperience\Contracts\Timeline_Provider;
+use Sabri\PublicExperience\Contracts\Timeline_Provider_Plan_Contract;
 
 if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
     exit;
@@ -26,7 +27,7 @@ final class Timeline_Registry
     /** @var array<string,Timeline_Provider> */
     private array $providers = [];
 
-    /** @var array<string,array{id:string,version:string,maturity:string,object_id:int}> */
+    /** @var array<string,array{id:string,version:string,maturity:string,object_id:int,plan_contract:bool}> */
     private array $registered_metadata = [];
 
     public function register(Timeline_Provider $provider): void
@@ -61,7 +62,16 @@ final class Timeline_Registry
             'version' => $version,
             'maturity' => $maturity,
             'object_id' => spl_object_id($provider),
+            'plan_contract' => $provider instanceof Timeline_Provider_Plan_Contract,
         ];
+        if ($provider instanceof Timeline_Provider_Plan_Contract) {
+            try {
+                $provider->register_sync_events();
+            } catch (\Throwable $exception) {
+                unset($this->providers[$raw_id], $this->registered_metadata[$raw_id]);
+                throw new InvalidArgumentException('Timeline provider sync-event registration failed safely.', 0, $exception);
+            }
+        }
         ksort($this->providers, SORT_STRING);
         ksort($this->registered_metadata, SORT_STRING);
     }
@@ -87,7 +97,7 @@ final class Timeline_Registry
             : null;
     }
 
-    /** @return array{id:string,version:string,maturity:string,object_id:int}|null */
+    /** @return array{id:string,version:string,maturity:string,object_id:int,plan_contract:bool}|null */
     public function validated_metadata(Timeline_Provider $provider, string $expected_id): ?array
     {
         if (! self::provider_id_is_exact($expected_id)) {
@@ -100,6 +110,7 @@ final class Timeline_Registry
                 'version' => $provider->get_provider_version(),
                 'maturity' => $provider->get_maturity_level(),
                 'object_id' => spl_object_id($provider),
+                'plan_contract' => $provider instanceof Timeline_Provider_Plan_Contract,
             ];
         } catch (\Throwable) {
             return null;
@@ -118,6 +129,7 @@ final class Timeline_Registry
             && hash_equals($registered['version'], $current['version'])
             && hash_equals($registered['maturity'], $current['maturity'])
             && $registered['object_id'] === $current['object_id']
+            && $registered['plan_contract'] === $current['plan_contract']
             && hash_equals($expected_id, $current['id']);
 
         return $consistent ? $registered : null;
