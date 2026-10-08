@@ -32,7 +32,7 @@ final class Plan_Completion
     private const MAX_METRIC_VALUE = 1000000000;
     private const RATE_LIMIT_SECONDS = 10;
     private const IDEMPOTENCY_TTL = 600;
-    private const PREVIEW_MODES = ['public', 'member', 'mobile', 'desktop', 'contact', 'search', 'social'];
+    private const PREVIEW_MODES = ['public', 'member', 'mobile', 'desktop', 'rtl', 'contact', 'search', 'social'];
     private const SECTIONS = [
         'overview', 'timeline', 'books-research', 'clinic-contact', 'clinic', 'about',
         'knowledge', 'media', 'videos', 'reels', 'pdfs', 'marketplace',
@@ -852,7 +852,12 @@ final class Plan_Completion
         $profile['available_sections'] = $available;
         $profile['visual_density'] = (string) $preferences['visual_density'];
         $profile['profile_template'] = (string) $preferences['profile_template'];
-        $profile['cover_focal_point'] = (string) $preferences['cover_focal_point'];
+        // Canonical File 03 focal coordinates win when present. The bounded
+        // administrator preset is only a visual fallback for legacy/absent
+        // focal metadata and never overwrites owner media truth.
+        $profile['cover_focal_point'] = ($profile['cover_has_focal'] ?? false) === true
+            ? 'owner'
+            : (string) $preferences['cover_focal_point'];
         return $profile;
     }
 
