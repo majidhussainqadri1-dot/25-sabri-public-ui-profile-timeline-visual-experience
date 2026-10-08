@@ -43,12 +43,12 @@ $css = $read('assets/css/public.css');
 
 $check(str_contains($native, "'has_focal' => \$has_focal"), 'File 03 media adapter must preserve whether focal coordinates were actually supplied.');
 $check(str_contains($profile, "'cover_focal_x'") && str_contains($profile, "'cover_focal_y'") && str_contains($profile, "'cover_has_focal'"), 'Profile projection must carry canonical cover focal metadata.');
-$check(str_contains($plan, "($profile['cover_has_focal'] ?? false) === true") && str_contains($plan, "? 'owner'"), 'Owner focal coordinates must override the administrator fallback preset.');
+$check(str_contains($plan, "(\$profile['cover_has_focal'] ?? false) === true") && str_contains($plan, "? 'owner'"), 'Owner focal coordinates must override the administrator fallback preset.');
 $check(str_contains($template, '--spux-cover-focal-x') && str_contains($template, '--spux-cover-focal-y'), 'Public template must emit bounded focal CSS variables.');
 $check(str_contains($css, 'object-position: var(--spux-cover-focal-x, 50%) var(--spux-cover-focal-y, 50%)'), 'Cover CSS must consume canonical focal variables.');
 
-$check(str_contains($plan, "'rtl'") && str_contains($template, "$rtl_preview = $preview_mode === 'rtl'"), 'Owner View-as-Public must include an RTL mode.');
-$check(str_contains($template, "' dir="rtl"'") && str_contains($css, '.spux-preview--rtl'), 'RTL preview must change presentation direction without changing data ownership.');
+$check(str_contains($plan, "'rtl'") && str_contains($template, "\$rtl_preview = \$preview_mode === 'rtl'"), 'Owner View-as-Public must include an RTL mode.');
+$check(str_contains($template, "' dir=\"rtl\"'") && str_contains($css, '.spux-preview--rtl'), 'RTL preview must change presentation direction without changing data ownership.');
 
 $check(str_contains($hero, 'wp_trim_words((string) $profile[\'bio\'], 28)'), 'Profile Hero must render a bounded brief introduction.');
 $check(str_contains($hero, 'profile_status_banner') && str_contains($hero, 'retired') && str_contains($hero, 'legacy'), 'Profile Hero must expose a bounded truthful public status-banner surface.');
