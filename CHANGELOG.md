@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.15.0 — Portfolio/Preview/Media Completeness Reviews 675–694 — 2026-10-08
+
+### Corrected
+
+- Preserved canonical File 03 cover focal coordinates into File 25 `object-position`; administrator focal presets are fallback-only.
+- Completed the Profile Hero brief introduction and bounded truthful public lifecycle/status banner.
+- Added an owner/admin private noindex RTL preview to the governed View-as-Public family.
+- Added the complete File 25 §46 `Timeline_Provider_Plan_Contract` while retaining the prior provider interface as a compatibility floor.
+- Federated enabled/available File 06 Knowledge, File 10 Video, File 11 Reels and File 12 PDF public projections into the author-centric Profile Timeline without duplicating native owner data.
+- Added conditional Knowledge/Video/Reel/PDF Timeline filters.
+- Kept normal profile-section card limits at 24 while allowing bounded deeper Timeline retrieval.
+- Required internal actor/reason/reference/surface/start/end audit metadata for every non-zero pin and made pin effect conditional on its active time window.
+- Refreshed current File 07 v1.2.1 and File 09 R26 repository-source evidence and advanced review/status lineage.
+
+### Review result
+
+Defect rounds: **677, 678, 679, 680, 681, 682, 683, 693**. The other twelve review scopes were clean after carrying forward prior corrections.
+
+### Acceptance boundary
+
+These corrections establish repository-source completeness only. Exact candidate/main CI, Hostinger staging, Founder acceptance, production/live deployment, deployed parity, live DB/schema, migration state and operations remain separate evidence gates.
+
+
 ## 0.15.0 — Admin/Plan/Cross-File Completeness Reviews 655–674 — 2026-10-07
 
 ### Corrected
