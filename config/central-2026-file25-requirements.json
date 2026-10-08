@@ -168,6 +168,35 @@
         "templates/partials/profile-hero.php",
         "includes/class-public-url.php"
       ]
+    },
+    {
+      "id": "CV-019",
+      "status": "implemented-source-external-content-acceptance-pending",
+      "owner_boundary": "File 25 now federates approved File 06 Knowledge, File 10 Video, File 11 Reels and File 12 PDF public projections into the author-centric Profile Timeline without copying native owner data. Courses/AMAs/events require their canonical owners to publish compatible providers.",
+      "code": [
+        "includes/class-section-timeline-provider.php",
+        "includes/class-plugin.php",
+        "includes/class-timeline-service.php"
+      ]
+    },
+    {
+      "id": "CV-021",
+      "status": "implemented-source-external-evidence-pending",
+      "owner_boundary": "Owner/admin private profile preview supports desktop, mobile and explicit RTL presentation without changing authorization or exposing unpublished/private owner data.",
+      "code": [
+        "includes/class-plan-completion.php",
+        "templates/public-profile.php",
+        "assets/css/public.css"
+      ]
+    },
+    {
+      "id": "CV-032",
+      "status": "implemented-source-external-evidence-pending",
+      "owner_boundary": "File 25 Profile Hero has a bounded truthful status-banner surface for public lifecycle/degraded facts; presentation extensions cannot fabricate native verification or availability authority.",
+      "code": [
+        "templates/partials/profile-hero.php",
+        "includes/class-profile-repository.php"
+      ]
     }
   ],
   "acceptance_journeys": [
@@ -209,5 +238,21 @@
     "production": false,
     "live": false,
     "operational": false
+  },
+  "latest_review_reconciliation": {
+    "date": "2026-10-08",
+    "review_range": "675-694",
+    "baseline_main_sha": "e35563b7f3d8ebf0acbbc80982b7bcf2e1b78c0a",
+    "source_only": true,
+    "corrected": [
+      "CV-019 portfolio timeline federation",
+      "CV-021 RTL owner preview",
+      "CV-032 status banner",
+      "File 03 focal-point rendering",
+      "File 25 §46 complete built-in timeline provider contract",
+      "File 25 §43 audited time-bounded pinning"
+    ],
+    "hostinger_staging_accepted": false,
+    "live_deployed": false
   }
 }
