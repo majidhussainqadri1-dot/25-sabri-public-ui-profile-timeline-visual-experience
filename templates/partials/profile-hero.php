@@ -30,16 +30,17 @@ if (in_array($profile_state, ['retired', 'legacy', 'archived'], true)) {
             : __('This profile is retained as historical public information; some current actions may be unavailable.', 'sabri-public-experience'),
     ];
 }
-if (function_exists('apply_filters')) {
-    $candidate_banner = apply_filters('sabri_public_experience/profile_status_banner', $status_banner, $profile);
-    if (is_array($candidate_banner)) {
-        $tone = sanitize_key((string) ($candidate_banner['tone'] ?? 'info'));
-        $message = sanitize_text_field((string) ($candidate_banner['message'] ?? ''));
-        if (in_array($tone, ['info', 'warning', 'error', 'success'], true) && $message !== '') {
-            $status_banner = ['tone' => $tone, 'message' => $message];
-        } elseif ($candidate_banner === []) {
-            $status_banner = [];
-        }
+if ($status_banner !== [] && function_exists('apply_filters')) {
+    // Presentation extensions may revoke a canonical lifecycle banner but may
+    // never invent or rewrite owner-native status truth.
+    $show_status_banner = apply_filters(
+        'sabri_public_experience/show_profile_status_banner',
+        true,
+        $profile,
+        $profile_state
+    );
+    if ($show_status_banner !== true) {
+        $status_banner = [];
     }
 }
 ?>
