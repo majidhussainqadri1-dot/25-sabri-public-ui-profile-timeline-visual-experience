@@ -104,7 +104,7 @@ foreach (['pin_reference','pin_actor','pin_reason','pin_surface','pin_start_at',
     $check(str_contains($normalized, "'{$field}'"), 'Audited pin field missing: ' . $field);
 }
 $check(str_contains($normalized, 'Pinned timeline items require actor, reason, reference, surface, start, and end audit metadata.'), 'Unaudited non-zero timeline pin must fail closed.');
-$check(str_contains($timeline, 'effective_pin_weight') && str_contains($timeline, '$now >= $start_at && $now <= $end_at'), 'Timeline pin must be effective only inside its active UTC window.');
+$check(str_contains($timeline, 'effective_pin_weight') && str_contains($timeline, 'strcmp($now, $start) >= 0') && str_contains($timeline, 'strcmp($now, $end) <= 0'), 'Timeline pin must be effective only inside its active UTC window.');
 $check(str_contains($normalized, "'pin_reference',") && str_contains($normalized, "'pin_end_at',"), 'Pin audit metadata must be redacted from public output.');
 
 try {
