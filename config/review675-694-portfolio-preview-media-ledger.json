@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "file": 25,
+  "review_range": {
+    "first": 675,
+    "last": 694,
+    "count": 20
+  },
+  "basis": {
+    "baseline_main_sha": "e35563b7f3d8ebf0acbbc80982b7bcf2e1b78c0a",
+    "baseline_main_ci": {
+      "run_number": 1689,
+      "run_id": 37623663162,
+      "conclusion": "success"
+    },
+    "candidate_branch": "fix/reviews-675-694-portfolio-preview-media-20261008",
+    "file25_plan": "Complete Public UI, Profile Timeline and Visual Experience — Final Harmonized Specification 2.0 plus current governing addenda",
+    "central_plan": "Sabri Social Homeopathy Platform — Three Central Plans Consolidated Governing Master Plan 2026",
+    "method": "Fresh twenty-scope plan-to-code and cross-file audit focused on File 03 public-media fidelity, profile hero completeness, current CV-021 RTL preview, §39-47 portfolio timeline coverage, complete §46 provider surface and audited §43 pinning."
+  },
+  "defect_rounds": [
+    677,
+    678,
+    679,
+    680,
+    681,
+    682,
+    683,
+    693
+  ],
+  "clean_rounds": [
+    675,
+    676,
+    684,
+    685,
+    686,
+    687,
+    688,
+    689,
+    690,
+    691,
+    692,
+    694
+  ],
+  "reviews": [
+    {
+      "review": 675,
+      "focus": "repository-baseline-and-exact-main-ci",
+      "status": "reviewed-clean",
+      "finding": "Baseline main e35563b7f3d8ebf0acbbc80982b7bcf2e1b78c0a and exact-main CI run 1689 were verified as repository/CI evidence only."
+    },
+    {
+      "review": 676,
+      "focus": "file25-final-plan-central-ownership",
+      "status": "reviewed-clean",
+      "finding": "File 25 remains the public visual/profile/timeline presentation owner without taking File 20 shell, File 21 publication, File 24 security or File 26 global search/ranking ownership."
+    },
+    {
+      "review": 677,
+      "focus": "file03-cover-focal-point-rendering",
+      "status": "defect-found-corrected",
+      "finding": "File 03 focal_x/focal_y were parsed but discarded before rendering. Canonical owner focal metadata now reaches cover object-position; admin focal preset is fallback-only."
+    },
+    {
+      "review": 678,
+      "focus": "profile-hero-introduction-status",
+      "status": "defect-found-corrected",
+      "finding": "The plan-required brief introduction and truthful status-banner surface were incomplete. Hero now renders a bounded bio introduction and safe public lifecycle/status banner."
+    },
+    {
+      "review": 679,
+      "focus": "central-cv021-rtl-owner-preview",
+      "status": "defect-found-corrected",
+      "finding": "Desktop/mobile owner preview existed but the current central CV-021 RTL pre-publish preview was absent. Added authorized noindex RTL preview without widening data authorization."
+    },
+    {
+      "review": 680,
+      "focus": "timeline-provider-plan-contract",
+      "status": "defect-found-corrected",
+      "finding": "The compatibility Timeline_Provider interface exposed only part of File 25 §46. Added an extended complete plan contract and implemented it in built-in File 21, WordPress fallback and portfolio adapters while preserving legacy compatibility."
+    },
+    {
+      "review": 681,
+      "focus": "portfolio-timeline-federation",
+      "status": "defect-found-corrected",
+      "finding": "Profile Timeline was effectively publication/post-only. Approved File 06 Knowledge, File 10 Video, File 11 Reels and File 12 PDF public projections now join the federated author timeline read-only."
+    },
+    {
+      "review": 682,
+      "focus": "timeline-primary-filter-coverage",
+      "status": "defect-found-corrected",
+      "finding": "Primary Timeline filters did not expose newly available Knowledge/Video/Reel/PDF types. Filters now appear only when their reviewed providers are enabled, available and registered."
+    },
+    {
+      "review": 683,
+      "focus": "timeline-pinning-audit-and-expiry",
+      "status": "defect-found-corrected",
+      "finding": "Non-zero pin_weight had no mandatory actor/reason/reference/surface/start/end audit metadata and no expiry enforcement. Pins are now audited, time-bounded and internal metadata is redacted publicly."
+    },
+    {
+      "review": 684,
+      "focus": "file21-publication-and-profiletimeline-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 21 remains canonical publication/ProfileTimeline owner; File 25 consumes its public query read-only and does not duplicate post state."
+    },
+    {
+      "review": 685,
+      "focus": "file06-10-11-12-owner-projection-boundaries",
+      "status": "reviewed-clean",
+      "finding": "Portfolio adapters reuse reviewed public section projections, preserve normal 24-card section limits, allow bounded deeper timeline retrieval, and expose no native IDs through public card output."
+    },
+    {
+      "review": 686,
+      "focus": "file08-clinic-appointment-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 08 remains clinic/appointment owner; File 25 does not infer a booking destination where no authoritative profile-to-booking contract exists."
+    },
+    {
+      "review": 687,
+      "focus": "file17-follow-message-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 17 remains relationships/messaging owner; Follow remains fail-closed without a target-bound owner contract and Message uses only a concrete owner-approved public destination."
+    },
+    {
+      "review": 688,
+      "focus": "file20-shell-admin-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 20 remains structural shell/navigation/admin-parent owner; no second shell or layout backend was introduced."
+    },
+    {
+      "review": 689,
+      "focus": "file24-security-privacy-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 24 retains security/privacy/compliance/resilience governance; File 25 changes remain presentation/read-projection scoped."
+    },
+    {
+      "review": 690,
+      "focus": "file26-global-search-ranking-boundary",
+      "status": "reviewed-clean",
+      "finding": "File 26 remains global search/discovery/ranking owner; new filters remain profile-local timeline presentation only."
+    },
+    {
+      "review": 691,
+      "focus": "file07-current-main-reconciliation",
+      "status": "reviewed-clean",
+      "finding": "Current File 07 main advanced to 1.2.1/DB 1.1.1/contract 1.2.1/projection schema 3; no File 25 code ownership conflict or direct dependency was introduced."
+    },
+    {
+      "review": 692,
+      "focus": "file09-r26-current-main-reconciliation",
+      "status": "reviewed-clean",
+      "finding": "Current File 09 R26 main remains runtime 1.3.0/schema 6/integration contract 1.1.0 inside File 25's reviewed compatibility range."
+    },
+    {
+      "review": 693,
+      "focus": "release-dependency-status-truth",
+      "status": "defect-found-corrected",
+      "finding": "Repository/dependency/staging/source documentation still pointed at Reviews 655-674 and older File 07/File 09 heads. Current source evidence is advanced through Reviews 675-694 without promoting staging/live truth."
+    },
+    {
+      "review": 694,
+      "focus": "final-regression-and-external-truth",
+      "status": "reviewed-clean",
+      "finding": "All newly discovered File 25 source defects are corrected; Hostinger staging, deployed package parity, live DB/schema, migration and operational status remain external unverified gates."
+    }
+  ],
+  "corrections": {
+    "focal_media": "Canonical File 03 focal coordinates now drive cover crop; admin preset is fallback-only.",
+    "hero": "Brief public introduction and bounded truthful status-banner presentation completed.",
+    "rtl_preview": "Owner/admin preview adds explicit RTL mode, private/noindex and presentation-only.",
+    "portfolio_timeline": "Knowledge, Video, Reels and PDFs federate through reviewed public projections without copying native owner data.",
+    "provider_contract": "Extended File 25 §46 contract implemented by built-in providers while preserving a compatibility floor for legacy providers.",
+    "filters": "Knowledge/Video/Reel/PDF filters are registered only with active approved providers.",
+    "pinning": "Non-zero pinning requires audit metadata and an active UTC time window; audit fields stay private.",
+    "dependency_truth": "File 07 1.2.1 and File 09 R26 current heads recorded as repository-source evidence."
+  },
+  "external_truth": {
+    "hostinger_staging_accepted": false,
+    "founder_staging_acceptance": false,
+    "production_accepted": false,
+    "live_deployed": false,
+    "operational": false,
+    "exact_deployed_code_verified": false,
+    "db_version_verified_live": false,
+    "migration_state_verified_live": false
+  },
+  "unresolved_cross_file_dependencies": [
+    "File 08 current main still does not publish an authoritative profile-user-to-booking-destination contract for File 25.",
+    "File 17 current main still does not publish an authoritative target-bound Follow destination contract for File 25.",
+    "Portfolio content types whose canonical owners do not yet publish compatible public timeline/section projections remain absent rather than fabricated."
+  ],
+  "source_candidate": {
+    "runtime": "0.15.0",
+    "known_unresolved_file25_source_defects_after_corrections": 0,
+    "exact_current_head_ci": "external-evidence-required-not-frozen-in-source"
+  }
+}
