@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Sabri\PublicExperience\Providers;
 
-use Sabri\PublicExperience\Contracts\Timeline_Provider;
+use Sabri\PublicExperience\Contracts\Timeline_Provider_Plan_Contract;
 use Sabri\PublicExperience\Normalized_Timeline_Item;
 use WP_Post;
 use WP_Query;
@@ -20,7 +20,7 @@ if (! defined('ABSPATH')) {
  * safe baseline for already-public WordPress posts until File 21 registers its
  * richer production provider.
  */
-final class WordPress_Posts_Provider implements Timeline_Provider
+final class WordPress_Posts_Provider implements Timeline_Provider_Plan_Contract
 {
     public function get_provider_id(): string
     {
@@ -106,39 +106,102 @@ final class WordPress_Posts_Provider implements Timeline_Provider
                 continue;
             }
 
-            try {
-                $items[] = new Normalized_Timeline_Item([
-                    'provider_id' => $this->get_provider_id(),
-                    'provider_version' => $this->get_provider_version(),
-                    'native_object_type' => $post->post_type,
-                    'native_object_id' => (string) $post->ID,
-                    'author_id' => (int) $post->post_author,
-                    'public_profile_id' => $author_id,
-                    'title' => get_the_title($post),
-                    'safe_excerpt' => wp_trim_words(wp_strip_all_tags(get_the_excerpt($post)), 36),
-                    'canonical_url' => $url,
-                    'published_at' => get_post_time(DATE_ATOM, true, $post),
-                    'updated_at' => get_post_modified_time(DATE_ATOM, true, $post),
-                    'visibility_state' => 'public',
-                    'native_status' => 'publish',
-                    'content_type' => $post->post_type,
-                    'topic' => '',
-                    'language' => str_replace('_', '-', (string) get_locale()),
-                    'thumbnail_reference' => function_exists('get_the_post_thumbnail_url')
-                        ? (string) (get_the_post_thumbnail_url($post, 'medium_large') ?: '')
-                        : '',
-                    'media_type' => has_post_thumbnail($post) ? 'image' : 'none',
-                    'verification_state' => 'native',
-                    'review_state' => 'published',
-                    'correction_state' => 'none',
-                    'available_actions' => ['read', 'share'],
-                ]);
-            } catch (\Throwable $exception) {
-                do_action('sabri_public_experience/provider_item_error', $this->get_provider_id(), (int) $post->ID, $exception);
+            $normalized = $this->normalize_public_item($post, $author_id);
+            if ($normalized !== null) {
+                $items[] = $normalized;
             }
         }
 
         return $items;
+    }
+
+    public function normalize_public_item(mixed $item, int $author_id): ?Normalized_Timeline_Item
+    {
+        if (! $item instanceof WP_Post
+            || (int) $item->post_author !== $author_id
+            || $item->post_password !== ''
+            || (string) $item->post_status !== 'publish'
+            || (string) $item->post_type !== 'post'
+        ) {
+            return null;
+        }
+        $approved = (bool) apply_filters(
+            'sabri_public_experience/wordpress_post_is_public_approved',
+            true,
+            $item,
+            $author_id
+        );
+        if (! $approved) {
+            return null;
+        }
+        $url = get_permalink($item);
+        if (! is_string($url) || $url === '') {
+            return null;
+        }
+        try {
+            return new Normalized_Timeline_Item([
+                'provider_id' => $this->get_provider_id(),
+                'provider_version' => $this->get_provider_version(),
+                'native_object_type' => $item->post_type,
+                'native_object_id' => (string) $item->ID,
+                'author_id' => (int) $item->post_author,
+                'public_profile_id' => $author_id,
+                'title' => get_the_title($item),
+                'safe_excerpt' => wp_trim_words(wp_strip_all_tags(get_the_excerpt($item)), 36),
+                'canonical_url' => $url,
+                'published_at' => get_post_time(DATE_ATOM, true, $item),
+                'updated_at' => get_post_modified_time(DATE_ATOM, true, $item),
+                'visibility_state' => 'public',
+                'native_status' => 'publish',
+                'content_type' => $item->post_type,
+                'topic' => '',
+                'language' => str_replace('_', '-', (string) get_locale()),
+                'thumbnail_reference' => function_exists('get_the_post_thumbnail_url')
+                    ? (string) (get_the_post_thumbnail_url($item, 'medium_large') ?: '')
+                    : '',
+                'media_type' => has_post_thumbnail($item) ? 'image' : 'none',
+                'verification_state' => 'native',
+                'review_state' => 'published',
+                'correction_state' => 'none',
+                'available_actions' => ['read', 'share'],
+            ]);
+        } catch (\Throwable $exception) {
+            do_action('sabri_public_experience/provider_item_error', $this->get_provider_id(), (int) $item->ID, $exception);
+            return null;
+        }
+    }
+
+    public function get_canonical_url(Normalized_Timeline_Item $item): string
+    {
+        return (string) $item->get('canonical_url');
+    }
+
+    public function get_visibility_state(Normalized_Timeline_Item $item): string
+    {
+        return (string) $item->get('visibility_state');
+    }
+
+    public function get_public_actions(Normalized_Timeline_Item $item): array
+    {
+        return array_values((array) $item->get('available_actions'));
+    }
+
+    public function get_public_metrics(Normalized_Timeline_Item $item): array
+    {
+        unset($item);
+        return [];
+    }
+
+    public function get_correction_state(Normalized_Timeline_Item $item): string
+    {
+        return (string) $item->get('correction_state');
+    }
+
+    public function register_sync_events(): void
+    {
+        if (function_exists('do_action')) {
+            do_action('sabri_public_experience/register_provider_sync_events', $this->get_provider_id(), 'post');
+        }
     }
 
     public function get_health_status(): array
