@@ -123,7 +123,12 @@
       "source_lifecycle": "second-fresh-80-review-feature-branch-candidate-pending-merge-and-hostinger-staging",
       "bundled_with_file_25": false,
       "staging_status": "pending",
-      "current_repository_head": "67c32ec4af45a7de6e3d9c1dbf0f8614d6b5a844"
+      "current_repository_head": "2f4a89707724fd2b9946600afe10ddab27ec3c2d",
+      "current_source_version_observed": "1.2.1",
+      "current_db_version_observed": "1.1.1",
+      "current_contract_version_observed": "1.2.1",
+      "current_projection_schema_observed": 3,
+      "current_repository_review": "compatible-current-main-v1.2.1-twenty-round-cross-file-reconciliation-2026-10-07; repository-source-only"
     },
     {
       "file": 8,
@@ -177,11 +182,11 @@
       "foreign_table_reads_allowed": false,
       "bundled_with_file_25": false,
       "staging_status": "pending",
-      "current_repository_head": "448d41f34586369ca5875693583b9cd8a6133167",
+      "current_repository_head": "cfc5f781a766330314dc98c42abeca0eb7786eba",
       "current_source_version_observed": "1.3.0",
       "current_schema_version_observed": 6,
       "current_contract_version_observed": "1.1.0",
-      "current_repository_review": "compatible-current-main-after-R25-2026-10-07; repository-source-only"
+      "current_repository_review": "compatible-current-main-after-R26-2026-10-07; repository-source-only"
     },
     {
       "file": 10,
@@ -397,9 +402,9 @@
       "package_status": "build-input-not-acceptance",
       "schema_version": "2",
       "installed_preflight": "wp sabri file25 staging-probe --expected-commit=<sha>",
-      "source_branch": "fix/reviews-655-674-admin-plan-completeness-20261007",
-      "source_status": "reviews-655-674-source-corrected; exact current HEAD CI must be queried externally",
-      "baseline_main_sha": "2d02c93356b050313e30e29aeceb57080771c2a5"
+      "source_branch": "fix/reviews-675-694-portfolio-preview-media-20261008",
+      "source_status": "reviews-675-694-source-corrected; exact current HEAD CI must be queried externally",
+      "baseline_main_sha": "e35563b7f3d8ebf0acbbc80982b7bcf2e1b78c0a"
     }
   ],
   "acceptance_rule": "No module is staging-accepted or production-accepted merely because this matrix, source code, a ZIP or green CI exists.",
@@ -426,15 +431,15 @@
     "22": "b7a7f2e69411cbd32f0574fd12d766fb70c01b7a",
     "23": "dcae138e6073f4d0ff596623deb05b9940b8271b",
     "24": "a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb",
-    "25": "2d02c93356b050313e30e29aeceb57080771c2a5",
+    "25": "e35563b7f3d8ebf0acbbc80982b7bcf2e1b78c0a",
     "26": "bbea3aad466792a4a6a62b53532bbd45c7c592de",
-    "observed_at": "2026-10-07",
+    "observed_at": "2026-10-08",
     "evidence_class": "repository-source-only-not-staging-live",
     "00": "2fa7c022ee9cd1b65432e900579512f304532442",
     "03": "636e3ef965423887f810718abec3cd1c11c3659d",
-    "07": "67c32ec4af45a7de6e3d9c1dbf0f8614d6b5a844",
+    "07": "2f4a89707724fd2b9946600afe10ddab27ec3c2d",
     "08": "70541974ce0ffb16aebef557c3016eb7447662f4",
-    "09": "448d41f34586369ca5875693583b9cd8a6133167",
+    "09": "cfc5f781a766330314dc98c42abeca0eb7786eba",
     "action_integration_note": "File 25 resolves only published owner-native profile destinations. File 08 Appointment and File 17 Follow remain hidden until authoritative target-bound owner contracts exist; Message is shown only when File 03 public projection supplies a concrete same-site destination.",
     "02": "224c39bcb8c28f77504c7348dbad41226753c7e8",
     "05": "e2667d69d43d655e3d86b0a358dec5f28b61dd96",
@@ -504,6 +509,33 @@
     "default_timeline_filter": "bounded key; applies only when approved current filter exists",
     "optional_provider_enablement": "built-in File 06/10/11/12/18 section providers are allowlisted and may all be explicitly disabled",
     "completion_alt": "Completion Assistant preserves canonical File 03 alt evidence and does not fabricate completion",
+    "evidence_boundary": "Repository source/CI only; no staging/live/deployed parity claim."
+  },
+  "file25_review675_694_audit": {
+    "baseline_main_sha": "e35563b7f3d8ebf0acbbc80982b7bcf2e1b78c0a",
+    "baseline_main_ci": {
+      "run_number": 1689,
+      "run_id": 37623663162,
+      "conclusion": "success"
+    },
+    "review_range": "675-694",
+    "candidate_branch": "fix/reviews-675-694-portfolio-preview-media-20261008",
+    "exact_current_head_ci": "external-evidence-required-not-frozen-in-source",
+    "defect_rounds": [
+      677,
+      678,
+      679,
+      680,
+      681,
+      682,
+      683,
+      693
+    ],
+    "focal_media": "File 03 focal_x/focal_y public metadata is now carried to CSS object-position; admin focal preset is fallback-only.",
+    "rtl_preview": "Owner/admin preview now includes a bounded RTL mode in addition to mobile/desktop and other projections.",
+    "portfolio_timeline": "File 06/10/11/12 reviewed public section projections now participate in the federated Profile Timeline through a read-only normalized adapter with Knowledge/Video/Reel/PDF filters.",
+    "provider_contract": "Built-in timeline providers implement the complete File 25 §46 plan contract while legacy Timeline_Provider remains the compatibility floor.",
+    "audited_pinning": "Non-zero pin_weight requires actor/reason/reference/surface/start/end audit metadata and is effective only within its UTC time window.",
     "evidence_boundary": "Repository source/CI only; no staging/live/deployed parity claim."
   }
 }
