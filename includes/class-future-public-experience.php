@@ -408,7 +408,7 @@ final class Future_Public_Experience
             return [];
         }
         $links = [];
-        foreach (['public', 'member', 'contact', 'search', 'social', 'mobile', 'desktop'] as $mode) {
+        foreach (['public', 'member', 'contact', 'search', 'social', 'mobile', 'desktop', 'rtl'] as $mode) {
             $url = Public_URL::sanitize_same_site(add_query_arg('spux_preview', $mode, $canonical), false);
             if ($url !== '') {
                 $links[$mode] = $url;
