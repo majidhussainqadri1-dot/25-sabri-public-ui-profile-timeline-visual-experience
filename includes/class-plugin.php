@@ -139,20 +139,47 @@ final class Plugin
             do_action('sabri_public_experience/section_provider_registration_error', $exception);
         }
 
+        $portfolio_filters = [];
         if (Plan_Completion::optional_provider_enabled('file-06-knowledge')) {
-            self::register_section_provider($section_registry, 'file-06-knowledge', new File_06_Knowledge_Provider());
+            $provider = new File_06_Knowledge_Provider();
+            self::register_section_provider($section_registry, 'file-06-knowledge', $provider);
+            self::register_timeline_provider($timeline_registry, new Section_Timeline_Provider($provider, $profiles, 'knowledge'));
+            if ($timeline_registry->get('file-06-knowledge') !== null) {
+                $portfolio_filters['knowledge'] = __('Knowledge', 'sabri-public-experience');
+            }
         }
         if (Plan_Completion::optional_provider_enabled('file-10-video-media')) {
-            self::register_section_provider($section_registry, 'file-10-video-media', new File_10_Video_Media_Provider());
+            $provider = new File_10_Video_Media_Provider();
+            self::register_section_provider($section_registry, 'file-10-video-media', $provider);
+            self::register_timeline_provider($timeline_registry, new Section_Timeline_Provider($provider, $profiles, 'video'));
+            if ($timeline_registry->get('file-10-video-media') !== null) {
+                $portfolio_filters['video'] = __('Videos', 'sabri-public-experience');
+            }
         }
         if (Plan_Completion::optional_provider_enabled('file-11-reels-media')) {
-            self::register_section_provider($section_registry, 'file-11-reels-media', new File_11_Reels_Media_Provider());
+            $provider = new File_11_Reels_Media_Provider();
+            self::register_section_provider($section_registry, 'file-11-reels-media', $provider);
+            self::register_timeline_provider($timeline_registry, new Section_Timeline_Provider($provider, $profiles, 'reel'));
+            if ($timeline_registry->get('file-11-reels-media') !== null) {
+                $portfolio_filters['reel'] = __('Reels', 'sabri-public-experience');
+            }
         }
         if (Plan_Completion::optional_provider_enabled('file-12-pdf-media')) {
-            self::register_section_provider($section_registry, 'file-12-pdf-media', new File_12_Pdf_Media_Provider());
+            $provider = new File_12_Pdf_Media_Provider();
+            self::register_section_provider($section_registry, 'file-12-pdf-media', $provider);
+            self::register_timeline_provider($timeline_registry, new Section_Timeline_Provider($provider, $profiles, 'pdf'));
+            if ($timeline_registry->get('file-12-pdf-media') !== null) {
+                $portfolio_filters['pdf'] = __('PDFs', 'sabri-public-experience');
+            }
         }
         if (Plan_Completion::optional_provider_enabled('file-18-marketplace')) {
             self::register_section_provider($section_registry, 'file-18-marketplace', new File_18_Marketplace_Provider());
+        }
+        if ($portfolio_filters !== []) {
+            add_filter(
+                'sabri_public_experience/timeline_filters',
+                static fn (array $filters): array => array_merge($filters, $portfolio_filters)
+            );
         }
 
         $timeline = new Timeline_Service($timeline_registry);
