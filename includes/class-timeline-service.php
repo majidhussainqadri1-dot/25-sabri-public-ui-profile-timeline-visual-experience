@@ -158,7 +158,7 @@ final class Timeline_Service
         usort(
             $items,
             function (Normalized_Timeline_Item $left, Normalized_Timeline_Item $right): int {
-                $pin = (int) $right->get('pin_weight') <=> (int) $left->get('pin_weight');
+                $pin = $this->effective_pin_weight($right) <=> $this->effective_pin_weight($left);
                 if ($pin !== 0) {
                     return $pin;
                 }
@@ -207,6 +207,23 @@ final class Timeline_Service
         ];
     }
 
+
+    private function effective_pin_weight(Normalized_Timeline_Item $item): int
+    {
+        $weight = (int) $item->get('pin_weight');
+        if ($weight <= 0) {
+            return 0;
+        }
+        $start = (string) ($item->get('pin_start_at') ?? '');
+        $end = (string) ($item->get('pin_end_at') ?? '');
+        $start_at = $start !== '' ? strtotime($start) : false;
+        $end_at = $end !== '' ? strtotime($end) : false;
+        if ($start_at === false || $end_at === false) {
+            return 0;
+        }
+        $now = function_exists('current_time') ? (int) current_time('timestamp', true) : time();
+        return $now >= $start_at && $now <= $end_at ? $weight : 0;
+    }
 
     private static function exact_positive_integer(mixed $value, int $maximum): ?int
     {
