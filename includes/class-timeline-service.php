@@ -216,13 +216,15 @@ final class Timeline_Service
         }
         $start = (string) ($item->get('pin_start_at') ?? '');
         $end = (string) ($item->get('pin_end_at') ?? '');
-        $start_at = $start !== '' ? strtotime($start) : false;
-        $end_at = $end !== '' ? strtotime($end) : false;
-        if ($start_at === false || $end_at === false) {
+        if ($start === '' || $end === '') {
             return 0;
         }
-        $now = function_exists('current_time') ? (int) current_time('timestamp', true) : time();
-        return $now >= $start_at && $now <= $end_at ? $weight : 0;
+        // Normalized_Timeline_Item has already converted these values to the
+        // fixed-width UTC Y-m-d\TH:i:s\Z representation, so lexical comparison
+        // is strict and avoids permissive date parsing.
+        $timestamp = function_exists('current_time') ? (int) current_time('timestamp', true) : time();
+        $now = gmdate('Y-m-d\TH:i:s\Z', $timestamp);
+        return strcmp($now, $start) >= 0 && strcmp($now, $end) <= 0 ? $weight : 0;
     }
 
     private static function exact_positive_integer(mixed $value, int $maximum): ?int
