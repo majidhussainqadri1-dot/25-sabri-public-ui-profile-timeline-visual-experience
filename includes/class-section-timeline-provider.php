@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Sabri\PublicExperience;
 
 use Sabri\PublicExperience\Contracts\Profile_Section_Provider;
-use Sabri\PublicExperience\Contracts\Timeline_Provider;
+use Sabri\PublicExperience\Contracts\Timeline_Provider_Plan_Contract;
 use WP_User;
 
 if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
@@ -17,7 +17,7 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
  * author-centric timeline provider. Native modules remain authoritative; File
  * 25 does not query private tables or create a second content backend.
  */
-final class Section_Timeline_Provider implements Timeline_Provider
+final class Section_Timeline_Provider implements Timeline_Provider_Plan_Contract
 {
     private const MAX_CANDIDATES = 500;
 
@@ -90,68 +90,110 @@ final class Section_Timeline_Provider implements Timeline_Provider
 
         $items = [];
         foreach (array_slice($rows, 0, $limit) as $row) {
-            if (! is_array($row)) {
-                continue;
-            }
-            $native_id = $row['native_object_id'] ?? null;
-            $native_type = sanitize_key((string) ($row['native_object_type'] ?? $row['type'] ?? 'public-item'));
-            $title = is_scalar($row['title'] ?? null) ? (string) $row['title'] : '';
-            $url = is_scalar($row['url'] ?? null) ? (string) $row['url'] : '';
-            $published = is_scalar($row['published_at'] ?? null) ? (string) $row['published_at'] : '';
-            if ((! is_int($native_id) && ! is_string($native_id))
-                || trim((string) $native_id) === ''
-                || $native_type === ''
-                || trim($title) === ''
-                || trim($url) === ''
-                || trim($published) === ''
-            ) {
-                continue;
-            }
-
-            $actions = match ($this->content_type) {
-                'video', 'reel' => ['watch', 'share'],
-                'pdf' => ['read', 'download', 'share'],
-                default => ['read', 'share'],
-            };
-            $media_type = match ($this->content_type) {
-                'video' => 'video',
-                'reel' => 'reel',
-                'pdf' => 'document',
-                default => ! empty($row['image_url']) ? 'image' : 'none',
-            };
-
-            try {
-                $items[] = new Normalized_Timeline_Item([
-                    'provider_id' => $this->get_provider_id(),
-                    'provider_version' => $this->get_provider_version(),
-                    'native_object_type' => $native_type,
-                    'native_object_id' => (string) $native_id,
-                    'author_id' => $author_id,
-                    'public_profile_id' => $author_id,
-                    'title' => $title,
-                    'safe_excerpt' => is_scalar($row['excerpt'] ?? null) ? (string) $row['excerpt'] : '',
-                    'canonical_url' => $url,
-                    'published_at' => $published,
-                    'visibility_state' => 'public',
-                    'native_status' => 'published',
-                    'content_type' => $this->content_type,
-                    'topic' => is_scalar($row['badge'] ?? null) ? (string) $row['badge'] : '',
-                    'language' => function_exists('get_locale') ? str_replace('_', '-', (string) get_locale()) : 'en-US',
-                    'thumbnail_reference' => is_scalar($row['image_url'] ?? null) ? (string) $row['image_url'] : '',
-                    'media_type' => $media_type,
-                    'verification_state' => 'native-owner-public-projection',
-                    'review_state' => 'published',
-                    'correction_state' => 'none',
-                    'available_actions' => $actions,
-                ]);
-            } catch (\Throwable $exception) {
-                if (function_exists('do_action')) {
-                    do_action('sabri_public_experience/provider_item_error', $this->get_provider_id(), (string) $native_id, $exception);
-                }
+            $normalized = $this->normalize_public_item($row, $author_id);
+            if ($normalized !== null) {
+                $items[] = $normalized;
             }
         }
 
         return $items;
+    }
+
+    public function normalize_public_item(mixed $item, int $author_id): ?Normalized_Timeline_Item
+    {
+        if (! is_array($item) || $author_id <= 0) {
+            return null;
+        }
+        $native_id = $item['native_object_id'] ?? null;
+        $native_type = sanitize_key((string) ($item['native_object_type'] ?? $item['type'] ?? 'public-item'));
+        $title = is_scalar($item['title'] ?? null) ? (string) $item['title'] : '';
+        $url = is_scalar($item['url'] ?? null) ? (string) $item['url'] : '';
+        $published = is_scalar($item['published_at'] ?? null) ? (string) $item['published_at'] : '';
+        if ((! is_int($native_id) && ! is_string($native_id))
+            || trim((string) $native_id) === ''
+            || $native_type === ''
+            || trim($title) === ''
+            || trim($url) === ''
+            || trim($published) === ''
+        ) {
+            return null;
+        }
+
+        $actions = match ($this->content_type) {
+            'video', 'reel' => ['watch', 'share'],
+            'pdf' => ['read', 'download', 'share'],
+            default => ['read', 'share'],
+        };
+        $media_type = match ($this->content_type) {
+            'video' => 'video',
+            'reel' => 'reel',
+            'pdf' => 'document',
+            default => ! empty($item['image_url']) ? 'image' : 'none',
+        };
+
+        try {
+            return new Normalized_Timeline_Item([
+                'provider_id' => $this->get_provider_id(),
+                'provider_version' => $this->get_provider_version(),
+                'native_object_type' => $native_type,
+                'native_object_id' => (string) $native_id,
+                'author_id' => $author_id,
+                'public_profile_id' => $author_id,
+                'title' => $title,
+                'safe_excerpt' => is_scalar($item['excerpt'] ?? null) ? (string) $item['excerpt'] : '',
+                'canonical_url' => $url,
+                'published_at' => $published,
+                'visibility_state' => 'public',
+                'native_status' => 'published',
+                'content_type' => $this->content_type,
+                'topic' => is_scalar($item['badge'] ?? null) ? (string) $item['badge'] : '',
+                'language' => function_exists('get_locale') ? str_replace('_', '-', (string) get_locale()) : 'en-US',
+                'thumbnail_reference' => is_scalar($item['image_url'] ?? null) ? (string) $item['image_url'] : '',
+                'media_type' => $media_type,
+                'verification_state' => 'native-owner-public-projection',
+                'review_state' => 'published',
+                'correction_state' => 'none',
+                'available_actions' => $actions,
+            ]);
+        } catch (\Throwable $exception) {
+            if (function_exists('do_action')) {
+                do_action('sabri_public_experience/provider_item_error', $this->get_provider_id(), (string) $native_id, $exception);
+            }
+            return null;
+        }
+    }
+
+    public function get_canonical_url(Normalized_Timeline_Item $item): string
+    {
+        return (string) $item->get('canonical_url');
+    }
+
+    public function get_visibility_state(Normalized_Timeline_Item $item): string
+    {
+        return (string) $item->get('visibility_state');
+    }
+
+    public function get_public_actions(Normalized_Timeline_Item $item): array
+    {
+        return array_values((array) $item->get('available_actions'));
+    }
+
+    public function get_public_metrics(Normalized_Timeline_Item $item): array
+    {
+        unset($item);
+        return [];
+    }
+
+    public function get_correction_state(Normalized_Timeline_Item $item): string
+    {
+        return (string) $item->get('correction_state');
+    }
+
+    public function register_sync_events(): void
+    {
+        if (function_exists('do_action')) {
+            do_action('sabri_public_experience/register_provider_sync_events', $this->get_provider_id(), $this->content_type);
+        }
     }
 
     /** @return array<string,mixed> */
