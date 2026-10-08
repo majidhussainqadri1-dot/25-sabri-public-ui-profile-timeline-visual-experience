@@ -63,6 +63,7 @@ namespace Sabri\HomeNewsFeed {
 
 namespace {
     require_once dirname(__DIR__) . '/includes/contracts/interface-timeline-provider.php';
+    require_once dirname(__DIR__) . '/includes/contracts/interface-timeline-provider-plan-contract.php';
     require_once dirname(__DIR__) . '/includes/class-normalized-timeline-item.php';
     require_once dirname(__DIR__) . '/includes/providers/class-file-21-provider.php';
 
