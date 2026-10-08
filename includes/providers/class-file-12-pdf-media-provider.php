@@ -15,7 +15,7 @@ final class File_12_Pdf_Media_Provider implements Profile_Section_Provider
 {
     private const MINIMUM_VERSION = '0.1.0';
     private const MAXIMUM_VERSION = '0.2.0';
-    private const MAX_ITEMS = 24;
+    private const MAX_ITEMS = 500;
 
     public function get_id(): string { return 'file-12-pdf-media'; }
     public function get_version(): string { return defined('SPL_VERSION') ? trim((string) SPL_VERSION) : '0.0.0'; }
@@ -91,6 +91,8 @@ final class File_12_Pdf_Media_Provider implements Profile_Section_Provider
                 $meta[] = $language;
             }
             $items[] = [
+                'native_object_type' => 'spl_document',
+                'native_object_id' => (string) $id,
                 'type' => 'pdf',
                 'title' => $title,
                 'url' => $url,
