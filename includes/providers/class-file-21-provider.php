@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Sabri\PublicExperience\Providers;
 
-use Sabri\PublicExperience\Contracts\Timeline_Provider;
+use Sabri\PublicExperience\Contracts\Timeline_Provider_Plan_Contract;
 use Sabri\PublicExperience\Normalized_Timeline_Item;
 
 if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
@@ -20,7 +20,7 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
  * pointer. No post body, private metadata, interaction ledger, or write path is
  * copied into File 25.
  */
-final class File_21_Provider implements Timeline_Provider
+final class File_21_Provider implements Timeline_Provider_Plan_Contract
 {
     private const PROVIDER_ID = 'file-21';
     private const MINIMUM_SUPPORTED_VERSION = '1.0.3';
@@ -128,7 +128,7 @@ final class File_21_Provider implements Timeline_Provider
                 if (! is_array($native_item)) {
                     continue;
                 }
-                $normalized = $this->normalize($native_item, $author_id);
+                $normalized = $this->normalize_public_item($native_item, $author_id);
                 if ($normalized !== null) {
                     $items[] = $normalized;
                 }
@@ -144,6 +144,39 @@ final class File_21_Provider implements Timeline_Provider
         }
 
         return $items;
+    }
+
+    public function get_canonical_url(Normalized_Timeline_Item $item): string
+    {
+        return (string) $item->get('canonical_url');
+    }
+
+    public function get_visibility_state(Normalized_Timeline_Item $item): string
+    {
+        return (string) $item->get('visibility_state');
+    }
+
+    public function get_public_actions(Normalized_Timeline_Item $item): array
+    {
+        return array_values((array) $item->get('available_actions'));
+    }
+
+    public function get_public_metrics(Normalized_Timeline_Item $item): array
+    {
+        unset($item);
+        return [];
+    }
+
+    public function get_correction_state(Normalized_Timeline_Item $item): string
+    {
+        return (string) $item->get('correction_state');
+    }
+
+    public function register_sync_events(): void
+    {
+        if (function_exists('do_action')) {
+            do_action('sabri_public_experience/register_provider_sync_events', self::PROVIDER_ID, 'post');
+        }
     }
 
     /** @return array<string,mixed> */
@@ -165,9 +198,11 @@ final class File_21_Provider implements Timeline_Provider
         ];
     }
 
-    /** @param array<string,mixed> $item */
-    private function normalize(array $item, int $author_id): ?Normalized_Timeline_Item
+    public function normalize_public_item(mixed $item, int $author_id): ?Normalized_Timeline_Item
     {
+        if (! is_array($item)) {
+            return null;
+        }
         $id = isset($item['id']) ? (int) $item['id'] : 0;
         $title = isset($item['title']) && is_scalar($item['title']) ? (string) $item['title'] : '';
         $excerpt = isset($item['excerpt']) && is_scalar($item['excerpt']) ? (string) $item['excerpt'] : '';
