@@ -19,6 +19,29 @@ if ($canonical_url !== '' && function_exists('apply_filters')) {
     $qr_candidate = apply_filters('sabri_public_experience/profile_qr_image_url', '', $canonical_url, $profile);
     $qr_image_url = \Sabri\PublicExperience\Public_URL::sanitize_same_site($qr_candidate, false);
 }
+
+$status_banner = [];
+$profile_state = sanitize_key((string) ($profile['profile_state'] ?? 'public'));
+if (in_array($profile_state, ['retired', 'legacy', 'archived'], true)) {
+    $status_banner = [
+        'tone' => 'warning',
+        'message' => $profile_state === 'retired'
+            ? __('This professional profile is retained for public authorship history; current professional actions may be limited.', 'sabri-public-experience')
+            : __('This profile is retained as historical public information; some current actions may be unavailable.', 'sabri-public-experience'),
+    ];
+}
+if (function_exists('apply_filters')) {
+    $candidate_banner = apply_filters('sabri_public_experience/profile_status_banner', $status_banner, $profile);
+    if (is_array($candidate_banner)) {
+        $tone = sanitize_key((string) ($candidate_banner['tone'] ?? 'info'));
+        $message = sanitize_text_field((string) ($candidate_banner['message'] ?? ''));
+        if (in_array($tone, ['info', 'warning', 'error', 'success'], true) && $message !== '') {
+            $status_banner = ['tone' => $tone, 'message' => $message];
+        } elseif ($candidate_banner === []) {
+            $status_banner = [];
+        }
+    }
+}
 ?>
 <header class="spux-hero">
     <div class="spux-hero__cover" aria-hidden="true">
@@ -49,6 +72,9 @@ if ($canonical_url !== '' && function_exists('apply_filters')) {
             </div>
             <?php if (! empty($profile['headline'])) : ?><p class="spux-headline"><?php echo esc_html((string) $profile['headline']); ?></p><?php endif; ?>
             <?php if ($location !== '') : ?><p class="spux-location"><?php echo esc_html($location); ?></p><?php endif; ?>
+            <?php if (! empty($profile['bio'])) : ?>
+                <p class="spux-introduction"><?php echo esc_html(wp_trim_words((string) $profile['bio'], 28)); ?></p>
+            <?php endif; ?>
         </div>
         <div class="spux-actions" aria-label="<?php esc_attr_e('Profile actions', 'sabri-public-experience'); ?>">
             <?php foreach ((array) ($profile['contacts'] ?? []) as $type => $value) : ?>
@@ -75,4 +101,9 @@ if ($canonical_url !== '' && function_exists('apply_filters')) {
             <?php endif; ?>
         </div>
     </div>
+    <?php if ($status_banner !== []) : ?>
+        <div class="spux-status-banner spux-status-banner--<?php echo esc_attr((string) $status_banner['tone']); ?>" role="status">
+            <p><?php echo esc_html((string) $status_banner['message']); ?></p>
+        </div>
+    <?php endif; ?>
 </header>
