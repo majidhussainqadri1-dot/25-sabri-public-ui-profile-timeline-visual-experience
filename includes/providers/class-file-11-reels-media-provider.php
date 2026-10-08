@@ -17,7 +17,7 @@ final class File_11_Reels_Media_Provider implements Profile_Section_Provider
     private const MAXIMUM_VERSION = '0.2.0';
     private const FILE_10_MINIMUM = '0.1.0';
     private const FILE_10_MAXIMUM = '0.2.0';
-    private const MAX_ITEMS = 24;
+    private const MAX_ITEMS = 500;
 
     public function get_id(): string { return 'file-11-reels-media'; }
     public function get_version(): string { return defined('SRL_VERSION') ? trim((string) SRL_VERSION) : '0.0.0'; }
@@ -90,6 +90,8 @@ final class File_11_Reels_Media_Provider implements Profile_Section_Provider
                 continue;
             }
             $items[] = [
+                'native_object_type' => 'svw_video',
+                'native_object_id' => (string) $id,
                 'type' => 'reel',
                 'title' => $title,
                 'url' => $url,
