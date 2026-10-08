@@ -90,6 +90,7 @@ $spux_files = [
     'includes/class-timeline-registry.php',
     'includes/class-component-api.php',
     'includes/class-timeline-service.php',
+    'includes/class-section-timeline-provider.php',
     'includes/class-section-registry.php',
     'includes/class-section-service.php',
     'includes/providers/class-file-06-knowledge-provider.php',
