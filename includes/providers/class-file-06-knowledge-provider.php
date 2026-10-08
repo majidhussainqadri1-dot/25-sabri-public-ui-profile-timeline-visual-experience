@@ -20,7 +20,8 @@ final class File_06_Knowledge_Provider implements Profile_Section_Provider
 {
     private const MINIMUM_VERSION = '0.1.0';
     private const MAXIMUM_VERSION = '0.2.0';
-    private const MAX_ITEMS = 500;
+    private const MAX_ITEMS = 24;
+    private const MAX_TIMELINE_ITEMS = 500;
 
     public function get_id(): string
     {
@@ -87,10 +88,13 @@ final class File_06_Knowledge_Provider implements Profile_Section_Provider
             return [];
         }
 
+        $maximum = (($context['surface'] ?? '') === 'timeline')
+            ? self::MAX_TIMELINE_ITEMS
+            : self::MAX_ITEMS;
         $requested = isset($context['limit']) && is_scalar($context['limit'])
             ? (int) $context['limit']
             : self::MAX_ITEMS;
-        $limit = max(1, min(self::MAX_ITEMS, $requested));
+        $limit = max(1, min($maximum, $requested));
 
         $posts = get_posts([
             'post_type' => (string) \HE_Content::TYPE,
