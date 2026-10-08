@@ -122,6 +122,28 @@ final class Normalized_Timeline_Item implements JsonSerializable
             throw new InvalidArgumentException('Timeline update date cannot precede its publication date.');
         }
 
+        $pin_weight = $this->exact_bounded_integer($data['pin_weight'] ?? 0, 0, 1000, 'pin weight');
+        $pin_reference = '';
+        $pin_actor = '';
+        $pin_reason = '';
+        $pin_surface = '';
+        $pin_start_at = null;
+        $pin_end_at = null;
+        if ($pin_weight > 0) {
+            $pin_reference = $this->exact_scalar((string) ($data['pin_reference'] ?? ''), 191, 'pin reference');
+            $pin_actor = $this->plain_text((string) ($data['pin_actor'] ?? ''), 190);
+            $pin_reason = $this->plain_text((string) ($data['pin_reason'] ?? ''), 500);
+            $pin_surface = $this->exact_key((string) ($data['pin_surface'] ?? ''), 64, 'pin surface');
+            $pin_start_at = $this->normalize_optional_date($data['pin_start_at'] ?? null);
+            $pin_end_at = $this->normalize_optional_date($data['pin_end_at'] ?? null);
+            if ($pin_actor === '' || $pin_reason === '' || $pin_start_at === null || $pin_end_at === null) {
+                throw new InvalidArgumentException('Pinned timeline items require actor, reason, reference, surface, start, and end audit metadata.');
+            }
+            if (strcmp($pin_end_at, $pin_start_at) < 0) {
+                throw new InvalidArgumentException('Timeline pin end must not precede pin start.');
+            }
+        }
+
         $this->data = [
             'provider_id' => $provider_id,
             'provider_version' => $provider_version,
@@ -147,7 +169,13 @@ final class Normalized_Timeline_Item implements JsonSerializable
             'safety_flags' => $this->exact_key_list($data['safety_flags'] ?? [], 'safety flags'),
             'available_actions' => $this->exact_action_list($data['available_actions'] ?? []),
             'metrics_reference' => $this->scalar_reference($data['metrics_reference'] ?? null),
-            'pin_weight' => $this->exact_bounded_integer($data['pin_weight'] ?? 0, 0, 1000, 'pin weight'),
+            'pin_weight' => $pin_weight,
+            'pin_reference' => $pin_reference,
+            'pin_actor' => $pin_actor,
+            'pin_reason' => $pin_reason,
+            'pin_surface' => $pin_surface,
+            'pin_start_at' => $pin_start_at,
+            'pin_end_at' => $pin_end_at,
         ];
     }
 
@@ -178,6 +206,12 @@ final class Normalized_Timeline_Item implements JsonSerializable
             'public_profile_id',
             'thumbnail_reference',
             'metrics_reference',
+            'pin_reference',
+            'pin_actor',
+            'pin_reason',
+            'pin_surface',
+            'pin_start_at',
+            'pin_end_at',
         ]));
 
         // Native attachment IDs and ungoverned remote image references never
