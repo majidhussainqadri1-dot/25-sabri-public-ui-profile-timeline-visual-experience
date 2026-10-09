@@ -63,7 +63,16 @@ final class Timeline_Service
         $max_page = max(1, intdiv(self::MAX_CANDIDATES_PER_PROVIDER - 1, $per_page) + 1);
         $page = $requested_page;
         $offset = ($page - 1) * $per_page;
-        $candidate_limit = $requested_page > $max_page
+        // Post-retrieval refinements and oldest ordering require the full
+        // bounded candidate window. Otherwise matching older items can be
+        // omitted and "oldest" sorts only the latest few records.
+        $needs_full_window = $year_filter !== ''
+            || $language_filter !== ''
+            || $topic_filter !== ''
+            || $content_type === 'corrections'
+            || $search !== ''
+            || $sort === 'oldest';
+        $candidate_limit = ($requested_page > $max_page || $needs_full_window)
             ? self::MAX_CANDIDATES_PER_PROVIDER
             : min(self::MAX_CANDIDATES_PER_PROVIDER, $offset + $per_page + 1);
         $items = [];
@@ -113,7 +122,11 @@ final class Timeline_Service
                 $provider_version = $metadata['version'];
 
                 $provider_items = $provider->get_public_author_items($author_id, $provider_query);
-                if (count($provider_items) >= $candidate_limit) {
+                // Reaching the requested look-ahead (e.g. 21 for page 1)
+                // is normal pagination, not a 500-item safety truncation.
+                if ($candidate_limit === self::MAX_CANDIDATES_PER_PROVIDER
+                    && count($provider_items) >= self::MAX_CANDIDATES_PER_PROVIDER
+                ) {
                     $provider_limit_reached = true;
                 }
                 if (count($provider_items) > $candidate_limit) {
