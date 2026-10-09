@@ -279,6 +279,26 @@
       "id": "timeline-richer-owner-contracts",
       "category": "integration",
       "requirement": "Current File 21 owner timeline exposes approved WordPress posts. Richer plan types such as Knowledge/Videos/Reels/PDFs/Clinic Updates may appear only after authoritative native timeline provider contracts are available; File 25 must not infer approval from section-card adapters."
+    },
+    {
+      "id": "timeline-bounded-full-window-refinements",
+      "category": "timeline",
+      "requirement": "At least 40 owner-authorized records; topic/year/language and oldest filters must find older matches beyond normal 21-item look-ahead without falsely claiming the 500-item safety limit."
+    },
+    {
+      "id": "timeline-merged-provider-pagination",
+      "category": "timeline",
+      "requirement": "Two available approved providers with 300 public items each must permit Page 26 at 20 per page without a one-provider 500-item page-ceiling error; PHP_INT_MAX page must fail closed without overflowing."
+    },
+    {
+      "id": "timeline-audited-pin-window",
+      "category": "governance",
+      "requirement": "Only a current active pin approved for profile-timeline with actor, reference, reason, and start/end may influence sorting. Future, expired, foreign-surface, or incomplete pin audit must lose pin authority without hiding otherwise-public content."
+    },
+    {
+      "id": "timeline-true-safety-limit-warning",
+      "category": "timeline",
+      "requirement": "Ordinary 20+1 page look-ahead is not a truncation warning; an actual 500-item per-provider response is potentially truncated and must be transparently signaled."
     }
   ]
 }
