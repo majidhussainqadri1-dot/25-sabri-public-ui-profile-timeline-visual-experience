@@ -99,7 +99,7 @@ try {
     $failures[] = 'Source completion matrix invalid: ' . $exception->getMessage();
 }
 $latestRange = (string) ($matrix['declaration']['latest_review_range'] ?? '');
-$check(in_array($latestRange, ['655-674', '675-694'], true), 'Source completion matrix must preserve or advance beyond Reviews 655-674.');
+$check(in_array($latestRange, ['655-674', '675-694', '695-714'], true), 'Source completion matrix must preserve or advance beyond Reviews 655-674.');
 $check(file_exists($root . '/config/review655-674-admin-plan-completeness-ledger.json'), 'Historical Reviews 655-674 ledger must remain preserved.');
 $check(($matrix['declaration']['known_unresolved_source_defects'] ?? null) === 0, 'Known File 25 source defects must be zero after corrections.');
 $check(($matrix['declaration']['exact_head_ci'] ?? '') === 'external-evidence-required-for-current-head-not-frozen-in-source', 'Mutable exact-head CI truth must remain external.');
