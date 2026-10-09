@@ -10,9 +10,19 @@ $current_provider = sanitize_key((string) ($context['timeline_provider'] ?? ''))
 $current_year = (string) ($context['timeline_year'] ?? '');
 $current_language = (string) ($context['timeline_language'] ?? '');
 $current_topic = (string) ($context['timeline_topic'] ?? '');
-$current_sort = in_array((string) ($context['timeline_sort'] ?? 'latest'), ['latest', 'oldest'], true)
+$current_sort = in_array((string) ($context['timeline_sort'] ?? 'latest'), ['latest', 'oldest', 'most_viewed', 'most_saved'], true)
     ? (string) ($context['timeline_sort'] ?? 'latest')
     : 'latest';
+$current_review_state = in_array((string) ($context['timeline_review_state'] ?? ''), ['published', 'approved', 'reviewed', 'not-required', 'corrected', 'retracted'], true)
+    ? (string) ($context['timeline_review_state'] ?? '')
+    : '';
+$current_source_state = in_array((string) ($context['timeline_source_state'] ?? ''), ['verified', 'unverified'], true)
+    ? (string) ($context['timeline_source_state'] ?? '')
+    : '';
+$metric_sorts = array_values(array_filter(
+    (array) ($context['timeline_metric_sorts'] ?? []),
+    static fn ($value): bool => is_string($value) && in_array($value, ['most_viewed', 'most_saved'], true)
+));
 $preview_mode = sanitize_key((string) ($context['preview_mode'] ?? ''));
 $search_query = (string) ($context['timeline_search_query'] ?? '');
 $search_error = sanitize_key((string) ($context['timeline_search_error'] ?? ''));
@@ -32,7 +42,10 @@ $secondary_active = $current_provider !== ''
     || $current_year !== ''
     || $current_language !== ''
     || $current_topic !== ''
-    || $current_sort !== 'latest';
+    || $current_review_state !== ''
+    || $current_source_state !== ''
+    || $current_sort !== 'latest'
+    || ! empty($context['timeline_filtered_request']);
 $filters = [];
 foreach ((array) ($context['timeline_filters'] ?? []) as $type => $label) {
     if (! is_scalar($type) || ! is_scalar($label)) {
@@ -60,6 +73,8 @@ if (! isset($filters[''])) {
         <?php if ($current_year !== '') : ?><input type="hidden" name="year" value="<?php echo esc_attr($current_year); ?>"><?php endif; ?>
         <?php if ($current_language !== '') : ?><input type="hidden" name="language" value="<?php echo esc_attr($current_language); ?>"><?php endif; ?>
         <?php if ($current_topic !== '') : ?><input type="hidden" name="topic" value="<?php echo esc_attr($current_topic); ?>"><?php endif; ?>
+        <?php if ($current_review_state !== '') : ?><input type="hidden" name="review_state" value="<?php echo esc_attr($current_review_state); ?>"><?php endif; ?>
+        <?php if ($current_source_state !== '') : ?><input type="hidden" name="source_state" value="<?php echo esc_attr($current_source_state); ?>"><?php endif; ?>
         <?php if ($current_sort !== 'latest') : ?><input type="hidden" name="sort" value="<?php echo esc_attr($current_sort); ?>"><?php endif; ?>
         <?php if ($preview_mode !== '') : ?><input type="hidden" name="spux_preview" value="<?php echo esc_attr($preview_mode); ?>"><?php endif; ?>
         <label for="spux-profile-search"><?php esc_html_e('Search this profile timeline', 'sabri-public-experience'); ?></label>
@@ -96,7 +111,7 @@ if (! isset($filters[''])) {
     </nav>
 <?php endif; ?>
 
-<form class="spux-timeline-secondary-filters" method="get" action="<?php echo esc_url(remove_query_arg(['provider', 'year', 'language', 'topic', 'sort', 'paged'])); ?>">
+<form class="spux-timeline-secondary-filters" method="get" action="<?php echo esc_url(remove_query_arg(['provider', 'year', 'language', 'topic', 'sort', 'review_state', 'source_state', 'paged'])); ?>">
     <?php if ($current_type !== '') : ?><input type="hidden" name="type" value="<?php echo esc_attr($current_type); ?>"><?php endif; ?>
     <?php if ($search_query !== '') : ?><input type="hidden" name="profile_q" value="<?php echo esc_attr($search_query); ?>"><?php endif; ?>
     <?php if ($preview_mode !== '') : ?><input type="hidden" name="spux_preview" value="<?php echo esc_attr($preview_mode); ?>"><?php endif; ?>
@@ -127,17 +142,42 @@ if (! isset($filters[''])) {
                 <input type="text" name="topic" maxlength="120" value="<?php echo esc_attr($current_topic); ?>">
             </label>
             <label>
+                <span><?php esc_html_e('Review state', 'sabri-public-experience'); ?></span>
+                <select name="review_state">
+                    <option value=""><?php esc_html_e('Any review state', 'sabri-public-experience'); ?></option>
+                    <option value="reviewed"<?php selected($current_review_state, 'reviewed'); ?>><?php esc_html_e('Reviewed', 'sabri-public-experience'); ?></option>
+                    <option value="approved"<?php selected($current_review_state, 'approved'); ?>><?php esc_html_e('Approved', 'sabri-public-experience'); ?></option>
+                    <option value="published"<?php selected($current_review_state, 'published'); ?>><?php esc_html_e('Published', 'sabri-public-experience'); ?></option>
+                    <option value="corrected"<?php selected($current_review_state, 'corrected'); ?>><?php esc_html_e('Corrected', 'sabri-public-experience'); ?></option>
+                    <option value="retracted"<?php selected($current_review_state, 'retracted'); ?>><?php esc_html_e('Retracted', 'sabri-public-experience'); ?></option>
+                </select>
+            </label>
+            <label>
+                <span><?php esc_html_e('Source state', 'sabri-public-experience'); ?></span>
+                <select name="source_state">
+                    <option value=""><?php esc_html_e('Any source state', 'sabri-public-experience'); ?></option>
+                    <option value="verified"<?php selected($current_source_state, 'verified'); ?>><?php esc_html_e('Verified source', 'sabri-public-experience'); ?></option>
+                    <option value="unverified"<?php selected($current_source_state, 'unverified'); ?>><?php esc_html_e('Unverified source', 'sabri-public-experience'); ?></option>
+                </select>
+            </label>
+            <label>
                 <span><?php esc_html_e('Sort', 'sabri-public-experience'); ?></span>
                 <select name="sort">
                     <option value="latest"<?php selected($current_sort, 'latest'); ?>><?php esc_html_e('Latest', 'sabri-public-experience'); ?></option>
                     <option value="oldest"<?php selected($current_sort, 'oldest'); ?>><?php esc_html_e('Oldest', 'sabri-public-experience'); ?></option>
+                    <?php if (in_array('most_viewed', $metric_sorts, true)) : ?>
+                        <option value="most_viewed"<?php selected($current_sort, 'most_viewed'); ?>><?php esc_html_e('Most viewed', 'sabri-public-experience'); ?></option>
+                    <?php endif; ?>
+                    <?php if (in_array('most_saved', $metric_sorts, true)) : ?>
+                        <option value="most_saved"<?php selected($current_sort, 'most_saved'); ?>><?php esc_html_e('Most saved', 'sabri-public-experience'); ?></option>
+                    <?php endif; ?>
                 </select>
             </label>
         </div>
         <div class="spux-timeline-secondary-filters__actions">
             <button class="spux-button spux-button--secondary" type="submit"><?php esc_html_e('Apply filters', 'sabri-public-experience'); ?></button>
             <?php if ($secondary_active) : ?>
-                <a class="spux-button spux-button--secondary" href="<?php echo esc_url(remove_query_arg(['provider', 'year', 'language', 'topic', 'sort', 'paged'])); ?>"><?php esc_html_e('Clear filters', 'sabri-public-experience'); ?></a>
+                <a class="spux-button spux-button--secondary" href="<?php echo esc_url(remove_query_arg(['provider', 'year', 'language', 'topic', 'sort', 'review_state', 'source_state', 'paged'])); ?>"><?php esc_html_e('Clear filters', 'sabri-public-experience'); ?></a>
             <?php endif; ?>
         </div>
     </fieldset>
@@ -229,8 +269,11 @@ if (! isset($filters[''])) {
                 <?php echo esc_html(sprintf(__('Page %d', 'sabri-public-experience'), $page)); ?>
             </span>
             <?php if ($has_more) : ?>
-                <a class="spux-button spux-button--secondary" rel="next" href="<?php echo esc_url(add_query_arg('paged', $page + 1)); ?>">
-                    <?php esc_html_e('Next page', 'sabri-public-experience'); ?>
+                <a class="spux-button spux-button--secondary spux-load-more" rel="next" href="<?php echo esc_url(add_query_arg('paged', $page + 1)); ?>" aria-label="<?php echo esc_attr(sprintf(__('Load more public contributions — page %d', 'sabri-public-experience'), $page + 1)); ?>">
+                    <?php esc_html_e('Load More', 'sabri-public-experience'); ?>
+                </a>
+                <a class="spux-pagination__next-fallback" rel="next" href="<?php echo esc_url(add_query_arg('paged', $page + 1)); ?>">
+                    <?php echo esc_html(sprintf(__('Next page %d', 'sabri-public-experience'), $page + 1)); ?>
                 </a>
             <?php endif; ?>
         </nav>
