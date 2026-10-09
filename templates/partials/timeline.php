@@ -6,9 +6,33 @@ $has_more = ! empty($timeline['has_more']);
 $partial = ! empty($timeline['provider_errors']);
 $truncated = ! empty($timeline['truncated']);
 $current_type = sanitize_key((string) ($context['timeline_content_type'] ?? ''));
+$current_provider = sanitize_key((string) ($context['timeline_provider'] ?? ''));
+$current_year = (string) ($context['timeline_year'] ?? '');
+$current_language = (string) ($context['timeline_language'] ?? '');
+$current_topic = (string) ($context['timeline_topic'] ?? '');
+$current_sort = in_array((string) ($context['timeline_sort'] ?? 'latest'), ['latest', 'oldest'], true)
+    ? (string) ($context['timeline_sort'] ?? 'latest')
+    : 'latest';
+$preview_mode = sanitize_key((string) ($context['preview_mode'] ?? ''));
 $search_query = (string) ($context['timeline_search_query'] ?? '');
 $search_error = sanitize_key((string) ($context['timeline_search_error'] ?? ''));
 $search_enabled = (($context['preferences']['profile_local_search'] ?? null) === true);
+$provider_filters = [];
+foreach ((array) ($context['timeline_provider_filters'] ?? []) as $provider_id => $provider_label) {
+    if (! is_scalar($provider_id) || ! is_scalar($provider_label)) {
+        continue;
+    }
+    $provider_id = sanitize_key((string) $provider_id);
+    $provider_label = sanitize_text_field((string) $provider_label);
+    if ($provider_id !== '' && $provider_label !== '') {
+        $provider_filters[$provider_id] = $provider_label;
+    }
+}
+$secondary_active = $current_provider !== ''
+    || $current_year !== ''
+    || $current_language !== ''
+    || $current_topic !== ''
+    || $current_sort !== 'latest';
 $filters = [];
 foreach ((array) ($context['timeline_filters'] ?? []) as $type => $label) {
     if (! is_scalar($type) || ! is_scalar($label)) {
@@ -31,9 +55,13 @@ if (! isset($filters[''])) {
 
 <?php if ($search_enabled) : ?>
     <form class="spux-timeline-search" method="get" action="<?php echo esc_url(remove_query_arg(['profile_q', 'paged'])); ?>" role="search">
-        <?php if ($current_type !== '') : ?>
-            <input type="hidden" name="type" value="<?php echo esc_attr($current_type); ?>">
-        <?php endif; ?>
+        <?php if ($current_type !== '') : ?><input type="hidden" name="type" value="<?php echo esc_attr($current_type); ?>"><?php endif; ?>
+        <?php if ($current_provider !== '') : ?><input type="hidden" name="provider" value="<?php echo esc_attr($current_provider); ?>"><?php endif; ?>
+        <?php if ($current_year !== '') : ?><input type="hidden" name="year" value="<?php echo esc_attr($current_year); ?>"><?php endif; ?>
+        <?php if ($current_language !== '') : ?><input type="hidden" name="language" value="<?php echo esc_attr($current_language); ?>"><?php endif; ?>
+        <?php if ($current_topic !== '') : ?><input type="hidden" name="topic" value="<?php echo esc_attr($current_topic); ?>"><?php endif; ?>
+        <?php if ($current_sort !== 'latest') : ?><input type="hidden" name="sort" value="<?php echo esc_attr($current_sort); ?>"><?php endif; ?>
+        <?php if ($preview_mode !== '') : ?><input type="hidden" name="spux_preview" value="<?php echo esc_attr($preview_mode); ?>"><?php endif; ?>
         <label for="spux-profile-search"><?php esc_html_e('Search this profile timeline', 'sabri-public-experience'); ?></label>
         <div class="spux-timeline-search__controls">
             <input id="spux-profile-search" type="search" name="profile_q" value="<?php echo esc_attr($search_query); ?>" maxlength="120" autocomplete="off">
@@ -68,6 +96,53 @@ if (! isset($filters[''])) {
     </nav>
 <?php endif; ?>
 
+<form class="spux-timeline-secondary-filters" method="get" action="<?php echo esc_url(remove_query_arg(['provider', 'year', 'language', 'topic', 'sort', 'paged'])); ?>">
+    <?php if ($current_type !== '') : ?><input type="hidden" name="type" value="<?php echo esc_attr($current_type); ?>"><?php endif; ?>
+    <?php if ($search_query !== '') : ?><input type="hidden" name="profile_q" value="<?php echo esc_attr($search_query); ?>"><?php endif; ?>
+    <?php if ($preview_mode !== '') : ?><input type="hidden" name="spux_preview" value="<?php echo esc_attr($preview_mode); ?>"><?php endif; ?>
+    <fieldset>
+        <legend><?php esc_html_e('Refine timeline', 'sabri-public-experience'); ?></legend>
+        <div class="spux-timeline-secondary-filters__grid">
+            <?php if ($provider_filters !== []) : ?>
+                <label>
+                    <span><?php esc_html_e('Provider', 'sabri-public-experience'); ?></span>
+                    <select name="provider">
+                        <option value=""><?php esc_html_e('All providers', 'sabri-public-experience'); ?></option>
+                        <?php foreach ($provider_filters as $provider_id => $provider_label) : ?>
+                            <option value="<?php echo esc_attr($provider_id); ?>"<?php selected($current_provider, $provider_id); ?>><?php echo esc_html($provider_label); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </label>
+            <?php endif; ?>
+            <label>
+                <span><?php esc_html_e('Year', 'sabri-public-experience'); ?></span>
+                <input type="text" name="year" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" value="<?php echo esc_attr($current_year); ?>" placeholder="<?php echo esc_attr((string) gmdate('Y')); ?>">
+            </label>
+            <label>
+                <span><?php esc_html_e('Language', 'sabri-public-experience'); ?></span>
+                <input type="text" name="language" maxlength="35" value="<?php echo esc_attr($current_language); ?>" placeholder="en-US">
+            </label>
+            <label>
+                <span><?php esc_html_e('Topic', 'sabri-public-experience'); ?></span>
+                <input type="text" name="topic" maxlength="120" value="<?php echo esc_attr($current_topic); ?>">
+            </label>
+            <label>
+                <span><?php esc_html_e('Sort', 'sabri-public-experience'); ?></span>
+                <select name="sort">
+                    <option value="latest"<?php selected($current_sort, 'latest'); ?>><?php esc_html_e('Latest', 'sabri-public-experience'); ?></option>
+                    <option value="oldest"<?php selected($current_sort, 'oldest'); ?>><?php esc_html_e('Oldest', 'sabri-public-experience'); ?></option>
+                </select>
+            </label>
+        </div>
+        <div class="spux-timeline-secondary-filters__actions">
+            <button class="spux-button spux-button--secondary" type="submit"><?php esc_html_e('Apply filters', 'sabri-public-experience'); ?></button>
+            <?php if ($secondary_active) : ?>
+                <a class="spux-button spux-button--secondary" href="<?php echo esc_url(remove_query_arg(['provider', 'year', 'language', 'topic', 'sort', 'paged'])); ?>"><?php esc_html_e('Clear filters', 'sabri-public-experience'); ?></a>
+            <?php endif; ?>
+        </div>
+    </fieldset>
+</form>
+
 <?php if ($partial) : ?>
     <div class="spux-notice spux-notice--warning" role="status">
         <p><?php esc_html_e('Some public contributions could not be loaded. Available verified items are shown below.', 'sabri-public-experience'); ?></p>
@@ -82,9 +157,9 @@ if (! isset($filters[''])) {
 
 <?php if ($items === []) : ?>
     <div class="spux-state spux-state--empty" role="status">
-        <?php if ($search_query !== '') : ?>
+        <?php if ($search_query !== '' || $current_type !== '' || $secondary_active) : ?>
             <h3><?php esc_html_e('No matching public contributions', 'sabri-public-experience'); ?></h3>
-            <p><?php esc_html_e('Try a different keyword or clear the profile-local search.', 'sabri-public-experience'); ?></p>
+            <p><?php esc_html_e('Try different filters or clear the current timeline refinement.', 'sabri-public-experience'); ?></p>
         <?php else : ?>
             <h3><?php esc_html_e('No public publications yet', 'sabri-public-experience'); ?></h3>
             <p><?php esc_html_e('Approved contributions will appear here when their native providers publish them.', 'sabri-public-experience'); ?></p>
@@ -140,6 +215,9 @@ if (! isset($filters[''])) {
         <?php endforeach; ?>
     </div>
 
+    <p class="spux-sr-only" role="status" aria-live="polite">
+        <?php echo esc_html(sprintf(__('Timeline page %1$d loaded with %2$d public items.', 'sabri-public-experience'), $page, count($items))); ?>
+    </p>
     <?php if ($page > 1 || $has_more) : ?>
         <nav class="spux-pagination" aria-label="<?php esc_attr_e('Timeline pagination', 'sabri-public-experience'); ?>">
             <?php if ($page > 1) : ?>
