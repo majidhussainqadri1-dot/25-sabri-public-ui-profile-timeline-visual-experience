@@ -123,7 +123,12 @@
       "source_lifecycle": "second-fresh-80-review-feature-branch-candidate-pending-merge-and-hostinger-staging",
       "bundled_with_file_25": false,
       "staging_status": "pending",
-      "current_repository_head": "67c32ec4af45a7de6e3d9c1dbf0f8614d6b5a844"
+      "current_repository_head": "2f4a89707724fd2b9946600afe10ddab27ec3c2d",
+      "current_source_version_observed": "1.2.1",
+      "current_db_version_observed": "1.1.1",
+      "current_contract_version_observed": "1.2.1",
+      "current_projection_schema_observed": 3,
+      "current_repository_review": "compatible-current-main-v1.2.1; repository-source-only"
     },
     {
       "file": 8,
@@ -432,7 +437,7 @@
     "evidence_class": "repository-source-only-not-staging-live",
     "00": "2fa7c022ee9cd1b65432e900579512f304532442",
     "03": "636e3ef965423887f810718abec3cd1c11c3659d",
-    "07": "67c32ec4af45a7de6e3d9c1dbf0f8614d6b5a844",
+    "07": "2f4a89707724fd2b9946600afe10ddab27ec3c2d",
     "08": "70541974ce0ffb16aebef557c3016eb7447662f4",
     "09": "cfc5f781a766330314dc98c42abeca0eb7786eba",
     "action_integration_note": "File 25 resolves only published owner-native profile destinations. File 08 Appointment and File 17 Follow remain hidden until authoritative target-bound owner contracts exist; Message is shown only when File 03 public projection supplies a concrete same-site destination.",
@@ -565,6 +570,29 @@
       "correct oldest sorting within bounded pool"
     ],
     "known_unresolved_source_defects": 0,
+    "source_only": true,
+    "external_acceptance": false
+  },
+  "file25_review715_734_audit": {
+    "date": "2026-10-09",
+    "review_range": "715-734",
+    "baseline_main_sha": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+    "baseline_main_ci": {
+      "run_number": 1837,
+      "run_id": 37908199554,
+      "conclusion": "success"
+    },
+    "candidate_branch": "fix/reviews-715-734-provider-contract-rebase-20261009",
+    "exact_candidate_ci": "external-check-required-after-last-commit",
+    "corrections": [
+      "complete Section 46 Timeline Provider method contract",
+      "provider sync registration and owner projection parity",
+      "privacy-safe conditional most-viewed/most-saved sorting",
+      "review/source-state refinements",
+      "REST/HTML/SEO state parity",
+      "accessible Load More plus page fallback",
+      "current File 07 v1.2.1 source evidence"
+    ],
     "source_only": true,
     "external_acceptance": false
   }
