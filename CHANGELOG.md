@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.15.0 — Provider-Contract/Plan/Cross-File Completeness Reviews 695–714 — 2026-10-09
+
+### Corrected
+
+- Completed the File 25 §46 Timeline Provider contract across the interface, File 21 adapter, WordPress compatibility adapter and test doubles.
+- Added fail-closed provider sync registration and canonical/visibility/action/correction parity validation.
+- Added conditional Most Viewed / Most Saved sorting gated by privacy-safe native provider metrics; unavailable metrics stay hidden and raw analytics are not emitted.
+- Added review-state and source-state timeline refinements with HTML/REST/SEO state parity.
+- Added accessible Load More while preserving page fallback and browser-Back behavior.
+- Refreshed File 07 current repository evidence to v1.2.1 / DB 1.1.1 / contract 1.2.1 / projection schema 3.
+- Preserved owner-contract limitations for File 08 Appointment, File 17 Follow, File 21 public metrics and richer non-post timeline classes instead of inventing foreign truth.
+
+### Review result
+
+Defect rounds: **697–711**. Clean rounds: **695, 696, 712, 713, 714**.
+
+### Acceptance boundary
+
+Repository/source corrections only. Exact current-head CI must be checked externally after the final commit; Hostinger staging, Founder acceptance, production/live deployment, deployed-code parity, live DB/schema, migration state and operations remain separate gates.
+
+
 ## 0.15.0 — Timeline/Plan/Cross-File Completeness Reviews 675–694 — 2026-10-09
 
 ### Corrected
