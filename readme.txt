@@ -20,7 +20,7 @@ The reviewed 0.15.0 source correction includes:
 * canonical File 03 contact preservation with monotonic revoke-only filters and substitution denial;
 * fail-closed high-risk rebuild/migration authorization requiring strict explicit approval;
 * data-free recoverable Safe Mode public profile routes using a no-store/noindex 503 native-theme surface;
-* Reviews 655–674 fresh admin/plan/cross-file completion, including removal of dead controls, governed admin sections, responsive-preview parity, truthful Completion Assistant alt evidence, bounded default timeline filter, optional provider enablement, and release-status reconciliation;
+* Reviews 675–694 fresh timeline/plan/cross-file completion, including provider/year/language/topic filters, latest/oldest sorting, Corrections filtering, REST/SEO parity, accessible pagination announcements, audited pin authority, and current companion reconciliation;
 * `CHAT-UX-001` accessible green welcome visual presentation with File 20 retaining the 30-day frequency owner;
 * Master Plan v3.0 and File 20 plan v4.1 ownership reconciliation;
 * current File 00 membership contract `1.2.3` with reviewed `1.2.2` compatibility as the sole membership, Founder, suspension, eligibility, guardian-policy and public-profile assertion authority;
@@ -59,14 +59,15 @@ This candidate is not production-complete. Exact multi-plugin Hostinger staging,
 == Changelog ==
 
 = 0.15.0 =
-* Reviews 655–674 completed a fresh File 25 administrator-configuration, plan-to-code and companion-boundary audit.
-* Removed no-op `timeline_provider_mode`, `accessibility_mode`, `cache_ttl`, `safe_mode_controls`, and `diagnostics_enabled` preferences; mandatory accessibility, Safe Mode and diagnostics remain non-disableable.
-* Grouped the control center under the governed File 25 admin sections.
-* Removed unsupported tablet from responsive-preview preferences.
-* Preserved canonical File 03 avatar alt evidence for the Completion Assistant so missing alt metadata is reportable.
-* Added bounded `default_timeline_filter`, applied only to approved current filters.
-* Added bounded `enabled_optional_providers` with explicit disable-all for built-in File 06/10/11/12/18 section providers.
-* Preserved File 08 Appointment and File 17 Follow as fail-closed hidden actions until canonical owners publish authoritative target-bound destinations.
+* Reviews 675–694 completed a fresh File 25 timeline/plan/cross-file audit.
+* Added bounded provider, year, language and topic secondary filters plus Latest/Oldest sorting.
+* Added Corrections filtering over corrected/retracted owner-authorized items without inventing a native content type.
+* Preserved search/filter/preview state across timeline forms and corrected misleading filtered empty states.
+* Added screen-reader page/item announcements.
+* Added REST parity for provider/year/language/topic/sort/search and noindex coverage for all explicit timeline refinement URLs.
+* Added bounded internal pin audit provenance; unaudited or malformed pin claims are neutralized to weight 0 without dropping valid public items.
+* Refreshed File 09 R26 and File 14 v1.4.8 repository-source evidence.
+* Richer non-post timeline classes remain owner-contract dependent; File 25 does not infer publication approval from section-card adapters.
 * Repository/source completion does not imply Hostinger staging, production/live deployment, deployed parity, live DB/schema, migration state or operations.
 
 = 0.14.0 =
