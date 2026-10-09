@@ -55,6 +55,12 @@ final class Timeline_Registry
             throw new InvalidArgumentException('Timeline provider registry reached its safe provider limit.');
         }
 
+        try {
+            $provider->register_sync_events();
+        } catch (\Throwable $exception) {
+            throw new InvalidArgumentException(sprintf('Timeline provider sync registration failed: %s', $raw_id), 0, $exception);
+        }
+
         $this->providers[$raw_id] = $provider;
         $this->registered_metadata[$raw_id] = [
             'id' => $raw_id,
