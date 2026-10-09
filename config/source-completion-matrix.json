@@ -22,14 +22,14 @@
     "production_accepted": false,
     "live_deployed": false,
     "operational": false,
-    "truthful_boundary": "Reviews 675-694 freshly re-audited File 25 against the final File 25 plan, central governing plan and current companion repository source. Defects in rounds 677-691 were corrected: profile-local provider/year/language/topic filters, latest/oldest sorting, Corrections filtering, search/filter state preservation, truthful filtered empty states, screen-reader pagination announcements, REST/HTML filter parity, comprehensive filtered-query noindex behavior, audited pin provenance, and current File 09/File 14 repository-head evidence. Richer timeline content classes beyond the current File 21 owner-authorized post timeline remain owner-contract dependent and may not be synthesized from section-card adapters. Hostinger staging, Founder, production, exact deployed parity, live DB/schema, migration state and operational acceptance remain separate unverified gates.",
-    "latest_review_range": "675-694",
+    "truthful_boundary": "Reviews 695-714 re-audited File 25 against Final Harmonized Specification 2.0, the central governing plan and current companion source. The cycle completed the full Section 46 Timeline Provider contract, privacy-safe conditional Most Viewed/Most Saved sorting, review/source-state refinements, HTML/REST/SEO parity, accessible Load More with numbered fallback, and refreshed File 07 current-source evidence. Canonical owner boundaries remain unchanged. Hostinger staging, Founder acceptance, production/live deployment, exact deployed parity, live DB/schema, migration state and operational acceptance remain separate unverified gates.",
+    "latest_review_range": "695-714",
     "exact_head_ci": "external-evidence-required-for-current-head-not-frozen-in-source",
     "exact_deployed_code_verified": false,
     "db_version_verified_live": false,
     "migration_state_verified_live": false,
-    "review_ledger": "config/review675-694-timeline-completeness-ledger.json",
-    "historical_review_lineage": "Reviews 515-594, 595-614, 615-634, 635-654 and 655-674 remain preserved; Reviews 675-694 are the latest fresh timeline/plan/cross-file completeness audit."
+    "review_ledger": "config/review695-714-provider-contract-completeness-ledger.json",
+    "historical_review_lineage": "Reviews 515-594, 595-614, 615-634, 635-654, 655-674 and 675-694 remain preserved; Reviews 695-714 are the latest provider-contract/plan/cross-file completeness audit."
   },
   "requirements": [
     {
@@ -142,7 +142,7 @@
       "id": "F25-TIMELINE-39-48",
       "source": "File 25 sections 39-48",
       "status": "implemented",
-      "summary": "File 25 now implements bounded federated timeline pagination, provider/year/language/topic secondary filters, latest/oldest ordering with audited pin precedence, Corrections projection filtering, search/filter URL-state preservation, accessible page announcements, deduplication and rebuildable optional index state. Richer content classes remain owner-contract dependent where current native owners do not yet publish authoritative timeline projections.",
+      "summary": "File 25 implements bounded federated timeline pagination; provider/year/language/topic/review/source refinements; latest/oldest and conditional privacy-safe Most Viewed/Most Saved sorting; audited pin precedence; Corrections filtering; URL-state preservation; accessible Load More plus numbered fallback; deduplication; complete Section 46 provider contracts; and rebuildable optional index state. Richer content classes and metrics remain owner-contract dependent and are never fabricated.",
       "evidence": [
         "includes/class-timeline-registry.php",
         "includes/class-timeline-service.php",
@@ -154,7 +154,10 @@
         "includes/class-profile-renderer.php",
         "tests/review655-674-admin-plan-completeness.php",
         "templates/partials/timeline.php",
-        "tests/review675-694-timeline-completeness.php"
+        "tests/review675-694-timeline-completeness.php",
+        "includes/contracts/interface-timeline-provider.php",
+        "tests/review695-714-provider-contract-completeness.php",
+        "docs/REVIEWS-695-714-PROVIDER-CONTRACT-COMPLETENESS-2026-10-09.md"
       ]
     },
     {
@@ -258,7 +261,7 @@
       "id": "F25-REST-COMPONENT-API-72-73",
       "source": "File 25 sections 72-73",
       "status": "implemented",
-      "summary": "Versioned public REST and component APIs use strict allow-lists, bounded pagination and sanitized output. Timeline REST now has provider/year/language/topic/sort/search parity with the public HTML timeline service.",
+      "summary": "Versioned public REST and component APIs use strict allow-lists, bounded pagination and sanitized output. Timeline REST mirrors provider/year/language/topic/review/source refinements and latest/oldest/conditional metric sorts, returning only public presentation data.",
       "evidence": [
         "includes/class-rest-controller.php",
         "includes/class-design-system.php",
@@ -266,7 +269,8 @@
         "includes/class-content-cards.php",
         "tests/review37-rest-etag-revalidation.php",
         "tests/review515-594-fifth-eighty-current-truth.php",
-        "tests/review675-694-timeline-completeness.php"
+        "tests/review675-694-timeline-completeness.php",
+        "tests/review695-714-provider-contract-completeness.php"
       ]
     },
     {
