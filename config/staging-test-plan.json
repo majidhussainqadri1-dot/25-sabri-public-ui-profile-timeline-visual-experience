@@ -58,7 +58,7 @@
     {
       "id": "file07-directory-visual-contract",
       "category": "integration",
-      "requirement": "Exact current File 07 1.2.0 / DB 1.1.0 / contract 1.2.0 / projection schema 2 branch fix/file-07-second-fresh-80-review-20260810 at b37c7c7b46f3f57b7325e075601c10bf3ced72ba retains directory/discovery/ranking truth while File 25 supplies visual presentation only. Feature-branch source truth is not staging/live truth."
+      "requirement": "Exact current File 07 main 1.2.1 / DB 1.1.1 / contract 1.2.1 / projection schema 3 at 2f4a89707724fd2b9946600afe10ddab27ec3c2d retains Doctors Directory domain discovery while File 26 owns platform-wide search/ranking and File 25 supplies bounded public visual presentation only. Repository source truth is not staging/live truth."
     },
     {
       "id": "file08-clinic-projection",
@@ -219,6 +219,16 @@
       "id": "owner-public-preview",
       "category": "profile",
       "requirement": "Authorized profile owner can switch among public/member/mobile/desktop/contact/search/social preview modes. Preview responses are noindex/noarchive, projection-only, suppress owner/mutating actions and completion controls, never widen native authorization, and expose only canonical public data."
+    },
+    {
+      "id": "timeline-provider-plan-contract",
+      "category": "integration",
+      "requirement": "Every registered File 25 timeline provider implements the complete plan contract: provider identity/version/availability/maturity, public author items, normalization, canonical URL, visibility, public actions, privacy-safe public metrics, correction state, sync registration and health. Contract failure must fail closed without native-domain mutation."
+    },
+    {
+      "id": "timeline-metric-review-source-refinements",
+      "category": "timeline",
+      "requirement": "Most Viewed/Most Saved appear only when an authoritative provider supplies privacy-safe public metrics; otherwise they remain unavailable. Review/source-state refinements, REST parity, SEO noindex and accessible Load More/numbered fallback preserve native ownership and URL state."
     },
     {
       "id": "timeline-config-and-back-navigation",
