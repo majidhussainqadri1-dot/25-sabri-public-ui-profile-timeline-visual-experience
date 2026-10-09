@@ -123,7 +123,12 @@
       "source_lifecycle": "second-fresh-80-review-feature-branch-candidate-pending-merge-and-hostinger-staging",
       "bundled_with_file_25": false,
       "staging_status": "pending",
-      "current_repository_head": "67c32ec4af45a7de6e3d9c1dbf0f8614d6b5a844"
+      "current_repository_head": "2f4a89707724fd2b9946600afe10ddab27ec3c2d",
+      "current_source_version_observed": "1.2.1",
+      "current_db_version_observed": "1.1.1",
+      "current_contract_version_observed": "1.2.1",
+      "current_projection_schema_observed": 3,
+      "current_repository_review": "compatible-current-main-v1.2.1-twenty-round-reconciliation-2026-10-07; repository-source-only"
     },
     {
       "file": 8,
@@ -426,13 +431,13 @@
     "22": "b7a7f2e69411cbd32f0574fd12d766fb70c01b7a",
     "23": "dcae138e6073f4d0ff596623deb05b9940b8271b",
     "24": "a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb",
-    "25": "e35563b7f3d8ebf0acbbc80982b7bcf2e1b78c0a",
+    "25": "3075224089506fed19af1441ebf3556c2d5230b5",
     "26": "bbea3aad466792a4a6a62b53532bbd45c7c592de",
     "observed_at": "2026-10-09",
     "evidence_class": "repository-source-only-not-staging-live",
     "00": "2fa7c022ee9cd1b65432e900579512f304532442",
     "03": "636e3ef965423887f810718abec3cd1c11c3659d",
-    "07": "67c32ec4af45a7de6e3d9c1dbf0f8614d6b5a844",
+    "07": "2f4a89707724fd2b9946600afe10ddab27ec3c2d",
     "08": "70541974ce0ffb16aebef557c3016eb7447662f4",
     "09": "cfc5f781a766330314dc98c42abeca0eb7786eba",
     "action_integration_note": "File 25 resolves only published owner-native profile destinations. File 08 Appointment and File 17 Follow remain hidden until authoritative target-bound owner contracts exist; Message is shown only when File 03 public projection supplies a concrete same-site destination.",
@@ -543,6 +548,18 @@
       }
     },
     "owner_contract_limitation": "Current File 21 ProfileTimeline owner contract exposes canonical approved WordPress posts. Planned richer timeline types (for example Knowledge, Videos, Reels, PDFs, clinic updates and other domain-native publication classes) must arrive through authoritative owner-native timeline providers/contracts; File 25 must not synthesize approval or foreign domain truth from section-card adapters.",
+    "evidence_boundary": "Repository source/CI only; no staging/live/deployed parity claim."
+  },
+  "file25_review695_714_audit": {
+    "baseline_main_sha": "3075224089506fed19af1441ebf3556c2d5230b5",
+    "baseline_main_ci": {
+      "run_number": 1784,
+      "run_id": 37904435708,
+      "conclusion": "success"
+    },
+    "review_range": "695-714",
+    "candidate_branch": "fix/reviews-695-714-provider-contract-completeness-20261009",
+    "exact_current_head_ci": "external-evidence-required-not-frozen-in-source",
     "evidence_boundary": "Repository source/CI only; no staging/live/deployed parity claim."
   }
 }
