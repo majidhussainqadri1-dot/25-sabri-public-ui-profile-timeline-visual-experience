@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.15.0 — Reviews 695–714: Source Timeline Integrity — 2026-10-09
+
+- **Time-bound pinning:** enforce exact `profile-timeline` surface and active UTC audit interval; unapproved/out-of-window pins rank as unpinned without hiding public items.
+- **Multi-provider pagination:** safely account for multiple 500-candidate provider windows rather than one global 500-item page cap.
+- **Overflow safety:** upper-bound huge page inputs before multiplying pagination offset.
+- **Honest truncation:** ordinary 20+1 look-ahead no longer displays a hard-limit warning; actual per-provider 500-item exhaustion remains marked.
+- **Filter completeness:** year, language, topic, Corrections and search use all bounded candidate items; `oldest` sorts that same bounded candidate pool.
+- **Tests:** new behavioral regression cases and historical Review 63 assertion reconciliation.
+- **Cross-file:** Files 03/08/09/14/17/20/21/22/23/24/26 repository source observed separately; richer timeline types and certain native actions still await explicit owner contracts.
+- **External acceptance:** Hostinger staging, deployed package checksums, live DB/schema, migration and live retest remain unverified.
+
+
 ## 0.15.0 — Timeline/Plan/Cross-File Completeness Reviews 675–694 — 2026-10-09
 
 ### Corrected
