@@ -239,6 +239,33 @@ final class Timeline_Service
     }
 
 
+    /** @return array<string,string> */
+    public function available_provider_filters(): array
+    {
+        $labels = [];
+        foreach ($this->registry->all() as $provider_id => $provider) {
+            try {
+                $metadata = $this->registry->validated_metadata($provider, (string) $provider_id);
+                if ($metadata === null
+                    || ! in_array($metadata['maturity'], ['read-only', 'staging-accepted', 'production-accepted'], true)
+                    || ! $provider->is_available()
+                ) {
+                    continue;
+                }
+                $label = ucwords(str_replace(['-', '_'], ' ', (string) $provider_id));
+                if (preg_match('/^File (\d+)$/i', $label, $matches) === 1) {
+                    $label = 'File ' . $matches[1];
+                }
+                $labels[(string) $provider_id] = $label;
+            } catch (\Throwable) {
+                continue;
+            }
+        }
+        ksort($labels, SORT_STRING);
+
+        return $labels;
+    }
+
     private static function exact_positive_integer(mixed $value, int $maximum): ?int
     {
         if (is_int($value)) {
