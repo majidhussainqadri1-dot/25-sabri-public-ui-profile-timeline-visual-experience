@@ -431,7 +431,7 @@
     "22": "b7a7f2e69411cbd32f0574fd12d766fb70c01b7a",
     "23": "dcae138e6073f4d0ff596623deb05b9940b8271b",
     "24": "a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb",
-    "25": "3075224089506fed19af1441ebf3556c2d5230b5",
+    "25": "e35563b7f3d8ebf0acbbc80982b7bcf2e1b78c0a",
     "26": "bbea3aad466792a4a6a62b53532bbd45c7c592de",
     "observed_at": "2026-10-09",
     "evidence_class": "repository-source-only-not-staging-live",
@@ -560,6 +560,7 @@
     "review_range": "695-714",
     "candidate_branch": "fix/reviews-695-714-provider-contract-completeness-20261009",
     "exact_current_head_ci": "external-evidence-required-not-frozen-in-source",
-    "evidence_boundary": "Repository source/CI only; no staging/live/deployed parity claim."
+    "evidence_boundary": "Repository source/CI only; no staging/live/deployed parity claim.",
+    "note": "The top-level observed File 25 head remains the preserved Reviews 675-694 snapshot for historical regression. This audit's newer baseline is recorded only in file25_review695_714_audit."
   }
 }
