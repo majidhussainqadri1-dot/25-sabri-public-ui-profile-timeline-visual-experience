@@ -110,7 +110,7 @@ try {
     $failures[] = 'Source completion matrix invalid: ' . $exception->getMessage();
 }
 $latestRange = (string) ($matrix['declaration']['latest_review_range'] ?? '');
-$check(in_array($latestRange, ['635-654', '655-674', '675-694'], true), 'Source completion matrix must preserve or advance beyond Reviews 635-654.');
+$check(in_array($latestRange, ['635-654', '655-674', '675-694', '695-714'], true), 'Source completion matrix must preserve or advance beyond Reviews 635-654.');
 $check(file_exists($root . '/config/review635-654-plan-completeness-ledger.json'), 'Historical Reviews 635-654 ledger must remain preserved.');
 $check(($matrix['declaration']['exact_head_ci'] ?? '') === 'external-evidence-required-for-current-head-not-frozen-in-source', 'Mutable exact-head CI truth must not be frozen as self-certified source status.');
 $check(($matrix['declaration']['known_unresolved_source_defects'] ?? null) === 0, 'Known File 25 source defects must be zero after corrections.');
@@ -152,7 +152,7 @@ $check(! str_contains($wpReadme, 'Confirm File 00 `1.2.4`'), 'Obsolete installat
 
 $composer = $read('composer.json');
 $check(str_contains($composer, 'tests/review635-654-plan-completeness.php'), 'Fresh audit test is not governed.');
-$check(str_contains($composer, 'Reviews 675-694') || str_contains($composer, 'Reviews 655-674') || str_contains($composer, 'Reviews 635-654'), 'Composer description does not identify current audit lineage.');
+$check(str_contains($composer, 'Reviews 695-714') || str_contains($composer, 'Reviews 675-694') || str_contains($composer, 'Reviews 655-674') || str_contains($composer, 'Reviews 635-654'), 'Composer description does not identify current audit lineage.');
 
 foreach ([
     'config/review635-654-plan-completeness-ledger.json',
