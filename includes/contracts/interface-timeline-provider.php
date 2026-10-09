@@ -47,6 +47,39 @@ interface Timeline_Provider
      */
     public function get_public_author_items(int $author_id, array $query): array;
 
+    /**
+     * Normalize one owner-native public candidate into File 25's immutable
+     * presentation pointer. Providers remain authoritative for publication and
+     * visibility truth.
+     *
+     * @param array<string,mixed> $native_item
+     */
+    public function normalize_public_item(array $native_item, int $author_id): ?Normalized_Timeline_Item;
+
+    public function get_canonical_url(Normalized_Timeline_Item $item): string;
+
+    public function get_visibility_state(Normalized_Timeline_Item $item): string;
+
+    /** @return list<string> */
+    public function get_public_actions(Normalized_Timeline_Item $item): array;
+
+    /**
+     * Return only public, aggregate, owner-defined metrics for presentation
+     * decisions. Raw analytics, reader identities and private counters are
+     * forbidden.
+     *
+     * @return array{views?:int,saves?:int,privacy_safe?:bool}
+     */
+    public function get_public_metrics(Normalized_Timeline_Item $item): array;
+
+    public function get_correction_state(Normalized_Timeline_Item $item): string;
+
+    /**
+     * Register owner-native invalidation/synchronization signals when the
+     * provider exposes them. This must not transfer canonical ownership.
+     */
+    public function register_sync_events(): void;
+
     /** @return array<string,mixed> */
     public function get_health_status(): array;
 }
