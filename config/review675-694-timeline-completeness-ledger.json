@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "file": 25,
+  "review_range": {
+    "first": 675,
+    "last": 694,
+    "count": 20
+  },
+  "basis": {
+    "baseline_main_sha": "e35563b7f3d8ebf0acbbc80982b7bcf2e1b78c0a",
+    "baseline_main_ci": {
+      "run_number": 1689,
+      "run_id": 37623663162,
+      "conclusion": "success"
+    },
+    "candidate_branch": "fix/reviews-675-694-timeline-completeness-20261009",
+    "file25_plan": "Complete Public UI, Profile Timeline and Visual Experience — Final Harmonized Specification 2.0 plus governing addenda",
+    "central_plan": "Sabri Social Homeopathy Platform Definitive/Consolidated Governing Master Plan 2026",
+    "method": "Fresh twenty-scope plan-to-code and cross-file audit focused on timeline filtering/sorting/pagination accessibility, REST/SEO parity, pin governance, and current companion repository drift."
+  },
+  "defect_rounds": [
+    677,
+    678,
+    679,
+    680,
+    681,
+    682,
+    683,
+    684,
+    685,
+    686,
+    687,
+    688,
+    689,
+    690,
+    691
+  ],
+  "clean_rounds": [
+    675,
+    676,
+    692,
+    693
+  ],
+  "dependency_limited_rounds": [
+    694
+  ],
+  "reviews": [
+    {
+      "review": 675,
+      "focus": "repository-baseline-exact-main-ci",
+      "status": "reviewed-clean",
+      "finding": "Baseline main e35563b7f3d8ebf0acbbc80982b7bcf2e1b78c0a and exact-main CI run 1689 were frozen as repository/CI evidence only."
+    },
+    {
+      "review": 676,
+      "focus": "file25-plan-central-ownership",
+      "status": "reviewed-clean",
+      "finding": "File 25 remains public visual/profile/timeline presentation owner; File 20 shell, File 21 publication, File 24 assurance and File 26 global search/ranking ownership remain intact."
+    },
+    {
+      "review": 677,
+      "focus": "timeline-provider-secondary-filter",
+      "status": "defect-found-corrected",
+      "finding": "Timeline_Service already accepted a provider filter internally, but public profile UI/renderer never exposed or forwarded it. Added bounded available-provider choices and renderer/UI wiring."
+    },
+    {
+      "review": 678,
+      "focus": "timeline-year-filter",
+      "status": "defect-found-corrected",
+      "finding": "Plan-required year filtering was absent. Added strict 4-digit bounded year parsing in HTML and REST paths plus normalized-item filtering."
+    },
+    {
+      "review": 679,
+      "focus": "timeline-language-filter",
+      "status": "defect-found-corrected",
+      "finding": "Plan-required language filtering was absent. Added bounded BCP47-like language validation and case-insensitive normalized-item filtering."
+    },
+    {
+      "review": 680,
+      "focus": "timeline-topic-filter",
+      "status": "defect-found-corrected",
+      "finding": "Plan-required topic filtering was absent. Added bounded plain-text topic input, safe parsing and exact case-insensitive normalized-item matching."
+    },
+    {
+      "review": 681,
+      "focus": "timeline-oldest-sort",
+      "status": "defect-found-corrected",
+      "finding": "Only reverse-chronological latest ordering existed. Added governed latest/oldest ordering while preserving pin precedence."
+    },
+    {
+      "review": 682,
+      "focus": "timeline-corrections-filter",
+      "status": "defect-found-corrected",
+      "finding": "The plan required a Corrections primary filter, but no filter existed. Added corrections projection filtering over corrected/retracted owner-authorized items without inventing a native content type."
+    },
+    {
+      "review": 683,
+      "focus": "timeline-filter-search-state",
+      "status": "defect-found-corrected",
+      "finding": "Search and secondary filter forms did not explicitly preserve each other's state or owner preview state. Added bounded hidden-state preservation and page reset behavior."
+    },
+    {
+      "review": 684,
+      "focus": "timeline-filtered-empty-state",
+      "status": "defect-found-corrected",
+      "finding": "Filtered empty results could falsely say that the profile had no public publications. Empty state now distinguishes no matches from no publications."
+    },
+    {
+      "review": 685,
+      "focus": "timeline-screen-reader-page-announcement",
+      "status": "defect-found-corrected",
+      "finding": "Pagination lacked the plan-required screen-reader result/page announcement. Added aria-live status with page and public item count."
+    },
+    {
+      "review": 686,
+      "focus": "timeline-rest-html-parity",
+      "status": "defect-found-corrected",
+      "finding": "REST timeline endpoints exposed only page/per_page/content_type, diverging from HTML filtering. Added provider/year/language/topic/sort/search validation and forwarding."
+    },
+    {
+      "review": 687,
+      "focus": "timeline-filtered-seo-noindex",
+      "status": "defect-found-corrected",
+      "finding": "SEO noindex detection covered only type/search/page/preview and missed new secondary filters. Added provider/year/language/topic/sort coverage."
+    },
+    {
+      "review": 688,
+      "focus": "explicit-default-query-indexing",
+      "status": "defect-found-corrected",
+      "finding": "Explicit default query variants such as ?sort=latest could remain indexable duplicates. Added query-presence detection so any timeline refinement URL is noindex."
+    },
+    {
+      "review": 689,
+      "focus": "timeline-pin-audit-provenance",
+      "status": "defect-found-corrected",
+      "finding": "pin_weight could alter ordering without the plan-required audit reference, actor, reason, surface and start/end window. Added bounded internal pin audit provenance; unaudited/invalid pins fail closed to weight 0 without dropping the public item."
+    },
+    {
+      "review": 690,
+      "focus": "file09-current-head-drift",
+      "status": "defect-found-corrected",
+      "finding": "File 09 repository main advanced to cfc5f781a766330314dc98c42abeca0eb7786eba (runtime 1.3.0/schema 6/contract 1.1.0). Dependency evidence was refreshed; compatibility remains within the accepted family."
+    },
+    {
+      "review": 691,
+      "focus": "file14-current-head-drift",
+      "status": "defect-found-corrected",
+      "finding": "File 14 repository main advanced to 080e2198d84dfb7491bb0b75946e14a5fe118b91 (runtime 1.4.8/schema 10005). Dependency evidence was refreshed; compatibility remains within >=1.4.3 <1.5.0."
+    },
+    {
+      "review": 692,
+      "focus": "file03-file08-file17-boundaries",
+      "status": "reviewed-clean",
+      "finding": "File 03 public profile/media ownership remains compatible; File 08 Appointment and File 17 Follow stay fail-closed where target-bound owner contracts are absent."
+    },
+    {
+      "review": 693,
+      "focus": "file20-file21-file22-file23-file24-file26-boundaries",
+      "status": "reviewed-clean",
+      "finding": "Shell, publication, authoring, private dashboard, assurance and global search/ranking ownership boundaries remain intact."
+    },
+    {
+      "review": 694,
+      "focus": "richer-timeline-content-owner-contracts",
+      "status": "dependency-limited-no-local-defect",
+      "finding": "Current File 21 ProfileTimeline owner contract exposes approved WordPress posts. Richer planned timeline types require authoritative owner-native timeline providers/contracts; File 25 must not infer public approval from section-card adapters or foreign storage."
+    }
+  ],
+  "external_truth": {
+    "hostinger_staging_accepted": false,
+    "founder_staging_acceptance": false,
+    "production_accepted": false,
+    "live_deployed": false,
+    "operational": false,
+    "exact_deployed_code_verified": false,
+    "db_version_verified_live": false,
+    "migration_state_verified_live": false
+  },
+  "unresolved_cross_file_dependencies": [
+    "File 08 current main still does not publish an authoritative profile-user-to-booking-destination contract for File 25.",
+    "File 17 current main still does not publish an authoritative target-bound Follow destination contract for File 25.",
+    "Current File 21 ProfileTimeline owner contract exposes approved WordPress posts; richer planned timeline content types require authoritative owner-native timeline providers/contracts before File 25 may present them as timeline items."
+  ],
+  "source_candidate": {
+    "runtime": "0.15.0",
+    "known_unresolved_file25_source_defects_after_corrections": 0,
+    "exact_current_head_ci": "external-evidence-required-not-frozen-in-source"
+  }
+}
