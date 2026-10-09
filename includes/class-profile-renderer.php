@@ -171,6 +171,7 @@ final class Profile_Renderer
             $context['timeline_sort'] = $sort;
             $context['timeline_search_query'] = $search_query;
             $context['timeline_search_error'] = $search_error;
+            $context['timeline_filtered_request'] = $this->timeline_filter_request_present();
             $timeline = $this->timeline->get_for_author((int) $user->ID, [
                 'page' => max(1, (int) get_query_var('paged')),
                 'per_page' => $timeline_page_size,
@@ -250,7 +251,8 @@ final class Profile_Renderer
         }
 
         $context = (array) ($GLOBALS['sabri_public_experience_context'] ?? []);
-        $filtered = sanitize_key((string) ($context['timeline_content_type'] ?? '')) !== ''
+        $filtered = ! empty($context['timeline_filtered_request'])
+            || sanitize_key((string) ($context['timeline_content_type'] ?? '')) !== ''
             || sanitize_key((string) ($context['timeline_provider'] ?? '')) !== ''
             || trim((string) ($context['timeline_year'] ?? '')) !== ''
             || trim((string) ($context['timeline_language'] ?? '')) !== ''
@@ -439,6 +441,17 @@ final class Profile_Renderer
         }
 
         return array_key_exists($requested, $filters) ? $requested : '';
+    }
+
+    private function timeline_filter_request_present(): bool
+    {
+        foreach (['type', 'provider', 'year', 'language', 'topic', 'sort', 'profile_q'] as $key) {
+            if (array_key_exists($key, $_GET)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /** @param list<string> $allowed */
