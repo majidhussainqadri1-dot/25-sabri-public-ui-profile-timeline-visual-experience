@@ -4,27 +4,43 @@
 
 WordPress module for the **Sabri Social Homeopathy Platform**. This is the existing File 25; no duplicate File 26 is created.
 
-## Current corrective candidate
+## Current corrective candidate — Reviews 695–714
 
-- Runtime: `0.15.0`
-- Schema: `2`
-- Fresh audit branch: `fix/reviews-675-694-timeline-completeness-20261009`
-- Baseline main SHA reviewed: `e35563b7f3d8ebf0acbbc80982b7bcf2e1b78c0a`
-- Baseline main exact-head CI: **PASS** — run `1689`
-- Governing product plan: Master Plan `v3.0` / consolidated governing addenda
-- Governing File 25 plan: Final Harmonized Specification `2.0`
-- Source correction status: **Reviews 675–694 corrected**
+- Runtime: `0.15.0` (source package version unchanged).
+- Frozen main audit baseline: `3075224089506fed19af1441ebf3556c2d5230b5`.
+- Baseline exact-main CI: **PASS**, run `1784` (source/CI evidence only).
+- Corrective branch: `fix/reviews-695-714-timeline-integrity-20261009`.
+- Governed File 25 plan: Final Harmonized Specification `2.0` and central consolidated master plan.
+- Source review result: **20 scopes; 6 corrected defect rounds, 13 clean source scopes and 1 owner-contract dependency scope**.
 - Known unresolved File 25 source defects after the recorded corrections: **0**
-- Known cross-file owner-contract limitations: File 08 profile→booking destination; File 17 target-bound Follow destination; richer non-post timeline classes require authoritative owner timeline contracts
+- Known owner-contract gaps: File 08 profile booking destination, File 17 target-bound Follow destination, and richer approved non-post timeline sources beyond File 21.
 - Hostinger staging accepted: **No**
 - Production approved: **No**
-- Live deployment verified: **No**
+- Live deployment verified: **No**. Exact deployed parity verified: **No**.
 
-Reviews `675–694` performed a fresh plan-to-code and cross-file audit focused on timeline filtering/sorting, pagination accessibility, REST/SEO parity, governed pinning and current companion repository drift. Defect rounds `677–691` were corrected.
+### Corrective implementation
+
+- Enforced **active UTC start/end and profile-timeline surface** for audited pins. Expired, future, malformed and foreign-surface pin claims lose ordering priority without hiding approved public items.
+- Repaired merged Timeline pagination: per-provider 500-item caps no longer impose a single-provider page ceiling across all providers.
+- Rejects pages outside bounded aggregate capacity **before** offset multiplication to avoid integer overflow.
+- Ordinary 20+1 look-ahead no longer produces a false hard-limit warning; actual 500-item provider cap still warns.
+- Year, language, topic, Corrections and search refinements now retrieve the **complete bounded 500-item candidate pool** so older matches can be found.
+- **Oldest** ordering now uses the full bounded pool rather than sorting a newest-only preview.
+- Added executable regression coverage with real bounded mock providers, multi-provider Page 26, huge-page input, and active/future/expired/foreign pin windows.
+
+### Evidence
+
+```text
+config/review695-714-timeline-integrity-ledger.json
+docs/REVIEWS-695-714-TIMELINE-INTEGRITY-2026-10-09.md
+tests/review695-714-timeline-integrity.php
+```
+
+**Evidence boundary:** CI builds and ZIP checks are not installed staging, live deployment or database truth. Exact deployed code, DB/schema, migration state, staging visual/role acceptance and live re-test all remain unverified.
 
 ## Source implementation status
 
-File 25 source-owned scope is complete after the recorded local corrections. Mutable exact-head CI state is intentionally **not frozen as permanent truth inside source metadata**: the exact current GitHub HEAD must be checked against its current CI run after the final commit. Repository/CI evidence never proves installed Hostinger staging or live deployment.
+File 25 source-owned scope identified in Reviews 695–714 has been corrected; later source changes require fresh exact-head CI evidence. Mutable exact-head CI state is intentionally **not frozen as permanent truth inside source metadata**: the exact current GitHub HEAD must be checked against its current CI run after the final commit. Repository/CI evidence never proves installed Hostinger staging or live deployment.
 
 Machine-readable traceability:
 
@@ -36,13 +52,14 @@ config/review615-634-fresh-cross-file-audit-ledger.json
 config/review635-654-plan-completeness-ledger.json
 config/review655-674-admin-plan-completeness-ledger.json
 config/review675-694-timeline-completeness-ledger.json
+config/review695-714-timeline-integrity-ledger.json
 config/staging-dependencies.json
 ```
 
 Current fresh audit record:
 
 ```text
-docs/REVIEWS-675-694-TIMELINE-COMPLETENESS-2026-10-09.md
+docs/REVIEWS-695-714-TIMELINE-INTEGRITY-2026-10-09.md
 ```
 
 The audited baseline main `e35563b7...` passed exact-head CI run `1689`. The final current-head CI status for any later corrective commit is external evidence and must be queried from GitHub; it is not self-certified by this README. Hostinger staging, Founder acceptance, production approval, exact deployed-code parity, live database/schema state, live migration state and operational acceptance remain separate gates.

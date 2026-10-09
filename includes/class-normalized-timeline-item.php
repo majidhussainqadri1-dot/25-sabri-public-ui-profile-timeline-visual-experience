@@ -311,7 +311,17 @@ final class Normalized_Timeline_Item implements JsonSerializable
             return null;
         }
 
-        if ($actor_id === null || $reason === '' || strcmp($end_at, $start_at) < 0) {
+        $now = gmdate('Y-m-d\\TH:i:s\\Z');
+        if ($actor_id === null
+            || $reason === ''
+            || $surface !== 'profile-timeline'
+            || strcmp($end_at, $start_at) < 0
+            || strcmp($now, $start_at) < 0
+            || strcmp($now, $end_at) > 0
+        ) {
+            // A pin may affect this profile timeline only during its approved
+            // period and on its audited surface. Outside that window the
+            // otherwise-authorized public item remains normally visible.
             return null;
         }
 

@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "file": 25,
+  "range": {
+    "first": 695,
+    "last": 714,
+    "count": 20
+  },
+  "baseline": {
+    "repository_head": "3075224089506fed19af1441ebf3556c2d5230b5",
+    "run_number": 1784,
+    "run_id": 37904435708,
+    "conclusion": "success"
+  },
+  "governing_sources": [
+    "File 25 Final Harmonized Specification 2.0, §§39–48, 60, 68, 72, 89–90",
+    "Sabri Social Homeopathy Consolidated Governing Master Plan 2026"
+  ],
+  "review_rounds": [
+    {
+      "number": 695,
+      "scope": "Exact repository HEAD and baseline CI",
+      "status": "clean",
+      "finding": "main 3075224089506fed19af1441ebf3556c2d5230b5 and exact-main run 1784 success were frozen as source/CI evidence, not live proof"
+    },
+    {
+      "number": 696,
+      "scope": "Time-bounded profile Timeline pinning",
+      "status": "corrected",
+      "finding": "pin audit was recorded but future/expired approvals and foreign surfaces could influence ordering; enforced active UTC window and profile-timeline surface"
+    },
+    {
+      "number": 697,
+      "scope": "Merged multi-provider pagination window",
+      "status": "corrected",
+      "finding": "max page derived from one provider even though up to 25 providers may each contribute 500 items; applied bounded aggregate provider capacity"
+    },
+    {
+      "number": 698,
+      "scope": "Very large page arithmetic",
+      "status": "corrected",
+      "finding": "validated PHP_INT_MAX page could overflow offset computation; upper-bound check now precedes arithmetic"
+    },
+    {
+      "number": 699,
+      "scope": "False truncated warning on ordinary pagination",
+      "status": "corrected",
+      "finding": "21-item page-one look-ahead triggered safe-limit warning; warning now requires actual per-provider 500-item cap"
+    },
+    {
+      "number": 700,
+      "scope": "Secondary filters over historical items",
+      "status": "corrected",
+      "finding": "year/language/topic/search/corrections could examine only first page of native candidates; retrieve bounded 500-item candidate window"
+    },
+    {
+      "number": 701,
+      "scope": "Oldest timeline ordering",
+      "status": "corrected",
+      "finding": "oldest was sorting only latest few items; use bounded full candidate window, report truncation at hard cap"
+    },
+    {
+      "number": 702,
+      "scope": "Invalid and out-of-range page inputs",
+      "status": "clean",
+      "finding": "strict integers, bounded per-page and safe empty/truncated overflow behavior retained"
+    },
+    {
+      "number": 703,
+      "scope": "Provider batch atomicity",
+      "status": "clean",
+      "finding": "malformed late item invalidates one provider batch and preserves other providers"
+    },
+    {
+      "number": 704,
+      "scope": "Public item metadata redaction",
+      "status": "clean",
+      "finding": "native object IDs, internal provider identifiers and private pin audit remain outside public projection"
+    },
+    {
+      "number": 705,
+      "scope": "Canonical URL and cross-provider deduplication",
+      "status": "clean",
+      "finding": "same-site canonical eligibility and global normalized deduplication retained"
+    },
+    {
+      "number": 706,
+      "scope": "Correction/retraction projection safety",
+      "status": "clean",
+      "finding": "only already authorized corrected/retracted normalized items eligible"
+    },
+    {
+      "number": 707,
+      "scope": "REST and HTML timeline filter parity",
+      "status": "clean",
+      "finding": "existing provider/year/language/topic/sort/search validation and forwarding retained"
+    },
+    {
+      "number": 708,
+      "scope": "SEO indexing of filtered pages",
+      "status": "clean",
+      "finding": "explicit timeline refinement query variants remain noindex"
+    },
+    {
+      "number": 709,
+      "scope": "Accessibility and pagination presentation",
+      "status": "clean",
+      "finding": "screen reader aria-live page result announcements, Back restoration and URL filter preservation retained"
+    },
+    {
+      "number": 710,
+      "scope": "File 03, 08 and 09 public authority",
+      "status": "clean",
+      "finding": "profile/media/clinic/doctor verification authority preserved; appointment fail closed absent owner target contract"
+    },
+    {
+      "number": 711,
+      "scope": "File 14, 17 and 20 ownership",
+      "status": "clean",
+      "finding": "clinic conversion, relationship/Follow and structural shell authority remain native"
+    },
+    {
+      "number": 712,
+      "scope": "File 21, 22 and 23 ownership",
+      "status": "clean",
+      "finding": "publication timeline, Composer and private publishing dashboard remain canonical owners"
+    },
+    {
+      "number": 713,
+      "scope": "File 24 and 26 governance",
+      "status": "clean",
+      "finding": "security/privacy assurance and global search/ranking stay with owning modules"
+    },
+    {
+      "number": 714,
+      "scope": "Non-post timeline content and acceptance gates",
+      "status": "dependency",
+      "finding": "richer content requires native owner-authorized timeline contracts; staging/live/deployed truth remains unverified"
+    }
+  ],
+  "defect_rounds": [
+    696,
+    697,
+    698,
+    699,
+    700,
+    701
+  ],
+  "clean_rounds": [
+    695,
+    702,
+    703,
+    704,
+    705,
+    706,
+    707,
+    708,
+    709,
+    710,
+    711,
+    712,
+    713
+  ],
+  "dependency_rounds": [
+    714
+  ],
+  "companion_heads": {
+    "14": "080e2198d84dfb7491bb0b75946e14a5fe118b91",
+    "17": "8ae656e51796d1f05865d8be5dca2480443d79ca",
+    "20": "8a4dbcaf4fef8e926b9b834ecfde16c21a0f00ca",
+    "21": "f2eb7e95ddea327af36ea725ffb923b029f885e6",
+    "22": "b7a7f2e69411cbd32f0574fd12d766fb70c01b7a",
+    "23": "dcae138e6073f4d0ff596623deb05b9940b8271b",
+    "24": "a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb",
+    "26": "bbea3aad466792a4a6a62b53532bbd45c7c592de",
+    "03": "636e3ef965423887f810718abec3cd1c11c3659d",
+    "08": "70541974ce0ffb16aebef557c3016eb7447662f4",
+    "09": "cfc5f781a766330314dc98c42abeca0eb7786eba"
+  },
+  "unresolved_owner_dependencies": [
+    "File 08 user-to-booking canonical destination",
+    "File 17 target-bound Follow destination",
+    "Owner-authorized non-post timeline sources beyond File 21 post projection"
+  ],
+  "external_truth": {
+    "hostinger_staging_accepted": false,
+    "founder_acceptance": false,
+    "production_accepted": false,
+    "exact_deployed_code_verified": false,
+    "live_db_version_verified": false,
+    "migration_state_verified": false,
+    "live_retest_verified": false
+  },
+  "current_head_ci": "must be independently queried after branch, PR and main commits; not certified in this ledger",
+  "source_known_defects_after_corrections": 0
+}

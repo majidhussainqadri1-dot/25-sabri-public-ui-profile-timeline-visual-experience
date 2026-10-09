@@ -20,7 +20,7 @@ The reviewed 0.15.0 source correction includes:
 * canonical File 03 contact preservation with monotonic revoke-only filters and substitution denial;
 * fail-closed high-risk rebuild/migration authorization requiring strict explicit approval;
 * data-free recoverable Safe Mode public profile routes using a no-store/noindex 503 native-theme surface;
-* Reviews 675–694 fresh timeline/plan/cross-file completion, including provider/year/language/topic filters, latest/oldest sorting, Corrections filtering, REST/SEO parity, accessible pagination announcements, audited pin authority, and current companion reconciliation;
+* Reviews 695–714 fresh cross-file timeline integrity audit: enforced time-active pin windows and exact profile surface; corrected multi-provider pagination, huge-page overflow, false truncation warning, older filtered matches and bounded oldest sorting; preserves native owner-contract limitations;
 * `CHAT-UX-001` accessible green welcome visual presentation with File 20 retaining the 30-day frequency owner;
 * Master Plan v3.0 and File 20 plan v4.1 ownership reconciliation;
 * current File 00 membership contract `1.2.3` with reviewed `1.2.2` compatibility as the sole membership, Founder, suspension, eligibility, guardian-policy and public-profile assertion authority;
@@ -59,6 +59,9 @@ This candidate is not production-complete. Exact multi-plugin Hostinger staging,
 == Changelog ==
 
 = 0.15.0 =
+* Reviews 695–714: six source defects corrected; thirteen source scopes clean, one native owner-contract dependency recorded; this is not installed staging or live acceptance.
+* Corrected time-bounded audited pin authority, per-provider/aggregate pagination, integer overflow protection and truthful retrieval-cap warnings.
+* Bounded full candidate window is now used for year/language/topic/search/Corrections filtering and oldest sorting.
 * Reviews 675–694 completed a fresh File 25 timeline/plan/cross-file audit.
 * Added bounded provider, year, language and topic secondary filters plus Latest/Oldest sorting.
 * Added Corrections filtering over corrected/retracted owner-authorized items without inventing a native content type.

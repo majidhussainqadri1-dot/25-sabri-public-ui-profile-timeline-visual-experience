@@ -259,8 +259,12 @@ namespace {
             break;
         case 63:
             $r = new Timeline_Registry(); $p = new TimelineProvider(); $r->register($p);
-            $result = (new Timeline_Service($r))->get_for_author(7, ['page' => 1, 'per_page' => 20]);
-            $check($result['truncated'] === true, 'Review 63: an exact hard-cap provider response must be reported as potentially truncated.');
+            $preview = (new Timeline_Service($r))->get_for_author(7, ['page' => 1, 'per_page' => 20]);
+            $check($preview['has_more'] === true && $preview['truncated'] === false,
+                'Review 63: ordinary 21-item look-ahead is not a 500-item hard-cap truncation.');
+            $hard_cap = (new Timeline_Service($r))->get_for_author(7, ['page' => 25, 'per_page' => 20]);
+            $check($hard_cap['truncated'] === true,
+                'Review 63: a provider response at the actual 500-item safety cap remains potentially truncated.');
             break;
         case 64:
             $check($throws(fn () => (new Section_Registry())->register(new SectionProvider(' Section'))), 'Review 64: section provider ID must be exact.');

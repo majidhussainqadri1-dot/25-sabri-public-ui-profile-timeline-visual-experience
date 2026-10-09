@@ -138,8 +138,8 @@ $audited_pin = timeline_item([
         'actor_id' => 7,
         'reason' => 'Founder-approved official item.',
         'surface' => 'profile-timeline',
-        'start_at' => '2026-10-01T00:00:00Z',
-        'end_at' => '2026-10-31T23:59:59Z',
+        'start_at' => gmdate('Y-m-d\\TH:i:s\\Z', time() - 3600),
+        'end_at' => gmdate('Y-m-d\\TH:i:s\\Z', time() + 3600),
     ],
 ]);
 check($audited_pin->get('pin_weight') === 1000, 'Audited pin weight must remain bounded to the maximum.');
