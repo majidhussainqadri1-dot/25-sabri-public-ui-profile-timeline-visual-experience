@@ -63,6 +63,36 @@ final class Rest_Controller
                 'sanitize_callback' => static fn ($value): string => is_string($value) ? $value : '',
                 'validate_callback' => static fn ($value): bool => self::exact_optional_key($value) !== null,
             ],
+            'provider' => [
+                'default' => '',
+                'sanitize_callback' => static fn ($value): string => is_string($value) ? $value : '',
+                'validate_callback' => static fn ($value): bool => self::exact_optional_key($value) !== null,
+            ],
+            'year' => [
+                'default' => '',
+                'sanitize_callback' => static fn ($value): string => is_string($value) ? $value : '',
+                'validate_callback' => static fn ($value): bool => self::exact_optional_year($value) !== null,
+            ],
+            'language' => [
+                'default' => '',
+                'sanitize_callback' => static fn ($value): string => is_string($value) ? $value : '',
+                'validate_callback' => static fn ($value): bool => self::exact_optional_language($value) !== null,
+            ],
+            'topic' => [
+                'default' => '',
+                'sanitize_callback' => static fn ($value): string => is_string($value) ? trim(wp_strip_all_tags($value)) : '',
+                'validate_callback' => static fn ($value): bool => self::exact_optional_text($value, 120) !== null,
+            ],
+            'sort' => [
+                'default' => 'latest',
+                'sanitize_callback' => static fn ($value): string => is_string($value) ? $value : 'latest',
+                'validate_callback' => static fn ($value): bool => is_string($value) && in_array($value, ['latest', 'oldest'], true),
+            ],
+            'search' => [
+                'default' => '',
+                'sanitize_callback' => static fn ($value): string => is_string($value) ? Plan_Completion::normalize_search_query($value) : '',
+                'validate_callback' => static fn ($value): bool => self::exact_optional_search($value),
+            ],
         ];
 
         register_rest_route('sabri-public/v1', '/founder', $public + [
@@ -228,6 +258,12 @@ final class Rest_Controller
             'page' => max(1, (int) $request['page']),
             'per_page' => min(50, max(1, (int) $request['per_page'])),
             'content_type' => (string) $request['content_type'],
+            'provider' => (string) $request['provider'],
+            'year' => (string) $request['year'],
+            'language' => (string) $request['language'],
+            'topic' => (string) $request['topic'],
+            'sort' => (string) $request['sort'],
+            'search' => (string) $request['search'],
         ]);
         $public_result = [
             'items' => $result['items'],
@@ -438,6 +474,61 @@ final class Rest_Controller
         }
 
         return preg_match('/^[a-z0-9][a-z0-9_-]{0,63}$/', $value) === 1 ? $value : null;
+    }
+
+    private static function exact_optional_year(mixed $value): ?string
+    {
+        if ($value === '') {
+            return '';
+        }
+        if (! is_string($value) || preg_match('/^(?:19|20|21)\\d{2}$/', $value) !== 1) {
+            return null;
+        }
+        $year = (int) $value;
+
+        return $year >= 1900 && $year <= ((int) gmdate('Y') + 1) ? $value : null;
+    }
+
+    private static function exact_optional_language(mixed $value): ?string
+    {
+        if ($value === '') {
+            return '';
+        }
+
+        return is_string($value)
+            && strlen($value) <= 35
+            && preg_match('/^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$/', $value) === 1
+                ? $value
+                : null;
+    }
+
+    private static function exact_optional_text(mixed $value, int $maximum): ?string
+    {
+        if ($value === '') {
+            return '';
+        }
+        if (! is_string($value)) {
+            return null;
+        }
+        $value = trim(wp_strip_all_tags($value));
+
+        return $value !== ''
+            && strlen($value) <= $maximum
+            && preg_match('/[\\x00-\\x1F\\x7F]/', $value) !== 1
+                ? $value
+                : null;
+    }
+
+    private static function exact_optional_search(mixed $value): bool
+    {
+        if ($value === '') {
+            return true;
+        }
+        if (! is_string($value) || strlen($value) > 120) {
+            return false;
+        }
+
+        return Plan_Completion::normalize_search_query($value) !== '';
     }
 
     private static function canonicalize_for_etag(
