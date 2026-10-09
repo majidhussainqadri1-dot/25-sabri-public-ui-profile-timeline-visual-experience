@@ -222,7 +222,7 @@ foreach ([
 $readme = file_get_contents($root . '/README.md');
 $assert(is_string($readme), 'README must be readable.');
 if (is_string($readme)) {
-    $assert(str_contains($readme, 'Reviews 695–714') && str_contains($readme, 'Known unresolved File 25-owned source defects from this cycle: **0**'), 'README must declare current corrected source status.');
+    $assert(str_contains($readme, 'Reviews 695–714') && str_contains($readme, 'Known unresolved File 25 source defects after the recorded corrections: **0**'), 'README must declare current corrected source status.');
     $assert(str_contains($readme, 'Hostinger staging accepted: **No**'), 'README must retain the Hostinger staging boundary.');
     $assert(str_contains($readme, 'Production approved: **No**'), 'README must retain the production boundary.');
 }
