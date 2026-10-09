@@ -122,6 +122,9 @@ final class Normalized_Timeline_Item implements JsonSerializable
             throw new InvalidArgumentException('Timeline update date cannot precede its publication date.');
         }
 
+        $pin_weight = $this->exact_bounded_integer($data['pin_weight'] ?? 0, 0, 1000, 'pin weight');
+        $pin_audit = $this->normalize_pin_audit($data['pin_audit'] ?? null, $pin_weight);
+
         $this->data = [
             'provider_id' => $provider_id,
             'provider_version' => $provider_version,
@@ -147,7 +150,8 @@ final class Normalized_Timeline_Item implements JsonSerializable
             'safety_flags' => $this->exact_key_list($data['safety_flags'] ?? [], 'safety flags'),
             'available_actions' => $this->exact_action_list($data['available_actions'] ?? []),
             'metrics_reference' => $this->scalar_reference($data['metrics_reference'] ?? null),
-            'pin_weight' => $this->exact_bounded_integer($data['pin_weight'] ?? 0, 0, 1000, 'pin weight'),
+            'pin_weight' => $pin_weight,
+            'pin_audit' => $pin_audit,
         ];
     }
 
@@ -178,6 +182,7 @@ final class Normalized_Timeline_Item implements JsonSerializable
             'public_profile_id',
             'thumbnail_reference',
             'metrics_reference',
+            'pin_audit',
         ]));
 
         // Native attachment IDs and ungoverned remote image references never
@@ -280,6 +285,37 @@ final class Normalized_Timeline_Item implements JsonSerializable
         }
 
         return array_values($actions);
+    }
+
+    /** @return array{reference:string,actor_id:int,reason:string,surface:string,start_at:string,end_at:string}|null */
+    private function normalize_pin_audit(mixed $value, int $pin_weight): ?array
+    {
+        if ($pin_weight === 0) {
+            return null;
+        }
+        if (! is_array($value)) {
+            throw new InvalidArgumentException('Pinned timeline items require bounded audit provenance.');
+        }
+
+        $reference = $this->exact_scalar((string) ($value['reference'] ?? ''), 191, 'pin audit reference');
+        $actor_id = $this->exact_positive_integer($value['actor_id'] ?? null);
+        $reason = $this->plain_text((string) ($value['reason'] ?? ''), 300);
+        $surface = $this->exact_key((string) ($value['surface'] ?? ''), 64, 'pin audit surface');
+        $start_at = $this->required_date((string) ($value['start_at'] ?? ''));
+        $end_at = $this->required_date((string) ($value['end_at'] ?? ''));
+
+        if ($actor_id === null || $reason === '' || strcmp($end_at, $start_at) < 0) {
+            throw new InvalidArgumentException('Pinned timeline audit provenance is incomplete or has an invalid time window.');
+        }
+
+        return [
+            'reference' => $reference,
+            'actor_id' => $actor_id,
+            'reason' => $reason,
+            'surface' => $surface,
+            'start_at' => $start_at,
+            'end_at' => $end_at,
+        ];
     }
 
     private function exact_positive_integer(mixed $value): ?int
