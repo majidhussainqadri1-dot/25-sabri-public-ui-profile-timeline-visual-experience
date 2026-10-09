@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.15.0 — Timeline/Plan/Cross-File Completeness Reviews 675–694 — 2026-10-09
+
+### Corrected
+
+- Added bounded provider, year, language and topic secondary timeline filters.
+- Added latest/oldest sorting while preserving governed pin precedence.
+- Added the plan-required Corrections filter over corrected/retracted owner-authorized items.
+- Preserved search/filter/preview URL state and corrected misleading filtered empty-state copy.
+- Added screen-reader page/item announcements for timeline pagination.
+- Added REST timeline parity for provider/year/language/topic/sort/search.
+- Expanded noindex behavior to every explicit timeline refinement URL, including semantically default query variants.
+- Added bounded pin audit provenance; invalid or unaudited pins fail closed to weight 0 without dropping the public item.
+- Refreshed current File 09 R26 and File 14 v1.4.8 repository evidence.
+- Recorded the owner-contract limitation for richer non-post timeline classes rather than synthesizing foreign publication approval.
+
+### Review result
+
+Defect rounds: **677–691**. Reviews **675, 676, 692 and 693** were clean. Review **694** is dependency-limited with no authorized File 25 local patch.
+
+### Acceptance boundary
+
+These corrections establish File 25 repository-source completeness only. Exact current-head CI must be checked externally after the final commit. Hostinger staging, Founder acceptance, production/live deployment, exact deployed-code parity, live DB/schema, migration state and operations remain separate unverified gates.
+
+
 ## 0.15.0 — Admin/Plan/Cross-File Completeness Reviews 655–674 — 2026-10-07
 
 ### Corrected

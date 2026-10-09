@@ -34,10 +34,23 @@ final class Timeline_Service
         $requested_page = self::exact_positive_integer($query['page'] ?? 1, PHP_INT_MAX);
         $content_type = self::exact_optional_key($query['content_type'] ?? '');
         $provider_filter = self::exact_optional_key($query['provider'] ?? '');
+        $year_filter = self::exact_optional_year($query['year'] ?? '');
+        $language_filter = self::exact_optional_language($query['language'] ?? '');
+        $topic_filter = self::exact_optional_text($query['topic'] ?? '', 120);
+        $sort = self::exact_sort($query['sort'] ?? 'latest');
         $raw_search = $query['search'] ?? '';
         $search = is_string($raw_search) ? Plan_Completion::normalize_search_query($raw_search) : '';
         $search_invalid = $raw_search !== '' && (! is_string($raw_search) || $search === '');
-        if ($per_page === null || $requested_page === null || $content_type === null || $provider_filter === null || $search_invalid) {
+        if ($per_page === null
+            || $requested_page === null
+            || $content_type === null
+            || $provider_filter === null
+            || $year_filter === null
+            || $language_filter === null
+            || $topic_filter === null
+            || $sort === null
+            || $search_invalid
+        ) {
             return [
                 'items' => [],
                 'page' => 1,
@@ -69,12 +82,15 @@ final class Timeline_Service
             ];
         }
 
+        $corrections_only = $content_type === 'corrections';
         $provider_query = [
             'page' => 1,
             'per_page' => $candidate_limit,
             'candidate_limit' => $candidate_limit,
             'requested_page' => $requested_page,
-            'content_type' => $content_type,
+            // Corrections are a File 25 projection filter over owner-authorized
+            // items; do not require native owners to invent a content type.
+            'content_type' => $corrections_only ? '' : $content_type,
             'search' => $search,
         ];
 
@@ -119,7 +135,20 @@ final class Timeline_Service
                     if ((int) $item->get('author_id') !== $author_id || (int) $item->get('public_profile_id') !== $author_id) {
                         throw new \UnexpectedValueException('Timeline provider returned an item for a different author or profile.');
                     }
-                    if ($content_type !== '' && $item->get('content_type') !== $content_type) {
+                    if ($corrections_only) {
+                        if (! in_array((string) $item->get('correction_state'), ['corrected', 'retracted'], true)) {
+                            continue;
+                        }
+                    } elseif ($content_type !== '' && $item->get('content_type') !== $content_type) {
+                        continue;
+                    }
+                    if ($year_filter !== '' && substr((string) $item->get('published_at'), 0, 4) !== $year_filter) {
+                        continue;
+                    }
+                    if ($language_filter !== '' && strcasecmp((string) $item->get('language'), $language_filter) !== 0) {
+                        continue;
+                    }
+                    if ($topic_filter !== '' && strcasecmp(trim((string) $item->get('topic')), $topic_filter) !== 0) {
                         continue;
                     }
                     if ($search !== '' && ! Plan_Completion::timeline_item_matches_search($item->to_public_array(), $search)) {
@@ -157,13 +186,15 @@ final class Timeline_Service
 
         usort(
             $items,
-            function (Normalized_Timeline_Item $left, Normalized_Timeline_Item $right): int {
+            function (Normalized_Timeline_Item $left, Normalized_Timeline_Item $right) use ($sort): int {
                 $pin = (int) $right->get('pin_weight') <=> (int) $left->get('pin_weight');
                 if ($pin !== 0) {
                     return $pin;
                 }
 
-                $date = strcmp((string) $right->get('published_at'), (string) $left->get('published_at'));
+                $date = $sort === 'oldest'
+                    ? strcmp((string) $left->get('published_at'), (string) $right->get('published_at'))
+                    : strcmp((string) $right->get('published_at'), (string) $left->get('published_at'));
                 if ($date !== 0) {
                     return $date;
                 }
@@ -208,6 +239,33 @@ final class Timeline_Service
     }
 
 
+    /** @return array<string,string> */
+    public function available_provider_filters(): array
+    {
+        $labels = [];
+        foreach ($this->registry->all() as $provider_id => $provider) {
+            try {
+                $metadata = $this->registry->validated_metadata($provider, (string) $provider_id);
+                if ($metadata === null
+                    || ! in_array($metadata['maturity'], ['read-only', 'staging-accepted', 'production-accepted'], true)
+                    || ! $provider->is_available()
+                ) {
+                    continue;
+                }
+                $label = ucwords(str_replace(['-', '_'], ' ', (string) $provider_id));
+                if (preg_match('/^File (\d+)$/i', $label, $matches) === 1) {
+                    $label = 'File ' . $matches[1];
+                }
+                $labels[(string) $provider_id] = $label;
+            } catch (\Throwable) {
+                continue;
+            }
+        }
+        ksort($labels, SORT_STRING);
+
+        return $labels;
+    }
+
     private static function exact_positive_integer(mixed $value, int $maximum): ?int
     {
         if (is_int($value)) {
@@ -222,6 +280,53 @@ final class Timeline_Service
         $integer = (int) $value;
 
         return (string) $integer === $value && $integer <= $maximum ? $integer : null;
+    }
+
+    private static function exact_optional_year(mixed $value): ?string
+    {
+        if ($value === '') {
+            return '';
+        }
+        if (! is_string($value) || preg_match('/^(?:19|20|21)\\d{2}$/', $value) !== 1) {
+            return null;
+        }
+        $year = (int) $value;
+        $maximum = (int) gmdate('Y') + 1;
+
+        return $year >= 1900 && $year <= $maximum ? $value : null;
+    }
+
+    private static function exact_optional_language(mixed $value): ?string
+    {
+        if ($value === '') {
+            return '';
+        }
+        if (! is_string($value) || strlen($value) > 35 || preg_match('/^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$/', $value) !== 1) {
+            return null;
+        }
+
+        return $value;
+    }
+
+    private static function exact_optional_text(mixed $value, int $maximum): ?string
+    {
+        if ($value === '') {
+            return '';
+        }
+        if (! is_string($value)) {
+            return null;
+        }
+        $value = trim(wp_strip_all_tags($value));
+        if ($value === '' || strlen($value) > $maximum || preg_match('/[\\x00-\\x1F\\x7F]/', $value) === 1) {
+            return null;
+        }
+
+        return $value;
+    }
+
+    private static function exact_sort(mixed $value): ?string
+    {
+        return is_string($value) && in_array($value, ['latest', 'oldest'], true) ? $value : null;
     }
 
     private static function exact_optional_key(mixed $value): ?string

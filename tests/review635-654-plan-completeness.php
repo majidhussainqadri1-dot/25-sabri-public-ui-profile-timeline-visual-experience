@@ -110,7 +110,7 @@ try {
     $failures[] = 'Source completion matrix invalid: ' . $exception->getMessage();
 }
 $latestRange = (string) ($matrix['declaration']['latest_review_range'] ?? '');
-$check(in_array($latestRange, ['635-654', '655-674'], true), 'Source completion matrix must preserve or advance beyond Reviews 635-654.');
+$check(in_array($latestRange, ['635-654', '655-674', '675-694'], true), 'Source completion matrix must preserve or advance beyond Reviews 635-654.');
 $check(file_exists($root . '/config/review635-654-plan-completeness-ledger.json'), 'Historical Reviews 635-654 ledger must remain preserved.');
 $check(($matrix['declaration']['exact_head_ci'] ?? '') === 'external-evidence-required-for-current-head-not-frozen-in-source', 'Mutable exact-head CI truth must not be frozen as self-certified source status.');
 $check(($matrix['declaration']['known_unresolved_source_defects'] ?? null) === 0, 'Known File 25 source defects must be zero after corrections.');
@@ -139,20 +139,20 @@ $check(($heads['26'] ?? '') === 'bbea3aad466792a4a6a62b53532bbd45c7c592de', 'Fil
 $check(($heads['evidence_class'] ?? '') === 'repository-source-only-not-staging-live', 'Repository-head evidence must remain non-live.');
 
 $readme = $read('README.md');
-$check(str_contains($readme, 'Reviews 655–674') || str_contains($readme, 'Reviews 635–654'), 'README review lineage missing.');
+$check(str_contains($readme, 'Reviews 675–694') || str_contains($readme, 'Reviews 655–674') || str_contains($readme, 'Reviews 635–654'), 'README review lineage missing.');
 $check(($ledger['basis']['baseline_main_ci']['run_number'] ?? null) === 1601 && ($ledger['basis']['baseline_main_ci']['conclusion'] ?? '') === 'success', 'Historical Reviews 635-654 baseline CI evidence missing from its ledger.');
 $check(str_contains($readme, 'exact current GitHub HEAD must be checked against its current CI run'), 'README current-head CI evidence boundary missing.');
 $check(! str_contains($readme, 'current candidate exact-head CI pending'), 'README contains stale pending-CI claim.');
 
 $wpReadme = $read('readme.txt');
-$check(str_contains($wpReadme, 'Reviews 655–674') || str_contains($wpReadme, 'Reviews 635–654'), 'WordPress readme review lineage missing.');
+$check(str_contains($wpReadme, 'Reviews 675–694') || str_contains($wpReadme, 'Reviews 655–674') || str_contains($wpReadme, 'Reviews 635–654'), 'WordPress readme review lineage missing.');
 $check(str_contains($wpReadme, 'runtime `1.2.15`, schema `3.4.0`, public-clinic contract `1.1.0`'), 'WordPress readme current File 08 repository observation missing.');
 $check(! str_contains($wpReadme, 'The exact File 08 staging input is runtime `0.2.1`'), 'Obsolete File 08 staging pin remains in WordPress readme.');
 $check(! str_contains($wpReadme, 'Confirm File 00 `1.2.4`'), 'Obsolete installation version list remains in WordPress readme.');
 
 $composer = $read('composer.json');
 $check(str_contains($composer, 'tests/review635-654-plan-completeness.php'), 'Fresh audit test is not governed.');
-$check(str_contains($composer, 'Reviews 655-674') || str_contains($composer, 'Reviews 635-654'), 'Composer description does not identify current audit lineage.');
+$check(str_contains($composer, 'Reviews 675-694') || str_contains($composer, 'Reviews 655-674') || str_contains($composer, 'Reviews 635-654'), 'Composer description does not identify current audit lineage.');
 
 foreach ([
     'config/review635-654-plan-completeness-ledger.json',

@@ -129,7 +129,21 @@ $bounded = timeline_item([
 ]);
 check(strlen((string) $bounded->get('title')) <= 300, 'Timeline title must be bounded.');
 check(strlen((string) $bounded->get('safe_excerpt')) <= 1200, 'Timeline excerpt must be bounded.');
-check($bounded->get('pin_weight') === 1000, 'Pin weight must be bounded.');
+check($bounded->get('pin_weight') === 0, 'Unaudited pin authority must fail closed without dropping the public item.');
+
+$audited_pin = timeline_item([
+    'pin_weight' => 9000,
+    'pin_audit' => [
+        'reference' => 'audit-123',
+        'actor_id' => 7,
+        'reason' => 'Founder-approved official item.',
+        'surface' => 'profile-timeline',
+        'start_at' => '2026-10-01T00:00:00Z',
+        'end_at' => '2026-10-31T23:59:59Z',
+    ],
+]);
+check($audited_pin->get('pin_weight') === 1000, 'Audited pin weight must remain bounded to the maximum.');
+check(is_array($audited_pin->get('pin_audit')), 'Audited pin provenance must be retained internally.');
 
 $thumbnail_id = timeline_item(['thumbnail_reference' => '123']);
 check($thumbnail_id->get('thumbnail_reference') === 123, 'Numeric thumbnail strings must normalize to positive integer references.');
