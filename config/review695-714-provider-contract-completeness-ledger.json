@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "file": 25,
+  "review_range": {
+    "first": 695,
+    "last": 714,
+    "count": 20
+  },
+  "basis": {
+    "baseline_main_sha": "3075224089506fed19af1441ebf3556c2d5230b5",
+    "baseline_main_ci": {
+      "run_number": 1784,
+      "run_id": 37904435708,
+      "conclusion": "success"
+    },
+    "candidate_branch": "fix/reviews-695-714-provider-contract-completeness-20261009",
+    "file25_plan": "Complete Public UI, Profile Timeline and Visual Experience — Final Harmonized Specification 2.0 plus governing addenda",
+    "central_plan": "Sabri Social Homeopathy Platform Definitive/Consolidated Governing Master Plan 2026",
+    "method": "Twenty sequential plan-to-code and cross-file reviews. Each scope was completed before its correction set was applied; repository evidence is not staging/live evidence."
+  },
+  "defect_rounds": [
+    697,
+    698,
+    699,
+    700,
+    701,
+    702,
+    703,
+    704,
+    705,
+    706,
+    707,
+    708,
+    709,
+    710,
+    711
+  ],
+  "clean_rounds": [
+    695,
+    696,
+    712,
+    713,
+    714
+  ],
+  "reviews": [
+    {
+      "review": 695,
+      "focus": "exact repository baseline and prior CI",
+      "status": "reviewed-clean",
+      "finding": "Current main 3075224089506fed19af1441ebf3556c2d5230b5 and CI run 1784 were verified as repository evidence only."
+    },
+    {
+      "review": 696,
+      "focus": "File 25 plan and central ownership law",
+      "status": "reviewed-clean",
+      "finding": "File 25 remains presentation owner; native profile, publication, shell, security and global search authorities remain external canonical owners."
+    },
+    {
+      "review": 697,
+      "focus": "File 07 current companion parity",
+      "status": "defect-found-corrected",
+      "finding": "File 07 had advanced to 1.2.1/DB1.1.1/contract1.2.1/projection3 at 2f4a8970..., while File 25 current-source evidence was stale.",
+      "correction": "Refreshed current File 07 source evidence without treating it as staging/live truth."
+    },
+    {
+      "review": 698,
+      "focus": "Timeline Provider contract completeness",
+      "status": "defect-found-corrected",
+      "finding": "The coded interface omitted seven methods explicitly required by File 25 section 46.",
+      "correction": "Completed the provider contract for normalization, canonical URL, visibility, actions, metrics, correction state and sync registration."
+    },
+    {
+      "review": 699,
+      "focus": "File 21 provider contract implementation",
+      "status": "defect-found-corrected",
+      "finding": "The File 21 adapter did not implement the newly reconciled full plan contract.",
+      "correction": "Implemented every required method while preserving File 21 ownership and returning no invented metrics."
+    },
+    {
+      "review": 700,
+      "focus": "WordPress fallback provider contract implementation",
+      "status": "defect-found-corrected",
+      "finding": "The compatibility provider also lacked the complete plan contract.",
+      "correction": "Implemented the complete read-only contract with no fabricated metrics or native ownership transfer."
+    },
+    {
+      "review": 701,
+      "focus": "provider sync-event registration",
+      "status": "defect-found-corrected",
+      "finding": "Provider registration did not exercise the plan-required sync-event hook.",
+      "correction": "Registry now invokes sync registration and fails closed on registration errors."
+    },
+    {
+      "review": 702,
+      "focus": "owner-projection parity",
+      "status": "defect-found-corrected",
+      "finding": "Timeline service trusted the normalized item without cross-checking provider canonical URL, visibility, actions and correction projection methods.",
+      "correction": "Added fail-closed owner-projection parity validation."
+    },
+    {
+      "review": 703,
+      "focus": "Most Viewed sorting",
+      "status": "defect-found-corrected",
+      "finding": "Plan-required Most Viewed was absent.",
+      "correction": "Added conditional Most Viewed ordering only when an owner provider returns privacy-safe real view counts."
+    },
+    {
+      "review": 704,
+      "focus": "Most Saved sorting",
+      "status": "defect-found-corrected",
+      "finding": "Plan-required Most Saved was absent.",
+      "correction": "Added conditional Most Saved ordering only when an owner provider returns privacy-safe real save counts."
+    },
+    {
+      "review": 705,
+      "focus": "metrics privacy and fake-default prevention",
+      "status": "defect-found-corrected",
+      "finding": "No explicit timeline metric-sort privacy gate existed.",
+      "correction": "Metrics require privacy_safe=true and bounded nonnegative owner counts; raw metrics are not emitted and unavailable metrics stay hidden."
+    },
+    {
+      "review": 706,
+      "focus": "review-state refinement",
+      "status": "defect-found-corrected",
+      "finding": "The plan-required reviewed/source-state refinement was incomplete.",
+      "correction": "Added strict review-state filtering across service, HTML and REST."
+    },
+    {
+      "review": 707,
+      "focus": "source-state refinement",
+      "status": "defect-found-corrected",
+      "finding": "Source verification refinement was absent.",
+      "correction": "Added strict verified/unverified source-state filtering without creating a new verification authority."
+    },
+    {
+      "review": 708,
+      "focus": "public HTML refinement UI and state preservation",
+      "status": "defect-found-corrected",
+      "finding": "UI exposed only latest/oldest and lacked review/source controls.",
+      "correction": "Added review/source selects and conditional metric-sort options with URL-state preservation."
+    },
+    {
+      "review": 709,
+      "focus": "REST parity",
+      "status": "defect-found-corrected",
+      "finding": "REST did not accept/return the new governed refinements.",
+      "correction": "Added strict metric sort, review/source args and applied-sort/available-sort output."
+    },
+    {
+      "review": 710,
+      "focus": "SEO filtered-query coverage",
+      "status": "defect-found-corrected",
+      "finding": "New review/source refinements were not part of the explicit filtered-query detector.",
+      "correction": "Included both in filtered-query/noindex detection and state accounting."
+    },
+    {
+      "review": 711,
+      "focus": "accessible Load More plus fallback",
+      "status": "defect-found-corrected",
+      "finding": "Pagination had Previous/Next only, while the plan requires accessible Load More plus numbered fallback.",
+      "correction": "Added explicit Load More and retained a next-page fallback; no infinite-scroll-only behavior introduced."
+    },
+    {
+      "review": 712,
+      "focus": "Files 20/21/22/23/24/26 boundaries",
+      "status": "reviewed-clean",
+      "finding": "Shell, publication, authoring, private dashboard, assurance and global search/ranking ownership remain intact."
+    },
+    {
+      "review": 713,
+      "focus": "Files 03/07/08/09/14/17/19 boundaries",
+      "status": "reviewed-clean",
+      "finding": "Profile, directory, clinic, verification, conversion, network and notification authorities remain owner-native after current-source reconciliation."
+    },
+    {
+      "review": 714,
+      "focus": "final source parity and external truth",
+      "status": "reviewed-clean",
+      "finding": "No additional File 25-owned source defect was found after corrections. External acceptance remains unpromoted."
+    }
+  ],
+  "unresolved_cross_file_dependencies": [
+    "File 08 current owner source still does not publish an authoritative profile-user to booking-destination contract consumable by File 25.",
+    "File 17 current owner source still does not publish an authoritative target-bound Follow destination contract consumable by File 25.",
+    "File 21 current ProfileTimeline provider exposes no governed public views/saves metric contract; therefore Most Viewed/Most Saved remain hidden for that provider until real privacy-safe metrics are published.",
+    "Richer non-post timeline classes remain owner-contract dependent and are not synthesized by File 25."
+  ],
+  "external_truth": {
+    "hostinger_staging_accepted": false,
+    "founder_staging_acceptance": false,
+    "production_accepted": false,
+    "live_deployed": false,
+    "operational": false,
+    "exact_deployed_code_verified": false,
+    "db_version_verified_live": false,
+    "migration_state_verified_live": false
+  },
+  "source_candidate": {
+    "runtime": "0.15.0",
+    "known_unresolved_file25_source_defects_after_corrections": 0,
+    "exact_current_head_ci": "external-evidence-required-not-frozen-in-source"
+  }
+}
