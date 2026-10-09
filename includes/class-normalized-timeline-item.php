@@ -124,6 +124,12 @@ final class Normalized_Timeline_Item implements JsonSerializable
 
         $pin_weight = $this->exact_bounded_integer($data['pin_weight'] ?? 0, 0, 1000, 'pin weight');
         $pin_audit = $this->normalize_pin_audit($data['pin_audit'] ?? null, $pin_weight);
+        if ($pin_weight > 0 && $pin_audit === null) {
+            // Fail closed on authority, not on the public item itself: legacy
+            // providers without complete pin provenance remain readable but
+            // cannot influence global ordering.
+            $pin_weight = 0;
+        }
 
         $this->data = [
             'provider_id' => $provider_id,
@@ -290,22 +296,23 @@ final class Normalized_Timeline_Item implements JsonSerializable
     /** @return array{reference:string,actor_id:int,reason:string,surface:string,start_at:string,end_at:string}|null */
     private function normalize_pin_audit(mixed $value, int $pin_weight): ?array
     {
-        if ($pin_weight === 0) {
+        if ($pin_weight === 0 || ! is_array($value)) {
             return null;
         }
-        if (! is_array($value)) {
-            throw new InvalidArgumentException('Pinned timeline items require bounded audit provenance.');
+
+        try {
+            $reference = $this->exact_scalar((string) ($value['reference'] ?? ''), 191, 'pin audit reference');
+            $actor_id = $this->exact_positive_integer($value['actor_id'] ?? null);
+            $reason = $this->plain_text((string) ($value['reason'] ?? ''), 300);
+            $surface = $this->exact_key((string) ($value['surface'] ?? ''), 64, 'pin audit surface');
+            $start_at = $this->required_date((string) ($value['start_at'] ?? ''));
+            $end_at = $this->required_date((string) ($value['end_at'] ?? ''));
+        } catch (InvalidArgumentException) {
+            return null;
         }
 
-        $reference = $this->exact_scalar((string) ($value['reference'] ?? ''), 191, 'pin audit reference');
-        $actor_id = $this->exact_positive_integer($value['actor_id'] ?? null);
-        $reason = $this->plain_text((string) ($value['reason'] ?? ''), 300);
-        $surface = $this->exact_key((string) ($value['surface'] ?? ''), 64, 'pin audit surface');
-        $start_at = $this->required_date((string) ($value['start_at'] ?? ''));
-        $end_at = $this->required_date((string) ($value['end_at'] ?? ''));
-
         if ($actor_id === null || $reason === '' || strcmp($end_at, $start_at) < 0) {
-            throw new InvalidArgumentException('Pinned timeline audit provenance is incomplete or has an invalid time window.');
+            return null;
         }
 
         return [
