@@ -141,6 +141,27 @@ final class WordPress_Posts_Provider implements Timeline_Provider
         return $items;
     }
 
+    public function normalize_public_item(array $native_item, int $author_id): ?Normalized_Timeline_Item
+    {
+        if ($author_id <= 0) { return null; }
+        try {
+            return new Normalized_Timeline_Item($native_item + ['author_id' => $author_id, 'public_profile_id' => $author_id]);
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    public function get_canonical_url(Normalized_Timeline_Item $item): string { return (string) $item->get('canonical_url'); }
+    public function get_visibility_state(Normalized_Timeline_Item $item): string { return (string) $item->get('visibility_state'); }
+    public function get_public_actions(Normalized_Timeline_Item $item): array
+    {
+        $actions = $item->get('available_actions');
+        return is_array($actions) ? array_values(array_filter($actions, 'is_string')) : [];
+    }
+    public function get_public_metrics(Normalized_Timeline_Item $item): array { unset($item); return []; }
+    public function get_correction_state(Normalized_Timeline_Item $item): string { return (string) $item->get('correction_state'); }
+    public function register_sync_events(): void {}
+
     public function get_health_status(): array
     {
         return [
