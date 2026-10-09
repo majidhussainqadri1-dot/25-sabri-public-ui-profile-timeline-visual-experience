@@ -144,6 +144,8 @@ final class Profile_Renderer
             $language = $this->requested_timeline_language();
             $topic = $this->requested_timeline_text('topic', 120);
             $sort = $this->requested_timeline_sort();
+            $review_state = $this->requested_timeline_review_state();
+            $source_state = $this->requested_timeline_source_state();
             $search_query = '';
             $search_error = '';
             if (isset($_GET['profile_q'])) {
@@ -169,6 +171,9 @@ final class Profile_Renderer
             $context['timeline_language'] = $language;
             $context['timeline_topic'] = $topic;
             $context['timeline_sort'] = $sort;
+            $context['timeline_review_state'] = $review_state;
+            $context['timeline_source_state'] = $source_state;
+            $context['timeline_metric_sorts'] = [];
             $context['timeline_search_query'] = $search_query;
             $context['timeline_search_error'] = $search_error;
             $context['timeline_filtered_request'] = $this->timeline_filter_request_present();
@@ -181,8 +186,15 @@ final class Profile_Renderer
                 'language' => $language,
                 'topic' => $topic,
                 'sort' => $sort,
+                'review_state' => $review_state,
+                'source_state' => $source_state,
                 'search' => $search_query,
             ]);
+            $context['timeline_sort'] = (string) ($timeline['sort'] ?? 'latest');
+            $context['timeline_metric_sorts'] = array_values(array_filter(
+                (array) ($timeline['available_metric_sorts'] ?? []),
+                static fn ($value): bool => is_string($value) && in_array($value, ['most_viewed', 'most_saved'], true)
+            ));
             $context['timeline_search_result_count'] = count((array) ($timeline['items'] ?? []));
         }
 
@@ -257,6 +269,8 @@ final class Profile_Renderer
             || trim((string) ($context['timeline_year'] ?? '')) !== ''
             || trim((string) ($context['timeline_language'] ?? '')) !== ''
             || trim((string) ($context['timeline_topic'] ?? '')) !== ''
+            || trim((string) ($context['timeline_review_state'] ?? '')) !== ''
+            || trim((string) ($context['timeline_source_state'] ?? '')) !== ''
             || (string) ($context['timeline_sort'] ?? 'latest') !== 'latest'
             || trim((string) ($context['timeline_search_query'] ?? '')) !== ''
             || (int) get_query_var('paged') > 1
@@ -445,7 +459,7 @@ final class Profile_Renderer
 
     private function timeline_filter_request_present(): bool
     {
-        foreach (['type', 'provider', 'year', 'language', 'topic', 'sort', 'profile_q'] as $key) {
+        foreach (['type', 'provider', 'year', 'language', 'topic', 'sort', 'review_state', 'source_state', 'profile_q'] as $key) {
             if (array_key_exists($key, $_GET)) {
                 return true;
             }
@@ -522,7 +536,21 @@ final class Profile_Renderer
         }
         $value = (string) wp_unslash($_GET['sort']);
 
-        return in_array($value, ['latest', 'oldest'], true) ? $value : 'latest';
+        return in_array($value, ['latest', 'oldest', 'most_viewed', 'most_saved'], true) ? $value : 'latest';
+    }
+
+    private function requested_timeline_review_state(): string
+    {
+        if (! isset($_GET['review_state']) || ! is_scalar($_GET['review_state'])) { return ''; }
+        $value = (string) wp_unslash($_GET['review_state']);
+        return in_array($value, ['published', 'approved', 'reviewed', 'not-required', 'corrected', 'retracted'], true) ? $value : '';
+    }
+
+    private function requested_timeline_source_state(): string
+    {
+        if (! isset($_GET['source_state']) || ! is_scalar($_GET['source_state'])) { return ''; }
+        $value = (string) wp_unslash($_GET['source_state']);
+        return in_array($value, ['verified', 'unverified'], true) ? $value : '';
     }
 
     private function resolve_user(): ?WP_User
