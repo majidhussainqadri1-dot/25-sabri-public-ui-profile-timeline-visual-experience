@@ -1,6 +1,6 @@
 {
   "name": "sabri/file-25-global-visual-experience",
-  "description": "File 25 public visual/profile/timeline presentation, Reviews 675-694 historical and Reviews 695-714 current exact source audits, bounded multi-provider timeline integrity, owner native contracts and deterministic staging candidate.",
+  "description": "File 25 public visual/profile/timeline presentation preserving Reviews 695-714 timeline integrity and Reviews 715-734 complete provider-contract, privacy-safe metric refinement, REST/SEO parity and deterministic staging governance.",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
   "require": {
@@ -47,7 +47,8 @@
       "tests/review635-654-plan-completeness.php",
       "tests/review655-674-admin-plan-completeness.php",
       "tests/review675-694-timeline-completeness.php",
-      "tests/review695-714-timeline-integrity.php"
+      "tests/review695-714-timeline-integrity.php",
+      "tests/review715-734-provider-contract-rebase.php"
     ]
   }
 }
