@@ -397,9 +397,9 @@
       "package_status": "build-input-not-acceptance",
       "schema_version": "2",
       "installed_preflight": "wp sabri file25 staging-probe --expected-commit=<sha>",
-      "source_branch": "fix/reviews-675-694-timeline-completeness-20261009",
-      "source_status": "reviews-675-694-source-corrected; exact current HEAD CI must be queried externally",
-      "baseline_main_sha": "e35563b7f3d8ebf0acbbc80982b7bcf2e1b78c0a"
+      "source_branch": "fix/reviews-695-714-timeline-integrity-20261009",
+      "source_status": "Reviews 695-714 source corrected; exact-head CI external to document",
+      "baseline_main_sha": "3075224089506fed19af1441ebf3556c2d5230b5"
     }
   ],
   "acceptance_rule": "No module is staging-accepted or production-accepted merely because this matrix, source code, a ZIP or green CI exists.",
@@ -544,5 +544,28 @@
     },
     "owner_contract_limitation": "Current File 21 ProfileTimeline owner contract exposes canonical approved WordPress posts. Planned richer timeline types (for example Knowledge, Videos, Reels, PDFs, clinic updates and other domain-native publication classes) must arrive through authoritative owner-native timeline providers/contracts; File 25 must not synthesize approval or foreign domain truth from section-card adapters.",
     "evidence_boundary": "Repository source/CI only; no staging/live/deployed parity claim."
+  },
+  "file25_review695_714_audit": {
+    "date": "2026-10-09",
+    "review_range": "695-714",
+    "baseline_main_sha": "3075224089506fed19af1441ebf3556c2d5230b5",
+    "baseline_main_ci": {
+      "run_number": 1784,
+      "run_id": 37904435708,
+      "conclusion": "success"
+    },
+    "candidate_branch": "fix/reviews-695-714-timeline-integrity-20261009",
+    "exact_candidate_ci": "external-check-required-after-last-commit",
+    "corrections": [
+      "time-valid pinning on profile-timeline only",
+      "merged provider pagination beyond single-provider 500 candidates",
+      "overflow-safe enormous page requests",
+      "hard-cap warning distinct from normal look-ahead",
+      "complete bounded candidate window for post-retrieval filters",
+      "correct oldest sorting within bounded pool"
+    ],
+    "known_unresolved_source_defects": 0,
+    "source_only": true,
+    "external_acceptance": false
   }
 }
