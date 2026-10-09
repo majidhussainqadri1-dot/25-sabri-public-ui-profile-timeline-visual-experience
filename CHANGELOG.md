@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.15.0 — Provider-Contract Rebase Reviews 715–734 — 2026-10-09
+
+### Corrected
+
+- Rebased the audit on current main `347a4ff4...` after concurrent Reviews 695–714 timeline-integrity corrections landed, preserving those fixes.
+- Completed the File 25 §46 Timeline Provider contract and concrete File 21/WordPress implementations.
+- Added fail-closed sync registration and canonical/visibility/action/correction owner-projection parity.
+- Added conditional privacy-safe Most Viewed/Most Saved sorting with no fake default metrics.
+- Added review-state/source-state refinements with HTML/REST/SEO parity.
+- Added accessible Load More with page fallback.
+- Refreshed File 07 current source evidence to 1.2.1 / DB 1.1.1 / contract 1.2.1 / projection schema 3.
+
+### Review result
+
+Defect rounds: **717–731**. Clean rounds: **715, 716, 732, 733, 734**.
+
+### Acceptance boundary
+
+Repository/source evidence only. Exact corrective-head CI is external evidence; Hostinger staging, Founder acceptance, production/live deployment, exact deployed parity, live DB/schema, migration state and operations remain separate gates.
+
+
 ## 0.15.0 — Reviews 695–714: Source Timeline Integrity — 2026-10-09
 
 - **Time-bound pinning:** enforce exact `profile-timeline` surface and active UTC audit interval; unapproved/out-of-window pins rank as unpinned without hiding public items.
