@@ -138,6 +138,12 @@ final class Profile_Renderer
         if ($requested_section === 'timeline') {
             $timeline_filters = $this->timeline_filters($profile);
             $content_type = $this->requested_timeline_content_type($timeline_filters);
+            $provider_filters = $this->timeline->available_provider_filters();
+            $provider = $this->requested_timeline_key('provider', array_keys($provider_filters));
+            $year = $this->requested_timeline_year();
+            $language = $this->requested_timeline_language();
+            $topic = $this->requested_timeline_text('topic', 120);
+            $sort = $this->requested_timeline_sort();
             $search_query = '';
             $search_error = '';
             if (isset($_GET['profile_q'])) {
@@ -157,12 +163,23 @@ final class Profile_Renderer
             }
             $context['timeline_filters'] = $timeline_filters;
             $context['timeline_content_type'] = $content_type;
+            $context['timeline_provider_filters'] = $provider_filters;
+            $context['timeline_provider'] = $provider;
+            $context['timeline_year'] = $year;
+            $context['timeline_language'] = $language;
+            $context['timeline_topic'] = $topic;
+            $context['timeline_sort'] = $sort;
             $context['timeline_search_query'] = $search_query;
             $context['timeline_search_error'] = $search_error;
             $timeline = $this->timeline->get_for_author((int) $user->ID, [
                 'page' => max(1, (int) get_query_var('paged')),
                 'per_page' => $timeline_page_size,
                 'content_type' => $content_type,
+                'provider' => $provider,
+                'year' => $year,
+                'language' => $language,
+                'topic' => $topic,
+                'sort' => $sort,
                 'search' => $search_query,
             ]);
             $context['timeline_search_result_count'] = count((array) ($timeline['items'] ?? []));
@@ -367,6 +384,7 @@ final class Profile_Renderer
         $base = [
             '' => __('All', 'sabri-public-experience'),
             'post' => __('Posts', 'sabri-public-experience'),
+            'corrections' => __('Corrections', 'sabri-public-experience'),
         ];
         $requested = (array) apply_filters(
             'sabri_public_experience/timeline_filters',
@@ -416,6 +434,77 @@ final class Profile_Renderer
         }
 
         return array_key_exists($requested, $filters) ? $requested : '';
+    }
+
+    /** @param list<string> $allowed */
+    private function requested_timeline_key(string $query_key, array $allowed): string
+    {
+        if (! isset($_GET[$query_key]) || ! is_scalar($_GET[$query_key])) {
+            return '';
+        }
+        $raw = (string) wp_unslash($_GET[$query_key]);
+        if ($raw === '') {
+            return '';
+        }
+        $key = sanitize_key($raw);
+        if ($key === '' || $key !== $raw || strlen($key) > 64) {
+            return '';
+        }
+
+        return in_array($key, $allowed, true) ? $key : '';
+    }
+
+    private function requested_timeline_year(): string
+    {
+        if (! isset($_GET['year']) || ! is_scalar($_GET['year'])) {
+            return '';
+        }
+        $value = (string) wp_unslash($_GET['year']);
+        if ($value === '') {
+            return '';
+        }
+        if (preg_match('/^(?:19|20|21)\\d{2}$/', $value) !== 1) {
+            return '';
+        }
+        $year = (int) $value;
+
+        return $year >= 1900 && $year <= ((int) gmdate('Y') + 1) ? $value : '';
+    }
+
+    private function requested_timeline_language(): string
+    {
+        if (! isset($_GET['language']) || ! is_scalar($_GET['language'])) {
+            return '';
+        }
+        $value = trim((string) wp_unslash($_GET['language']));
+        if ($value === '' || strlen($value) > 35 || preg_match('/^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$/', $value) !== 1) {
+            return '';
+        }
+
+        return $value;
+    }
+
+    private function requested_timeline_text(string $query_key, int $maximum): string
+    {
+        if (! isset($_GET[$query_key]) || ! is_scalar($_GET[$query_key])) {
+            return '';
+        }
+        $value = trim(wp_strip_all_tags((string) wp_unslash($_GET[$query_key])));
+        if ($value === '' || strlen($value) > $maximum || preg_match('/[\\x00-\\x1F\\x7F]/', $value) === 1) {
+            return '';
+        }
+
+        return $value;
+    }
+
+    private function requested_timeline_sort(): string
+    {
+        if (! isset($_GET['sort']) || ! is_scalar($_GET['sort'])) {
+            return 'latest';
+        }
+        $value = (string) wp_unslash($_GET['sort']);
+
+        return in_array($value, ['latest', 'oldest'], true) ? $value : 'latest';
     }
 
     private function resolve_user(): ?WP_User
