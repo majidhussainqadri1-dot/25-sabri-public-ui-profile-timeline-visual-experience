@@ -8,19 +8,19 @@ WordPress module for the **Sabri Social Homeopathy Platform**. This is the exist
 
 - Runtime: `0.15.0`
 - Schema: `2`
-- Fresh audit branch: `fix/reviews-675-694-timeline-completeness-20261009`
-- Baseline main SHA reviewed: `e35563b7f3d8ebf0acbbc80982b7bcf2e1b78c0a`
-- Baseline main exact-head CI: **PASS** — run `1689`
+- Fresh audit branch: `fix/reviews-695-714-provider-contract-completeness-20261009`
+- Baseline main SHA reviewed: `3075224089506fed19af1441ebf3556c2d5230b5`
+- Baseline main exact-head CI: **PASS** — run `1784`
 - Governing product plan: Master Plan `v3.0` / consolidated governing addenda
 - Governing File 25 plan: Final Harmonized Specification `2.0`
-- Source correction status: **Reviews 675–694 corrected**
+- Source correction status: **Reviews 695–714 corrected**
 - Known unresolved File 25 source defects after the recorded corrections: **0**
-- Known cross-file owner-contract limitations: File 08 profile→booking destination; File 17 target-bound Follow destination; richer non-post timeline classes require authoritative owner timeline contracts
+- Known cross-file owner-contract limitations: File 08 profile→booking destination; File 17 target-bound Follow destination; File 21 public views/saves metrics; richer non-post timeline classes require authoritative owner timeline contracts
 - Hostinger staging accepted: **No**
 - Production approved: **No**
 - Live deployment verified: **No**
 
-Reviews `675–694` performed a fresh plan-to-code and cross-file audit focused on timeline filtering/sorting, pagination accessibility, REST/SEO parity, governed pinning and current companion repository drift. Defect rounds `677–691` were corrected.
+Reviews `695–714` performed a fresh plan-to-code and cross-file audit focused on the complete Timeline Provider contract, current File 07 source parity, privacy-safe metric sorting, review/source refinements, REST/SEO parity and accessible Load More. Defect rounds `697–711` were corrected.
 
 ## Source implementation status
 
@@ -36,16 +36,17 @@ config/review615-634-fresh-cross-file-audit-ledger.json
 config/review635-654-plan-completeness-ledger.json
 config/review655-674-admin-plan-completeness-ledger.json
 config/review675-694-timeline-completeness-ledger.json
+config/review695-714-provider-contract-completeness-ledger.json
 config/staging-dependencies.json
 ```
 
 Current fresh audit record:
 
 ```text
-docs/REVIEWS-675-694-TIMELINE-COMPLETENESS-2026-10-09.md
+docs/REVIEWS-695-714-PROVIDER-CONTRACT-COMPLETENESS-2026-10-09.md
 ```
 
-The audited baseline main `e35563b7...` passed exact-head CI run `1689`. The final current-head CI status for any later corrective commit is external evidence and must be queried from GitHub; it is not self-certified by this README. Hostinger staging, Founder acceptance, production approval, exact deployed-code parity, live database/schema state, live migration state and operational acceptance remain separate gates.
+The audited baseline main `3075224089506fed19af1441ebf3556c2d5230b5` passed exact-head CI run `1784`. The final current-head CI status for any later corrective commit is external evidence and must be queried from GitHub; it is not self-certified by this README. Hostinger staging, Founder acceptance, production approval, exact deployed-code parity, live database/schema state, live migration state and operational acceptance remain separate gates.
 
 ## Current ownership and compatibility boundaries
 
@@ -75,6 +76,17 @@ The audited baseline main `e35563b7...` passed exact-head CI run `1689`. The fin
 - A nonzero `pin_weight` now requires bounded internal audit provenance: reference, actor, reason, surface, start and end. Invalid/unaudited pins are neutralized to weight `0` without dropping the public item.
 - Refreshed File 09 R26 and File 14 v1.4.8 repository-source evidence.
 - Richer planned timeline types beyond the current File 21 post timeline remain owner-contract dependent; File 25 will not infer publication approval from section-card adapters or foreign storage.
+
+## Reviews 695–714 corrections
+
+- Completed all thirteen plan-required Timeline Provider contract methods.
+- File 21 and WordPress compatibility providers now implement the complete contract without taking native ownership.
+- Added fail-closed sync registration and owner-projection parity checks.
+- Added conditional **Most Viewed / Most Saved** ordering only when providers supply privacy-safe real metrics; no fake defaults and no raw analytics output.
+- Added **Review state / Source state** refinements across HTML, service and REST.
+- Added explicit accessible **Load More** while retaining numbered/next-page fallback and existing browser-Back restoration.
+- Refreshed current File 07 source evidence to runtime `1.2.1`, DB `1.1.1`, contract `1.2.1`, projection schema `3`.
+- File 21 currently exposes no governed public views/saves metrics, so metric sorts remain hidden for that provider rather than being fabricated.
 
 ## Existing visual and public contracts retained
 
