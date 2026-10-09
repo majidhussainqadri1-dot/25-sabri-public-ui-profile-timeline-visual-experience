@@ -60,8 +60,25 @@ final class Timeline_Service
                 'provider_errors' => [],
             ];
         }
-        $max_page = max(1, intdiv(self::MAX_CANDIDATES_PER_PROVIDER - 1, $per_page) + 1);
+        // The 500-item boundary belongs to each provider, not the merged
+        // timeline. Two providers with 500 authorized items each may support
+        // pages beyond the first provider's 500-item window.
+        $provider_count = max(1, count($this->registry->all()));
+        $max_page = max(1, (int) ceil(($provider_count * self::MAX_CANDIDATES_PER_PROVIDER) / $per_page));
+        $per_provider_page_limit = max(1, (int) ceil(self::MAX_CANDIDATES_PER_PROVIDER / $per_page));
         $page = $requested_page;
+        if ($page > $max_page) {
+            // Check the page bound BEFORE calculating an offset, which would
+            // overflow for a syntactically valid but enormous page integer.
+            return [
+                'items' => [],
+                'page' => $page,
+                'per_page' => $per_page,
+                'has_more' => false,
+                'truncated' => true,
+                'provider_errors' => [],
+            ];
+        }
         $offset = ($page - 1) * $per_page;
         // Post-retrieval refinements and oldest ordering require the full
         // bounded candidate window. Otherwise matching older items can be
@@ -72,7 +89,7 @@ final class Timeline_Service
             || $content_type === 'corrections'
             || $search !== ''
             || $sort === 'oldest';
-        $candidate_limit = ($requested_page > $max_page || $needs_full_window)
+        $candidate_limit = ($requested_page > $per_provider_page_limit || $needs_full_window)
             ? self::MAX_CANDIDATES_PER_PROVIDER
             : min(self::MAX_CANDIDATES_PER_PROVIDER, $offset + $per_page + 1);
         $items = [];
@@ -229,14 +246,12 @@ final class Timeline_Service
             }
         );
 
-        $slice = $requested_page > $max_page ? [] : array_slice($items, $offset, $per_page + 1);
+        $slice = array_slice($items, $offset, $per_page + 1);
         $has_more = count($slice) > $per_page;
         if ($has_more) {
             array_pop($slice);
         }
-        $truncated = $requested_page > $max_page
-            || $provider_limit_reached
-            || ($candidate_limit === self::MAX_CANDIDATES_PER_PROVIDER && count($items) >= self::MAX_CANDIDATES_PER_PROVIDER);
+        $truncated = $provider_limit_reached;
 
         return [
             'items' => array_map(
