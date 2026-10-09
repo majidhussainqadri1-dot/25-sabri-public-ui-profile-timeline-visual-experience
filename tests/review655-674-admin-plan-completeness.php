@@ -83,8 +83,10 @@ $scenarioById = [];
 foreach ((array) ($staging['scenarios'] ?? []) as $scenario) {
     if (is_array($scenario) && is_string($scenario['id'] ?? null)) { $scenarioById[$scenario['id']] = (string) ($scenario['requirement'] ?? ''); }
 }
-$check(str_contains($scenarioById['file09-doctor-decision'] ?? '', '448d41f34586369ca5875693583b9cd8a6133167'), 'File 09 current staging scenario is stale.');
-$check(str_contains($scenarioById['file14-visual-consumer'] ?? '', 'f64e7d17268daff4e3097c18ad510116e6eaf105'), 'File 14 current staging scenario is stale.');
+$file09Scenario = $scenarioById['file09-doctor-decision'] ?? '';
+$check(str_contains($file09Scenario, '448d41f34586369ca5875693583b9cd8a6133167') || str_contains($file09Scenario, 'cfc5f781a766330314dc98c42abeca0eb7786eba'), 'File 09 staging scenario must preserve or advance beyond the Reviews 655-674 baseline.');
+$file14Scenario = $scenarioById['file14-visual-consumer'] ?? '';
+$check(str_contains($file14Scenario, 'f64e7d17268daff4e3097c18ad510116e6eaf105') || str_contains($file14Scenario, '080e2198d84dfb7491bb0b75946e14a5fe118b91'), 'File 14 staging scenario must preserve or advance beyond the Reviews 655-674 baseline.');
 $check(str_contains($scenarioById['file20-current-shell-contract'] ?? '', '8a4dbcaf4fef8e926b9b834ecfde16c21a0f00ca'), 'File 20 current staging scenario is stale.');
 $check(str_contains($scenarioById['file21-current-profile-timeline-contract'] ?? '', 'f2eb7e95ddea327af36ea725ffb923b029f885e6'), 'File 21 current staging scenario is stale.');
 $check(str_contains($scenarioById['file22-create-edit-contract'] ?? '', 'b7a7f2e69411cbd32f0574fd12d766fb70c01b7a'), 'File 22 current staging scenario is stale.');
