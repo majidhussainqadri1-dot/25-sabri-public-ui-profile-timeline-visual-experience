@@ -32,7 +32,8 @@ WordPress module for the **Sabri Social Homeopathy Platform**. This is the exist
 
 ```text
 config/review695-714-timeline-integrity-ledger.json
-docs/REVIEWS-695-714-TIMELINE-INTEGRITY-2026-10-09.md
+config/review715-734-provider-contract-rebase-ledger.json
+docs/REVIEWS-715-734-PROVIDER-CONTRACT-REBASE-2026-10-09.md
 tests/review695-714-timeline-integrity.php
 ```
 
@@ -92,6 +93,16 @@ The audited baseline main `e35563b7...` passed exact-head CI run `1689`. The fin
 - A nonzero `pin_weight` now requires bounded internal audit provenance: reference, actor, reason, surface, start and end. Invalid/unaudited pins are neutralized to weight `0` without dropping the public item.
 - Refreshed File 09 R26 and File 14 v1.4.8 repository-source evidence.
 - Richer planned timeline types beyond the current File 21 post timeline remain owner-contract dependent; File 25 will not infer publication approval from section-card adapters or foreign storage.
+
+## Reviews 715–734 corrections
+
+- Restarted from newer main `347a4ff4...` after concurrent Reviews 695–714 timeline-integrity work landed; those integrity fixes were preserved rather than overwritten.
+- Completed all plan-required Timeline Provider methods across the interface and concrete File 21/WordPress providers.
+- Provider registration now executes the sync hook fail-closed; normalized public items are cross-checked against owner canonical URL, visibility, actions and correction state.
+- Added **Most Viewed / Most Saved** only when a provider supplies real `privacy_safe` public metrics. Current File 21 publishes no such metric contract, so these sorts remain hidden there.
+- Added **Review state / Source state** refinements across renderer, public HTML, service, REST and SEO filtered-query handling.
+- Added explicit accessible **Load More** while retaining page fallback and current browser-Back/pagination integrity.
+- Refreshed current File 07 source evidence to runtime `1.2.1`, DB `1.1.1`, contract `1.2.1`, projection schema `3`.
 
 ## Existing visual and public contracts retained
 
