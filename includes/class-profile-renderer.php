@@ -251,6 +251,11 @@ final class Profile_Renderer
 
         $context = (array) ($GLOBALS['sabri_public_experience_context'] ?? []);
         $filtered = sanitize_key((string) ($context['timeline_content_type'] ?? '')) !== ''
+            || sanitize_key((string) ($context['timeline_provider'] ?? '')) !== ''
+            || trim((string) ($context['timeline_year'] ?? '')) !== ''
+            || trim((string) ($context['timeline_language'] ?? '')) !== ''
+            || trim((string) ($context['timeline_topic'] ?? '')) !== ''
+            || (string) ($context['timeline_sort'] ?? 'latest') !== 'latest'
             || trim((string) ($context['timeline_search_query'] ?? '')) !== ''
             || (int) get_query_var('paged') > 1
             || trim((string) ($context['preview_mode'] ?? '')) !== '';
