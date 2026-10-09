@@ -15,6 +15,7 @@ WordPress module for the **Sabri Social Homeopathy Platform**. This is the exist
 - Known unresolved File 25 source defects after the recorded corrections: **0**
 - Known owner-contract gaps: File 08 profile booking destination, File 17 target-bound Follow destination, and richer approved non-post timeline sources beyond File 21.
 - Hostinger staging accepted: **No**
+- Production approved: **No**
 - Live deployment verified: **No**. Exact deployed parity verified: **No**.
 
 ### Corrective implementation
