@@ -308,8 +308,13 @@ final class Plan_Completion
             </form>
 
             <h2><?php esc_html_e('Cache and Index', 'sabri-public-experience'); ?></h2>
-            <p><?php esc_html_e('Public profile responses remain no-store until an accepted cache-partition contract exists. The optional timeline index is rebuildable File 25 projection state.', 'sabri-public-experience'); ?></p>
-            <?php $this->operation_form('spux_rebuild_index', __('Rebuild Timeline Index', 'sabri-public-experience')); ?>
+            <p><?php esc_html_e('Public profile responses remain no-store until an accepted cache-partition contract exists. Optional timeline indexing is only used when a governed native builder exists; bounded live provider queries remain the default.', 'sabri-public-experience'); ?></p>
+            <?php if (function_exists('has_filter') && has_filter('sabri_public_experience/timeline_index_build') !== false): ?>
+                <?php $this->operation_form('spux_rebuild_index', __('Rebuild Timeline Index', 'sabri-public-experience')); ?>
+                <p><?php esc_html_e('Builder registration alone does not establish acceptance. Rebuild still requires separate high-risk approval, strict owner-contract validation, and staging proof; pause/resume is not claimed until an accepted resumable builder exists.', 'sabri-public-experience'); ?></p>
+            <?php else: ?>
+                <p><?php esc_html_e('Optional timeline index is not enabled: no native builder is registered. Rebuild controls are hidden rather than showing an unusable action. Any future pause/resume acceptance remains pending until a real indexed deployment is approved.', 'sabri-public-experience'); ?></p>
+            <?php endif; ?>
 
             <h2><?php esc_html_e('Adapter Health', 'sabri-public-experience'); ?></h2>
             <p><a href="<?php echo esc_url(admin_url('site-health.php')); ?>"><?php esc_html_e('Open File 25 Site Health checks', 'sabri-public-experience'); ?></a></p>
