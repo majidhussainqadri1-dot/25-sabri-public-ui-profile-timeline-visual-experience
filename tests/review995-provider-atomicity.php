@@ -101,4 +101,11 @@ r3953_assert(count($verified['items']) === 1
 r3953_assert(count($unverified['items']) === 2,
     'Owner authorization and unknown provenance must remain unverified.');
 
+$adminSource = file_get_contents(dirname(__DIR__) . '/includes/class-plan-completion.php');
+r3953_assert(is_string($adminSource)
+    && str_contains($adminSource, "has_filter('sabri_public_experience/timeline_index_build')")
+    && str_contains($adminSource, 'Rebuild controls are hidden rather than showing an unusable action.')
+    && str_contains($adminSource, 'pause/resume acceptance remains pending'),
+    'Absent optional index builder must not expose a dead rebuild action or claim pause/resume acceptance.');
+
 echo "PASS: Review 995 provider truncation/metric atomicity and explicit source verification\n";
