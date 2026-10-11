@@ -149,11 +149,8 @@ final class Timeline_Service
                 $provider_items = $provider->get_public_author_items($author_id, $provider_query);
                 // Reaching the requested look-ahead (e.g. 21 for page 1)
                 // is normal pagination, not a 500-item safety truncation.
-                if ($candidate_limit === self::MAX_CANDIDATES_PER_PROVIDER
-                    && count($provider_items) >= self::MAX_CANDIDATES_PER_PROVIDER
-                ) {
-                    $provider_limit_reached = true;
-                }
+                $provider_reached_limit = $candidate_limit === self::MAX_CANDIDATES_PER_PROVIDER
+                    && count($provider_items) >= self::MAX_CANDIDATES_PER_PROVIDER;
                 if (count($provider_items) > $candidate_limit) {
                     $provider_items = array_slice($provider_items, 0, $candidate_limit);
                 }
@@ -163,6 +160,8 @@ final class Timeline_Service
                 // otherwise earlier items would survive a provider contract failure.
                 $provider_items_by_key = [];
                 $provider_canonical_items = [];
+                $provider_metric_scores = [];
+                $provider_metric_sorts = ['most_viewed' => false, 'most_saved' => false];
                 foreach ($provider_items as $item) {
                     if (! $item instanceof Normalized_Timeline_Item) {
                         throw new \UnexpectedValueException('Timeline providers must return normalized timeline items.');
@@ -199,7 +198,10 @@ final class Timeline_Service
                         continue;
                     }
                     if ($source_state !== '') {
-                        $verified_source = (string) $item->get('verification_state') !== 'unverified';
+                        // Native publication authorization is not evidence of
+                        // source verification. Only an explicit verified state
+                        // may satisfy the "verified" public refinement.
+                        $verified_source = (string) $item->get('verification_state') === 'verified';
                         if (($source_state === 'verified') !== $verified_source) {
                             continue;
                         }
@@ -221,15 +223,6 @@ final class Timeline_Service
                     }
 
                     $key = $provider_id . ':' . $item->get('native_object_type') . ':' . $item->get('native_object_id');
-                    $metrics = self::public_metric_scores($provider->get_public_metrics($item));
-                    if (isset($metrics['views'])) {
-                        $metric_scores[$key]['most_viewed'] = $metrics['views'];
-                        $metric_sorts['most_viewed'] = true;
-                    }
-                    if (isset($metrics['saves'])) {
-                        $metric_scores[$key]['most_saved'] = $metrics['saves'];
-                        $metric_sorts['most_saved'] = true;
-                    }
                     $canonical_key = $this->canonical_key((string) $item->get('canonical_url'));
                     if (isset($provider_items_by_key[$key])
                         || isset($items[$key])
@@ -238,6 +231,17 @@ final class Timeline_Service
                         continue;
                     }
 
+                    // Stage metric ordering only for accepted unique items.
+                    // A late provider exception must discard its entire batch.
+                    $metrics = self::public_metric_scores($provider->get_public_metrics($item));
+                    if (isset($metrics['views'])) {
+                        $provider_metric_scores[$key]['most_viewed'] = $metrics['views'];
+                        $provider_metric_sorts['most_viewed'] = true;
+                    }
+                    if (isset($metrics['saves'])) {
+                        $provider_metric_scores[$key]['most_saved'] = $metrics['saves'];
+                        $provider_metric_sorts['most_saved'] = true;
+                    }
                     $provider_items_by_key[$key] = $item;
                     if ($canonical_key !== '') {
                         $provider_canonical_items[$canonical_key] = $key;
@@ -248,6 +252,16 @@ final class Timeline_Service
                 }
                 foreach ($provider_canonical_items as $canonical_key => $key) {
                     $canonical_items[$canonical_key] = $key;
+                }
+                // Commit provider-wide status only after every item and
+                // owner projection was validated. Failed providers contribute
+                // neither truncation nor ranking/availability metadata.
+                $provider_limit_reached = $provider_limit_reached || $provider_reached_limit;
+                foreach ($provider_metric_scores as $key => $scores) {
+                    $metric_scores[$key] = $scores;
+                }
+                foreach ($provider_metric_sorts as $name => $available) {
+                    $metric_sorts[$name] = $metric_sorts[$name] || $available;
                 }
             } catch (\Throwable $exception) {
                 $errors[] = (string) $provider_id;
