@@ -29,7 +29,25 @@
     "db_version_verified_live": false,
     "migration_state_verified_live": false,
     "review_ledger": "config/review715-734-provider-contract-rebase-ledger.json",
-    "historical_review_lineage": "Reviews 515-594; Reviews through 695-714 remain preserved; Reviews 715-734 are the latest provider-contract rebase audit on top of current main."
+    "historical_review_lineage": "Reviews 515-594; Reviews through 695-714 remain preserved; Reviews 715-734 are the latest provider-contract rebase audit on top of current main.",
+    "conditional_review_gates": {
+      "checkpoint": "R995",
+      "review_batch_995_1014_completed": false,
+      "scope_of_source_complete": "The 25 recorded base requirement groups and 24 approved Future candidate groups only; not the current unfinished R995-1014 fresh audit or installed acceptance.",
+      "optional_timeline_index": {
+        "source": "File25 Plan section 48 and QA item 45",
+        "activation": "not_enabled_without_native_builder",
+        "pause_resume_qa": "pending_conditional_index_activation",
+        "cannot_claim_resumable_index": true
+      },
+      "latest_file14_exact_repository_head": "b0524faaa60c5324de4da43e6c813370c4f75084",
+      "external_owner_gaps": [
+        "File08 native profile-targeted booking destination",
+        "File17 native target-bound Follow destination",
+        "File21 public metrics and approved richer non-post timeline classes"
+      ],
+      "hostinger_staging_live_verified": false
+    }
   },
   "requirements": [
     {
