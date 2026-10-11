@@ -108,4 +108,13 @@ r3953_assert(is_string($adminSource)
     && str_contains($adminSource, 'pause/resume acceptance remains pending'),
     'Absent optional index builder must not expose a dead rebuild action or claim pause/resume acceptance.');
 
+$matrix = json_decode((string) file_get_contents(dirname(__DIR__) . '/config/source-completion-matrix.json'), true);
+$gates = is_array($matrix) ? ($matrix['declaration']['conditional_review_gates'] ?? null) : null;
+r3953_assert(is_array($gates)
+    && ($gates['checkpoint'] ?? null) === 'R995'
+    && ($gates['review_batch_995_1014_completed'] ?? null) === false
+    && ($gates['optional_timeline_index']['pause_resume_qa'] ?? '') === 'pending_conditional_index_activation'
+    && ($gates['hostinger_staging_live_verified'] ?? null) === false,
+    'Source-complete baseline must not imply R995-1014, index pause/resume or installed acceptance.');
+
 echo "PASS: Review 995 provider truncation/metric atomicity and explicit source verification\n";
