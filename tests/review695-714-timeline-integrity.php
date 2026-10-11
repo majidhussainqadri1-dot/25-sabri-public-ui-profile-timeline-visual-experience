@@ -21,6 +21,35 @@ final class R695_Bounded_Provider implements Timeline_Provider
         $this->last_limit = (int) ($query['candidate_limit'] ?? 0);
         return array_slice($this->items, 0, $this->last_limit);
     }
+    // Exercise the current owner-projection interface while preserving this
+    // historical bounded-candidate regression's read-only mock semantics.
+    public function normalize_public_item(array $native_item, int $author_id): ?Normalized_Timeline_Item
+    {
+        unset($native_item, $author_id);
+        return null; // This mock supplies pre-normalized public candidates only.
+    }
+    public function get_canonical_url(Normalized_Timeline_Item $item): string
+    {
+        return (string) $item->get('canonical_url');
+    }
+    public function get_visibility_state(Normalized_Timeline_Item $item): string
+    {
+        return (string) $item->get('visibility_state');
+    }
+    public function get_public_actions(Normalized_Timeline_Item $item): array
+    {
+        return (array) $item->get('available_actions');
+    }
+    public function get_public_metrics(Normalized_Timeline_Item $item): array
+    {
+        unset($item);
+        return []; // Never invent native-owned metrics.
+    }
+    public function get_correction_state(Normalized_Timeline_Item $item): string
+    {
+        return (string) $item->get('correction_state');
+    }
+    public function register_sync_events(): void {}
     public function get_health_status(): array { return ['available' => true]; }
 }
 
