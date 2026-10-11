@@ -246,10 +246,11 @@
       "source_lifecycle": "fifth-80-review-feature-branch-candidate-pending-merge-and-hostinger-staging",
       "bundled_with_file_25": false,
       "staging_status": "pending",
-      "current_repository_head": "080e2198d84dfb7491bb0b75946e14a5fe118b91",
-      "current_source_version_observed": "1.4.8",
+      "current_repository_head": "b0524faaa60c5324de4da43e6c813370c4f75084",
+      "current_source_version_observed": "1.4.16",
       "current_schema_version_observed": 10005,
-      "current_repository_review": "compatible-current-main-fourth-twenty-pass-2026-10-09; repository-source-only"
+      "current_repository_review": "File14 main v1.4.16 source-only R12; native File07/08/09 owner outcomes and experiment baseline restore unresolved; staging/live unverified",
+      "current_repository_observed_at": "2026-10-11"
     },
     {
       "file": 18,
@@ -421,7 +422,7 @@
     "10": "4b8a3dda140186c01b05d998e729cb1aeeed2cf3",
     "11": "c2df8e72bad76dc1a7fb83cbe039541f7aa1fd8b",
     "12": "2b369ef2d609247896e1ab32118f1dc498407f51",
-    "14": "080e2198d84dfb7491bb0b75946e14a5fe118b91",
+    "14": "b0524faaa60c5324de4da43e6c813370c4f75084",
     "15": "4e5d768d637052063bf37a038592b8f7b27f120a",
     "17": "8ae656e51796d1f05865d8be5dca2480443d79ca",
     "18": "04a5872e3e2e170ee400e7c607e39abd5484df65",
