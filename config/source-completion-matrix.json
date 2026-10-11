@@ -29,7 +29,7 @@
     "db_version_verified_live": false,
     "migration_state_verified_live": false,
     "review_ledger": "config/review715-734-provider-contract-rebase-ledger.json",
-    "historical_review_lineage": "Reviews through 695-714 remain preserved; Reviews 715-734 are the latest provider-contract rebase audit on top of current main."
+    "historical_review_lineage": "Reviews 515-594; Reviews through 695-714 remain preserved; Reviews 715-734 are the latest provider-contract rebase audit on top of current main."
   },
   "requirements": [
     {
