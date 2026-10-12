@@ -81,7 +81,7 @@ $breadcrumbs = array_values(array_filter(
                             <?php foreach ($preview_urls as $mode => $url) : ?>
                                 <?php
                                 $mode = sanitize_key((string) $mode);
-                                $url = SabriPublicExperiencePublic_URL::sanitize_same_site($url, false);
+                                $url = \Sabri\PublicExperience\Public_URL::sanitize_same_site($url, false);
                                 if ($mode === '' || $url === '') { continue; }
                                 $active = $mode === $preview_mode;
                                 ?>
@@ -91,7 +91,7 @@ $breadcrumbs = array_values(array_filter(
                             <?php endforeach; ?>
                         </nav>
                     <?php endif; ?>
-                    <?php $exit_preview = SabriPublicExperiencePublic_URL::sanitize_same_site($profile['canonical_url'] ?? '', false); ?>
+                    <?php $exit_preview = \Sabri\PublicExperience\Public_URL::sanitize_same_site($profile['canonical_url'] ?? '', false); ?>
                     <?php if ($exit_preview !== '') : ?>
                         <a class="spux-text-link" href="<?php echo esc_url($exit_preview); ?>"><?php esc_html_e('Exit preview', 'sabri-public-experience'); ?></a>
                     <?php endif; ?>
@@ -171,7 +171,7 @@ $breadcrumbs = array_values(array_filter(
                             <?php foreach ($assistant_previews as $mode => $url) : ?>
                                 <?php
                                 $mode = sanitize_key((string) $mode);
-                                $url = SabriPublicExperiencePublic_URL::sanitize_same_site($url, false);
+                                $url = \Sabri\PublicExperience\Public_URL::sanitize_same_site($url, false);
                                 if ($mode === '' || $url === '') { continue; }
                                 ?>
                                 <a class="spux-button spux-button--secondary" href="<?php echo esc_url($url); ?>"><?php echo esc_html(ucwords(str_replace('-', ' ', $mode))); ?></a>
