@@ -121,10 +121,13 @@ final class Section_Service
                 continue;
             }
             if ($status !== 'usable') {
-                // Eligibility/availability can change without a new provider
-                // version or public-profile cache digest. A skipped owner
-                // must not make its absence a permanent cache fact.
-                $has_skipped_provider = true;
+                // Dynamic availability/profile eligibility can change without
+                // a new owner version or public-profile cache digest. Only
+                // such transient skips prevent caching. Permanently disabled
+                // providers are stable metadata and need no repeat query.
+                if ($status === 'skip') {
+                    $has_skipped_provider = true;
+                }
                 continue;
             }
 
@@ -273,7 +276,7 @@ final class Section_Service
             if ($metadata['maturity'] === 'disabled'
                 || ! in_array($metadata['maturity'], ['read-only', 'staging-accepted', 'production-accepted'], true)
             ) {
-                return 'skip';
+                return 'disabled';
             }
 
             return $provider->is_available() && $provider->supports_profile($profile)
