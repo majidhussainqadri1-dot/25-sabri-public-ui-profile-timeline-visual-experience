@@ -42,7 +42,12 @@ namespace {
     function sanitize_key(string $value): string { return trim((string) preg_replace('/[^a-z0-9_\-]/', '-', strtolower(trim($value))), '-'); }
     function sanitize_text_field(string $value): string { return trim(strip_tags($value)); }
     function sanitize_textarea_field(string $value): string { return trim(strip_tags($value)); }
-    function apply_filters(string $hook, mixed $value, mixed ...$args): mixed { return $value; }
+    function apply_filters(string $hook, mixed $value, mixed ...$args): mixed
+    {
+        global $r3953_test_filters;
+        $callback = is_array($r3953_test_filters ?? null) ? ($r3953_test_filters[$hook] ?? null) : null;
+        return is_callable($callback) ? $callback($value, ...$args) : $value;
+    }
     function get_user_by(string $field, int|string $value): WP_User|false { return $field === 'id' && (int) $value > 0 ? new WP_User((int) $value) : false; }
     function home_url(string $path = '/'): string { return 'https://example.test' . '/' . ltrim($path, '/'); }
     function wp_parse_url(string $url): array|false { return parse_url($url); }
