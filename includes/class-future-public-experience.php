@@ -270,21 +270,23 @@ final class Future_Public_Experience
         ];
         $data = apply_filters('sabri_public_experience/profile_trust_capsule', $default, $profile);
         $data = is_array($data) ? $data : $default;
-        $state = sanitize_key((string) ($data['correction_state'] ?? 'none'));
-        if (! in_array($state, ['none', 'corrected', 'retracted', 'archived'], true)) {
-            $state = 'none';
-        }
+        // Only the actual File 03/09 verified bit may establish trust.
+        // File 25 presentation hooks may revoke that bit, not invent owner
+        // provenance, verification timestamps, or correction decisions.
         $verified = $default['verified'] === true;
         if (array_key_exists('verified', $data)) {
             $verified = $verified && $data['verified'] === true;
         }
         return [
             'verified' => $verified,
-            'label' => self::plain($data['label'] ?? $default['label'], 190),
-            'source_label' => self::plain($data['source_label'] ?? $default['source_label'], 190),
-            'verified_at' => $verified ? self::iso_time((string) ($data['verified_at'] ?? '')) : '',
-            'freshness' => self::plain($data['freshness'] ?? '', 190),
-            'correction_state' => $state,
+            'label' => $default['label'],
+            'source_label' => $default['source_label'],
+            // The public File 03 DTO currently supplies no validated values
+            // for these claims. Keep the states neutral until versioned native
+            // owner contracts can provide public-safe provenance.
+            'verified_at' => '',
+            'freshness' => '',
+            'correction_state' => 'none',
         ];
     }
 
@@ -295,6 +297,11 @@ final class Future_Public_Experience
         if (! is_array($data)) {
             return [];
         }
+        // A translation is a second route to public profile text, not a new
+        // disclosure grant. Never render a translated field when the File 03
+        // public projection withheld the corresponding canonical field.
+        $headline_public = self::plain($profile['headline'] ?? '', 300) !== '';
+        $bio_public = self::plain($profile['bio'] ?? '', 12000) !== '';
         $clean = [];
         foreach (array_slice($data, 0, 8, true) as $code => $row) {
             if (! is_string($code) || ! is_array($row)) {
@@ -305,8 +312,8 @@ final class Future_Public_Experience
                 continue;
             }
             $label = self::plain($row['label'] ?? strtoupper($code), 80);
-            $headline = self::plain($row['headline'] ?? '', 300);
-            $bio = self::plain($row['bio'] ?? '', 12000);
+            $headline = $headline_public ? self::plain($row['headline'] ?? '', 300) : '';
+            $bio = $bio_public ? self::plain($row['bio'] ?? '', 12000) : '';
             if ($label !== '' && ($headline !== '' || $bio !== '')) {
                 $clean[] = ['code' => $code, 'label' => $label, 'headline' => $headline, 'bio' => $bio];
             }
