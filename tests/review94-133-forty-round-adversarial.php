@@ -133,4 +133,8 @@ $assert(str_contains($source, 'approved_dry_run_required')
     && str_contains($source, 'stale_rebuild_reconciled')
     && str_contains($css, '.spux-timeline-search'), 'Review 133: migration, rollback, repair, redirects, and new UI are operationally wired.');
 
+$GLOBALS['spux_test_filters']['sabri_public_experience/public_metrics'] = ['followers' => 999999];
+$assert(Plan_Completion::public_metrics(['user_id' => 7]) === [], 'Metrics require a verified native owner.');
+unset($GLOBALS['spux_test_filters']['sabri_public_experience/public_metrics']);
+
 echo sprintf("Reviews 94-133 corrective regressions PASS (%d checks)\n", $checks);
