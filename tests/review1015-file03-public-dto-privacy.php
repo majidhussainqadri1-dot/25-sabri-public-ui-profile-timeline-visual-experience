@@ -52,6 +52,25 @@ r3953_native_assert(($public['display_name'] ?? '') === 'Public profile',
 r3953_native_assert(! str_contains((string) json_encode($public), 'WP_ONLY_UNREVIEWED_'),
     'No unreviewed WordPress-only private identity fields may cross public projection.');
 
+// An independent File25 presentation filter must never disclose text absent
+// from the canonical File03 public DTO. This is distinct from WP_User fallbacks.
+$r3953_test_filters['sabri_public_experience/public_profile_data'] =
+    static function (array $profile): array {
+        $profile['bio'] = 'FILTER_ONLY_PRIVATE_BIO';
+        $profile['headline'] = 'FILTER_ONLY_PRIVATE_HEADLINE';
+        return $profile;
+    };
+$filteredNative = new Native_Integration();
+$filteredRepository = new Profile_Repository(new Visibility_Policy($filteredNative), $filteredNative);
+$filteredProfile = $filteredRepository->get_public_profile($wpUser);
+r3953_native_assert(is_array($filteredProfile)
+    && ($filteredProfile['bio'] ?? 'not-empty') === ''
+    && ($filteredProfile['headline'] ?? 'not-empty') === '',
+    'Presentation filters must not create File03-withheld bio/headline.');
+r3953_native_assert(! str_contains((string) json_encode($filteredProfile), 'FILTER_ONLY_PRIVATE'),
+    'A profile filter must never bypass File03 disclosure consent.');
+unset($r3953_test_filters['sabri_public_experience/public_profile_data']);
+
 // The patch must not suppress values actually authorized by File 03.
 $source['display_name'] = 'File03 Approved Public Name';
 $source['fields'] = ['bio' => 'File03 approved public biography'];
@@ -63,5 +82,23 @@ r3953_native_assert(is_array($approved)
     && ($approved['display_name'] ?? null) === 'File03 Approved Public Name'
     && ($approved['bio'] ?? null) === 'File03 approved public biography',
     'File03-authorized public name and biography must continue to render normally.');
+
+
+// Allowed presentation transformations are monotonic: shorten or hide an
+// already File03-authorized value, never substitute arbitrary source text.
+$r3953_test_filters['sabri_public_experience/public_profile_data'] =
+    static function (array $profile): array {
+        $profile['bio'] = 'File03 approved';
+        $profile['headline'] = 'UNAPPROVED_REPLACEMENT_HEADLINE';
+        return $profile;
+    };
+$trimNative = new Native_Integration();
+$trimRepository = new Profile_Repository(new Visibility_Policy($trimNative), $trimNative);
+$trimProfile = $trimRepository->get_public_profile($wpUser);
+r3953_native_assert(is_array($trimProfile)
+    && ($trimProfile['bio'] ?? null) === 'File03 approved'
+    && ($trimProfile['headline'] ?? 'not-empty') === '',
+    'A presentation filter may excerpt approved text but may not invent headline.');
+unset($r3953_test_filters['sabri_public_experience/public_profile_data']);
 
 echo "PASS: File25 File03-authorized-only public name/bio fallback regression\n";
