@@ -216,9 +216,6 @@ final class Profile_Renderer
         // canonical public media metadata. An intentionally private contact choice
         // remains a privacy state rather than fabricated public contact data.
         $completion_profile = $profile;
-        if (empty($completion_profile['contacts'])) {
-            $completion_profile['contacts'] = ['_privacy_state' => 'not-public'];
-        }
         $completion_assistant = $preview_mode === ''
             ? Plan_Completion::completion_assistant($completion_profile)
             : [
