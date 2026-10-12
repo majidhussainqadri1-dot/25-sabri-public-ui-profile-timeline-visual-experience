@@ -84,6 +84,49 @@ $_GET['spux_year'] = '../2026';
 $year = Future_Public_Experience::timeline_year_request();
 $check(($year['year'] ?? -1) === 0 && ($year['error'] ?? '') === 'invalid_year', 'Malformed timeline year must fail closed.');
 
+
+// Real public timeline items do not expose provider_id. A claimed source
+// provenance badge must require explicit owner verification, not presence of
+// a provider pointer (which would label unverified items as verified).
+$timelineMetaMethod = new ReflectionMethod(Future_Public_Experience::class, 'timeline_meta');
+$timelineMetaMethod->setAccessible(true);
+$meta = $timelineMetaMethod->invoke(null, [
+    'items' => [
+        [
+            'canonical_url' => 'https://example.test/verified/',
+            'verification_state' => 'verified',
+            'published_at' => '2026-10-12T08:00:00Z',
+        ],
+        [
+            'canonical_url' => 'https://example.test/unverified/',
+            'verification_state' => 'unverified',
+            'provider_id' => 'file-21',
+            'published_at' => '2026-10-12T08:00:00Z',
+        ],
+        [
+            'canonical_url' => 'https://example.test/owner-approved/',
+            'verification_state' => 'native-owner-authorized',
+            'provider_id' => 'file-21',
+            'published_at' => '2026-10-12T08:00:00Z',
+        ],
+    ],
+]);
+$check(is_array($meta) && count($meta) === 3, 'Timeline provenance must retain three public-safe references.');
+$check(($meta[0]['source_verified'] ?? null) === true,
+    'An explicitly verified public source must display its genuine verification badge.');
+$check(($meta[1]['source_verified'] ?? null) === false
+    && ($meta[2]['source_verified'] ?? null) === false,
+    'Provider ID or native publication approval must never forge a source-verification badge.');
+
+// The Preview route is a real runtime template, so PHP lint alone does not
+// catch an undefined class invoked only when preview markup is rendered.
+$publicTemplate = (string) file_get_contents(dirname(__DIR__) . '/templates/public-profile.php');
+$check(! str_contains($publicTemplate, 'SabriPublicExperiencePublic_URL::'),
+    'Preview must never call the undefined concatenated Public_URL class.');
+$check(substr_count($publicTemplate, '\\Sabri\\PublicExperience\\Public_URL::sanitize_same_site') >= 3,
+    'Preview and exit links must use the actual namespaced same-site URL validator.');
+
+
 if ($failures !== []) {
     fwrite(STDERR, "FAILED\n- " . implode("\n- ", $failures) . "\n");
     exit(1);
