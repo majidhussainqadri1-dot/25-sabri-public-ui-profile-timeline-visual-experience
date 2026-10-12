@@ -305,63 +305,30 @@ final class Future_Public_Experience
     /** @param array<string,mixed> $profile @return list<array<string,string>> */
     private static function relationships(array $profile): array
     {
-        $data = apply_filters('sabri_public_experience/public_relationships', [], $profile);
-        if (! is_array($data)) {
-            return [];
-        }
-        $clean = [];
-        foreach (array_slice($data, 0, 40) as $row) {
-            if (! is_array($row)) {
-                continue;
-            }
-            $label = self::plain($row['label'] ?? '', 140);
-            $url = Public_URL::sanitize_same_site($row['url'] ?? '', false);
-            if ($label === '' || $url === '') {
-                continue;
-            }
-            $clean[] = [
-                'label' => $label,
-                'type' => sanitize_key((string) ($row['type'] ?? 'related')) ?: 'related',
-                'relationship' => self::plain($row['relationship'] ?? '', 100),
-                'url' => $url,
-            ];
-        }
-        return $clean;
+        // File 03/07/21/26 have not published a versioned, public-safe
+        // relationship projection for this component. Generic presentation
+        // filters cannot assert professional or institutional affiliations.
+        unset($profile);
+        return [];
     }
 
     /** @param array<string,mixed> $profile @param array<string,mixed> $context @return list<array<string,string>> */
     private static function citations(array $profile, array $context): array
     {
-        $data = apply_filters('sabri_public_experience/public_citations', [], $profile, $context);
-        if (! is_array($data)) {
-            return [];
-        }
-        $clean = [];
-        foreach (array_slice($data, 0, 40) as $row) {
-            if (! is_array($row)) {
-                continue;
-            }
-            $title = self::plain($row['title'] ?? '', 240);
-            $url = Public_URL::sanitize_same_site($row['url'] ?? '', false);
-            if ($title !== '' && $url !== '') {
-                $clean[] = ['title' => $title, 'source' => self::plain($row['source'] ?? '', 240), 'url' => $url];
-            }
-        }
-        return $clean;
+        // Source attributions require native object IDs, provenance and
+        // rights checks from the publishing/knowledge owner. A same-site URL
+        // is not evidence that a filtered citation is real or public.
+        unset($profile, $context);
+        return [];
     }
 
     /** @param array<string,mixed> $profile @return array<string,string> */
     private static function freshness(array $profile): array
     {
-        $data = apply_filters('sabri_public_experience/content_freshness', [], $profile);
-        if (! is_array($data)) {
-            return [];
-        }
-        $updated = self::iso_time((string) ($data['updated_at'] ?? ''));
-        if ($updated === '') {
-            return [];
-        }
-        return ['updated_at' => $updated, 'label' => self::plain($data['label'] ?? '', 190)];
+        // Never publish an unaudited "recently updated" assertion minted by
+        // a UI hook. The native owner must provide a versioned public date.
+        unset($profile);
+        return [];
     }
 
     /** @param array<string,mixed> $timeline @return list<array<string,mixed>> */
