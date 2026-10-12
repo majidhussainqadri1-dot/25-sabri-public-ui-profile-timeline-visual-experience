@@ -39,6 +39,10 @@ tests/review695-714-timeline-integrity.php
 
 **Evidence boundary:** CI builds and ZIP checks are not installed staging, live deployment or database truth. Exact deployed code, DB/schema, migration state, staging visual/role acceptance and live re-test all remain unverified.
 
+## Latest exact-source review boundary — 2026-10-12
+
+A fresh twenty-area read-only File 25 / consolidated-central / companion-source inspection on the existing corrective PR identified two owner-boundary presentation fallbacks: a File 03-omitted public biography was replaced with unreviewed WordPress \`WP_User::description\`, and an omitted public display name was replaced with \`WP_User::display_name\`. The candidate now respects File 03's public DTO for both, using an empty biography and a neutral public label when the canonical owner withholds them. Dynamic regressions are in \`tests/review1015-file03-public-dto-privacy.php\`. A separate File 25 welcome/Skip Intro PR #19 remains OPEN DRAFT and is **not** included in correction PR #16 or main. Do not call either PR merged, deployed, accepted on Hostinger, or 20/20 whole-repository audited solely from source and CI.
+
 ## Source implementation status
 
 File 25 source-owned scope identified in Reviews 695–714 has been corrected; later source changes require fresh exact-head CI evidence. Mutable exact-head CI state is intentionally **not frozen as permanent truth inside source metadata**: the exact current GitHub HEAD must be checked against its current CI run after the final commit. Repository/CI evidence never proves installed Hostinger staging or live deployment.
@@ -70,7 +74,7 @@ The audited baseline main `e35563b7...` passed exact-head CI run `1689`. The fin
 - **File 03:** profile master/public projection, contact consent, canonical public media and canonical profile identity remain File 03-owned.
 - **File 08:** current main `70541974ce0ffb16aebef557c3016eb7447662f4`; no reviewed profile-user→booking-destination API is published, so **Appointment remains hidden**.
 - **File 09:** current main `cfc5f781a766330314dc98c42abeca0eb7786eba`, runtime `1.3.0`, schema `6`, integration contract `1.1.0`; Doctor-verification truth remains File 09-owned.
-- **File 14:** current main `080e2198d84dfb7491bb0b75946e14a5fe118b91`, runtime `1.4.8`, schema `10005`; File 14 remains within File 25's reviewed compatibility family.
+- **File 14:** latest separately verified repository main as of 2026-10-12 `a5e6fa9eb298d98e00850af16a284ce65d54b71d`, source runtime `1.4.27`, base schema candidate `10005`. This is **source-only evidence**; the historic reviewed candidate remains `907a04b25567a607e5ecb11d26e50bd0f07852be` (v1.4.3), and installed/staging/live compatibility has not been proven.
 - **File 17:** current main `8ae656e51796d1f05865d8be5dca2480443d79ca`; **Follow remains hidden** without a target-bound owner contract.
 - **File 20:** current main `8a4dbcaf4fef8e926b9b834ecfde16c21a0f00ca`; sole structural shell/navigation/layout and canonical admin-parent owner.
 - **File 21:** current main `f2eb7e95ddea327af36ea725ffb923b029f885e6`; canonical publication/ProfileTimeline owner. Its current `ProfileTimeline::query` remains the authoritative approved post timeline source.
