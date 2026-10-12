@@ -749,40 +749,10 @@ final class Plan_Completion
     /** @param array<string,mixed> $profile @return array<string,int> */
     public static function public_metrics(array $profile): array
     {
-        if (self::preferences()['public_metrics'] !== true) {
-            return [];
-        }
-        $user_id = self::exact_integer($profile['user_id'] ?? null) ?? 0;
-        if ($user_id < 1) {
-            return [];
-        }
-        $metrics = apply_filters('sabri_public_experience/public_metrics', [], $user_id, $profile);
-        if (! is_array($metrics)) {
-            return [];
-        }
-        $allowed = ['publications', 'videos', 'research', 'followers', 'views', 'saves', 'reviews'];
-        $clean = [];
-        foreach ($allowed as $key) {
-            if (! array_key_exists($key, $metrics) || ! is_int($metrics[$key])) {
-                continue;
-            }
-            $value = $metrics[$key];
-            if ($value < 0 || $value > self::MAX_METRIC_VALUE) {
-                continue;
-            }
-            $threshold = apply_filters('sabri_public_experience/public_metric_minimum', 0, $key, $user_id, $profile);
-            if (! is_int($threshold) || $threshold < 0 || $threshold > self::MAX_METRIC_VALUE) {
-                $threshold = 0;
-            }
-            if ($value < $threshold) {
-                continue;
-            }
-            if (apply_filters('sabri_public_experience/public_metric_allowed', true, $key, $user_id, $profile) !== true) {
-                continue;
-            }
-            $clean[$key] = $value;
-        }
-        return $clean;
+        // Public metric values require an approved native-source projection.
+        // Generic presentation hooks cannot establish counter provenance.
+        unset($profile);
+        return [];
     }
 
     /** @param array<string,mixed> $profile @return array<string,mixed> */
