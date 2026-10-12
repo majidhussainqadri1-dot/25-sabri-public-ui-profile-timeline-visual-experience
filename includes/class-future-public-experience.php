@@ -293,32 +293,13 @@ final class Future_Public_Experience
     /** @param array<string,mixed> $profile @return list<array<string,string>> */
     private static function translations(array $profile): array
     {
-        $data = apply_filters('sabri_public_experience/profile_translations', [], $profile);
-        if (! is_array($data)) {
-            return [];
-        }
-        // A translation is a second route to public profile text, not a new
-        // disclosure grant. Never render a translated field when the File 03
-        // public projection withheld the corresponding canonical field.
-        $headline_public = self::plain($profile['headline'] ?? '', 300) !== '';
-        $bio_public = self::plain($profile['bio'] ?? '', 12000) !== '';
-        $clean = [];
-        foreach (array_slice($data, 0, 8, true) as $code => $row) {
-            if (! is_string($code) || ! is_array($row)) {
-                continue;
-            }
-            $code = strtolower(trim($code));
-            if (preg_match('/^[a-z]{2,3}(?:-[a-z]{2})?$/', $code) !== 1) {
-                continue;
-            }
-            $label = self::plain($row['label'] ?? strtoupper($code), 80);
-            $headline = $headline_public ? self::plain($row['headline'] ?? '', 300) : '';
-            $bio = $bio_public ? self::plain($row['bio'] ?? '', 12000) : '';
-            if ($label !== '' && ($headline !== '' || $bio !== '')) {
-                $clean[] = ['code' => $code, 'label' => $label, 'headline' => $headline, 'bio' => $bio];
-            }
-        }
-        return $clean;
+        // File 03's current public DTO does not publish an approved translated
+        // biography/headline or a versioned owner-translation contract. A
+        // general presentation filter cannot mint a second publishing path.
+        // Until the canonical owner adds a public-safe translation projection,
+        // leave this enhancement conditional rather than expose invented text.
+        unset($profile);
+        return [];
     }
 
     /** @param array<string,mixed> $profile @return list<array<string,string>> */
