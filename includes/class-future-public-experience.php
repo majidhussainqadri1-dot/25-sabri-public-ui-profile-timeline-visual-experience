@@ -391,7 +391,7 @@ final class Future_Public_Experience
             $state = sanitize_key((string) ($item['correction_state'] ?? 'none'));
             $clean[] = [
                 'url' => $url,
-                'source_verified' => sanitize_key((string) ($item['provider_id'] ?? '')) !== '',
+                'source_verified' => ($item['verification_state'] ?? null) === 'verified',
                 'correction_state' => in_array($state, ['corrected', 'retracted'], true) ? $state : 'none',
                 'updated_at' => self::iso_time((string) ($item['updated_at'] ?? $item['published_at'] ?? '')),
             ];
