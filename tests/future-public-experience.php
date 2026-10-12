@@ -12,6 +12,13 @@ if (! function_exists('apply_filters')) {
         return $value;
     }
 }
+if (! function_exists('sanitize_key')) {
+    function sanitize_key(string $key): string
+    {
+        $key = strtolower(trim($key));
+        return trim((string) preg_replace('/[^a-z0-9_\-]/', '-', $key), '-');
+    }
+}
 if (! function_exists('wp_unslash')) {
     function wp_unslash(mixed $value): mixed
     {
