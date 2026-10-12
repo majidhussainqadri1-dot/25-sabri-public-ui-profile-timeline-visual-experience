@@ -57,6 +57,12 @@ The optional public relationship/citation/freshness payloads now fail closed unt
 
 Affected tests: `tests/future-public-experience.php` and `tests/review1037-timeline-instant-precision.php`. Actual GH CI must be checked against the **last correction PR16 HEAD**, not an earlier CI success. Separate Draft PR #19 (File13 welcome), File14 independent moving repo HEAD, deployed package/DB/migrations and Hostinger staging acceptance are not assumed completed.
 
+## Source-only continuation — public counters and contact completion (2026-10-13)
+
+File 25 plan section 69 requires approved native, aggregate and privacy-screened public counters. A generic WordPress presentation filter cannot attest count provenance, deduplication, consent or disclosure thresholds. Public profile counters are temporarily withheld until their canonical owners publish an accepted versioned public metrics DTO. This does not claim the full metrics experience is implemented. Section 70's owner-only Completion Assistant uses actual public contact visibility. No public contact is an acceptable not-public state; no substitute or implied consent/contact object is invented. Regression evidence is in `tests/review94-133-forty-round-adversarial.php`.
+
+These changes are only in an open correction PR. File03 owner approvals, File17/21 metrics data, File24 assurance, Staging browser/role QA, migrations and production release remain separately gated and unverified.
+
 ## Source implementation status
 
 File 25 source-owned scope identified in Reviews 695–714 has been corrected; later source changes require fresh exact-head CI evidence. Mutable exact-head CI state is intentionally **not frozen as permanent truth inside source metadata**: the exact current GitHub HEAD must be checked against its current CI run after the final commit. Repository/CI evidence never proves installed Hostinger staging or live deployment.
