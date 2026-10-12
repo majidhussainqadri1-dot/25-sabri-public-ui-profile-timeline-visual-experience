@@ -95,9 +95,11 @@ final class Profile_Repository
         $headline = $profile_class === 'founder'
             ? (string) ($founder_source['title'] ?? '')
             : (string) ($professional['specialization'] ?? $this->native->profile_value($user_id, 'specialty'));
+        // A missing public File 03 biography is deliberately empty, even if
+        // WP_User carries an unreviewed WordPress description value.
         $bio = $profile_class === 'founder'
             ? (string) ($founder_source['introduction'] ?? $this->native->profile_value($user_id, 'bio', ''))
-            : $this->native->profile_value($user_id, 'bio', $user->description);
+            : $this->native->profile_value($user_id, 'bio', '');
 
         $show_professional_location = in_array($profile_class, ['founder', 'doctor', 'institution'], true);
         $country = $show_professional_location
@@ -121,9 +123,11 @@ final class Profile_Repository
         $projected_name = is_scalar($source_projection['display_name'] ?? null)
             ? (string) $source_projection['display_name']
             : '';
+        // File 03 alone decides which name is public. Never recover an omitted
+        // name from a raw WordPress account record; use a neutral UI label.
         $default_name = $profile_class === 'founder'
             ? self::FOUNDER_DISPLAY_NAME
-            : ($projected_name !== '' ? $projected_name : (string) $user->display_name);
+            : ($projected_name !== '' ? $projected_name : __('Public profile', 'sabri-public-experience'));
         $badge = is_array($source_projection['badge'] ?? null) ? $source_projection['badge'] : [];
 
         $profile = [
