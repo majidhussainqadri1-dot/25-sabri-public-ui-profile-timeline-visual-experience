@@ -145,4 +145,8 @@ $profile1040['contacts'] = ['website' => 'https://example.test/contact/'];
 $public1040 = Plan_Completion::completion_assistant($profile1040);
 $assert($public1040['contact_privacy_state'] === 'public', 'Real visible contact has public status.');
 
+$GLOBALS['spux_test_user_id'] = 0;
+$outside1040 = Plan_Completion::completion_assistant($profile1040);
+$assert($outside1040['authorized'] === false && $outside1040['contact_privacy_state'] === '' && $outside1040['missing'] === [], 'Nonowner cannot inspect contact completion state.');
+$assert(! str_contains($renderer, "'_privacy_state' => 'not-public'"), 'Renderer cannot invent a private contact.');
 echo sprintf("Reviews 94-133 corrective regressions PASS (%d checks)\n", $checks);
