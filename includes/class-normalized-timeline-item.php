@@ -506,7 +506,7 @@ final class Normalized_Timeline_Item implements JsonSerializable
             $date = DateTimeImmutable::createFromFormat(
                 '!Y-m-d H:i:s',
                 $value,
-                new \\DateTimeZone('UTC')
+                new \DateTimeZone('UTC')
             );
             if ($date instanceof DateTimeImmutable) {
                 return $date;
