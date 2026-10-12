@@ -112,6 +112,7 @@ final class Section_Service
         $seen = [];
         $errors = 0;
         $truncated = false;
+        $has_skipped_provider = false;
 
         foreach ($this->registry->for_section($section) as $provider) {
             $status = $this->provider_status($provider, $profile, $section);
@@ -120,6 +121,10 @@ final class Section_Service
                 continue;
             }
             if ($status !== 'usable') {
+                // Eligibility/availability can change without a new provider
+                // version or public-profile cache digest. A skipped owner
+                // must not make its absence a permanent cache fact.
+                $has_skipped_provider = true;
                 continue;
             }
 
@@ -198,7 +203,7 @@ final class Section_Service
         ];
         // Transient provider failures must not become sticky cache entries:
         // the same service may be queried again after native-source recovery.
-        if ($cache_key !== null && $errors === 0) {
+        if ($cache_key !== null && $errors === 0 && ! $has_skipped_provider) {
             $this->public_cache[$cache_key] = $result;
         }
 
