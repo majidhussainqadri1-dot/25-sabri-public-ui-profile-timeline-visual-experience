@@ -193,10 +193,8 @@ $onlyPublishedBio = $translationsMethod->invoke(null, [
     'headline' => '',
     'bio' => 'File03 explicitly published biography',
 ]);
-$check(count($onlyPublishedBio) === 1
-    && ($onlyPublishedBio[0]['headline'] ?? 'leak') === ''
-    && ($onlyPublishedBio[0]['bio'] ?? '') === 'PRIVATE_TRANSLATED_BIO',
-    'Only already-public File03 field types may be presented in translation; withheld headline stays hidden.');
+$check($onlyPublishedBio === [],
+    'A generic filter must not publish any untranslated-owner-approved translation until File03 supplies a versioned public translation contract.');
 unset($GLOBALS['spux_future_public_test_hooks']['sabri_public_experience/profile_translations']);
 
 if ($failures !== []) {
