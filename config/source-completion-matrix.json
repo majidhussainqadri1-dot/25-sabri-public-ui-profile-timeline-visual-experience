@@ -44,7 +44,8 @@
       "external_owner_gaps": [
         "File08 native profile-targeted booking destination",
         "File17 native target-bound Follow destination",
-        "File21 public metrics and approved richer non-post timeline classes"
+        "File21 public metrics and approved richer non-post timeline classes",
+        "File03 versioned approved public-profile translations (until native DTO is accepted, File25 translation data remains hidden)"
       ],
       "hostinger_staging_live_verified": false
     }
