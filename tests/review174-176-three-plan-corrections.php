@@ -117,9 +117,16 @@ namespace Sabri\PublicExperience {
 
     $assert(Three_Plan_Corrections::render_welcome_panel(['title'=>'Welcome','message'=>'One coherent Sabri platform experience.','continue_url'=>'/home/']) === '', 'File 25 must not render welcome unless File 20 invokes it.');
     $welcome = Three_Plan_Corrections::render_welcome_panel(['invoked_by_file_20'=>true,'title'=>'Welcome','message'=>'One coherent Sabri platform experience.','continue_url'=>'/home/','skip_label'=>'Skip']);
-    foreach (['data-directive="CHAT-UX-001"','data-frequency-owner="file-20"','data-visual-owner="file-25"','sabri-ui-welcome-panel', 'sabri-ui-welcome-panel__brand', 'Sabri Homeopathy', 'data-sabri-welcome-skip', '>Skip</button>'] as $marker) { $assert(str_contains($welcome, $marker), 'Welcome ownership marker missing: ' . $marker); }
+    foreach (['data-directive="CHAT-UX-001"','data-frequency-owner="file-20"','data-visual-owner="file-25"','sabri-ui-welcome-panel', 'sabri-ui-welcome-panel__brand', 'Sabri Homeopathy', 'sabri-ui-welcome-panel__cue', 'aria-hidden="true"', 'data-sabri-welcome-skip', '>Skip</button>'] as $marker) { $assert(str_contains($welcome, $marker), 'Welcome ownership marker missing: ' . $marker); }
 
     $assert(Three_Plan_Corrections::render_welcome_panel(['invoked_by_file_20'=>true,'skip_label'=>'']) === '', 'Unlabelled Skip action must not render.');
+    $css = Three_Plan_Corrections::css();
+    $assert(str_contains($css, 'background:var(--sabri-visual-primary,#087a4e)'), 'Green Welcome cue must use canonical File25 green visual token.');
+    $assert(str_contains($css, 'animation:sabri-ui-welcome-cue .55s ease-out 1 both'), 'One-shot Welcome cue must be short and non-blocking.');
+    $assert(str_contains($css, '.sabri-ui-welcome-panel__cue { animation:none; transform:none; }'), 'Reduced-motion must show static cue without animation.');
+    $assert(str_contains($css, '[dir="rtl"] .sabri-ui-welcome-panel__cue'), 'Green cue must respect RTL progression.');
+    $assert(strpos($welcome, 'sabri-ui-welcome-panel__cue') > strpos($welcome, 'sabri-welcome-title'), 'Green cue must follow brand title, never defer content.');
+
     $GLOBALS['spux_logo_id'] = 123;
     $brandedWelcome = Three_Plan_Corrections::render_welcome_panel(['invoked_by_file_20'=>true]);
     $assert(str_contains($brandedWelcome, 'src="/logo-123.png"') && str_contains($brandedWelcome, 'sabri-ui-welcome-panel__brand'), 'Only canonical site-approved logo attachment should render.');
