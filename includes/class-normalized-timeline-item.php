@@ -118,7 +118,14 @@ final class Normalized_Timeline_Item implements JsonSerializable
         ) {
             throw new InvalidArgumentException('Timeline update date must be an absolute, valid UTC or offset timestamp.');
         }
-        if ($updated_at !== null && strcmp($updated_at, $published_at) < 0) {
+        // strict_absolute_date intentionally serializes at UTC-second
+        // precision. Compare original validated instants so that an update
+        // earlier by milliseconds within the same second cannot evade the
+        // publication chronology invariant.
+        if ($updated_at !== null
+            && $this->precise_absolute_instant((string) $data['updated_at'])
+                < $this->precise_absolute_instant((string) $data['published_at'])
+        ) {
             throw new InvalidArgumentException('Timeline update date cannot precede its publication date.');
         }
 
@@ -485,6 +492,30 @@ final class Normalized_Timeline_Item implements JsonSerializable
         }
 
         return is_scalar($value) ? $this->strict_absolute_date((string) $value) : null;
+    }
+
+    /**
+     * Preserve sub-second precision only while comparing authorized native
+     * event times. The public normalized DTO retains its established
+     * UTC-seconds contract for backward compatibility.
+     */
+    private function precise_absolute_instant(string $value): DateTimeImmutable
+    {
+        $value = trim($value);
+        if (preg_match('/^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$/', $value) === 1) {
+            $date = DateTimeImmutable::createFromFormat(
+                '!Y-m-d H:i:s',
+                $value,
+                new \\DateTimeZone('UTC')
+            );
+            if ($date instanceof DateTimeImmutable) {
+                return $date;
+            }
+            throw new InvalidArgumentException('Invalid validated timeline UTC time.');
+        }
+        // Constructor only calls this after strict_absolute_date validated
+        // the absolute ISO timestamp, including required timezone/offset.
+        return new DateTimeImmutable($value);
     }
 
     private function strict_absolute_date(string $value): ?string
