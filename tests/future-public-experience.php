@@ -9,8 +9,12 @@ if (! defined('ABSPATH')) {
 if (! function_exists('apply_filters')) {
     function apply_filters(string $hook_name, mixed $value, mixed ...$args): mixed
     {
-        return $value;
+        $callback = $GLOBALS['spux_future_public_test_hooks'][$hook_name] ?? null;
+        return is_callable($callback) ? $callback($value, ...$args) : $value;
     }
+}
+if (! function_exists('__')) {
+    function __(string $value, string $domain = ''): string { return $value; }
 }
 if (! function_exists('sanitize_key')) {
     function sanitize_key(string $key): string
@@ -133,6 +137,67 @@ $check(! str_contains($publicTemplate, 'SabriPublicExperiencePublic_URL::'),
 $check(substr_count($publicTemplate, '\\Sabri\\PublicExperience\\Public_URL::sanitize_same_site') >= 3,
     'Preview and exit links must use the actual namespaced same-site URL validator.');
 
+
+// Native trust state must never be forged through a presentation filter.
+// Current File03 public profile DTO has no owner-certified verification date
+// or profile-level correction/freshness assertion for this component.
+$trustMethod = new ReflectionMethod(Future_Public_Experience::class, 'trust_payload');
+$trustMethod->setAccessible(true);
+$GLOBALS['spux_future_public_test_hooks']['sabri_public_experience/profile_trust_capsule'] =
+    static function (array $data): array {
+        return array_merge($data, [
+            'verified' => true,
+            'label' => 'FAKE_VERIFIED_ISSUER',
+            'source_label' => 'FAKE_MEDICAL_REGULATOR',
+            'verified_at' => '2026-10-12T13:00:00Z',
+            'freshness' => 'FAKE_RECENTLY_CHECKED',
+            'correction_state' => 'retracted',
+        ]);
+    };
+$trust = $trustMethod->invoke(null, [
+    'class' => 'doctor',
+    'verified' => true,
+    'role_label' => 'Institution Verified Doctor',
+]);
+$check(($trust['verified'] ?? null) === true, 'Native verified doctor state must survive a presentation filter.');
+$check(($trust['label'] ?? '') === 'Institution Verified Doctor'
+    && ($trust['source_label'] ?? '') === 'Institutional verification source'
+    && ($trust['verified_at'] ?? 'x') === ''
+    && ($trust['freshness'] ?? 'x') === ''
+    && ($trust['correction_state'] ?? '') === 'none',
+    'Presentation hooks may not fabricate trust issuers, dates, freshness or corrections.');
+$unverifiedTrust = $trustMethod->invoke(null, [
+    'class' => 'member',
+    'verified' => false,
+    'role_label' => 'Member',
+]);
+$check(($unverifiedTrust['verified'] ?? null) === false,
+    'A presentation hook cannot promote an unverified member to verified.');
+unset($GLOBALS['spux_future_public_test_hooks']['sabri_public_experience/profile_trust_capsule']);
+
+// Supplemental translations cannot grant File03-withheld public text.
+$translationsMethod = new ReflectionMethod(Future_Public_Experience::class, 'translations');
+$translationsMethod->setAccessible(true);
+$GLOBALS['spux_future_public_test_hooks']['sabri_public_experience/profile_translations'] =
+    static function (): array {
+        return ['ur' => [
+            'label' => 'Urdu',
+            'headline' => 'PRIVATE_TRANSLATED_HEADLINE',
+            'bio' => 'PRIVATE_TRANSLATED_BIO',
+        ]];
+    };
+$noPublicFields = $translationsMethod->invoke(null, ['headline' => '', 'bio' => '']);
+$check($noPublicFields === [],
+    'An omitted File03 public headline and biography must not reappear through translations.');
+$onlyPublishedBio = $translationsMethod->invoke(null, [
+    'headline' => '',
+    'bio' => 'File03 explicitly published biography',
+]);
+$check(count($onlyPublishedBio) === 1
+    && ($onlyPublishedBio[0]['headline'] ?? 'leak') === ''
+    && ($onlyPublishedBio[0]['bio'] ?? '') === 'PRIVATE_TRANSLATED_BIO',
+    'Only already-public File03 field types may be presented in translation; withheld headline stays hidden.');
+unset($GLOBALS['spux_future_public_test_hooks']['sabri_public_experience/profile_translations']);
 
 if ($failures !== []) {
     fwrite(STDERR, "FAILED\n- " . implode("\n- ", $failures) . "\n");
