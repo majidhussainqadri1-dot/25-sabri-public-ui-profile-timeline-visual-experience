@@ -177,12 +177,31 @@ final class Three_Plan_Corrections
             return '';
         }
 
+        // Display only the existing site-approved WordPress Custom Logo.
+        // A safe text identity remains when no approved attachment is set.
+        $brand_label = self::text($args['brand_label'] ?? 'Sabri Homeopathy', 80);
+        if ($brand_label === '') { return ''; }
+        $logo_html = '';
+        if (function_exists('get_theme_mod') && function_exists('wp_get_attachment_image') && function_exists('wp_kses_post')) {
+            $logo_id = get_theme_mod('custom_logo', 0);
+            if (is_numeric($logo_id) && (int) $logo_id > 0) {
+                $logo = wp_get_attachment_image((int) $logo_id, 'thumbnail', false, [
+                    'class' => 'sabri-ui-welcome-panel__logo', 'alt' => '', 'loading' => 'eager',
+                ]);
+                $logo_html = is_string($logo) ? wp_kses_post($logo) : '';
+            }
+        }
+        $identity = '<div class="sabri-ui-welcome-panel__brand" data-visual-owner="file-25">'
+            . $logo_html . '<span class="sabri-ui-welcome-panel__brand-text">'
+            . self::escape_html($brand_label) . '</span></div>';
+
         $description = $message !== ''
             ? '<p class="sabri-ui-welcome-panel__message">' . self::escape_html($message) . '</p>'
             : '';
 
         return '<section class="sabri-ui-welcome-panel" role="region" aria-labelledby="sabri-welcome-title"'
             . ' data-directive="CHAT-UX-001" data-frequency-owner="file-20" data-visual-owner="file-25">'
+            . $identity
             . '<h2 id="sabri-welcome-title">' . self::escape_html($title) . '</h2>'
             . $description
             . '<div class="sabri-ui-welcome-panel__actions">'
@@ -218,6 +237,8 @@ final class Three_Plan_Corrections
     box-shadow: 0 1rem 2.5rem rgb(15 23 42 / 10%);
     color: var(--sabri-text, #111827);
 }
+.sabri-ui-welcome-panel__brand { display:flex; align-items:center; flex-wrap:wrap; gap:.75rem; color:var(--sabri-visual-primary,#087a4e); font-weight:700; }
+.sabri-ui-welcome-panel__logo { display:block; inline-size:auto; block-size:auto; max-inline-size:5rem; max-block-size:3.5rem; object-fit:contain; }
 .sabri-ui-welcome-panel h2,
 .sabri-ui-welcome-panel p { margin: 0; }
 .sabri-ui-welcome-panel__actions {
