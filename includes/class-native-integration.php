@@ -734,10 +734,11 @@ final class Native_Integration
     public function professional_credentials(int $user_id): array
     {
         $projection = $this->public_profile_projection($user_id, 0);
+        // The public File 03 DTO is the sole authority for what professional
+        // fields may be displayed. File 09's approved snapshot can be used by
+        // doctor eligibility checks, but it is not an alternate publication
+        // permission when File 03 deliberately withholds public fields.
         $source = is_array($projection['professional'] ?? null) ? $projection['professional'] : [];
-        if ($source === []) {
-            $source = (array) ($this->doctor_approved_snapshot($user_id)['profile'] ?? []);
-        }
         if ($source === []) {
             return [];
         }
