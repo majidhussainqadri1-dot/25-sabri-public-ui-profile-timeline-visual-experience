@@ -203,6 +203,8 @@ final class Three_Plan_Corrections
             . ' data-directive="CHAT-UX-001" data-frequency-owner="file-20" data-visual-owner="file-25">'
             . $identity
             . '<h2 id="sabri-welcome-title">' . self::escape_html($title) . '</h2>'
+            // A purely decorative, non-blocking cue: never delays the page or a control.
+            . '<span class="sabri-ui-welcome-panel__cue" aria-hidden="true"></span>'
             . $description
             . '<div class="sabri-ui-welcome-panel__actions">'
             . '<a class="sabri-ui-button sabri-ui-button--primary" href="' . self::escape_url($continue_url) . '">'
@@ -239,6 +241,19 @@ final class Three_Plan_Corrections
 }
 .sabri-ui-welcome-panel__brand { display:flex; align-items:center; flex-wrap:wrap; gap:.75rem; color:var(--sabri-visual-primary,#087a4e); font-weight:700; }
 .sabri-ui-welcome-panel__logo { display:block; inline-size:auto; block-size:auto; max-inline-size:5rem; max-block-size:3.5rem; object-fit:contain; }
+/* File25 owns the green brand cue; no blocking timer, media or sound. */
+.sabri-ui-welcome-panel__cue {
+    display:block; inline-size:min(12rem,100%); block-size:.25rem;
+    border-radius:999px; background:var(--sabri-visual-primary,#087a4e);
+    transform-origin:0 50%;
+    animation:sabri-ui-welcome-cue .55s ease-out 1 both;
+}
+[dir="rtl"] .sabri-ui-welcome-panel__cue { transform-origin:100% 50%; }
+@keyframes sabri-ui-welcome-cue {
+    from { transform:scaleX(.1); }
+    to { transform:scaleX(1); }
+}
+
 .sabri-ui-welcome-panel h2,
 .sabri-ui-welcome-panel p { margin: 0; }
 .sabri-ui-welcome-panel__actions {
@@ -254,6 +269,7 @@ final class Three_Plan_Corrections
 }
 @media (prefers-reduced-motion: reduce) {
     .sabri-ui-welcome-panel { scroll-behavior: auto; }
+    .sabri-ui-welcome-panel__cue { animation:none; transform:none; }
 }
 CSS;
     }
