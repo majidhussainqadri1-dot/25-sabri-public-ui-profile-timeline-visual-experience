@@ -138,9 +138,9 @@ final class Section_Service
                 $errors++;
                 continue;
             }
-            if (count($raw) >= self::MAX_ITEMS_PER_PROVIDER) {
-                $truncated = true;
-            }
+            // Stage the cap per provider; a malformed batch is rejected in
+            // full and must never leave a phantom public truncation signal.
+            $provider_truncated = count($raw) >= self::MAX_ITEMS_PER_PROVIDER;
 
             // One provider response is one transaction. A malformed candidate
             // invalidates the complete untrusted batch; valid duplicates remain
@@ -171,6 +171,9 @@ final class Section_Service
                 continue;
             }
 
+            if ($provider_truncated) {
+                $truncated = true;
+            }
             foreach ($provider_cards as $key => $card) {
                 if (isset($seen[$key])) {
                     continue;
@@ -193,7 +196,9 @@ final class Section_Service
             'truncated' => $truncated,
             'is_provider_section' => true,
         ];
-        if ($cache_key !== null) {
+        // Transient provider failures must not become sticky cache entries:
+        // the same service may be queried again after native-source recovery.
+        if ($cache_key !== null && $errors === 0) {
             $this->public_cache[$cache_key] = $result;
         }
 
