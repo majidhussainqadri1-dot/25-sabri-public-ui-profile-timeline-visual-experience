@@ -173,7 +173,7 @@ final class Three_Plan_Corrections
         $close_label = self::text($args['close_label'] ?? 'Close', 80);
         $skip_label = self::text($args['skip_label'] ?? 'Skip intro', 80);
         $continue_url = Public_URL::sanitize_same_site($args['continue_url'] ?? home_url('/'));
-        if ($title === '' || $continue_label === '' || $close_label === '' || $continue_url === '') {
+        if ($title === '' || $continue_label === '' || $close_label === '' || $skip_label === '' || $continue_url === '') {
             return '';
         }
 
