@@ -137,4 +137,12 @@ $GLOBALS['spux_test_filters']['sabri_public_experience/public_metrics'] = ['foll
 $assert(Plan_Completion::public_metrics(['user_id' => 7]) === [], 'Metrics require a verified native owner.');
 unset($GLOBALS['spux_test_filters']['sabri_public_experience/public_metrics']);
 
+$GLOBALS['spux_test_user_id'] = 7;
+$profile1040 = ['user_id' => 7, 'class' => 'member', 'display_name' => 'A', 'avatar_url' => 'https://example.test/a.jpg', 'avatar_alt' => 'Portrait', 'cover_url' => 'https://example.test/c.jpg', 'headline' => 'Title', 'bio' => 'Public', 'canonical_url' => 'https://example.test/members/a/', 'contacts' => []];
+$private1040 = Plan_Completion::completion_assistant($profile1040);
+$assert($private1040['complete'] === true && $private1040['contact_privacy_state'] === 'not-public' && $private1040['missing'] === [], 'Private contact is not missing public profile data.');
+$profile1040['contacts'] = ['website' => 'https://example.test/contact/'];
+$public1040 = Plan_Completion::completion_assistant($profile1040);
+$assert($public1040['contact_privacy_state'] === 'public', 'Real visible contact has public status.');
+
 echo sprintf("Reviews 94-133 corrective regressions PASS (%d checks)\n", $checks);
