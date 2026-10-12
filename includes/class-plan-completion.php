@@ -762,7 +762,7 @@ final class Plan_Completion
         $current = function_exists('get_current_user_id') ? get_current_user_id() : 0;
         $authorized = $user_id > 0 && ($current === $user_id || (function_exists('current_user_can') && current_user_can('manage_options')));
         if (! $authorized) {
-            return ['authorized' => false, 'complete' => false, 'missing' => [], 'preview_modes' => [], 'preview_urls' => [], 'default_responsive_preview' => '', 'edit_url' => ''];
+            return ['authorized' => false, 'complete' => false, 'missing' => [], 'contact_privacy_state' => '', 'preview_modes' => [], 'preview_urls' => [], 'default_responsive_preview' => '', 'edit_url' => ''];
         }
         $missing = [];
         foreach (['display_name', 'avatar_url', 'cover_url', 'headline', 'bio'] as $field) {
