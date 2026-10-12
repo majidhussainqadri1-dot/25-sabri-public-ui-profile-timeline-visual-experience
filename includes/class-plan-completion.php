@@ -773,9 +773,7 @@ final class Plan_Completion
         if (! empty($profile['avatar_url']) && empty($profile['avatar_alt'])) {
             $missing[] = 'avatar_alt_text';
         }
-        if (empty($profile['contacts'])) {
-            $missing[] = 'contact_privacy_or_contact';
-        }
+        $contact_privacy_state = empty($profile['contacts']) ? 'not-public' : 'public';
         if (($profile['class'] ?? '') === 'doctor' && ($profile['verified'] ?? null) !== true) {
             $missing[] = 'doctor_verification';
         }
@@ -789,6 +787,7 @@ final class Plan_Completion
             'authorized' => true,
             'complete' => $missing === [],
             'missing' => array_values(array_unique($missing)),
+            'contact_privacy_state' => $contact_privacy_state,
             'preview_modes' => self::PREVIEW_MODES,
             'preview_urls' => self::preview_urls($profile),
             'default_responsive_preview' => (string) (self::preferences()['responsive_preview'] ?? 'desktop'),
