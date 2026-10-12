@@ -46,14 +46,14 @@ $deps = json_decode($read('config/staging-dependencies.json'), true);
 $check(is_array($deps), 'Dependency matrix invalid.');
 $heads = is_array($deps) ? (array) ($deps['observed_repository_heads'] ?? []) : [];
 $check(($heads['09'] ?? '') === 'cfc5f781a766330314dc98c42abeca0eb7786eba', 'File 09 head drift.');
-$check(($heads['14'] ?? '') === 'b0524faaa60c5324de4da43e6c813370c4f75084', 'File 14 current observed main must match exact 2026-10-11 freeze.');
+$check(($heads['14'] ?? '') === 'a5e6fa9eb298d98e00850af16a284ce65d54b71d', 'File 14 current observed main must match exact 2026-10-12 freeze.');
 $module14 = null;
 foreach ((array) ($deps['modules'] ?? []) as $module) {
     if (is_array($module) && ($module['file'] ?? null) === 14) { $module14 = $module; break; }
 }
 $check(is_array($module14)
     && ($module14['current_repository_head'] ?? '') === ($heads['14'] ?? '')
-    && ($module14['current_source_version_observed'] ?? '') === '1.4.16'
+    && ($module14['current_source_version_observed'] ?? '') === '1.4.27'
     && ($module14['reviewed_source_commit'] ?? '') === '907a04b25567a607e5ecb11d26e50bd0f07852be'
     && ($module14['staging_status'] ?? '') === 'pending',
     'Current File14 repository observation must not overwrite historical reviewed source or staging truth.');
