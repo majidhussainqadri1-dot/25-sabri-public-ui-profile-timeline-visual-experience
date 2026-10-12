@@ -49,6 +49,14 @@ A new focused twenty-area File25/central/companion source audit found that a gen
 
 New adversarial tests are in `tests/future-public-experience.php`. This source correction is on the open PR #16 only; the independent File13 Skip Intro PR #19 is not bundled, merged, or deployed by these corrections. Exact HEAD CI, installed plugin, File03 owner acceptance, staging browser/role tests, and live/DB/migration parity must be verified independently.
 
+## New 2026-10-12 21:17 PKT File25 source/plan cross-file audit
+
+Twenty separate *source and canonical-ownership scopes* were inspected on PR #16 before any new code edit (not twenty complete real-role/staging/live acceptance cycles). Two File25-source defects were proven: generic UI hooks could fabricate public relationships, citations, and freshness in the Future Public Experience JSON without a typed verified owner projection; and normalized Timeline update dates could pass an invalid same-second microsecond chronology check when precision was truncated before comparison.
+
+The optional public relationship/citation/freshness payloads now fail closed until the File03/06/07/21/26 owners publish versioned, public-safe, rights/verification-cleared contracts. This is intentionally an OPEN EXTERNAL INTEGRATION GATE, not a claim of feature-complete graph/knowledge recency or a new duplicate File25 backend. The public Timeline timestamp wire format remains UTC seconds, while validation compares complete original offset-aware microsecond instants before reducing wire precision. Adversarial regressions cover both.
+
+Affected tests: `tests/future-public-experience.php` and `tests/review1037-timeline-instant-precision.php`. Actual GH CI must be checked against the **last correction PR16 HEAD**, not an earlier CI success. Separate Draft PR #19 (File13 welcome), File14 independent moving repo HEAD, deployed package/DB/migrations and Hostinger staging acceptance are not assumed completed.
+
 ## Source implementation status
 
 File 25 source-owned scope identified in Reviews 695–714 has been corrected; later source changes require fresh exact-head CI evidence. Mutable exact-head CI state is intentionally **not frozen as permanent truth inside source metadata**: the exact current GitHub HEAD must be checked against its current CI run after the final commit. Repository/CI evidence never proves installed Hostinger staging or live deployment.
