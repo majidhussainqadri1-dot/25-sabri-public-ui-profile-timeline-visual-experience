@@ -32,6 +32,11 @@ namespace {
     }
     function wp_add_inline_style(string $handle, string $css): bool { return true; }
     function home_url(string $path = '/'): string { return 'https://example.test/' . ltrim($path, '/'); }
+    $GLOBALS['spux_logo_id'] = 0;
+    function get_theme_mod(string $key, mixed $default = 0): mixed { return $key === 'custom_logo' ? $GLOBALS['spux_logo_id'] : $default; }
+    function wp_get_attachment_image(int $id, string $size, bool $icon = false, array $attr = []): string { return '<img class="sabri-ui-welcome-panel__logo" src="/logo-' . $id . '.png" alt="">'; }
+    function wp_kses_post(string $html): string { return strip_tags($html, '<img>'); }
+
     function wp_parse_url(string $url): array|false { return parse_url($url); }
     function sanitize_key(string $value): string { return trim((string) preg_replace('/[^a-z0-9_\-]/', '', strtolower($value)), '-'); }
     function sanitize_text_field(string $value): string { return trim(strip_tags($value)); }
@@ -112,9 +117,16 @@ namespace Sabri\PublicExperience {
 
     $assert(Three_Plan_Corrections::render_welcome_panel(['title'=>'Welcome','message'=>'One coherent Sabri platform experience.','continue_url'=>'/home/']) === '', 'File 25 must not render welcome unless File 20 invokes it.');
     $welcome = Three_Plan_Corrections::render_welcome_panel(['invoked_by_file_20'=>true,'title'=>'Welcome','message'=>'One coherent Sabri platform experience.','continue_url'=>'/home/','skip_label'=>'Skip']);
-    foreach (['data-directive="CHAT-UX-001"','data-frequency-owner="file-20"','data-visual-owner="file-25"','sabri-ui-welcome-panel', 'data-sabri-welcome-skip', '>Skip</button>'] as $marker) { $assert(str_contains($welcome, $marker), 'Welcome ownership marker missing: ' . $marker); }
+    foreach (['data-directive="CHAT-UX-001"','data-frequency-owner="file-20"','data-visual-owner="file-25"','sabri-ui-welcome-panel', 'sabri-ui-welcome-panel__brand', 'Sabri Homeopathy', 'data-sabri-welcome-skip', '>Skip</button>'] as $marker) { $assert(str_contains($welcome, $marker), 'Welcome ownership marker missing: ' . $marker); }
 
     $assert(Three_Plan_Corrections::render_welcome_panel(['invoked_by_file_20'=>true,'skip_label'=>'']) === '', 'Unlabelled Skip action must not render.');
+    $GLOBALS['spux_logo_id'] = 123;
+    $brandedWelcome = Three_Plan_Corrections::render_welcome_panel(['invoked_by_file_20'=>true]);
+    $assert(str_contains($brandedWelcome, 'src="/logo-123.png"') && str_contains($brandedWelcome, 'sabri-ui-welcome-panel__brand'), 'Only canonical site-approved logo attachment should render.');
+    $GLOBALS['spux_logo_id'] = 0;
+    $fallbackWelcome = Three_Plan_Corrections::render_welcome_panel(['invoked_by_file_20'=>true]);
+    $assert(str_contains($fallbackWelcome, 'Sabri Homeopathy') && !str_contains($fallbackWelcome, '<img'), 'Missing Custom Logo must use safe text-brand fallback.');
+
     $matrixRaw = file_get_contents($root . '/config/all-chats-directive-matrix.json');
     $matrix = is_string($matrixRaw) ? json_decode($matrixRaw, true) : [];
     $ids = array_column((array) ($matrix['directives'] ?? []), 'id');
