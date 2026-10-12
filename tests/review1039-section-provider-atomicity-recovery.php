@@ -11,14 +11,16 @@ final class R1039_Section_Provider implements Profile_Section_Provider
 {
     public int $query_calls = 0;
     public bool $fail_query = false;
+    public bool $available = true;
+    public bool $supported = true;
     /** @param array<mixed> $items */
     public function __construct(private string $id, public array $items) {}
     public function get_id(): string { return $this->id; }
     public function get_version(): string { return '1.0.0'; }
     public function get_section(): string { return 'knowledge'; }
     public function get_maturity_level(): string { return 'read-only'; }
-    public function is_available(): bool { return true; }
-    public function supports_profile(array $profile): bool { return true; }
+    public function is_available(): bool { return $this->available; }
+    public function supports_profile(array $profile): bool { return $this->supported; }
     public function query(int $user_id, array $profile, array $context = []): array
     {
         ++$this->query_calls;
@@ -99,5 +101,44 @@ r3953_section_assert(count($validCap['items']) === 24
     && $validCap['provider_error_count'] === 0
     && $validCap['truncated'] === true,
     'A completely valid bounded provider must preserve its honest truncation indication.');
+
+// An unavailable provider is skipped without an exception; the previous
+// implementation cached this empty section indefinitely within this service.
+$availableProvider = new R1039_Section_Provider('unavailable-then-active', [r1039_card(101)]);
+$availableProvider->available = false;
+$availabilityRegistry = new Section_Registry();
+$availabilityRegistry->register($availableProvider);
+$availabilityService = new Section_Service($availabilityRegistry);
+$hidden = $availabilityService->get_public_section(7, $profile, 'knowledge');
+r3953_section_assert($hidden['items'] === []
+    && $hidden['provider_error_count'] === 0
+    && $availableProvider->query_calls === 0,
+    'Unavailable owner is safely skipped without a forged provider error.');
+$availableProvider->available = true;
+$nowAvailable = $availabilityService->get_public_section(7, $profile, 'knowledge');
+r3953_section_assert(count($nowAvailable['items']) === 1
+    && $availableProvider->query_calls === 1,
+    'Same-instance section must recover after native provider availability changes.');
+$availabilityCached = $availabilityService->get_public_section(7, $profile, 'knowledge');
+r3953_section_assert($availabilityCached['items'] === $nowAvailable['items']
+    && $availableProvider->query_calls === 1,
+    'Successful recovered section must remain cacheable.');
+
+// A provider can become newly eligible for this public profile without
+// registry metadata or user-profile digest changing.
+$eligibleProvider = new R1039_Section_Provider('unsupported-then-eligible', [r1039_card(102)]);
+$eligibleProvider->supported = false;
+$eligibilityRegistry = new Section_Registry();
+$eligibilityRegistry->register($eligibleProvider);
+$eligibilityService = new Section_Service($eligibilityRegistry);
+$unmatched = $eligibilityService->get_public_section(7, $profile, 'knowledge');
+r3953_section_assert($unmatched['items'] === []
+    && $unmatched['provider_error_count'] === 0,
+    'Nonmatching native provider must not publish an unrelated card.');
+$eligibleProvider->supported = true;
+$matched = $eligibilityService->get_public_section(7, $profile, 'knowledge');
+r3953_section_assert(count($matched['items']) === 1
+    && $eligibleProvider->query_calls === 1,
+    'Same-instance section must recover when provider profile eligibility changes.');
 
 echo "PASS: File25 public section atomic truncation and transient provider cache recovery\n";
