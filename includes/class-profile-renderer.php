@@ -227,7 +227,6 @@ final class Profile_Renderer
                 'default_responsive_preview' => '',
                 'edit_url' => '',
             ];
-        $completion_assistant['contact_privacy_state'] = empty($profile['contacts']) ? 'not-public' : 'public';
 
         $GLOBALS['sabri_public_experience_profile_user'] = $user;
         $GLOBALS['sabri_public_experience_profile'] = $profile;
