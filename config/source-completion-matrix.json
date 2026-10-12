@@ -45,7 +45,8 @@
         "File08 native profile-targeted booking destination",
         "File17 native target-bound Follow destination",
         "File21 public metrics and approved richer non-post timeline classes",
-        "File03 versioned approved public-profile translations (until native DTO is accepted, File25 translation data remains hidden)"
+        "File03 versioned approved public-profile translations (until native DTO is accepted, File25 translation data remains hidden)",
+        "Files03/06/07/21/26 typed, owner-approved public relationship, citation/provenance and freshness projections; until accepted, File25 conditional supplemental claims remain empty"
       ],
       "hostinger_staging_live_verified": false
     }
