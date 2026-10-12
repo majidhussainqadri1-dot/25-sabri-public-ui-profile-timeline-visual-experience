@@ -197,6 +197,44 @@ $check($onlyPublishedBio === [],
     'A generic filter must not publish any untranslated-owner-approved translation until File03 supplies a versioned public translation contract.');
 unset($GLOBALS['spux_future_public_test_hooks']['sabri_public_experience/profile_translations']);
 
+// Relationships, citations and freshness remain future/conditional until
+// File03/06/07/21/26 native owners publish versioned public-safe projections.
+// Untrusted WordPress presentation hooks must not invent affiliations,
+// published sources or independently asserted "recently updated" facts.
+$GLOBALS['spux_future_public_test_hooks']['sabri_public_experience/public_relationships'] =
+    static function (): array {
+        return [['label' => 'PRIVATE_UNVERIFIED_AFFILIATION',
+            'type' => 'doctor', 'relationship' => 'Staff doctor',
+            'url' => 'https://example.test/clinics/false-claim/']];
+    };
+$GLOBALS['spux_future_public_test_hooks']['sabri_public_experience/public_citations'] =
+    static function (): array {
+        return [['title' => 'PRIVATE_FABRICATED_RESEARCH_SOURCE',
+            'source' => 'UNVERIFIED_INSTITUTION',
+            'url' => 'https://example.test/knowledge/false-reference/']];
+    };
+$GLOBALS['spux_future_public_test_hooks']['sabri_public_experience/content_freshness'] =
+    static function (): array {
+        return ['updated_at' => '2026-10-12T21:00:00Z',
+            'label' => 'PRIVATE_UNVERIFIED_RECENCY'];
+    };
+foreach ([
+    ['relationships', ['display_name' => 'Public Doctor']],
+    ['citations', ['display_name' => 'Public Doctor'], ['section' => 'overview']],
+    ['freshness', ['display_name' => 'Public Doctor']],
+] as $sample) {
+    $method = new ReflectionMethod(Future_Public_Experience::class, $sample[0]);
+    $method->setAccessible(true);
+    $observed = $method->invoke(null, ...array_slice($sample, 1));
+    $check($observed === [], 'Unverified optional native-owned supplemental ' . $sample[0]
+        . ' must not be minted from a presentation filter.');
+}
+unset(
+    $GLOBALS['spux_future_public_test_hooks']['sabri_public_experience/public_relationships'],
+    $GLOBALS['spux_future_public_test_hooks']['sabri_public_experience/public_citations'],
+    $GLOBALS['spux_future_public_test_hooks']['sabri_public_experience/content_freshness']
+);
+
 if ($failures !== []) {
     fwrite(STDERR, "FAILED\n- " . implode("\n- ", $failures) . "\n");
     exit(1);
