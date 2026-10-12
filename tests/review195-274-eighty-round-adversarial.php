@@ -80,7 +80,7 @@ $check(! str_contains($css, 'z-index: 9999'), 'Review 204 hard-coded overlay z-i
 $check(str_contains($renderer, '$profile[\'user_id\'] = (int) $user->ID;'), 'Review 205 internal profile identity binding correction missing.');
 $check(str_contains($repository, '$visibility = array_fill_keys(array_keys($canonical), true);'), 'Review 206 contact visibility-map correction missing.');
 $check(str_contains($repository, '$public[$field] = $value;'), 'Review 206 canonical contact value preservation missing.');
-$check(str_contains($renderer, "['_privacy_state' => 'not-public']"), 'Review 207 private-contact completion semantic correction missing.');
+$check(! str_contains($renderer, "['_privacy_state' => 'not-public']"), 'Review 207 public completion must not fabricate a contact.');
 $check(str_contains($sourceVerifier, 'Future Public Experience class must be loaded by the production bootstrap.'), 'Review 208 source verifier bootstrap gate missing.');
 $check(str_contains($runner, 'verify-future-structure.php'), 'Review 209 governed future structural verifier missing.');
 $check(str_contains($composer, 'tests/future-public-experience.php'), 'Review 210 Composer future test manifest correction missing.');
