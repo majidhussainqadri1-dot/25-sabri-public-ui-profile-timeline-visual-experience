@@ -71,6 +71,12 @@ The review found a member discoverability issue: a generic presentational WordPr
 
 The public SEO indexing grant is **not a completed feature**; it is an explicit File03 native-owner integration and real-account staging acceptance gate. PR #16 source tests, Draft PR #19 visual intro, installed runtime, DB/schema/migrations, full 55 staging checks and 28 DoD acceptance are distinct realities.
 
+## REST conditional correctness audit — 2026-10-13
+
+A new forty-area source/plan/companion review identified a stale-representation issue in the File25 REST controller. A nested public item's unchanged `updated_at` is **not** a canonical owner-approved modification watermark for the entire profile, timeline or section payload. Previously an `If-Modified-Since` comparison could return empty HTTP 304 when a different approved public field changed but the nested timestamp remained unchanged. The response now keeps full-payload ETag for conditional HTTP 304; `Last-Modified` remains an informational header only pending a versioned File03/File21 representation-wide owner watermark. This is a deliberate incomplete native-owner contract, not a completed date-based HTTP revalidation feature. Adversarial tests in `tests/review37-rest-etag-revalidation.php` verify date-stable changed biographies are not lost and ETag rules still work.
+
+The forty inspections are distinct source/contract focus areas, **not forty independently executed full end-to-end staging/live audit rounds**. Tests at the new PR head, owner-contract acceptance, real Hostinger staging and deployed/DB/schema parity must be verified separately.
+
 ## Source implementation status
 
 File 25 source-owned scope identified in Reviews 695–714 has been corrected; later source changes require fresh exact-head CI evidence. Mutable exact-head CI state is intentionally **not frozen as permanent truth inside source metadata**: the exact current GitHub HEAD must be checked against its current CI run after the final commit. Repository/CI evidence never proves installed Hostinger staging or live deployment.
