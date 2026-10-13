@@ -274,13 +274,11 @@ final class Profile_Renderer
         $profile = (array) ($GLOBALS['sabri_public_experience_profile'] ?? []);
         $profile_class = sanitize_key((string) ($profile['class'] ?? ''));
         $professional = in_array($profile_class, ['founder', 'doctor'], true);
-        $member_indexing = $profile !== [] && (bool) apply_filters(
-            'sabri_public_experience/index_nonprofessional_profile',
-            false,
-            $profile
-        );
-
-        if (is_404() || $filtered || (! $professional && ! $member_indexing)) {
+        // A generic presentation filter is not a native File 03 consent
+        // grant to expose member/patient profiles in search engines. File 03
+        // currently provides no versioned, approved public indexability DTO.
+        // Keep nonprofessional profiles noindex until that owner contract exists.
+        if (is_404() || $filtered || ! $professional) {
             $robots['noindex'] = true;
             $robots['noarchive'] = true;
             $robots['nofollow'] = is_404();
