@@ -117,9 +117,11 @@ namespace Sabri\PublicExperience {
 
     $assert(Three_Plan_Corrections::render_welcome_panel(['title'=>'Welcome','message'=>'One coherent Sabri platform experience.','continue_url'=>'/home/']) === '', 'File 25 must not render welcome unless File 20 invokes it.');
     $welcome = Three_Plan_Corrections::render_welcome_panel(['invoked_by_file_20'=>true,'title'=>'Welcome','message'=>'One coherent Sabri platform experience.','continue_url'=>'/home/','skip_label'=>'Skip']);
-    foreach (['data-directive="CHAT-UX-001"','data-frequency-owner="file-20"','data-visual-owner="file-25"','sabri-ui-welcome-panel', 'sabri-ui-welcome-panel__brand', 'Sabri Homeopathy', 'sabri-ui-welcome-panel__cue', 'aria-hidden="true"', 'data-sabri-welcome-skip', '>Skip</button>'] as $marker) { $assert(str_contains($welcome, $marker), 'Welcome ownership marker missing: ' . $marker); }
+    foreach (['data-directive="CHAT-UX-001"','data-frequency-owner="file-20"','data-visual-owner="file-25"','sabri-ui-welcome-panel', 'sabri-ui-welcome-panel__brand', 'Sabri Homeopathy', 'sabri-ui-welcome-panel__cue', 'aria-hidden="true"', 'role="status"', 'aria-live="polite"', 'aria-atomic="true"', 'data-sabri-welcome-announcement', 'data-sabri-welcome-skip', '>Skip</button>'] as $marker) { $assert(str_contains($welcome, $marker), 'Welcome ownership marker missing: ' . $marker); }
 
     $assert(Three_Plan_Corrections::render_welcome_panel(['invoked_by_file_20'=>true,'skip_label'=>'']) === '', 'Unlabelled Skip action must not render.');
+    $assert(substr_count($welcome, 'data-sabri-welcome-announcement') === 1, 'Welcome must contain exactly one explicit nonfocusable screen-reader status target.');
+    $assert(strpos($welcome, 'data-sabri-welcome-announcement') > strpos($welcome, 'sabri-welcome-title'), 'Accessible status region follows semantic heading for assistive technology.');
     $css = Three_Plan_Corrections::css();
     $assert(str_contains($css, 'background:var(--sabri-visual-primary,#087a4e)'), 'Green Welcome cue must use canonical File25 green visual token.');
     $assert(str_contains($css, 'animation:sabri-ui-welcome-cue .55s ease-out 1 both'), 'One-shot Welcome cue must be short and non-blocking.');
