@@ -340,11 +340,13 @@ final class Rest_Controller
         if ($status === 200 && $etag !== '' && self::request_matches_etag($request, $etag)) {
             return new WP_REST_Response(null, 304, $headers);
         }
-        if ($status === 200 && $last_modified !== '' && ! self::request_has_if_none_match($request)
-            && self::request_matches_last_modified($request, $last_modified)
-        ) {
-            return new WP_REST_Response(null, 304, $headers);
-        }
+        // Last-Modified above is derived from nested native item dates, not
+        // a certified watermark of every field in this public representation.
+        // An unchanged item date cannot prove that public bio, visibility,
+        // action URLs or other owner-approved fields have not changed. Honor
+        // conditional 304 responses only when the full-payload ETag matches.
+        // Keep the date as an advisory header until owners provide a verified
+        // representation-wide modification contract.
 
         return new WP_REST_Response($data, $status, $headers);
     }
