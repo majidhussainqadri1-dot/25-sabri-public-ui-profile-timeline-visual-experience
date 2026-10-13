@@ -30,6 +30,13 @@ namespace {
         public function is_available(): bool { return $this->available; }
         public function get_maturity_level(): string { return $this->maturity; }
         public function get_public_author_items(int $author_id, array $query): array { return $this->items; }
+        public function normalize_public_item(array $native_item, int $author_id): ?\Sabri\PublicExperience\Normalized_Timeline_Item { unset($native_item); return $this->items[0] ?? null; }
+        public function get_canonical_url(\Sabri\PublicExperience\Normalized_Timeline_Item $item): string { return (string) $item->get('canonical_url'); }
+        public function get_visibility_state(\Sabri\PublicExperience\Normalized_Timeline_Item $item): string { return (string) $item->get('visibility_state'); }
+        public function get_public_actions(\Sabri\PublicExperience\Normalized_Timeline_Item $item): array { return (array) $item->get('available_actions'); }
+        public function get_public_metrics(\Sabri\PublicExperience\Normalized_Timeline_Item $item): array { unset($item); return []; }
+        public function get_correction_state(\Sabri\PublicExperience\Normalized_Timeline_Item $item): string { return (string) $item->get('correction_state'); }
+        public function register_sync_events(): void {}
         public function get_health_status(): array { return []; }
     }
 

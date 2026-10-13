@@ -158,6 +158,21 @@ $provider = new class implements Timeline_Provider {
     public function is_available(): bool { return true; }
     public function get_maturity_level(): string { return 'read-only'; }
     public function get_public_author_items(int $author_id, array $query): array { return []; }
+
+    public function normalize_public_item(array $native_item, int $author_id): ?Normalized_Timeline_Item { unset($native_item); return null; }
+
+    public function get_canonical_url(Normalized_Timeline_Item $item): string { return (string) $item->get('canonical_url'); }
+
+    public function get_visibility_state(Normalized_Timeline_Item $item): string { return (string) $item->get('visibility_state'); }
+
+    public function get_public_actions(Normalized_Timeline_Item $item): array { return (array) $item->get('available_actions'); }
+
+    public function get_public_metrics(Normalized_Timeline_Item $item): array { unset($item); return []; }
+
+    public function get_correction_state(Normalized_Timeline_Item $item): string { return (string) $item->get('correction_state'); }
+
+    public function register_sync_events(): void {}
+
     public function get_health_status(): array { return ['available' => true]; }
 };
 $registry = new Timeline_Registry();
@@ -180,6 +195,21 @@ try {
         public function is_available(): bool { return true; }
         public function get_maturity_level(): string { return 'read-only'; }
         public function get_public_author_items(int $author_id, array $query): array { return []; }
+
+        public function normalize_public_item(array $native_item, int $author_id): ?Normalized_Timeline_Item { unset($native_item); return null; }
+
+        public function get_canonical_url(Normalized_Timeline_Item $item): string { return (string) $item->get('canonical_url'); }
+
+        public function get_visibility_state(Normalized_Timeline_Item $item): string { return (string) $item->get('visibility_state'); }
+
+        public function get_public_actions(Normalized_Timeline_Item $item): array { return (array) $item->get('available_actions'); }
+
+        public function get_public_metrics(Normalized_Timeline_Item $item): array { unset($item); return []; }
+
+        public function get_correction_state(Normalized_Timeline_Item $item): string { return (string) $item->get('correction_state'); }
+
+        public function register_sync_events(): void {}
+
         public function get_health_status(): array { return []; }
     });
 } catch (InvalidArgumentException) {
@@ -195,6 +225,21 @@ try {
         public function is_available(): bool { return true; }
         public function get_maturity_level(): string { return 'unknown'; }
         public function get_public_author_items(int $author_id, array $query): array { return []; }
+
+        public function normalize_public_item(array $native_item, int $author_id): ?Normalized_Timeline_Item { unset($native_item); return null; }
+
+        public function get_canonical_url(Normalized_Timeline_Item $item): string { return (string) $item->get('canonical_url'); }
+
+        public function get_visibility_state(Normalized_Timeline_Item $item): string { return (string) $item->get('visibility_state'); }
+
+        public function get_public_actions(Normalized_Timeline_Item $item): array { return (array) $item->get('available_actions'); }
+
+        public function get_public_metrics(Normalized_Timeline_Item $item): array { unset($item); return []; }
+
+        public function get_correction_state(Normalized_Timeline_Item $item): string { return (string) $item->get('correction_state'); }
+
+        public function register_sync_events(): void {}
+
         public function get_health_status(): array { return []; }
     });
 } catch (InvalidArgumentException) {
@@ -210,6 +255,21 @@ foreach (['first-provider', 'second-provider'] as $index => $provider_id) {
         public function get_provider_version(): string { return '1.0.0'; }
         public function is_available(): bool { return true; }
         public function get_maturity_level(): string { return 'read-only'; }
+
+        public function normalize_public_item(array $native_item, int $author_id): ?Normalized_Timeline_Item { unset($native_item); return null; }
+
+        public function get_canonical_url(Normalized_Timeline_Item $item): string { return (string) $item->get('canonical_url'); }
+
+        public function get_visibility_state(Normalized_Timeline_Item $item): string { return (string) $item->get('visibility_state'); }
+
+        public function get_public_actions(Normalized_Timeline_Item $item): array { return (array) $item->get('available_actions'); }
+
+        public function get_public_metrics(Normalized_Timeline_Item $item): array { unset($item); return []; }
+
+        public function get_correction_state(Normalized_Timeline_Item $item): string { return (string) $item->get('correction_state'); }
+
+        public function register_sync_events(): void {}
+
         public function get_health_status(): array { return []; }
         public function get_public_author_items(int $author_id, array $query): array
         {
@@ -233,6 +293,21 @@ $mismatch_registry->register(new class implements Timeline_Provider {
     public function get_provider_version(): string { return '1.0.0'; }
     public function is_available(): bool { return true; }
     public function get_maturity_level(): string { return 'read-only'; }
+
+    public function normalize_public_item(array $native_item, int $author_id): ?Normalized_Timeline_Item { unset($native_item); return null; }
+
+    public function get_canonical_url(Normalized_Timeline_Item $item): string { return (string) $item->get('canonical_url'); }
+
+    public function get_visibility_state(Normalized_Timeline_Item $item): string { return (string) $item->get('visibility_state'); }
+
+    public function get_public_actions(Normalized_Timeline_Item $item): array { return (array) $item->get('available_actions'); }
+
+    public function get_public_metrics(Normalized_Timeline_Item $item): array { unset($item); return []; }
+
+    public function get_correction_state(Normalized_Timeline_Item $item): string { return (string) $item->get('correction_state'); }
+
+    public function register_sync_events(): void {}
+
     public function get_health_status(): array { return []; }
     public function get_public_author_items(int $author_id, array $query): array
     {
@@ -253,6 +328,21 @@ $spoof_registry->register(new class implements Timeline_Provider {
     public function get_provider_version(): string { return '1.0.0'; }
     public function is_available(): bool { return true; }
     public function get_maturity_level(): string { return 'read-only'; }
+
+    public function normalize_public_item(array $native_item, int $author_id): ?Normalized_Timeline_Item { unset($native_item); return null; }
+
+    public function get_canonical_url(Normalized_Timeline_Item $item): string { return (string) $item->get('canonical_url'); }
+
+    public function get_visibility_state(Normalized_Timeline_Item $item): string { return (string) $item->get('visibility_state'); }
+
+    public function get_public_actions(Normalized_Timeline_Item $item): array { return (array) $item->get('available_actions'); }
+
+    public function get_public_metrics(Normalized_Timeline_Item $item): array { unset($item); return []; }
+
+    public function get_correction_state(Normalized_Timeline_Item $item): string { return (string) $item->get('correction_state'); }
+
+    public function register_sync_events(): void {}
+
     public function get_health_status(): array { return []; }
     public function get_public_author_items(int $author_id, array $query): array
     {
@@ -273,6 +363,21 @@ $external_registry->register(new class implements Timeline_Provider {
     public function get_provider_version(): string { return '1.0.0'; }
     public function is_available(): bool { return true; }
     public function get_maturity_level(): string { return 'read-only'; }
+
+    public function normalize_public_item(array $native_item, int $author_id): ?Normalized_Timeline_Item { unset($native_item); return null; }
+
+    public function get_canonical_url(Normalized_Timeline_Item $item): string { return (string) $item->get('canonical_url'); }
+
+    public function get_visibility_state(Normalized_Timeline_Item $item): string { return (string) $item->get('visibility_state'); }
+
+    public function get_public_actions(Normalized_Timeline_Item $item): array { return (array) $item->get('available_actions'); }
+
+    public function get_public_metrics(Normalized_Timeline_Item $item): array { unset($item); return []; }
+
+    public function get_correction_state(Normalized_Timeline_Item $item): string { return (string) $item->get('correction_state'); }
+
+    public function register_sync_events(): void {}
+
     public function get_health_status(): array { return []; }
     public function get_public_author_items(int $author_id, array $query): array
     {
@@ -296,6 +401,21 @@ $pagination_provider = new class implements Timeline_Provider {
     public function get_provider_version(): string { return '1.0.0'; }
     public function is_available(): bool { return true; }
     public function get_maturity_level(): string { return 'read-only'; }
+
+    public function normalize_public_item(array $native_item, int $author_id): ?Normalized_Timeline_Item { unset($native_item); return null; }
+
+    public function get_canonical_url(Normalized_Timeline_Item $item): string { return (string) $item->get('canonical_url'); }
+
+    public function get_visibility_state(Normalized_Timeline_Item $item): string { return (string) $item->get('visibility_state'); }
+
+    public function get_public_actions(Normalized_Timeline_Item $item): array { return (array) $item->get('available_actions'); }
+
+    public function get_public_metrics(Normalized_Timeline_Item $item): array { unset($item); return []; }
+
+    public function get_correction_state(Normalized_Timeline_Item $item): string { return (string) $item->get('correction_state'); }
+
+    public function register_sync_events(): void {}
+
     public function get_health_status(): array { return []; }
     public function get_public_author_items(int $author_id, array $query): array
     {

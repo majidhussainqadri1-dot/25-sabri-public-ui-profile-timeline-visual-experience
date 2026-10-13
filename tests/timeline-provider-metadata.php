@@ -38,6 +38,13 @@ namespace Sabri\PublicExperience\Tests {
         public function get_provider_version(): string { return $this->version; }
         public function is_available(): bool { return $this->available; }
         public function get_maturity_level(): string { return $this->maturity; }
+        public function normalize_public_item(array $native_item, int $author_id): ?Normalized_Timeline_Item { unset($native_item); return $this->get_public_author_items($author_id, [])[0] ?? null; }
+        public function get_canonical_url(Normalized_Timeline_Item $item): string { return (string) $item->get('canonical_url'); }
+        public function get_visibility_state(Normalized_Timeline_Item $item): string { return (string) $item->get('visibility_state'); }
+        public function get_public_actions(Normalized_Timeline_Item $item): array { return (array) $item->get('available_actions'); }
+        public function get_public_metrics(Normalized_Timeline_Item $item): array { unset($item); return []; }
+        public function get_correction_state(Normalized_Timeline_Item $item): string { return (string) $item->get('correction_state'); }
+        public function register_sync_events(): void {}
         public function get_health_status(): array { return ['available' => $this->available]; }
         public function get_public_author_items(int $author_id, array $query): array
         {

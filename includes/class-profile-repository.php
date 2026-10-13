@@ -95,9 +95,11 @@ final class Profile_Repository
         $headline = $profile_class === 'founder'
             ? (string) ($founder_source['title'] ?? '')
             : (string) ($professional['specialization'] ?? $this->native->profile_value($user_id, 'specialty'));
+        // A missing public File 03 biography is deliberately empty, even if
+        // WP_User carries an unreviewed WordPress description value.
         $bio = $profile_class === 'founder'
             ? (string) ($founder_source['introduction'] ?? $this->native->profile_value($user_id, 'bio', ''))
-            : $this->native->profile_value($user_id, 'bio', $user->description);
+            : $this->native->profile_value($user_id, 'bio', '');
 
         $show_professional_location = in_array($profile_class, ['founder', 'doctor', 'institution'], true);
         $country = $show_professional_location
@@ -121,9 +123,11 @@ final class Profile_Repository
         $projected_name = is_scalar($source_projection['display_name'] ?? null)
             ? (string) $source_projection['display_name']
             : '';
+        // File 03 alone decides which name is public. Never recover an omitted
+        // name from a raw WordPress account record; use a neutral UI label.
         $default_name = $profile_class === 'founder'
             ? self::FOUNDER_DISPLAY_NAME
-            : ($projected_name !== '' ? $projected_name : (string) $user->display_name);
+            : ($projected_name !== '' ? $projected_name : __('Public profile', 'sabri-public-experience'));
         $badge = is_array($source_projection['badge'] ?? null) ? $source_projection['badge'] : [];
 
         $profile = [
@@ -154,14 +158,22 @@ final class Profile_Repository
         /** @var array<string,mixed> $filtered */
         $filtered = (array) apply_filters('sabri_public_experience/public_profile_data', $profile, $user);
 
-        // Canonical identity and File 03 media are immutable. Presentation hooks
-        // may alter bounded text and revoke media, but cannot substitute another
-        // identity, contact destination or media URL.
+        // Canonical identity, File 03 public text and media are immutable
+        // disclosure ceilings. Presentation hooks may revoke or excerpt public
+        // text but must not publish content File 03 withheld or invent text.
         $profile['display_name'] = $profile_class === 'founder'
             ? self::FOUNDER_DISPLAY_NAME
             : $this->plain_text($default_name, 190);
-        $profile['headline'] = $this->plain_text((string) ($filtered['headline'] ?? $profile['headline']), 300);
-        $profile['bio'] = $this->plain_text((string) ($filtered['bio'] ?? $profile['bio']), 12000);
+        $profile['headline'] = $this->monotonic_public_text(
+            (string) $profile['headline'],
+            $filtered['headline'] ?? $profile['headline'],
+            300
+        );
+        $profile['bio'] = $this->monotonic_public_text(
+            (string) $profile['bio'],
+            $filtered['bio'] ?? $profile['bio'],
+            12000
+        );
         $profile['avatar_url'] = $this->monotonic_media_filter(
             $profile['avatar_url'],
             $filtered['avatar_url'] ?? $profile['avatar_url']
@@ -374,6 +386,26 @@ final class Profile_Repository
 
         $url = wp_get_attachment_image_url($attachment_id, $size);
         return Public_URL::sanitize_same_site(is_string($url) ? $url : '', false);
+    }
+
+    /**
+     * A presentation filter may only hide or excerpt text previously released
+     * by the File 03 public DTO. It must never grant absent profile fields or
+     * substitute non-owner content, even if the value is syntactically safe.
+     */
+    private function monotonic_public_text(string $canonical, mixed $filtered, int $limit): string
+    {
+        $approved = $this->plain_text($canonical, $limit);
+        if ($approved === '') {
+            return '';
+        }
+        if (! is_scalar($filtered)) {
+            return $approved;
+        }
+        $candidate = $this->plain_text((string) $filtered, $limit);
+        return $candidate === '' || str_contains($approved, $candidate)
+            ? $candidate
+            : $approved;
     }
 
     private function monotonic_media_filter(string $canonical, mixed $filtered): string

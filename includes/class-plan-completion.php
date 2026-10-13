@@ -308,8 +308,13 @@ final class Plan_Completion
             </form>
 
             <h2><?php esc_html_e('Cache and Index', 'sabri-public-experience'); ?></h2>
-            <p><?php esc_html_e('Public profile responses remain no-store until an accepted cache-partition contract exists. The optional timeline index is rebuildable File 25 projection state.', 'sabri-public-experience'); ?></p>
-            <?php $this->operation_form('spux_rebuild_index', __('Rebuild Timeline Index', 'sabri-public-experience')); ?>
+            <p><?php esc_html_e('Public profile responses remain no-store until an accepted cache-partition contract exists. Optional timeline indexing is only used when a governed native builder exists; bounded live provider queries remain the default.', 'sabri-public-experience'); ?></p>
+            <?php if (function_exists('has_filter') && has_filter('sabri_public_experience/timeline_index_build') !== false): ?>
+                <?php $this->operation_form('spux_rebuild_index', __('Rebuild Timeline Index', 'sabri-public-experience')); ?>
+                <p><?php esc_html_e('Builder registration alone does not establish acceptance. Rebuild still requires separate high-risk approval, strict owner-contract validation, and staging proof; pause/resume is not claimed until an accepted resumable builder exists.', 'sabri-public-experience'); ?></p>
+            <?php else: ?>
+                <p><?php esc_html_e('Optional timeline index is not enabled: no native builder is registered. Rebuild controls are hidden rather than showing an unusable action. Any future pause/resume acceptance remains pending until a real indexed deployment is approved.', 'sabri-public-experience'); ?></p>
+            <?php endif; ?>
 
             <h2><?php esc_html_e('Adapter Health', 'sabri-public-experience'); ?></h2>
             <p><a href="<?php echo esc_url(admin_url('site-health.php')); ?>"><?php esc_html_e('Open File 25 Site Health checks', 'sabri-public-experience'); ?></a></p>
@@ -744,40 +749,10 @@ final class Plan_Completion
     /** @param array<string,mixed> $profile @return array<string,int> */
     public static function public_metrics(array $profile): array
     {
-        if (self::preferences()['public_metrics'] !== true) {
-            return [];
-        }
-        $user_id = self::exact_integer($profile['user_id'] ?? null) ?? 0;
-        if ($user_id < 1) {
-            return [];
-        }
-        $metrics = apply_filters('sabri_public_experience/public_metrics', [], $user_id, $profile);
-        if (! is_array($metrics)) {
-            return [];
-        }
-        $allowed = ['publications', 'videos', 'research', 'followers', 'views', 'saves', 'reviews'];
-        $clean = [];
-        foreach ($allowed as $key) {
-            if (! array_key_exists($key, $metrics) || ! is_int($metrics[$key])) {
-                continue;
-            }
-            $value = $metrics[$key];
-            if ($value < 0 || $value > self::MAX_METRIC_VALUE) {
-                continue;
-            }
-            $threshold = apply_filters('sabri_public_experience/public_metric_minimum', 0, $key, $user_id, $profile);
-            if (! is_int($threshold) || $threshold < 0 || $threshold > self::MAX_METRIC_VALUE) {
-                $threshold = 0;
-            }
-            if ($value < $threshold) {
-                continue;
-            }
-            if (apply_filters('sabri_public_experience/public_metric_allowed', true, $key, $user_id, $profile) !== true) {
-                continue;
-            }
-            $clean[$key] = $value;
-        }
-        return $clean;
+        // Public metric values require an approved native-source projection.
+        // Generic presentation hooks cannot establish counter provenance.
+        unset($profile);
+        return [];
     }
 
     /** @param array<string,mixed> $profile @return array<string,mixed> */
@@ -787,7 +762,7 @@ final class Plan_Completion
         $current = function_exists('get_current_user_id') ? get_current_user_id() : 0;
         $authorized = $user_id > 0 && ($current === $user_id || (function_exists('current_user_can') && current_user_can('manage_options')));
         if (! $authorized) {
-            return ['authorized' => false, 'complete' => false, 'missing' => [], 'preview_modes' => [], 'preview_urls' => [], 'default_responsive_preview' => '', 'edit_url' => ''];
+            return ['authorized' => false, 'complete' => false, 'missing' => [], 'contact_privacy_state' => '', 'preview_modes' => [], 'preview_urls' => [], 'default_responsive_preview' => '', 'edit_url' => ''];
         }
         $missing = [];
         foreach (['display_name', 'avatar_url', 'cover_url', 'headline', 'bio'] as $field) {
@@ -798,9 +773,7 @@ final class Plan_Completion
         if (! empty($profile['avatar_url']) && empty($profile['avatar_alt'])) {
             $missing[] = 'avatar_alt_text';
         }
-        if (empty($profile['contacts'])) {
-            $missing[] = 'contact_privacy_or_contact';
-        }
+        $contact_privacy_state = empty($profile['contacts']) ? 'not-public' : 'public';
         if (($profile['class'] ?? '') === 'doctor' && ($profile['verified'] ?? null) !== true) {
             $missing[] = 'doctor_verification';
         }
@@ -814,6 +787,7 @@ final class Plan_Completion
             'authorized' => true,
             'complete' => $missing === [],
             'missing' => array_values(array_unique($missing)),
+            'contact_privacy_state' => $contact_privacy_state,
             'preview_modes' => self::PREVIEW_MODES,
             'preview_urls' => self::preview_urls($profile),
             'default_responsive_preview' => (string) (self::preferences()['responsive_preview'] ?? 'desktop'),

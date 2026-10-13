@@ -112,6 +112,7 @@ final class Section_Service
         $seen = [];
         $errors = 0;
         $truncated = false;
+        $has_skipped_provider = false;
 
         foreach ($this->registry->for_section($section) as $provider) {
             $status = $this->provider_status($provider, $profile, $section);
@@ -120,6 +121,13 @@ final class Section_Service
                 continue;
             }
             if ($status !== 'usable') {
+                // Dynamic availability/profile eligibility can change without
+                // a new owner version or public-profile cache digest. Only
+                // such transient skips prevent caching. Permanently disabled
+                // providers are stable metadata and need no repeat query.
+                if ($status === 'skip') {
+                    $has_skipped_provider = true;
+                }
                 continue;
             }
 
@@ -138,9 +146,9 @@ final class Section_Service
                 $errors++;
                 continue;
             }
-            if (count($raw) >= self::MAX_ITEMS_PER_PROVIDER) {
-                $truncated = true;
-            }
+            // Stage the cap per provider; a malformed batch is rejected in
+            // full and must never leave a phantom public truncation signal.
+            $provider_truncated = count($raw) >= self::MAX_ITEMS_PER_PROVIDER;
 
             // One provider response is one transaction. A malformed candidate
             // invalidates the complete untrusted batch; valid duplicates remain
@@ -171,6 +179,9 @@ final class Section_Service
                 continue;
             }
 
+            if ($provider_truncated) {
+                $truncated = true;
+            }
             foreach ($provider_cards as $key => $card) {
                 if (isset($seen[$key])) {
                     continue;
@@ -193,7 +204,9 @@ final class Section_Service
             'truncated' => $truncated,
             'is_provider_section' => true,
         ];
-        if ($cache_key !== null) {
+        // Transient provider failures must not become sticky cache entries:
+        // the same service may be queried again after native-source recovery.
+        if ($cache_key !== null && $errors === 0 && ! $has_skipped_provider) {
             $this->public_cache[$cache_key] = $result;
         }
 
@@ -263,7 +276,7 @@ final class Section_Service
             if ($metadata['maturity'] === 'disabled'
                 || ! in_array($metadata['maturity'], ['read-only', 'staging-accepted', 'production-accepted'], true)
             ) {
-                return 'skip';
+                return 'disabled';
             }
 
             return $provider->is_available() && $provider->supports_profile($profile)

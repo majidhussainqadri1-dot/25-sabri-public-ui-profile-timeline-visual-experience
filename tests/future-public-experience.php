@@ -9,7 +9,18 @@ if (! defined('ABSPATH')) {
 if (! function_exists('apply_filters')) {
     function apply_filters(string $hook_name, mixed $value, mixed ...$args): mixed
     {
-        return $value;
+        $callback = $GLOBALS['spux_future_public_test_hooks'][$hook_name] ?? null;
+        return is_callable($callback) ? $callback($value, ...$args) : $value;
+    }
+}
+if (! function_exists('__')) {
+    function __(string $value, string $domain = ''): string { return $value; }
+}
+if (! function_exists('sanitize_key')) {
+    function sanitize_key(string $key): string
+    {
+        $key = strtolower(trim($key));
+        return trim((string) preg_replace('/[^a-z0-9_\-]/', '-', $key), '-');
     }
 }
 if (! function_exists('wp_unslash')) {
@@ -83,6 +94,146 @@ $check(($year['year'] ?? 0) === 2026 && ($year['error'] ?? 'x') === '', 'Valid t
 $_GET['spux_year'] = '../2026';
 $year = Future_Public_Experience::timeline_year_request();
 $check(($year['year'] ?? -1) === 0 && ($year['error'] ?? '') === 'invalid_year', 'Malformed timeline year must fail closed.');
+
+
+// Real public timeline items do not expose provider_id. A claimed source
+// provenance badge must require explicit owner verification, not presence of
+// a provider pointer (which would label unverified items as verified).
+$timelineMetaMethod = new ReflectionMethod(Future_Public_Experience::class, 'timeline_meta');
+$timelineMetaMethod->setAccessible(true);
+$meta = $timelineMetaMethod->invoke(null, [
+    'items' => [
+        [
+            'canonical_url' => 'https://example.test/verified/',
+            'verification_state' => 'verified',
+            'published_at' => '2026-10-12T08:00:00Z',
+        ],
+        [
+            'canonical_url' => 'https://example.test/unverified/',
+            'verification_state' => 'unverified',
+            'provider_id' => 'file-21',
+            'published_at' => '2026-10-12T08:00:00Z',
+        ],
+        [
+            'canonical_url' => 'https://example.test/owner-approved/',
+            'verification_state' => 'native-owner-authorized',
+            'provider_id' => 'file-21',
+            'published_at' => '2026-10-12T08:00:00Z',
+        ],
+    ],
+]);
+$check(is_array($meta) && count($meta) === 3, 'Timeline provenance must retain three public-safe references.');
+$check(($meta[0]['source_verified'] ?? null) === true,
+    'An explicitly verified public source must display its genuine verification badge.');
+$check(($meta[1]['source_verified'] ?? null) === false
+    && ($meta[2]['source_verified'] ?? null) === false,
+    'Provider ID or native publication approval must never forge a source-verification badge.');
+
+// The Preview route is a real runtime template, so PHP lint alone does not
+// catch an undefined class invoked only when preview markup is rendered.
+$publicTemplate = (string) file_get_contents(dirname(__DIR__) . '/templates/public-profile.php');
+$check(! str_contains($publicTemplate, 'SabriPublicExperiencePublic_URL::'),
+    'Preview must never call the undefined concatenated Public_URL class.');
+$check(substr_count($publicTemplate, '\\Sabri\\PublicExperience\\Public_URL::sanitize_same_site') >= 3,
+    'Preview and exit links must use the actual namespaced same-site URL validator.');
+
+
+// Native trust state must never be forged through a presentation filter.
+// Current File03 public profile DTO has no owner-certified verification date
+// or profile-level correction/freshness assertion for this component.
+$trustMethod = new ReflectionMethod(Future_Public_Experience::class, 'trust_payload');
+$trustMethod->setAccessible(true);
+$GLOBALS['spux_future_public_test_hooks']['sabri_public_experience/profile_trust_capsule'] =
+    static function (array $data): array {
+        return array_merge($data, [
+            'verified' => true,
+            'label' => 'FAKE_VERIFIED_ISSUER',
+            'source_label' => 'FAKE_MEDICAL_REGULATOR',
+            'verified_at' => '2026-10-12T13:00:00Z',
+            'freshness' => 'FAKE_RECENTLY_CHECKED',
+            'correction_state' => 'retracted',
+        ]);
+    };
+$trust = $trustMethod->invoke(null, [
+    'class' => 'doctor',
+    'verified' => true,
+    'role_label' => 'Institution Verified Doctor',
+]);
+$check(($trust['verified'] ?? null) === true, 'Native verified doctor state must survive a presentation filter.');
+$check(($trust['label'] ?? '') === 'Institution Verified Doctor'
+    && ($trust['source_label'] ?? '') === 'Institutional verification source'
+    && ($trust['verified_at'] ?? 'x') === ''
+    && ($trust['freshness'] ?? 'x') === ''
+    && ($trust['correction_state'] ?? '') === 'none',
+    'Presentation hooks may not fabricate trust issuers, dates, freshness or corrections.');
+$unverifiedTrust = $trustMethod->invoke(null, [
+    'class' => 'member',
+    'verified' => false,
+    'role_label' => 'Member',
+]);
+$check(($unverifiedTrust['verified'] ?? null) === false,
+    'A presentation hook cannot promote an unverified member to verified.');
+unset($GLOBALS['spux_future_public_test_hooks']['sabri_public_experience/profile_trust_capsule']);
+
+// Supplemental translations cannot grant File03-withheld public text.
+$translationsMethod = new ReflectionMethod(Future_Public_Experience::class, 'translations');
+$translationsMethod->setAccessible(true);
+$GLOBALS['spux_future_public_test_hooks']['sabri_public_experience/profile_translations'] =
+    static function (): array {
+        return ['ur' => [
+            'label' => 'Urdu',
+            'headline' => 'PRIVATE_TRANSLATED_HEADLINE',
+            'bio' => 'PRIVATE_TRANSLATED_BIO',
+        ]];
+    };
+$noPublicFields = $translationsMethod->invoke(null, ['headline' => '', 'bio' => '']);
+$check($noPublicFields === [],
+    'An omitted File03 public headline and biography must not reappear through translations.');
+$onlyPublishedBio = $translationsMethod->invoke(null, [
+    'headline' => '',
+    'bio' => 'File03 explicitly published biography',
+]);
+$check($onlyPublishedBio === [],
+    'A generic filter must not publish any untranslated-owner-approved translation until File03 supplies a versioned public translation contract.');
+unset($GLOBALS['spux_future_public_test_hooks']['sabri_public_experience/profile_translations']);
+
+// Relationships, citations and freshness remain future/conditional until
+// File03/06/07/21/26 native owners publish versioned public-safe projections.
+// Untrusted WordPress presentation hooks must not invent affiliations,
+// published sources or independently asserted "recently updated" facts.
+$GLOBALS['spux_future_public_test_hooks']['sabri_public_experience/public_relationships'] =
+    static function (): array {
+        return [['label' => 'PRIVATE_UNVERIFIED_AFFILIATION',
+            'type' => 'doctor', 'relationship' => 'Staff doctor',
+            'url' => 'https://example.test/clinics/false-claim/']];
+    };
+$GLOBALS['spux_future_public_test_hooks']['sabri_public_experience/public_citations'] =
+    static function (): array {
+        return [['title' => 'PRIVATE_FABRICATED_RESEARCH_SOURCE',
+            'source' => 'UNVERIFIED_INSTITUTION',
+            'url' => 'https://example.test/knowledge/false-reference/']];
+    };
+$GLOBALS['spux_future_public_test_hooks']['sabri_public_experience/content_freshness'] =
+    static function (): array {
+        return ['updated_at' => '2026-10-12T21:00:00Z',
+            'label' => 'PRIVATE_UNVERIFIED_RECENCY'];
+    };
+foreach ([
+    ['relationships', ['display_name' => 'Public Doctor']],
+    ['citations', ['display_name' => 'Public Doctor'], ['section' => 'overview']],
+    ['freshness', ['display_name' => 'Public Doctor']],
+] as $sample) {
+    $method = new ReflectionMethod(Future_Public_Experience::class, $sample[0]);
+    $method->setAccessible(true);
+    $observed = $method->invoke(null, ...array_slice($sample, 1));
+    $check($observed === [], 'Unverified optional native-owned supplemental ' . $sample[0]
+        . ' must not be minted from a presentation filter.');
+}
+unset(
+    $GLOBALS['spux_future_public_test_hooks']['sabri_public_experience/public_relationships'],
+    $GLOBALS['spux_future_public_test_hooks']['sabri_public_experience/public_citations'],
+    $GLOBALS['spux_future_public_test_hooks']['sabri_public_experience/content_freshness']
+);
 
 if ($failures !== []) {
     fwrite(STDERR, "FAILED\n- " . implode("\n- ", $failures) . "\n");

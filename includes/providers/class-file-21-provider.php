@@ -128,7 +128,7 @@ final class File_21_Provider implements Timeline_Provider
                 if (! is_array($native_item)) {
                     continue;
                 }
-                $normalized = $this->normalize($native_item, $author_id);
+                $normalized = $this->normalize_public_item($native_item, $author_id);
                 if ($normalized !== null) {
                     $items[] = $normalized;
                 }
@@ -144,6 +144,33 @@ final class File_21_Provider implements Timeline_Provider
         }
 
         return $items;
+    }
+
+    public function get_canonical_url(Normalized_Timeline_Item $item): string { return (string) $item->get('canonical_url'); }
+
+    public function get_visibility_state(Normalized_Timeline_Item $item): string { return (string) $item->get('visibility_state'); }
+
+    public function get_public_actions(Normalized_Timeline_Item $item): array
+    {
+        $actions = $item->get('available_actions');
+        return is_array($actions) ? array_values(array_filter($actions, 'is_string')) : [];
+    }
+
+    public function get_public_metrics(Normalized_Timeline_Item $item): array
+    {
+        unset($item);
+        // Current File 21 ProfileTimeline publishes no governed public view/save
+        // counts. Hide metric sorts rather than inventing values or reading
+        // File 21 storage directly.
+        return [];
+    }
+
+    public function get_correction_state(Normalized_Timeline_Item $item): string { return (string) $item->get('correction_state'); }
+
+    public function register_sync_events(): void
+    {
+        // Current File 21 public timeline contract exposes no versioned sync
+        // event. File 25 remains a read-through presentation consumer.
     }
 
     /** @return array<string,mixed> */
@@ -166,7 +193,7 @@ final class File_21_Provider implements Timeline_Provider
     }
 
     /** @param array<string,mixed> $item */
-    private function normalize(array $item, int $author_id): ?Normalized_Timeline_Item
+    public function normalize_public_item(array $item, int $author_id): ?Normalized_Timeline_Item
     {
         $id = isset($item['id']) ? (int) $item['id'] : 0;
         $title = isset($item['title']) && is_scalar($item['title']) ? (string) $item['title'] : '';

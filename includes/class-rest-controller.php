@@ -86,7 +86,17 @@ final class Rest_Controller
             'sort' => [
                 'default' => 'latest',
                 'sanitize_callback' => static fn ($value): string => is_string($value) ? $value : 'latest',
-                'validate_callback' => static fn ($value): bool => is_string($value) && in_array($value, ['latest', 'oldest'], true),
+                'validate_callback' => static fn ($value): bool => is_string($value) && in_array($value, ['latest', 'oldest', 'most_viewed', 'most_saved'], true),
+            ],
+            'review_state' => [
+                'default' => '',
+                'sanitize_callback' => static fn ($value): string => is_string($value) ? $value : '',
+                'validate_callback' => static fn ($value): bool => is_string($value) && ($value === '' || in_array($value, ['published', 'approved', 'reviewed', 'not-required', 'corrected', 'retracted'], true)),
+            ],
+            'source_state' => [
+                'default' => '',
+                'sanitize_callback' => static fn ($value): string => is_string($value) ? $value : '',
+                'validate_callback' => static fn ($value): bool => is_string($value) && ($value === '' || in_array($value, ['verified', 'unverified'], true)),
             ],
             'search' => [
                 'default' => '',
@@ -263,6 +273,8 @@ final class Rest_Controller
             'language' => (string) $request['language'],
             'topic' => (string) $request['topic'],
             'sort' => (string) $request['sort'],
+            'review_state' => (string) $request['review_state'],
+            'source_state' => (string) $request['source_state'],
             'search' => (string) $request['search'],
         ]);
         $public_result = [
@@ -272,6 +284,8 @@ final class Rest_Controller
             'has_more' => $result['has_more'],
             'truncated' => $result['truncated'],
             'partial' => $result['provider_errors'] !== [],
+            'sort' => $result['sort'] ?? 'latest',
+            'available_metric_sorts' => $result['available_metric_sorts'] ?? [],
         ];
 
         return $this->response($public_result, 200, $request);
@@ -326,11 +340,13 @@ final class Rest_Controller
         if ($status === 200 && $etag !== '' && self::request_matches_etag($request, $etag)) {
             return new WP_REST_Response(null, 304, $headers);
         }
-        if ($status === 200 && $last_modified !== '' && ! self::request_has_if_none_match($request)
-            && self::request_matches_last_modified($request, $last_modified)
-        ) {
-            return new WP_REST_Response(null, 304, $headers);
-        }
+        // Last-Modified above is derived from nested native item dates, not
+        // a certified watermark of every field in this public representation.
+        // An unchanged item date cannot prove that public bio, visibility,
+        // action URLs or other owner-approved fields have not changed. Honor
+        // conditional 304 responses only when the full-payload ETag matches.
+        // Keep the date as an advisory header until owners provide a verified
+        // representation-wide modification contract.
 
         return new WP_REST_Response($data, $status, $headers);
     }

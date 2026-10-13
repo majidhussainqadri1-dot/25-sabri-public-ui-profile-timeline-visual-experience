@@ -32,11 +32,50 @@ WordPress module for the **Sabri Social Homeopathy Platform**. This is the exist
 
 ```text
 config/review695-714-timeline-integrity-ledger.json
-docs/REVIEWS-695-714-TIMELINE-INTEGRITY-2026-10-09.md
+config/review715-734-provider-contract-rebase-ledger.json
+docs/REVIEWS-715-734-PROVIDER-CONTRACT-REBASE-2026-10-09.md
 tests/review695-714-timeline-integrity.php
 ```
 
 **Evidence boundary:** CI builds and ZIP checks are not installed staging, live deployment or database truth. Exact deployed code, DB/schema, migration state, staging visual/role acceptance and live re-test all remain unverified.
+
+## Latest exact-source review boundary — 2026-10-12
+
+A fresh twenty-area read-only File 25 / consolidated-central / companion-source inspection on the existing corrective PR identified two owner-boundary presentation fallbacks: a File 03-omitted public biography was replaced with unreviewed WordPress \`WP_User::description\`, and an omitted public display name was replaced with \`WP_User::display_name\`. The candidate now respects File 03's public DTO for both, using an empty biography and a neutral public label when the canonical owner withholds them. Dynamic regressions are in \`tests/review1015-file03-public-dto-privacy.php\`. A separate File 25 welcome/Skip Intro PR #19 remains OPEN DRAFT and is **not** included in correction PR #16 or main. Do not call either PR merged, deployed, accepted on Hostinger, or 20/20 whole-repository audited solely from source and CI.
+
+## File03 public translation and trust provenance — pending owner contract (2026-10-12)
+
+A new focused twenty-area File25/central/companion source audit found that a generic presentation filter could publish a translated biography/headline absent from File03's approved public profile DTO and could supply unsupported trust-capsule verification dates, source-issuer labels, or profile-level correction states. File25 no longer publishes those unverified claims. Profile translation **content** is temporarily gated off until File03 defines and accepts a versioned public-safe translation projection; this is an **unresolved native-owner integration and staging acceptance gate**, not a completed translation feature. Ordinary application UI localization and RTL remain separate. Trusted File03/09 `verified` status remains presentation-visible; an arbitrary presentational filter cannot create provenance.
+
+New adversarial tests are in `tests/future-public-experience.php`. This source correction is on the open PR #16 only; the independent File13 Skip Intro PR #19 is not bundled, merged, or deployed by these corrections. Exact HEAD CI, installed plugin, File03 owner acceptance, staging browser/role tests, and live/DB/migration parity must be verified independently.
+
+## New 2026-10-12 21:17 PKT File25 source/plan cross-file audit
+
+Twenty separate *source and canonical-ownership scopes* were inspected on PR #16 before any new code edit (not twenty complete real-role/staging/live acceptance cycles). Two File25-source defects were proven: generic UI hooks could fabricate public relationships, citations, and freshness in the Future Public Experience JSON without a typed verified owner projection; and normalized Timeline update dates could pass an invalid same-second microsecond chronology check when precision was truncated before comparison.
+
+The optional public relationship/citation/freshness payloads now fail closed until the File03/06/07/21/26 owners publish versioned, public-safe, rights/verification-cleared contracts. This is intentionally an OPEN EXTERNAL INTEGRATION GATE, not a claim of feature-complete graph/knowledge recency or a new duplicate File25 backend. The public Timeline timestamp wire format remains UTC seconds, while validation compares complete original offset-aware microsecond instants before reducing wire precision. Adversarial regressions cover both.
+
+Affected tests: `tests/future-public-experience.php` and `tests/review1037-timeline-instant-precision.php`. Actual GH CI must be checked against the **last correction PR16 HEAD**, not an earlier CI success. Separate Draft PR #19 (File13 welcome), File14 independent moving repo HEAD, deployed package/DB/migrations and Hostinger staging acceptance are not assumed completed.
+
+## Source-only continuation — public counters and contact completion (2026-10-13)
+
+File 25 plan section 69 requires approved native, aggregate and privacy-screened public counters. A generic WordPress presentation filter cannot attest count provenance, deduplication, consent or disclosure thresholds. Public profile counters are temporarily withheld until their canonical owners publish an accepted versioned public metrics DTO. This does not claim the full metrics experience is implemented. Section 70's owner-only Completion Assistant uses actual public contact visibility. No public contact is an acceptable not-public state; no substitute or implied consent/contact object is invented. Regression evidence is in `tests/review94-133-forty-round-adversarial.php`.
+
+These changes are only in an open correction PR. File03 owner approvals, File17/21 metrics data, File24 assurance, Staging browser/role QA, migrations and production release remain separately gated and unverified.
+
+## File25 forty-area source/plan/companion review — 2026-10-13
+
+Forty distinct read-only source/contract areas were inspected before source modification using the attached File25 final plan, governing central plans, current File03 public DTO and exact GitHub candidate. These are **40 scoped checks, not 40 whole-repository repeated end-to-end staging/live reviews**.
+
+The review found a member discoverability issue: a generic presentational WordPress `index_nonprofessional_profile` filter could turn on search indexing for nonprofessional members without a public-native File03 indexability consent contract. File25 now leaves nonprofessional pages `noindex/noarchive` until File03 supplies an approved versioned, public indexability projection. Verified Founder/Doctor ordinary public pages and filtered/preview/404 SEO guards retain their existing behavior. Adversarial regression: `tests/review1041-member-seo-index-consent.php`.
+
+The public SEO indexing grant is **not a completed feature**; it is an explicit File03 native-owner integration and real-account staging acceptance gate. PR #16 source tests, Draft PR #19 visual intro, installed runtime, DB/schema/migrations, full 55 staging checks and 28 DoD acceptance are distinct realities.
+
+## REST conditional correctness audit — 2026-10-13
+
+A new forty-area source/plan/companion review identified a stale-representation issue in the File25 REST controller. A nested public item's unchanged `updated_at` is **not** a canonical owner-approved modification watermark for the entire profile, timeline or section payload. Previously an `If-Modified-Since` comparison could return empty HTTP 304 when a different approved public field changed but the nested timestamp remained unchanged. The response now keeps full-payload ETag for conditional HTTP 304; `Last-Modified` remains an informational header only pending a versioned File03/File21 representation-wide owner watermark. This is a deliberate incomplete native-owner contract, not a completed date-based HTTP revalidation feature. Adversarial tests in `tests/review37-rest-etag-revalidation.php` verify date-stable changed biographies are not lost and ETag rules still work.
+
+The forty inspections are distinct source/contract focus areas, **not forty independently executed full end-to-end staging/live audit rounds**. Tests at the new PR head, owner-contract acceptance, real Hostinger staging and deployed/DB/schema parity must be verified separately.
 
 ## Source implementation status
 
@@ -69,7 +108,7 @@ The audited baseline main `e35563b7...` passed exact-head CI run `1689`. The fin
 - **File 03:** profile master/public projection, contact consent, canonical public media and canonical profile identity remain File 03-owned.
 - **File 08:** current main `70541974ce0ffb16aebef557c3016eb7447662f4`; no reviewed profile-user→booking-destination API is published, so **Appointment remains hidden**.
 - **File 09:** current main `cfc5f781a766330314dc98c42abeca0eb7786eba`, runtime `1.3.0`, schema `6`, integration contract `1.1.0`; Doctor-verification truth remains File 09-owned.
-- **File 14:** current main `080e2198d84dfb7491bb0b75946e14a5fe118b91`, runtime `1.4.8`, schema `10005`; File 14 remains within File 25's reviewed compatibility family.
+- **File 14:** latest separately verified repository main as of 2026-10-12 `d28c4ef76667f75e3269201da6f935c2816568ee`, source runtime `1.4.29`, base schema candidate `10005`. This is **source-only evidence**; the historic reviewed candidate remains `907a04b25567a607e5ecb11d26e50bd0f07852be` (v1.4.3), and installed/staging/live compatibility has not been proven.
 - **File 17:** current main `8ae656e51796d1f05865d8be5dca2480443d79ca`; **Follow remains hidden** without a target-bound owner contract.
 - **File 20:** current main `8a4dbcaf4fef8e926b9b834ecfde16c21a0f00ca`; sole structural shell/navigation/layout and canonical admin-parent owner.
 - **File 21:** current main `f2eb7e95ddea327af36ea725ffb923b029f885e6`; canonical publication/ProfileTimeline owner. Its current `ProfileTimeline::query` remains the authoritative approved post timeline source.
@@ -92,6 +131,16 @@ The audited baseline main `e35563b7...` passed exact-head CI run `1689`. The fin
 - A nonzero `pin_weight` now requires bounded internal audit provenance: reference, actor, reason, surface, start and end. Invalid/unaudited pins are neutralized to weight `0` without dropping the public item.
 - Refreshed File 09 R26 and File 14 v1.4.8 repository-source evidence.
 - Richer planned timeline types beyond the current File 21 post timeline remain owner-contract dependent; File 25 will not infer publication approval from section-card adapters or foreign storage.
+
+## Reviews 715–734 corrections
+
+- Restarted from newer main `347a4ff4...` after concurrent Reviews 695–714 timeline-integrity work landed; those integrity fixes were preserved rather than overwritten.
+- Completed all plan-required Timeline Provider methods across the interface and concrete File 21/WordPress providers.
+- Provider registration now executes the sync hook fail-closed; normalized public items are cross-checked against owner canonical URL, visibility, actions and correction state.
+- Added **Most Viewed / Most Saved** only when a provider supplies real `privacy_safe` public metrics. Current File 21 publishes no such metric contract, so these sorts remain hidden there.
+- Added **Review state / Source state** refinements across renderer, public HTML, service, REST and SEO filtered-query handling.
+- Added explicit accessible **Load More** while retaining page fallback and current browser-Back/pagination integrity.
+- Refreshed current File 07 source evidence to runtime `1.2.1`, DB `1.1.1`, contract `1.2.1`, projection schema `3`.
 
 ## Existing visual and public contracts retained
 

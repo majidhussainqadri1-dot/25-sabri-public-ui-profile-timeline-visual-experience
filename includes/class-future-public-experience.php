@@ -270,110 +270,65 @@ final class Future_Public_Experience
         ];
         $data = apply_filters('sabri_public_experience/profile_trust_capsule', $default, $profile);
         $data = is_array($data) ? $data : $default;
-        $state = sanitize_key((string) ($data['correction_state'] ?? 'none'));
-        if (! in_array($state, ['none', 'corrected', 'retracted', 'archived'], true)) {
-            $state = 'none';
-        }
+        // Only the actual File 03/09 verified bit may establish trust.
+        // File 25 presentation hooks may revoke that bit, not invent owner
+        // provenance, verification timestamps, or correction decisions.
         $verified = $default['verified'] === true;
         if (array_key_exists('verified', $data)) {
             $verified = $verified && $data['verified'] === true;
         }
         return [
             'verified' => $verified,
-            'label' => self::plain($data['label'] ?? $default['label'], 190),
-            'source_label' => self::plain($data['source_label'] ?? $default['source_label'], 190),
-            'verified_at' => $verified ? self::iso_time((string) ($data['verified_at'] ?? '')) : '',
-            'freshness' => self::plain($data['freshness'] ?? '', 190),
-            'correction_state' => $state,
+            'label' => $default['label'],
+            'source_label' => $default['source_label'],
+            // The public File 03 DTO currently supplies no validated values
+            // for these claims. Keep the states neutral until versioned native
+            // owner contracts can provide public-safe provenance.
+            'verified_at' => '',
+            'freshness' => '',
+            'correction_state' => 'none',
         ];
     }
 
     /** @param array<string,mixed> $profile @return list<array<string,string>> */
     private static function translations(array $profile): array
     {
-        $data = apply_filters('sabri_public_experience/profile_translations', [], $profile);
-        if (! is_array($data)) {
-            return [];
-        }
-        $clean = [];
-        foreach (array_slice($data, 0, 8, true) as $code => $row) {
-            if (! is_string($code) || ! is_array($row)) {
-                continue;
-            }
-            $code = strtolower(trim($code));
-            if (preg_match('/^[a-z]{2,3}(?:-[a-z]{2})?$/', $code) !== 1) {
-                continue;
-            }
-            $label = self::plain($row['label'] ?? strtoupper($code), 80);
-            $headline = self::plain($row['headline'] ?? '', 300);
-            $bio = self::plain($row['bio'] ?? '', 12000);
-            if ($label !== '' && ($headline !== '' || $bio !== '')) {
-                $clean[] = ['code' => $code, 'label' => $label, 'headline' => $headline, 'bio' => $bio];
-            }
-        }
-        return $clean;
+        // File 03's current public DTO does not publish an approved translated
+        // biography/headline or a versioned owner-translation contract. A
+        // general presentation filter cannot mint a second publishing path.
+        // Until the canonical owner adds a public-safe translation projection,
+        // leave this enhancement conditional rather than expose invented text.
+        unset($profile);
+        return [];
     }
 
     /** @param array<string,mixed> $profile @return list<array<string,string>> */
     private static function relationships(array $profile): array
     {
-        $data = apply_filters('sabri_public_experience/public_relationships', [], $profile);
-        if (! is_array($data)) {
-            return [];
-        }
-        $clean = [];
-        foreach (array_slice($data, 0, 40) as $row) {
-            if (! is_array($row)) {
-                continue;
-            }
-            $label = self::plain($row['label'] ?? '', 140);
-            $url = Public_URL::sanitize_same_site($row['url'] ?? '', false);
-            if ($label === '' || $url === '') {
-                continue;
-            }
-            $clean[] = [
-                'label' => $label,
-                'type' => sanitize_key((string) ($row['type'] ?? 'related')) ?: 'related',
-                'relationship' => self::plain($row['relationship'] ?? '', 100),
-                'url' => $url,
-            ];
-        }
-        return $clean;
+        // File 03/07/21/26 have not published a versioned, public-safe
+        // relationship projection for this component. Generic presentation
+        // filters cannot assert professional or institutional affiliations.
+        unset($profile);
+        return [];
     }
 
     /** @param array<string,mixed> $profile @param array<string,mixed> $context @return list<array<string,string>> */
     private static function citations(array $profile, array $context): array
     {
-        $data = apply_filters('sabri_public_experience/public_citations', [], $profile, $context);
-        if (! is_array($data)) {
-            return [];
-        }
-        $clean = [];
-        foreach (array_slice($data, 0, 40) as $row) {
-            if (! is_array($row)) {
-                continue;
-            }
-            $title = self::plain($row['title'] ?? '', 240);
-            $url = Public_URL::sanitize_same_site($row['url'] ?? '', false);
-            if ($title !== '' && $url !== '') {
-                $clean[] = ['title' => $title, 'source' => self::plain($row['source'] ?? '', 240), 'url' => $url];
-            }
-        }
-        return $clean;
+        // Source attributions require native object IDs, provenance and
+        // rights checks from the publishing/knowledge owner. A same-site URL
+        // is not evidence that a filtered citation is real or public.
+        unset($profile, $context);
+        return [];
     }
 
     /** @param array<string,mixed> $profile @return array<string,string> */
     private static function freshness(array $profile): array
     {
-        $data = apply_filters('sabri_public_experience/content_freshness', [], $profile);
-        if (! is_array($data)) {
-            return [];
-        }
-        $updated = self::iso_time((string) ($data['updated_at'] ?? ''));
-        if ($updated === '') {
-            return [];
-        }
-        return ['updated_at' => $updated, 'label' => self::plain($data['label'] ?? '', 190)];
+        // Never publish an unaudited "recently updated" assertion minted by
+        // a UI hook. The native owner must provide a versioned public date.
+        unset($profile);
+        return [];
     }
 
     /** @param array<string,mixed> $timeline @return list<array<string,mixed>> */
@@ -391,7 +346,7 @@ final class Future_Public_Experience
             $state = sanitize_key((string) ($item['correction_state'] ?? 'none'));
             $clean[] = [
                 'url' => $url,
-                'source_verified' => sanitize_key((string) ($item['provider_id'] ?? '')) !== '',
+                'source_verified' => ($item['verification_state'] ?? null) === 'verified',
                 'correction_state' => in_array($state, ['corrected', 'retracted'], true) ? $state : 'none',
                 'updated_at' => self::iso_time((string) ($item['updated_at'] ?? $item['published_at'] ?? '')),
             ];

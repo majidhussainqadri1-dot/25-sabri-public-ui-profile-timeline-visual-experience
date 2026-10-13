@@ -133,4 +133,20 @@ $assert(str_contains($source, 'approved_dry_run_required')
     && str_contains($source, 'stale_rebuild_reconciled')
     && str_contains($css, '.spux-timeline-search'), 'Review 133: migration, rollback, repair, redirects, and new UI are operationally wired.');
 
+$GLOBALS['spux_test_filters']['sabri_public_experience/public_metrics'] = ['followers' => 999999];
+$assert(Plan_Completion::public_metrics(['user_id' => 7]) === [], 'Metrics require a verified native owner.');
+unset($GLOBALS['spux_test_filters']['sabri_public_experience/public_metrics']);
+
+$GLOBALS['spux_test_user_id'] = 7;
+$profile1040 = ['user_id' => 7, 'class' => 'member', 'display_name' => 'A', 'avatar_url' => 'https://example.test/a.jpg', 'avatar_alt' => 'Portrait', 'cover_url' => 'https://example.test/c.jpg', 'headline' => 'Title', 'bio' => 'Public', 'canonical_url' => 'https://example.test/members/a/', 'contacts' => []];
+$private1040 = Plan_Completion::completion_assistant($profile1040);
+$assert($private1040['complete'] === true && $private1040['contact_privacy_state'] === 'not-public' && $private1040['missing'] === [], 'Private contact is not missing public profile data.');
+$profile1040['contacts'] = ['website' => 'https://example.test/contact/'];
+$public1040 = Plan_Completion::completion_assistant($profile1040);
+$assert($public1040['contact_privacy_state'] === 'public', 'Real visible contact has public status.');
+
+$GLOBALS['spux_test_user_id'] = 0;
+$outside1040 = Plan_Completion::completion_assistant($profile1040);
+$assert($outside1040['authorized'] === false && $outside1040['contact_privacy_state'] === '' && $outside1040['missing'] === [], 'Nonowner cannot inspect contact completion state.');
+$assert(! str_contains($renderer, "'_privacy_state' => 'not-public'"), 'Renderer cannot invent a private contact.');
 echo sprintf("Reviews 94-133 corrective regressions PASS (%d checks)\n", $checks);
