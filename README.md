@@ -63,6 +63,14 @@ File 25 plan section 69 requires approved native, aggregate and privacy-screened
 
 These changes are only in an open correction PR. File03 owner approvals, File17/21 metrics data, File24 assurance, Staging browser/role QA, migrations and production release remain separately gated and unverified.
 
+## File25 forty-area source/plan/companion review — 2026-10-13
+
+Forty distinct read-only source/contract areas were inspected before source modification using the attached File25 final plan, governing central plans, current File03 public DTO and exact GitHub candidate. These are **40 scoped checks, not 40 whole-repository repeated end-to-end staging/live reviews**.
+
+The review found a member discoverability issue: a generic presentational WordPress `index_nonprofessional_profile` filter could turn on search indexing for nonprofessional members without a public-native File03 indexability consent contract. File25 now leaves nonprofessional pages `noindex/noarchive` until File03 supplies an approved versioned, public indexability projection. Verified Founder/Doctor ordinary public pages and filtered/preview/404 SEO guards retain their existing behavior. Adversarial regression: `tests/review1041-member-seo-index-consent.php`.
+
+The public SEO indexing grant is **not a completed feature**; it is an explicit File03 native-owner integration and real-account staging acceptance gate. PR #16 source tests, Draft PR #19 visual intro, installed runtime, DB/schema/migrations, full 55 staging checks and 28 DoD acceptance are distinct realities.
+
 ## Source implementation status
 
 File 25 source-owned scope identified in Reviews 695–714 has been corrected; later source changes require fresh exact-head CI evidence. Mutable exact-head CI state is intentionally **not frozen as permanent truth inside source metadata**: the exact current GitHub HEAD must be checked against its current CI run after the final commit. Repository/CI evidence never proves installed Hostinger staging or live deployment.
