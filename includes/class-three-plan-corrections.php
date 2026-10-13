@@ -171,10 +171,29 @@ final class Three_Plan_Corrections
         $message = self::text($args['message'] ?? '', 600);
         $continue_label = self::text($args['continue_label'] ?? 'Continue', 80);
         $close_label = self::text($args['close_label'] ?? 'Close', 80);
+        $skip_label = self::text($args['skip_label'] ?? 'Skip intro', 80);
         $continue_url = Public_URL::sanitize_same_site($args['continue_url'] ?? home_url('/'));
-        if ($title === '' || $continue_label === '' || $close_label === '' || $continue_url === '') {
+        if ($title === '' || $continue_label === '' || $close_label === '' || $skip_label === '' || $continue_url === '') {
             return '';
         }
+
+        // Display only the existing site-approved WordPress Custom Logo.
+        // A safe text identity remains when no approved attachment is set.
+        $brand_label = self::text($args['brand_label'] ?? 'Sabri Homeopathy', 80);
+        if ($brand_label === '') { return ''; }
+        $logo_html = '';
+        if (function_exists('get_theme_mod') && function_exists('wp_get_attachment_image') && function_exists('wp_kses_post')) {
+            $logo_id = get_theme_mod('custom_logo', 0);
+            if (is_numeric($logo_id) && (int) $logo_id > 0) {
+                $logo = wp_get_attachment_image((int) $logo_id, 'thumbnail', false, [
+                    'class' => 'sabri-ui-welcome-panel__logo', 'alt' => '', 'loading' => 'eager',
+                ]);
+                $logo_html = is_string($logo) ? wp_kses_post($logo) : '';
+            }
+        }
+        $identity = '<div class="sabri-ui-welcome-panel__brand" data-visual-owner="file-25">'
+            . $logo_html . '<span class="sabri-ui-welcome-panel__brand-text">'
+            . self::escape_html($brand_label) . '</span></div>';
 
         $description = $message !== ''
             ? '<p class="sabri-ui-welcome-panel__message">' . self::escape_html($message) . '</p>'
@@ -182,13 +201,20 @@ final class Three_Plan_Corrections
 
         return '<section class="sabri-ui-welcome-panel" role="region" aria-labelledby="sabri-welcome-title"'
             . ' data-directive="CHAT-UX-001" data-frequency-owner="file-20" data-visual-owner="file-25">'
+            . $identity
             . '<h2 id="sabri-welcome-title">' . self::escape_html($title) . '</h2>'
+            // Filled once AFTER the non-modal panel becomes visible; never steals focus.
+            . '<span class="sabri-ui-welcome-panel__announcement" role="status" aria-live="polite" aria-atomic="true" data-sabri-welcome-announcement></span>'
+            // A purely decorative, non-blocking cue: never delays the page or a control.
+            . '<span class="sabri-ui-welcome-panel__cue" aria-hidden="true"></span>'
             . $description
             . '<div class="sabri-ui-welcome-panel__actions">'
             . '<a class="sabri-ui-button sabri-ui-button--primary" href="' . self::escape_url($continue_url) . '">'
             . self::escape_html($continue_label) . '</a>'
             . '<button class="sabri-ui-button sabri-ui-button--secondary" type="button" data-sabri-welcome-dismiss>'
             . self::escape_html($close_label) . '</button>'
+            . '<button class="sabri-ui-button sabri-ui-button--secondary" type="button" data-sabri-welcome-skip>'
+            . self::escape_html($skip_label) . '</button>'
             . '</div></section>';
     }
 
@@ -215,6 +241,23 @@ final class Three_Plan_Corrections
     box-shadow: 0 1rem 2.5rem rgb(15 23 42 / 10%);
     color: var(--sabri-text, #111827);
 }
+.sabri-ui-welcome-panel__brand { display:flex; align-items:center; flex-wrap:wrap; gap:.75rem; color:var(--sabri-visual-primary,#087a4e); font-weight:700; }
+.sabri-ui-welcome-panel__logo { display:block; inline-size:auto; block-size:auto; max-inline-size:5rem; max-block-size:3.5rem; object-fit:contain; }
+/* An empty, non-focusable status region for exactly one accessible announcement. */
+.sabri-ui-welcome-panel__announcement { position:absolute;inline-size:1px;block-size:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0; }
+/* File25 owns the green brand cue; no blocking timer, media or sound. */
+.sabri-ui-welcome-panel__cue {
+    display:block; inline-size:min(12rem,100%); block-size:.25rem;
+    border-radius:999px; background:var(--sabri-visual-primary,#087a4e);
+    transform-origin:0 50%;
+    animation:sabri-ui-welcome-cue .55s ease-out 1 both;
+}
+[dir="rtl"] .sabri-ui-welcome-panel__cue { transform-origin:100% 50%; }
+@keyframes sabri-ui-welcome-cue {
+    from { transform:scaleX(.1); }
+    to { transform:scaleX(1); }
+}
+
 .sabri-ui-welcome-panel h2,
 .sabri-ui-welcome-panel p { margin: 0; }
 .sabri-ui-welcome-panel__actions {
@@ -230,6 +273,7 @@ final class Three_Plan_Corrections
 }
 @media (prefers-reduced-motion: reduce) {
     .sabri-ui-welcome-panel { scroll-behavior: auto; }
+    .sabri-ui-welcome-panel__cue { animation:none; transform:none; }
 }
 CSS;
     }

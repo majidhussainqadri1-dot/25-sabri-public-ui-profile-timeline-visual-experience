@@ -32,6 +32,11 @@ namespace {
     }
     function wp_add_inline_style(string $handle, string $css): bool { return true; }
     function home_url(string $path = '/'): string { return 'https://example.test/' . ltrim($path, '/'); }
+    $GLOBALS['spux_logo_id'] = 0;
+    function get_theme_mod(string $key, mixed $default = 0): mixed { return $key === 'custom_logo' ? $GLOBALS['spux_logo_id'] : $default; }
+    function wp_get_attachment_image(int $id, string $size, bool $icon = false, array $attr = []): string { return '<img class="sabri-ui-welcome-panel__logo" src="/logo-' . $id . '.png" alt="">'; }
+    function wp_kses_post(string $html): string { return strip_tags($html, '<img>'); }
+
     function wp_parse_url(string $url): array|false { return parse_url($url); }
     function sanitize_key(string $value): string { return trim((string) preg_replace('/[^a-z0-9_\-]/', '', strtolower($value)), '-'); }
     function sanitize_text_field(string $value): string { return trim(strip_tags($value)); }
@@ -112,7 +117,24 @@ namespace Sabri\PublicExperience {
 
     $assert(Three_Plan_Corrections::render_welcome_panel(['title'=>'Welcome','message'=>'One coherent Sabri platform experience.','continue_url'=>'/home/']) === '', 'File 25 must not render welcome unless File 20 invokes it.');
     $welcome = Three_Plan_Corrections::render_welcome_panel(['invoked_by_file_20'=>true,'title'=>'Welcome','message'=>'One coherent Sabri platform experience.','continue_url'=>'/home/','skip_label'=>'Skip']);
-    foreach (['data-directive="CHAT-UX-001"','data-frequency-owner="file-20"','data-visual-owner="file-25"','sabri-ui-welcome-panel'] as $marker) { $assert(str_contains($welcome, $marker), 'Welcome ownership marker missing: ' . $marker); }
+    foreach (['data-directive="CHAT-UX-001"','data-frequency-owner="file-20"','data-visual-owner="file-25"','sabri-ui-welcome-panel', 'sabri-ui-welcome-panel__brand', 'Sabri Homeopathy', 'sabri-ui-welcome-panel__cue', 'aria-hidden="true"', 'role="status"', 'aria-live="polite"', 'aria-atomic="true"', 'data-sabri-welcome-announcement', 'data-sabri-welcome-skip', '>Skip</button>'] as $marker) { $assert(str_contains($welcome, $marker), 'Welcome ownership marker missing: ' . $marker); }
+
+    $assert(Three_Plan_Corrections::render_welcome_panel(['invoked_by_file_20'=>true,'skip_label'=>'']) === '', 'Unlabelled Skip action must not render.');
+    $assert(substr_count($welcome, 'data-sabri-welcome-announcement') === 1, 'Welcome must contain exactly one explicit nonfocusable screen-reader status target.');
+    $assert(strpos($welcome, 'data-sabri-welcome-announcement') > strpos($welcome, 'sabri-welcome-title'), 'Accessible status region follows semantic heading for assistive technology.');
+    $css = Three_Plan_Corrections::css();
+    $assert(str_contains($css, 'background:var(--sabri-visual-primary,#087a4e)'), 'Green Welcome cue must use canonical File25 green visual token.');
+    $assert(str_contains($css, 'animation:sabri-ui-welcome-cue .55s ease-out 1 both'), 'One-shot Welcome cue must be short and non-blocking.');
+    $assert(str_contains($css, '.sabri-ui-welcome-panel__cue { animation:none; transform:none; }'), 'Reduced-motion must show static cue without animation.');
+    $assert(str_contains($css, '[dir="rtl"] .sabri-ui-welcome-panel__cue'), 'Green cue must respect RTL progression.');
+    $assert(strpos($welcome, 'sabri-ui-welcome-panel__cue') > strpos($welcome, 'sabri-welcome-title'), 'Green cue must follow brand title, never defer content.');
+
+    $GLOBALS['spux_logo_id'] = 123;
+    $brandedWelcome = Three_Plan_Corrections::render_welcome_panel(['invoked_by_file_20'=>true]);
+    $assert(str_contains($brandedWelcome, 'src="/logo-123.png"') && str_contains($brandedWelcome, 'sabri-ui-welcome-panel__brand'), 'Only canonical site-approved logo attachment should render.');
+    $GLOBALS['spux_logo_id'] = 0;
+    $fallbackWelcome = Three_Plan_Corrections::render_welcome_panel(['invoked_by_file_20'=>true]);
+    $assert(str_contains($fallbackWelcome, 'Sabri Homeopathy') && !str_contains($fallbackWelcome, '<img'), 'Missing Custom Logo must use safe text-brand fallback.');
 
     $matrixRaw = file_get_contents($root . '/config/all-chats-directive-matrix.json');
     $matrix = is_string($matrixRaw) ? json_decode($matrixRaw, true) : [];
