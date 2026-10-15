@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — 2026-10-15 — Reviews 755–794 REST/public-policy parity
+
+- Forty distinct source inspections: six REST configuration/visibility gaps corrected; Skip Link confirmed File20-owned rather than duplicated.
+- One additional Reviews/Research tab allowlist/default omission corrected.
+- New PHP8.0/PHP8.3 executable regression for public REST profile visibility, hidden tab endpoints and disabled profile-local search.
+- No native File03/File08/File09/File17/File20/File21/File24 data writes; Hostinger/live evidence remains unverified.
+
+
 
 ## Unreleased — 2026-10-15 — Forty-scope public-profile ownership correction
 
