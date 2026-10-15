@@ -47,7 +47,8 @@
       "tests/review635-654-plan-completeness.php",
       "tests/review655-674-admin-plan-completeness.php",
       "tests/review675-694-timeline-completeness.php",
-      "tests/review695-714-timeline-integrity.php"
+      "tests/review695-714-timeline-integrity.php",
+      "tests/review755-794-rest-policy-parity.php"
     ]
   }
 }

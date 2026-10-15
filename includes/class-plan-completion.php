@@ -35,7 +35,7 @@ final class Plan_Completion
     private const PREVIEW_MODES = ['public', 'member', 'mobile', 'desktop', 'contact', 'search', 'social'];
     private const SECTIONS = [
         'overview', 'timeline', 'books-research', 'clinic-contact', 'clinic', 'about',
-        'knowledge', 'media', 'videos', 'reels', 'pdfs', 'marketplace',
+        'knowledge', 'media', 'reviews', 'research', 'videos', 'reels', 'pdfs', 'marketplace',
     ];
     private const OPTIONAL_SECTION_PROVIDERS = [
         'file-06-knowledge',

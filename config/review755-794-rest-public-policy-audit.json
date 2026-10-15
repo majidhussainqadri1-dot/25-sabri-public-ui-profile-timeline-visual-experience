@@ -1,0 +1,331 @@
+{
+  "schema": 1,
+  "module": 25,
+  "review_range": "755-794",
+  "date": "2026-10-15",
+  "frozen_source_base": {
+    "branch": "fix/file25-40-scope-review-public-profile-owner-privacy-20261015",
+    "sha": "bc5ed1dcff8c289e6279e3869d0a0a0ca43e0761",
+    "main_sha": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e"
+  },
+  "governing_plans": [
+    "File25 Final Harmonized Specification v2.0 (§§ 29, 37–47, 55–68, 71–90)",
+    "Sabri Social Homeopathy Platform Three Central Plans Consolidated Governing Master Plan 2026 (especially ownership and public access)",
+    "File03, File08, File09, File17, File20 and File21 canonical integration contracts"
+  ],
+  "interpretation": "Forty separate purpose-specific source inspections, NOT forty complete end-to-end test cycles, and positive source witness is not staging/live acceptance.",
+  "totals": {
+    "source_checks": 40,
+    "source_witness_found": 33,
+    "source_defect_scopes": 6,
+    "confirmed_delegated_owner": 1,
+    "additional_crosscheck_defects": 1,
+    "additional_ci_test_harness_defects": 1
+  },
+  "root_causes": [
+    {
+      "id": "REST-PROFILE-GLOBAL-POLICY",
+      "rounds": [
+        756,
+        757,
+        758
+      ],
+      "description": "Public REST profile and owned child endpoints bypass the HTML public_visibility configuration gate.",
+      "fix": "Return non-disclosing 404 for public REST profile, timeline and public sections when disabled."
+    },
+    {
+      "id": "REST-TAB-POLICY",
+      "rounds": [
+        759,
+        760
+      ],
+      "description": "REST still exposes Timeline/Knowledge/Media after admin hides their public tabs.",
+      "fix": "Gate their public REST endpoints by enabled_public_tabs."
+    },
+    {
+      "id": "REST-SEARCH-POLICY",
+      "rounds": [
+        762
+      ],
+      "description": "REST search runs when HTML profile_local_search preference disables search.",
+      "fix": "Explicit 400 profile_search_disabled for nonempty REST search; empty timeline remains available."
+    },
+    {
+      "id": "TAB-SCHEMA-PARITY",
+      "rounds": [],
+      "description": "Additional post-check: 'reviews' and 'research' were omitted from enabled_public_tabs schema despite Section_Registry and File25 plan.",
+      "fix": "Include governed reviews/research tabs in the allowed/default File25 sections."
+    },
+    {
+      "id": "CI-PHP80-HARNESS",
+      "rounds": [],
+      "description": "New reflection-based test initially failed on PHP8.0 private method invocation.",
+      "fix": "Set ReflectionMethod accessible for PHP8.0; code was not the cause."
+    }
+  ],
+  "delegated": [
+    {
+      "round": 788,
+      "owner": 20,
+      "detail": "File20 actual current source emits .sabri-shell-skip-link linking to #sabri-shell-main-content from class-renderer.php; File25 must not duplicate structural skip."
+    }
+  ],
+  "pending_external": [
+    "File08 public-user-to-booking destination owner contract",
+    "File17 target-bound Follow action owner contract",
+    "Canonical extended non-post native Timeline providers",
+    "Installed staging version/DB/migration/role/accessibility evidence",
+    "Founder acceptance and live deployed parity"
+  ],
+  "verification": {
+    "git_source_only": true,
+    "exact_ci": "CHECK_LATEST_HEAD_EXTERNALLY",
+    "installed_staging_verified": false,
+    "live_deployed_version_verified": false,
+    "live_db_verified": false,
+    "migration_verified": false,
+    "live_retest_verified": false
+  },
+  "rounds": [
+    {
+      "round": 755,
+      "scope": "HTML global public-visibility guard",
+      "source": "includes/class-profile-renderer.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 756,
+      "scope": "REST profile global visibility parity",
+      "source": "includes/class-rest-controller.php",
+      "result": "SOURCE_DEFECT_CORRECTED_PENDING_EXACT_HEAD_QA"
+    },
+    {
+      "round": 757,
+      "scope": "REST timeline global visibility parity",
+      "source": "includes/class-rest-controller.php",
+      "result": "SOURCE_DEFECT_CORRECTED_PENDING_EXACT_HEAD_QA"
+    },
+    {
+      "round": 758,
+      "scope": "REST Knowledge/Media global visibility parity",
+      "source": "includes/class-rest-controller.php",
+      "result": "SOURCE_DEFECT_CORRECTED_PENDING_EXACT_HEAD_QA"
+    },
+    {
+      "round": 759,
+      "scope": "REST disabled Timeline tab enforcement",
+      "source": "includes/class-rest-controller.php",
+      "result": "SOURCE_DEFECT_CORRECTED_PENDING_EXACT_HEAD_QA"
+    },
+    {
+      "round": 760,
+      "scope": "REST disabled Knowledge/Media tab enforcement",
+      "source": "includes/class-rest-controller.php",
+      "result": "SOURCE_DEFECT_CORRECTED_PENDING_EXACT_HEAD_QA"
+    },
+    {
+      "round": 761,
+      "scope": "HTML disabled profile-local search",
+      "source": "includes/class-profile-renderer.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 762,
+      "scope": "REST disabled profile-local search",
+      "source": "includes/class-rest-controller.php",
+      "result": "SOURCE_DEFECT_CORRECTED_PENDING_EXACT_HEAD_QA"
+    },
+    {
+      "round": 763,
+      "scope": "Founder/Doctor/Member canonical routes",
+      "source": "includes/class-profile-repository.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 764,
+      "scope": "Mismatched route canonical redirect",
+      "source": "includes/class-profile-renderer.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 765,
+      "scope": "Public REST GET-only contract",
+      "source": "includes/class-rest-controller.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 766,
+      "scope": "REST permission callback",
+      "source": "includes/class-rest-controller.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 767,
+      "scope": "REST bounded rate limiter",
+      "source": "includes/class-rest-controller.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 768,
+      "scope": "REST no-store privacy cache",
+      "source": "includes/class-rest-controller.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 769,
+      "scope": "ETag and Last-Modified semantics",
+      "source": "includes/class-rest-controller.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 770,
+      "scope": "File00 membership assertion owner",
+      "source": "includes/class-native-integration.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 771,
+      "scope": "File03 public profile DTO owner",
+      "source": "includes/class-native-integration.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 772,
+      "scope": "File09 doctor verification owner",
+      "source": "includes/class-native-integration.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 773,
+      "scope": "No duplicate Timeline writes",
+      "source": "includes/class-timeline-service.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 774,
+      "scope": "Same-site canonical Timeline destination",
+      "source": "includes/class-timeline-service.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 775,
+      "scope": "OpenGraph same-site media",
+      "source": "includes/class-profile-renderer.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 776,
+      "scope": "Filtered timeline noindex",
+      "source": "includes/class-profile-renderer.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 777,
+      "scope": "Section max 24 candidate bound",
+      "source": "includes/class-section-service.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 778,
+      "scope": "Section response atomicity",
+      "source": "includes/class-section-service.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 779,
+      "scope": "Section card deduplication",
+      "source": "includes/class-section-service.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 780,
+      "scope": "Provider no-native-ownership law",
+      "source": "includes/class-section-registry.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 781,
+      "scope": "Card canonical public URL sanitization",
+      "source": "includes/class-content-cards.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 782,
+      "scope": "Public card field allowlist",
+      "source": "includes/class-content-cards.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 783,
+      "scope": "Accessible Share feedback",
+      "source": "assets/js/public.js",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 784,
+      "scope": "Browser Back scroll restoration",
+      "source": "assets/js/public.js",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 785,
+      "scope": "Keyboard focus styling",
+      "source": "assets/css/public.css",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 786,
+      "scope": "Reduced motion styling",
+      "source": "assets/css/public.css",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 787,
+      "scope": "Responsive media rules",
+      "source": "assets/css/public.css",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 788,
+      "scope": "Skip-to-main navigation ownership",
+      "source": "File20 class-renderer.php",
+      "result": "DELEGATED_CONFIRMED_IN_FILE20"
+    },
+    {
+      "round": 789,
+      "scope": "File25 Safe Mode fallback",
+      "source": "includes/class-safe-mode.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 790,
+      "scope": "Upgrade-manager schema flow",
+      "source": "includes/class-upgrade-manager.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 791,
+      "scope": "Admin REST permission gate",
+      "source": "includes/class-plan-completion.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 792,
+      "scope": "High-risk rebuild gate",
+      "source": "includes/class-plan-completion.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 793,
+      "scope": "Reversible legacy redirect mapping",
+      "source": "includes/class-plan-completion.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    },
+    {
+      "round": 794,
+      "scope": "Visual acceptance contract",
+      "source": "includes/class-visual-acceptance.php",
+      "result": "SOURCE_WITNESS_FOUND_NOT_LIVE_VERIFIED"
+    }
+  ]
+}

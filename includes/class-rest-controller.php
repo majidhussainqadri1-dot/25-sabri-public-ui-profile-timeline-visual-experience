@@ -239,19 +239,30 @@ final class Rest_Controller
 
     private function profile_response(?WP_User $user, ?WP_REST_Request $request = null): WP_REST_Response
     {
+        if (! self::public_surface_enabled()) {
+            return $this->response(['code' => 'profile_not_found'], 404, $request);
+        }
         $profile = $user instanceof WP_User ? $this->profiles->get_public_profile($user) : null;
         if ($profile === null) {
             return $this->response(['code' => 'profile_not_found'], 404, $request);
         }
 
-        return $this->response($profile, 200, $request);
+        // REST and HTML must honor the same administrator-selected tabs.
+        return $this->response(Plan_Completion::apply_profile_preferences($profile), 200, $request);
     }
 
     private function timeline_response(?WP_User $user, WP_REST_Request $request): WP_REST_Response
     {
+        if (! self::public_surface_enabled('timeline')) {
+            return $this->response(['code' => 'profile_not_found'], 404, $request);
+        }
         $profile = $user instanceof WP_User ? $this->profiles->get_public_profile($user) : null;
         if (! $user instanceof WP_User || $profile === null) {
             return $this->response(['code' => 'profile_not_found'], 404, $request);
+        }
+
+        if (! self::public_search_enabled((string) $request['search'])) {
+            return $this->response(['code' => 'profile_search_disabled'], 400, $request);
         }
 
         $result = $this->timeline->get_for_author((int) $user->ID, [
@@ -280,7 +291,9 @@ final class Rest_Controller
     private function section_response(?WP_User $user, string $section, ?WP_REST_Request $request = null): WP_REST_Response
     {
         $section = sanitize_key($section);
-        if (! in_array($section, ['knowledge', 'media'], true)) {
+        if (! in_array($section, ['knowledge', 'media'], true)
+            || ! self::public_surface_enabled($section)
+        ) {
             return $this->response(['code' => 'section_not_found'], 404, $request);
         }
 
@@ -299,6 +312,28 @@ final class Rest_Controller
             'truncated' => $result['truncated'],
             'partial' => $result['provider_error_count'] > 0,
         ], 200, $request);
+    }
+
+    /**
+     * Public REST responses must honor the same opt-out and tab visibility
+     * decisions used by the server-rendered profile. This never grants File 03
+     * visibility; native owner authorization is still enforced separately.
+     */
+    private static function public_surface_enabled(string $section = ''): bool
+    {
+        $preferences = Plan_Completion::preferences();
+        if (($preferences['public_visibility'] ?? false) !== true) {
+            return false;
+        }
+
+        return $section === '' || in_array(
+            $section, (array) ($preferences['enabled_public_tabs'] ?? []), true
+        );
+    }
+
+    private static function public_search_enabled(string $query): bool
+    {
+        return $query === '' || Plan_Completion::preferences()['profile_local_search'] === true;
     }
 
     /** @param array<string,mixed> $data */
