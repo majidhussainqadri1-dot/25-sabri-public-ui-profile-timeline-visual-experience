@@ -131,6 +131,22 @@ final class Profile_Data
         return $result;
     }
 
+    /**
+     * Preserve native owner truth. Presentation filters may hide approved text
+     * but may not expand blank fields or substitute an unapproved message.
+     */
+    public static function monotonic_owner_text(mixed $approved, mixed $proposed, int $limit): string
+    {
+        $source = self::text($approved, $limit);
+        if ($source === '') {
+            return '';
+        }
+        if (! is_scalar($proposed)) {
+            return $source;
+        }
+        return self::text($proposed, $limit) === '' ? '' : $source;
+    }
+
     private static function text(mixed $value, int $limit): string
     {
         if (! is_scalar($value)) {
