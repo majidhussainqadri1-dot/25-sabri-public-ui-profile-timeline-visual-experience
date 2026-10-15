@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — 2026-10-15 — Reviews 795–834 SEO/privacy scope
+
+- Forty new independently targeted source checks; five SEO/privacy source defects corrected.
+- Limit File25 `wp_robots` override to its own routes; enforce noindex/noarchive and no social metadata for owner-only private profiles.
+- Preserve existing `nofollow=true` and require exact boolean true for member search indexing opt-in.
+- PHP8.0/PHP8.3 behavioural tests; baseline requirements and owner boundaries retained.
+- No live deployment, staging acceptance, database or migration verification is asserted.
+
+
 ## Unreleased — 2026-10-15 — Reviews 755–794 REST/public-policy parity
 
 - Forty distinct source inspections: six REST configuration/visibility gaps corrected; Skip Link confirmed File20-owned rather than duplicated.
