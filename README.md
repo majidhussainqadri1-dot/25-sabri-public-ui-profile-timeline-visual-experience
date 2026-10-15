@@ -16,7 +16,13 @@ Forty separate source-level completeness inspections were performed against File
 - Neither staging, production, DB/schema/migration state nor exact live deployed parity is verified.
 
 
-## Corrective candidate — Reviews 755–794 (15 October 2026)
+## Latest source corrective candidate — Reviews 795–834 (15 October 2026)
+
+The forty source inspections in `config/review795-834-seo-privacy-boundary-audit.json` identified and corrected **five** File25-owned privacy/SEO issues: File25's global robots filter improperly affected non-File25 pages; private owner-visible profiles lacked mandatory noindex; such profiles could emit social/structured metadata; an existing nofollow could be cleared; member-profile indexing accepted truthy, non-boolean plugin values. These are five source defects corrected on the unmerged branch, not live incidents proven resolved. `tests/review795-834-seo-scope-privacy.php` exercises actual PHP behavior on PHP 8.0 and 8.3. Full report: `docs/REVIEWS-795-834-SEO-PRIVACY-SCOPE-2026-10-15.md`.
+
+The review also confirmed that RTL is implemented via logical CSS and the File25 direction class; File20 already owns the global skip link. External File08 booking/File17 Follow destination APIs, richer native Timeline, real-role staging, exact deployed checksum, live DB/schema/migration and live re-test remain pending. This candidate is **stacked on unmerged PRs #21 and #20**; a green source CI does not establish production parity.
+
+## Earlier source corrective candidate — Reviews 755–794 (15 October 2026)
 
 - **40 distinct source inspections**, not forty deployed end-to-end journeys. Six REST-facing policy gaps were corrected and one separate default-tab omission was found and corrected after the scoped checks.
 - Public GET profiles, Timelines, Knowledge and Media now consistently honor File 25 `public_visibility` and administrator-approved enabled public tabs; disabled profile-local search cannot be bypassed through REST.
