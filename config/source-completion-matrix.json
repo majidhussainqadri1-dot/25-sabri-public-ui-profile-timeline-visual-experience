@@ -392,18 +392,6 @@
         "docs/REVIEWS-695-714-TIMELINE-INTEGRITY-2026-10-09.md",
         "tests/review695-714-timeline-integrity.php"
       ]
-    },
-    {
-      "id": "F25-R755-R794-REST-PUBLIC-PREFERENCE-PARITY",
-      "source": "File25 Final Harmonized 2.0 §§29/55-68/71-72; Central Plan global public access and privacy",
-      "status": "implemented-on-unmerged-review-branch-pending-exact-head-ci",
-      "summary": "Public REST profile/timeline/knowledge/media honor File25 public_visibility and enabled_public_tabs; profile-local search opt-out also enforced. Restored plan-defined Reviews/Research tab options; no native owner data changes.",
-      "evidence": [
-        "includes/class-rest-controller.php",
-        "includes/class-plan-completion.php",
-        "tests/review755-794-rest-policy-parity.php",
-        "config/review755-794-rest-public-policy-audit.json"
-      ]
     }
   ],
   "current_repository_audit": {
@@ -424,5 +412,20 @@
     "dependency_rounds": [
       714
     ]
-  }
+  },
+  "followup_audits": [
+    {
+      "record_class": "source-review-extension-not-base-requirement",
+      "id": "F25-R755-R794-REST-PUBLIC-PREFERENCE-PARITY",
+      "source": "File25 Final Harmonized 2.0 §§29/55-68/71-72; Central Plan global public access and privacy",
+      "status": "implemented-on-unmerged-review-branch-pending-exact-head-ci",
+      "summary": "Public REST profile/timeline/knowledge/media honor File25 public_visibility and enabled_public_tabs; profile-local search opt-out also enforced. Restored plan-defined Reviews/Research tab options; no native owner data changes.",
+      "evidence": [
+        "includes/class-rest-controller.php",
+        "includes/class-plan-completion.php",
+        "tests/review755-794-rest-policy-parity.php",
+        "config/review755-794-rest-public-policy-audit.json"
+      ]
+    }
+  ]
 }
