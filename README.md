@@ -79,7 +79,7 @@ The audited baseline main `e35563b7...` passed exact-head CI run `1689`. The fin
 ## Current ownership and compatibility boundaries
 
 - **File 03:** profile master/public projection, contact consent, canonical public media and canonical profile identity remain File 03-owned.
-- **File 08:** current main `70541974ce0ffb16aebef557c3016eb7447662f4`; no reviewed profile-user→booking-destination API is published, so **Appointment remains hidden**.
+- **File 08:** reviewed current main `9dcc8d16ea81d0bbd27184e71bc09ba04d30ba03`, source runtime `1.2.16`; public clinic contract `1.1.0` remains within the File 25 supported family. No reviewed profile-user→booking-destination API is published, so **Appointment remains hidden**. This is source-only evidence, not staging parity.
 - **File 09:** current main `cfc5f781a766330314dc98c42abeca0eb7786eba`, runtime `1.3.0`, schema `6`, integration contract `1.1.0`; Doctor-verification truth remains File 09-owned.
 - **File 14:** current main `080e2198d84dfb7491bb0b75946e14a5fe118b91`, runtime `1.4.8`, schema `10005`; File 14 remains within File 25's reviewed compatibility family.
 - **File 17:** current main `8ae656e51796d1f05865d8be5dca2480443d79ca`; **Follow remains hidden** without a target-bound owner contract.
