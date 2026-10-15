@@ -16,7 +16,17 @@ Forty separate source-level completeness inspections were performed against File
 - Neither staging, production, DB/schema/migration state nor exact live deployed parity is verified.
 
 
-## Current corrective candidate — Reviews 695–714
+## Corrective candidate — Reviews 755–794 (15 October 2026)
+
+- **40 distinct source inspections**, not forty deployed end-to-end journeys. Six REST-facing policy gaps were corrected and one separate default-tab omission was found and corrected after the scoped checks.
+- Public GET profiles, Timelines, Knowledge and Media now consistently honor File 25 `public_visibility` and administrator-approved enabled public tabs; disabled profile-local search cannot be bypassed through REST.
+- `reviews` and `research` are available in the governed tab preference schema, without fabricating native content or provider publication approval.
+- The apparent Skip Link omission was ruled out: File 20 owns and renders the global skip link and target.
+- Executable regression: `tests/review755-794-rest-policy-parity.php`; audit: `config/review755-794-rest-public-policy-audit.json` and `docs/REVIEWS-755-794-REST-PUBLIC-POLICY-PARITY-2026-10-15.md`.
+- Corrective branch is stacked on the still-unmerged PR #20; this and other draft branches must not be mistaken for GitHub main or the installed plugin.
+- **Source QA only:** Exact latest-branch CI must be checked independently. No staging/production approval, live DB/schema/migration or deployed-code parity is asserted.
+
+## Historical corrective candidate — Reviews 695–714
 
 - Runtime: `0.15.0` (source package version unchanged).
 - Frozen main audit baseline: `3075224089506fed19af1441ebf3556c2d5230b5`.
