@@ -264,16 +264,21 @@ final class Profile_Renderer
         $profile = (array) ($GLOBALS['sabri_public_experience_profile'] ?? []);
         $profile_class = sanitize_key((string) ($profile['class'] ?? ''));
         $professional = in_array($profile_class, ['founder', 'doctor'], true);
-        $member_indexing = $profile !== [] && (bool) apply_filters(
+        $member_indexing = $profile !== [] && apply_filters(
             'sabri_public_experience/index_nonprofessional_profile',
             false,
             $profile
-        );
+        ) === true;
 
-        if (is_404() || $filtered || (! $professional && ! $member_indexing)) {
+        if (is_404() || $filtered || Plan_Completion::preferences()['public_visibility'] !== true
+            || (! $professional && ! $member_indexing)
+        ) {
             $robots['noindex'] = true;
             $robots['noarchive'] = true;
-            $robots['nofollow'] = is_404();
+            // Do not weaken an earlier privacy/security nofollow directive.
+            if (is_404()) {
+                $robots['nofollow'] = true;
+            }
         }
 
         return $robots;
@@ -285,6 +290,7 @@ final class Profile_Renderer
             || is_404()
             || empty($GLOBALS['sabri_public_experience_profile'])
             || Plan_Completion::preferences()['seo_enabled'] !== true
+            || Plan_Completion::preferences()['public_visibility'] !== true
             || ! empty($GLOBALS['sabri_public_experience_context']['preview_mode'])
         ) {
             return;

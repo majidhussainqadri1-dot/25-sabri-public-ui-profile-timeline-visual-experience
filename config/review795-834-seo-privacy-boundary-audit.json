@@ -1,0 +1,325 @@
+{
+  "module": 25,
+  "inspection_range": "795-834",
+  "date": "2026-10-15",
+  "source_baseline": {
+    "main": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+    "stacked_parent_branch": "fix/file25-r755-794-rest-public-visibility-parity-20261015",
+    "stacked_parent_sha": "7ed66229bed5b6825378eed1046477fc4be40ed9"
+  },
+  "governing_sources": [
+    "File25 Complete Public UI, Profile Timeline and Visual Experience Final v2.0 §§29,30,60,65,68,72,80-90 and 7 Aug 70-requirement addendum",
+    "Sabri Social Homeopathy Platform Three Central Plans Consolidated Governing Master Plan (source-of-truth, privacy, SEO, no-duplicate ownership, release gates)",
+    "File08 public clinic 1.1.0 and source v1.2.16 (repository HEAD 9dcc8d16...)",
+    "File20 shell main 8a4dbcaf... contains Skip Link in class-renderer.php",
+    "File21 main f2eb7e95... holds native post timeline"
+  ],
+  "type": "40 distinct targeted source inspections, NOT forty full test passes or staging/live acceptance",
+  "totals": {
+    "inspections": 40,
+    "source_presence": 32,
+    "confirmed_source_defects_corrected": 5,
+    "delegated_to_native_owner": 1,
+    "unverified_external_gates": 2
+  },
+  "root_cause": "Two independently registered global wp_robots filters had inconsistent scoping and privacy decisions: Plan_Completion was able to noindex unrelated site pages, while owner-visible private profiles could emit indexable robots/OG data. Renderer also coerced truthy indexing opt-ins and weakened preexisting nofollow.",
+  "changes": [
+    "Restrict Plan_Completion::profile_robots to canonical File25 profile route",
+    "Noindex/noarchive owner-only public-disabled profile output",
+    "Suppress OG, canonical and JSON-LD emission for globally nonpublic profiles",
+    "Preserve stricter prior nofollow; on 404 require true",
+    "Require strict true from nonprofessional indexing opt-in filter"
+  ],
+  "regression": "tests/review795-834-seo-scope-privacy.php",
+  "statuses": {
+    "source_branch": "corrective candidate",
+    "git_main": "not merged",
+    "staging": "not verified",
+    "live_deployed_artifact": "not verified",
+    "live_db_schema": "not verified",
+    "migration": "not verified",
+    "live_retest": "not verified"
+  },
+  "rounds": [
+    {
+      "review": 795,
+      "topic": "Founder/Doctor/Member route disambiguation",
+      "evidence": "includes/class-profile-router.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 796,
+      "topic": "Canonical role mismatch redirect",
+      "evidence": "includes/class-profile-renderer.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 797,
+      "topic": "Unavailable profile fail-closed",
+      "evidence": "includes/class-profile-renderer.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 798,
+      "topic": "Owner/Admin preview authorization",
+      "evidence": "includes/class-plan-completion.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 799,
+      "topic": "Server HTML public-visibility switch",
+      "evidence": "includes/class-profile-renderer.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 800,
+      "topic": "REST public-visibility switch",
+      "evidence": "includes/class-rest-controller.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 801,
+      "topic": "SEO noindex isolated from unrelated WordPress pages",
+      "evidence": "includes/class-plan-completion.php",
+      "finding": "confirmed-source-defect-fixed",
+      "comment": "Root cause fixed in this stacked corrective branch; PHP regression added."
+    },
+    {
+      "review": 802,
+      "topic": "Owner-only hidden profile robots noindex",
+      "evidence": "includes/class-profile-renderer.php",
+      "finding": "confirmed-source-defect-fixed",
+      "comment": "Root cause fixed in this stacked corrective branch; PHP regression added."
+    },
+    {
+      "review": 803,
+      "topic": "Owner-only hidden profile prevents OpenGraph/JSON-LD",
+      "evidence": "includes/class-profile-renderer.php",
+      "finding": "confirmed-source-defect-fixed",
+      "comment": "Root cause fixed in this stacked corrective branch; PHP regression added."
+    },
+    {
+      "review": 804,
+      "topic": "No weakening of earlier nofollow",
+      "evidence": "includes/class-profile-renderer.php",
+      "finding": "confirmed-source-defect-fixed",
+      "comment": "Root cause fixed in this stacked corrective branch; PHP regression added."
+    },
+    {
+      "review": 805,
+      "topic": "Exact boolean nonprofessional indexing opt-in",
+      "evidence": "includes/class-profile-renderer.php",
+      "finding": "confirmed-source-defect-fixed",
+      "comment": "Root cause fixed in this stacked corrective branch; PHP regression added."
+    },
+    {
+      "review": 806,
+      "topic": "Native approved public-profile eligibility",
+      "evidence": "includes/class-profile-repository.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 807,
+      "topic": "File03 contract-version owner projection",
+      "evidence": "includes/class-native-integration.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 808,
+      "topic": "No independent WordPress bio fallback",
+      "evidence": "includes/class-profile-repository.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 809,
+      "topic": "No independent WordPress display-name fallback",
+      "evidence": "includes/class-profile-repository.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 810,
+      "topic": "Monotonic File03 public bio/headline",
+      "evidence": "includes/class-profile-repository.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 811,
+      "topic": "Minor contact refusal",
+      "evidence": "includes/class-visibility-policy.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 812,
+      "topic": "Approved File03 contact consent",
+      "evidence": "includes/class-visibility-policy.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 813,
+      "topic": "File09 doctor verification authoritative",
+      "evidence": "includes/class-native-integration.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 814,
+      "topic": "File08 public clinic read adapter",
+      "evidence": "includes/class-native-integration.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 815,
+      "topic": "Safe same-origin canonical URL",
+      "evidence": "includes/class-profile-renderer.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 816,
+      "topic": "Filtered Timeline noindex",
+      "evidence": "includes/class-profile-renderer.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 817,
+      "topic": "Pagination secondary pages noindex",
+      "evidence": "includes/class-profile-renderer.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 818,
+      "topic": "Owner-safe OpenGraph avatar URL",
+      "evidence": "includes/class-profile-renderer.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 819,
+      "topic": "Public REST response no-store",
+      "evidence": "includes/class-rest-controller.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 820,
+      "topic": "Conditional ETag handling",
+      "evidence": "includes/class-rest-controller.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 821,
+      "topic": "Bounded public REST rate limiter",
+      "evidence": "includes/class-rest-controller.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 822,
+      "topic": "REST permission callback",
+      "evidence": "includes/class-rest-controller.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 823,
+      "topic": "REST tab visibility parity",
+      "evidence": "includes/class-rest-controller.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 824,
+      "topic": "REST search opt-out parity",
+      "evidence": "includes/class-rest-controller.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 825,
+      "topic": "Timeline provider batch validation",
+      "evidence": "includes/class-timeline-service.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 826,
+      "topic": "Normalized DTO public output",
+      "evidence": "includes/class-normalized-timeline-item.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 827,
+      "topic": "Duplicate canonical timeline normalization",
+      "evidence": "includes/class-timeline-service.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 828,
+      "topic": "Bounded timeline candidates/pagination",
+      "evidence": "includes/class-timeline-service.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 829,
+      "topic": "File24 security integration module",
+      "evidence": "includes/class-file-24-integration.php",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 830,
+      "topic": "File20 global Skip Link owned externally",
+      "evidence": "File20 includes/class-renderer.php",
+      "finding": "native-owner-delegated",
+      "comment": "File20 renders a skip link and content anchor; not a File25 duplicate."
+    },
+    {
+      "review": 831,
+      "topic": "RTL through logical CSS and design-system direction",
+      "evidence": "assets/css/public.css; assets/css/design-system.css; includes/class-design-system.php",
+      "finding": "source-evidence-present",
+      "comment": "Logical margin/padding CSS plus File25 direction class cover RTL; first narrow search was false negative."
+    },
+    {
+      "review": 832,
+      "topic": "Reduced-motion support",
+      "evidence": "assets/css/public.css",
+      "finding": "source-evidence-present",
+      "comment": null
+    },
+    {
+      "review": 833,
+      "topic": "File08 Booking and File17 Follow owner destination acceptance",
+      "evidence": "File08 and File17 native contracts",
+      "finding": "external-evidence-unverified",
+      "comment": null
+    },
+    {
+      "review": 834,
+      "topic": "Exact deployed DB/schema/migration and live/staging parity",
+      "evidence": "Installed WordPress runtime and Hostinger DB",
+      "finding": "external-evidence-unverified",
+      "comment": null
+    }
+  ]
+}
