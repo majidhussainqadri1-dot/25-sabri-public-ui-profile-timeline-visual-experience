@@ -41,6 +41,9 @@ $check = static function (bool $ok, string $reason) use (&$failures): void {
 };
 $surface = new ReflectionMethod(Rest_Controller::class, 'public_surface_enabled');
 $search = new ReflectionMethod(Rest_Controller::class, 'public_search_enabled');
+// PHP 8.0 still requires explicit access for private-method regression tests.
+$surface->setAccessible(true);
+$search->setAccessible(true);
 
 // Default public availability; preserve both native-owner and admin decisions.
 $GLOBALS['file25_rest_policy_options'] = [];
