@@ -1,5 +1,14 @@
 # Changelog
 
+
+## Unreleased — 2026-10-15 — Forty-scope public-profile ownership correction
+
+- File 25 privacy source audit (40 focused inspections) identified four public-profile text authority defects; evidence in `docs/REVIEWS-715-754-FORTY-SCOPE-PRIVACY-BOUNDARY-2026-10-15.md`.
+- Removed unaudited WordPress `description` and `display_name` fallbacks when File 03 public fields are absent.
+- Public biography/headline presentation filters may only retain or redact File 03-approved text; they may not substitute or expand it.
+- Added regression assertions; live deploy, staging, migration and DB truth remain unverified.
+
+
 ## 0.15.0 — Reviews 695–714: Source Timeline Integrity — 2026-10-09
 
 - **Time-bound pinning:** enforce exact `profile-timeline` surface and active UTC audit interval; unapproved/out-of-window pins rank as unpinned without hiding public items.

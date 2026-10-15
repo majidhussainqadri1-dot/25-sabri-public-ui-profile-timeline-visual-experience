@@ -97,7 +97,7 @@ final class Profile_Repository
             : (string) ($professional['specialization'] ?? $this->native->profile_value($user_id, 'specialty'));
         $bio = $profile_class === 'founder'
             ? (string) ($founder_source['introduction'] ?? $this->native->profile_value($user_id, 'bio', ''))
-            : $this->native->profile_value($user_id, 'bio', $user->description);
+            : $this->native->profile_value($user_id, 'bio', '');
 
         $show_professional_location = in_array($profile_class, ['founder', 'doctor', 'institution'], true);
         $country = $show_professional_location
@@ -121,9 +121,14 @@ final class Profile_Repository
         $projected_name = is_scalar($source_projection['display_name'] ?? null)
             ? (string) $source_projection['display_name']
             : '';
+        // Do not use the independent WordPress display_name when File 03
+        // has not authorized a public display name for this identity.
+        if ($profile_class !== 'founder' && trim(wp_strip_all_tags($projected_name)) === '') {
+            return null;
+        }
         $default_name = $profile_class === 'founder'
             ? self::FOUNDER_DISPLAY_NAME
-            : ($projected_name !== '' ? $projected_name : (string) $user->display_name);
+            : $projected_name;
         $badge = is_array($source_projection['badge'] ?? null) ? $source_projection['badge'] : [];
 
         $profile = [
@@ -160,8 +165,14 @@ final class Profile_Repository
         $profile['display_name'] = $profile_class === 'founder'
             ? self::FOUNDER_DISPLAY_NAME
             : $this->plain_text($default_name, 190);
-        $profile['headline'] = $this->plain_text((string) ($filtered['headline'] ?? $profile['headline']), 300);
-        $profile['bio'] = $this->plain_text((string) ($filtered['bio'] ?? $profile['bio']), 12000);
+        // Extension hooks may redact owner-approved public text, but cannot
+        // create a new or substituted headline/bio outside File 03 authority.
+        $profile['headline'] = Profile_Data::monotonic_owner_text(
+            $profile['headline'], $filtered['headline'] ?? $profile['headline'], 300
+        );
+        $profile['bio'] = Profile_Data::monotonic_owner_text(
+            $profile['bio'], $filtered['bio'] ?? $profile['bio'], 12000
+        );
         $profile['avatar_url'] = $this->monotonic_media_filter(
             $profile['avatar_url'],
             $filtered['avatar_url'] ?? $profile['avatar_url']
