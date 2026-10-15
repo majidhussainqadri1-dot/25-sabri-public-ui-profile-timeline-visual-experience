@@ -66,6 +66,10 @@ This record documents **40 separate evidence-anchored source inspections**, not 
 
 **Files corrected:** `includes/class-profile-repository.php`, `includes/class-profile-data.php`. **Behavioral/static regression assertions:** `tests/profile-data.php`.
 
+## Cross-file source refresh — File 08 (documentation drift, not a fifth File 25 runtime defect)
+
+File 08 `main` is now `9dcc8d16ea81d0bbd27184e71bc09ba04d30ba03`, source runtime `1.2.16`; the published public clinic contract remains `1.1.0`. The File 25 supported source range `>=1.2.0 <1.3.0` and public projection versions `1.0.0/1.1.0` remain compatible on source inspection. The historical Reviews 615–634/635–654 snapshots of the prior File 08 SHA are deliberately not rewritten. Installed staging parity still needs proof.
+
 ## Unresolved external contracts, not File 25-owned patches
 
 - File 08 has no reviewed user-specific public-to-booking destination contract; Appointment must remain hidden when unavailable.
