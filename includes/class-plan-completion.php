@@ -891,7 +891,18 @@ final class Plan_Completion
     /** @param array<string,bool> $robots @return array<string,bool> */
     public function profile_robots(array $robots): array
     {
-        if (self::preferences()['seo_enabled'] !== true || ! empty($GLOBALS['sabri_public_experience_context']['preview_mode'])) {
+        // This hook runs on *every* WordPress page. File 25 has authority only
+        // over its own public profile routes; never noindex File 20, File 21,
+        // editorial/news, or unrelated owner pages due to File 25 preferences.
+        if (! (new Profile_Router())->is_profile_request()) {
+            return $robots;
+        }
+
+        $preferences = self::preferences();
+        if ($preferences['seo_enabled'] !== true
+            || $preferences['public_visibility'] !== true
+            || ! empty($GLOBALS['sabri_public_experience_context']['preview_mode'])
+        ) {
             $robots['noindex'] = true;
             $robots['noarchive'] = true;
         }
