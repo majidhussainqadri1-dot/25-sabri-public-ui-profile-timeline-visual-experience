@@ -56,7 +56,9 @@
       "tests/review915-954-rest-html-unicode-parity.php",
       "tests/review955-994-founder-timeline-rest-unicode.php",
       "tests/review995-1034-wordpress-post-approval.php",
-      "tests/review995-1034-rest-rate-storage.php"
+      "tests/review995-1034-rest-rate-storage.php",
+      "tests/review1035-1074-owner-capability-metrics.php",
+      "tests/review1035-1074-native-visibility.php"
     ]
   }
 }
