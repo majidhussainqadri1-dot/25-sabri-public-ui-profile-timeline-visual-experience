@@ -1,0 +1,384 @@
+{
+  "module": 25,
+  "range": {
+    "first": 915,
+    "last": 954,
+    "count": 40
+  },
+  "date": "2026-10-16",
+  "method": "40 distinct targeted source inspections mapped to governing File25 and Three Central Plans; not forty independent full runtime checks.",
+  "authority": [
+    "File25 Complete Public UI, Profile Timeline and Visual Experience Final (1).docx: §§3,5,9-11,17-25,56,60-61,68,72,75,80-90",
+    "Sabri Three Central Plans Consolidated Governing Master Plan 2026: §§1.1–1.2,3–4,13,20–25, QA/release gates",
+    "File03, File08, File09, File17, File20, File21, File24 canonical ownership boundaries"
+  ],
+  "source_heads": {
+    "file25_main": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+    "file25_parent_candidate": "aa18aae531fbd6b05a887673bf7d16cac38f6842",
+    "file03_main": "636e3ef965423887f810718abec3cd1c11c3659d",
+    "file08_main": "9dcc8d16ea81d0bbd27184e71bc09ba04d30ba03",
+    "file17_main": "8ae656e51796d1f05865d8be5dca2480443d79ca",
+    "file20_main": "8a4dbcaf4fef8e926b9b834ecfde16c21a0f00ca",
+    "file21_main": "f2eb7e95ddea327af36ea725ffb923b029f885e6"
+  },
+  "counts": {
+    "targeted_inspections": 40,
+    "source_witnesses": 27,
+    "failed_inspections_corrected": 13,
+    "distinct_root_cause_groups": 5,
+    "unresolved_within_corrective_source_scope": 0,
+    "staging_tests_executed": 0,
+    "live_retests_executed": 0
+  },
+  "root_causes": [
+    {
+      "rounds": [
+        916,
+        917,
+        918,
+        919
+      ],
+      "issue": "Fourteen allowed tabs but limit 12 on admin save, silently loses PDFs/Marketplace",
+      "fix": "Both governed list maxima raised from 12 to 14, testing persisted roundtrip."
+    },
+    {
+      "rounds": [
+        921,
+        922
+      ],
+      "issue": "Invalid public tab or optional provider list fell back to expansive full default, bypassing prior opt-outs",
+      "fix": "Fallback to overview-only or no optional providers on malformed explicit input."
+    },
+    {
+      "rounds": [
+        923,
+        924,
+        925
+      ],
+      "issue": "Malformed explicit privacy-sensitive booleans re-enabled public visibility/metrics/local search via true schema default",
+      "fix": "Fail-closed malformed settings; preserve explicit true/false and fresh-install defaults."
+    },
+    {
+      "rounds": [
+        935,
+        936,
+        937
+      ],
+      "issue": "120-byte checks prematurely excluded valid 120-character Urdu/Unicode REST search, REST topic and HTML topic",
+      "fix": "120 Unicode codepoints with bounded 480 raw UTF8 bytes in both REST and HTML; mbstring-independent codepoint fallback."
+    },
+    {
+      "rounds": [
+        939
+      ],
+      "issue": "REST topic allowed hidden bidi/format controls excluded by profile-local search",
+      "fix": "Use the same normalized strict Unicode and format-control policy for topic and search."
+    }
+  ],
+  "false_alarm": {
+    "round": 938,
+    "reason": "Preexisting Plan_Completion::normalize_search_query already rejects bidi override/format controls; not counted as a defect."
+  },
+  "tests": [
+    "tests/review915-954-preferences-privacy-unicode.php",
+    "tests/review915-954-rest-html-unicode-parity.php"
+  ],
+  "remaining_external": [
+    "Staging same-version installed runtime and exact checksum",
+    "Live plugin version, WordPress DB/schema and migration evidence",
+    "File08 booking and File17 Follow native target-bound contracts",
+    "Real-role staging QA, RTL/a11y and Founder acceptance",
+    "Merge -> package -> deploy -> live retest"
+  ],
+  "release_status": {
+    "main_merged": false,
+    "source_branch_corrected": true,
+    "staging_accepted": false,
+    "live_deployed_verified": false,
+    "db_version_verified": false,
+    "migration_state_verified": false,
+    "live_retested": false
+  },
+  "checks": [
+    {
+      "review": 915,
+      "scope": "Plan admits fourteen defined public sections",
+      "source": "includes/class-plan-completion.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 916,
+      "scope": "Enabled public tabs cap covers all fourteen",
+      "source": "includes/class-plan-completion.php",
+      "status": "source-gap-corrected-in-candidate",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 917,
+      "scope": "Featured section order cap covers all fourteen",
+      "source": "includes/class-plan-completion.php",
+      "status": "source-gap-corrected-in-candidate",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 918,
+      "scope": "Save roundtrip retains Marketplace tab",
+      "source": "includes/class-plan-completion.php",
+      "status": "source-gap-corrected-in-candidate",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 919,
+      "scope": "Save roundtrip retains PDF tab",
+      "source": "includes/class-plan-completion.php",
+      "status": "source-gap-corrected-in-candidate",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 920,
+      "scope": "Tab names restricted to canonical allow-list",
+      "source": "includes/class-plan-completion.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 921,
+      "scope": "Malformed enabled tabs cannot reopen hidden tabs",
+      "source": "includes/class-plan-completion.php",
+      "status": "source-gap-corrected-in-candidate",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 922,
+      "scope": "Malformed optional provider list cannot activate all",
+      "source": "includes/class-plan-completion.php",
+      "status": "source-gap-corrected-in-candidate",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 923,
+      "scope": "Malformed public_visibility fails closed",
+      "source": "includes/class-plan-completion.php",
+      "status": "source-gap-corrected-in-candidate",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 924,
+      "scope": "Malformed public_metrics fails closed",
+      "source": "includes/class-plan-completion.php",
+      "status": "source-gap-corrected-in-candidate",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 925,
+      "scope": "Malformed profile_local_search fails closed",
+      "source": "includes/class-plan-completion.php",
+      "status": "source-gap-corrected-in-candidate",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 926,
+      "scope": "File03 identity ownership and publication eligibility",
+      "source": "includes/class-visibility-policy.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 927,
+      "scope": "Minor public contact refusal",
+      "source": "includes/class-visibility-policy.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 928,
+      "scope": "No independent WordPress biography fallback",
+      "source": "includes/class-profile-repository.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 929,
+      "scope": "No independent WP display name fallback",
+      "source": "includes/class-profile-repository.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 930,
+      "scope": "Owner-only preview permission",
+      "source": "includes/class-plan-completion.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 931,
+      "scope": "Private preview noindex",
+      "source": "includes/class-profile-renderer.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 932,
+      "scope": "Server public visibility kill switch",
+      "source": "includes/class-profile-renderer.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 933,
+      "scope": "REST public visibility kill switch",
+      "source": "includes/class-rest-controller.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 934,
+      "scope": "Native enabled tab allow-list applied",
+      "source": "includes/class-plan-completion.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 935,
+      "scope": "120-Unicode-character REST search budget",
+      "source": "includes/class-rest-controller.php",
+      "status": "source-gap-corrected-in-candidate",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 936,
+      "scope": "120-Unicode-character REST topic budget",
+      "source": "includes/class-rest-controller.php",
+      "status": "source-gap-corrected-in-candidate",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 937,
+      "scope": "HTML topic matches Unicode character budget",
+      "source": "includes/class-profile-renderer.php",
+      "status": "source-gap-corrected-in-candidate",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 938,
+      "scope": "Normalize search rejects Unicode bidi overrides",
+      "source": "includes/class-plan-completion.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 939,
+      "scope": "REST topic rejects hidden Unicode controls",
+      "source": "includes/class-rest-controller.php",
+      "status": "source-gap-corrected-in-candidate",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 940,
+      "scope": "REST/HTML normalized optional provider tabs",
+      "source": "includes/class-rest-controller.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 941,
+      "scope": "Local REST search opt-out honored",
+      "source": "includes/class-rest-controller.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 942,
+      "scope": "Malformed REST search rejected",
+      "source": "includes/class-rest-controller.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 943,
+      "scope": "Bounded REST page size",
+      "source": "includes/class-rest-controller.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 944,
+      "scope": "Private REST no-store response headers",
+      "source": "includes/class-rest-controller.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 945,
+      "scope": "File20 shell layout ownership",
+      "source": "includes/class-profile-router.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 946,
+      "scope": "File17 Follow requires owner destination",
+      "source": "includes/class-plan-completion.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 947,
+      "scope": "File08 booking URL requires owner contract",
+      "source": "includes/class-current-companion-2026-08-10.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 948,
+      "scope": "Native Section Provider identity consistency",
+      "source": "includes/class-section-registry.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 949,
+      "scope": "Public Section Card allow-list normalization",
+      "source": "includes/class-section-service.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 950,
+      "scope": "File25 does not create a global Search Engine",
+      "source": "includes/class-plan-completion.php",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 951,
+      "scope": "RTL and logical CSS",
+      "source": "assets/css/public.css",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 952,
+      "scope": "Reduced motion presentation",
+      "source": "assets/css/public.css",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 953,
+      "scope": "Staging acceptance not falsely promoted",
+      "source": "config/source-completion-matrix.json",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    },
+    {
+      "review": 954,
+      "scope": "Live deployed parity not falsely promoted",
+      "source": "config/source-completion-matrix.json",
+      "status": "source-witness-or-owned-boundary-verified",
+      "assurance": "targeted source inspection; not a full runtime/staging execution"
+    }
+  ]
+}
