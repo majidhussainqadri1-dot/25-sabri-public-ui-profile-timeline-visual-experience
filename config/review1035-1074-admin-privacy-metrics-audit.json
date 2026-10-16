@@ -1,0 +1,317 @@
+{
+  "schema": 1,
+  "module": "File25",
+  "date": "2026-10-17",
+  "review_range": {
+    "first": 1035,
+    "last": 1074,
+    "total": 40
+  },
+  "method": "40 separate target-to-source contract checks. A source witness is NOT an end-to-end proof or a pass against the exact deployed version.",
+  "plans": [
+    "File25 Complete Public UI Profile Timeline Visual Experience Final: §§40–48 author/public timeline, §64 security and object permissions, §65 privacy, §69 aggregate metric controls, §71 admin, §72 REST, §§80–90 QA/staging",
+    "Three Central Plans Consolidated Governing Master Plan 2026: §15 role constitution, §24 canonical ownership, §37 privacy lifecycle, §38 security architecture, §§48–50 acceptance",
+    "File03 public identity/consent, File08 clinic, File09 doctor verification, File17 Follow, File20 shell, File21 publication, File24 security controls"
+  ],
+  "baseline": {
+    "main": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+    "parent_unmerged_pr": 27,
+    "parent_sha": "6b4ab2eda27706a61819c455634f1142f574dbbd"
+  },
+  "counts": {
+    "specific_inspections": 40,
+    "positive_code_witnesses": 34,
+    "deficient_check_scopes": 6,
+    "distinct_source_root_causes": 3,
+    "corrected_source_check_scopes": 6,
+    "live_execution_attempted": false,
+    "staging_execution_attempted": false
+  },
+  "root_causes": [
+    {
+      "rounds": [
+        1035,
+        1036
+      ],
+      "issue": "Plan_Completion::can_operate trusted a filter-substituted capability instead of requiring the immutable owner/admin capability floor. A late extension could substitute 'read' for manage_options.",
+      "correction": "Require both original operation capability and any extension capability; extension may restrict but not downgrade.",
+      "regression": "tests/review1035-1074-owner-capability-metrics.php"
+    },
+    {
+      "rounds": [
+        1047,
+        1048
+      ],
+      "issue": "Native_Integration::public_visibility returned 'public' when a malformed visibility restriction filter was returned (and string-cast nonstring values, including arrays).",
+      "correction": "Strict type, exact valid key, approved visibility state; malformed response returns 'private'.",
+      "regression": "tests/review1035-1074-native-visibility.php"
+    },
+    {
+      "rounds": [
+        1055,
+        1056
+      ],
+      "issue": "Plan_Completion::public_metrics rewrote malformed owner metric minimum thresholds to zero, potentially displaying low-count aggregates under malformed privacy state.",
+      "correction": "Suppress the affected metric for invalid threshold; keep validated numeric thresholds and explicit owner's metric opt-outs.",
+      "regression": "tests/review1035-1074-owner-capability-metrics.php"
+    }
+  ],
+  "retained_owner_limits": [
+    "No extra owner DB or native File03/08/17/20/21 backend created",
+    "No alternate public identity or patient data introduced",
+    "File08 booking and File17 Follow owner native targets remain separate unaccepted gates"
+  ],
+  "checks": [
+    {
+      "round": 1035,
+      "requirement": "Immutable native owner capability floor on operations",
+      "source": "includes/class-plan-completion.php",
+      "result": "confirmed-source-gap-corrected-on-unmerged-branch"
+    },
+    {
+      "round": 1036,
+      "requirement": "Extension admin capability cannot reduce RBAC",
+      "source": "includes/class-plan-completion.php",
+      "result": "confirmed-source-gap-corrected-on-unmerged-branch"
+    },
+    {
+      "round": 1037,
+      "requirement": "Unauthenticated administrative API denied",
+      "source": "includes/class-plan-completion.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1038,
+      "requirement": "Additional extension capability checked separately",
+      "source": "includes/class-plan-completion.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1039,
+      "requirement": "High-risk authorization exact true required",
+      "source": "includes/class-plan-completion.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1040,
+      "requirement": "Unknown admin preference fields rejected",
+      "source": "includes/class-plan-completion.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1041,
+      "requirement": "Revision conflict (optimistic locking)",
+      "source": "includes/class-plan-completion.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1042,
+      "requirement": "REST mutation preflight gate",
+      "source": "includes/class-plan-completion.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1043,
+      "requirement": "Admin post nonce anti-CSRF",
+      "source": "includes/class-plan-completion.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1044,
+      "requirement": "Approved 14 public tabs administrative persistence",
+      "source": "includes/class-plan-completion.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1045,
+      "requirement": "Malformed critical public booleans fail closed",
+      "source": "includes/class-plan-completion.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1046,
+      "requirement": "File00 native assertions strictly typed",
+      "source": "includes/class-native-integration.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1047,
+      "requirement": "Malformed profile visibility hook fails closed",
+      "source": "includes/class-native-integration.php",
+      "result": "confirmed-source-gap-corrected-on-unmerged-branch"
+    },
+    {
+      "round": 1048,
+      "requirement": "Nonstring File03 visibility hook cannot cast to public",
+      "source": "includes/class-native-integration.php",
+      "result": "confirmed-source-gap-corrected-on-unmerged-branch"
+    },
+    {
+      "round": 1049,
+      "requirement": "File03 public profile contract binding",
+      "source": "includes/class-native-integration.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1050,
+      "requirement": "File09 Doctor verification native source",
+      "source": "includes/class-native-integration.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1051,
+      "requirement": "File08 Clinic projection version/owner boundary",
+      "source": "includes/class-native-integration.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1052,
+      "requirement": "File03 eligibility cannot be enlarged by visual filter",
+      "source": "includes/class-visibility-policy.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1053,
+      "requirement": "Minor contacts forced private",
+      "source": "includes/class-visibility-policy.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1054,
+      "requirement": "Global public metrics admin opt-out",
+      "source": "includes/class-plan-completion.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1055,
+      "requirement": "Malformed metric threshold never becomes zero",
+      "source": "includes/class-plan-completion.php",
+      "result": "confirmed-source-gap-corrected-on-unmerged-branch"
+    },
+    {
+      "round": 1056,
+      "requirement": "Below-threshold metric aggregate never leaks",
+      "source": "includes/class-plan-completion.php",
+      "result": "confirmed-source-gap-corrected-on-unmerged-branch"
+    },
+    {
+      "round": 1057,
+      "requirement": "Public metrics exact allowlisted keys",
+      "source": "includes/class-plan-completion.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1058,
+      "requirement": "Public metrics bounded integer value",
+      "source": "includes/class-plan-completion.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1059,
+      "requirement": "Public metric allow gate accepts exact true",
+      "source": "includes/class-plan-completion.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1060,
+      "requirement": "Profile robots hook scoped only to File25",
+      "source": "includes/class-plan-completion.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1061,
+      "requirement": "Private profile OG/JSONLD suppression",
+      "source": "includes/class-profile-renderer.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1062,
+      "requirement": "Private profile cache no-store",
+      "source": "includes/class-profile-renderer.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1063,
+      "requirement": "Unavailable profile uses 404/410 no-cache",
+      "source": "includes/class-profile-renderer.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1064,
+      "requirement": "Public REST visibility preference respected",
+      "source": "includes/class-rest-controller.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1065,
+      "requirement": "Public REST no-store cache headers",
+      "source": "includes/class-rest-controller.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1066,
+      "requirement": "REST quota storage failure rejected",
+      "source": "includes/class-rest-controller.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1067,
+      "requirement": "File20 structural shell ownership remains distinct",
+      "source": "includes/class-file-20-integration.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1068,
+      "requirement": "File24 centralized security integration separate",
+      "source": "includes/class-file-24-integration.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1069,
+      "requirement": "Same-origin canonical URL boundary",
+      "source": "includes/class-public-url.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1070,
+      "requirement": "Public Timeline author identity verification",
+      "source": "includes/class-timeline-service.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1071,
+      "requirement": "Timeline native provider metadata exact identity",
+      "source": "includes/class-timeline-service.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1072,
+      "requirement": "Section provider invalid batch atomicity",
+      "source": "includes/class-section-service.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1073,
+      "requirement": "Safe Mode prevents public indexing",
+      "source": "includes/class-safe-mode-public.php",
+      "result": "source-witness-reported-not-installed-proof"
+    },
+    {
+      "round": 1074,
+      "requirement": "No File25 duplicate File20 global header",
+      "source": "includes/class-file-20-integration.php",
+      "result": "source-witness-reported-not-installed-proof"
+    }
+  ],
+  "acceptance": {
+    "head_exact_ci": "pending-final-head-check",
+    "merge_to_main": false,
+    "staging": false,
+    "production_deployed": false,
+    "deployed_checksum_verified": false,
+    "db_schema_version": "unverified",
+    "migration_state": "unverified",
+    "founder_acceptance": false,
+    "live_retest": false
+  }
+}
