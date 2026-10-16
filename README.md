@@ -16,7 +16,16 @@ Forty separate source-level completeness inspections were performed against File
 - Neither staging, production, DB/schema/migration state nor exact live deployed parity is verified.
 
 
-## Latest source candidate — Reviews 995–1034 (16 October 2026)
+## Latest source candidate — Reviews 1035–1074 (17 October 2026)
+
+Forty new targeted source inspections against File25 Final, the Consolidated Three Central Plans and File03/08/09/17/20/21/24 owner boundaries revealed **six deficient requirement checks across three underlying defects**: owner administration could be lowered to `read` by the capability filter; malformed native File03 visibility restriction filters could restore public status; malformed metrics aggregation thresholds could become zero and expose low-count metrics. These source deficiencies have corrective implementations and two actual PHP regressions in this stacked **unmerged draft candidate**.
+
+- Detailed 40-row ledger: `config/review1035-1074-admin-privacy-metrics-audit.json`.
+- Technical report: `docs/REVIEWS-1035-1074-ADMIN-PRIVACY-METRICS-2026-10-17.md`.
+- Governed behavioral regressions: `tests/review1035-1074-owner-capability-metrics.php`, `tests/review1035-1074-native-visibility.php`.
+- Source checks are **not** 40 installed WordPress or live E2E tests. Hostinger deployed package, DB/migration parity, real role QA, Founder acceptance, File08 Booking, File17 Follow and controlled live re-test remain outstanding.
+
+## Previous source candidate — Reviews 995–1034 (16 October 2026)
 
 Forty new targeted plan/source inspections against File25, the consolidated governing plan and native File03/08/17/20/21 ownership: 36 existing source witnesses and four deficient check scopes in two root causes. Fixed File25's WordPress core post compatibility adapter so a public approval extension must return **strict boolean `true`** rather than any truthy value. Hardened public REST read rate limiting so missing storage, invalid bucket, or failed quota persistence produces safe retryable **503**, while a valid exceeded quota still returns **429**. This does not modify native File21 publishing or File24's global abuse authority.
 
