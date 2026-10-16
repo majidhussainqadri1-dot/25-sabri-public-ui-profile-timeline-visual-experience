@@ -163,12 +163,12 @@ final class Rest_Controller
             && function_exists('wp_cache_incr');
         $has_transients = function_exists('get_transient') && function_exists('set_transient');
         if (! $has_persistent_cache && ! $has_transients) {
-            return true;
+            return self::rate_limit_unavailable();
         }
 
         $bucket = self::request_rate_bucket($request, $window);
         if ($bucket === '') {
-            return true;
+            return self::rate_limit_unavailable();
         }
         $key = 'sabri_f25_rl_' . $bucket;
         $count = null;
@@ -187,10 +187,19 @@ final class Rest_Controller
         if ($count === null && $has_transients) {
             $stored = get_transient($key);
             $count = is_int($stored) && $stored > 0 ? $stored + 1 : 1;
-            set_transient($key, $count, $window);
+            // A failed quota write must not silently permit unlimited public
+            // Profile/Timeline reads. WordPress transients are best-effort
+            // under concurrency, but an explicit persistence failure is known.
+            if (set_transient($key, $count, $window) !== true) {
+                return self::rate_limit_unavailable();
+            }
         }
 
-        if ($count !== null && $count > $limit) {
+        if ($count === null) {
+            return self::rate_limit_unavailable();
+        }
+
+        if ($count > $limit) {
             return new WP_Error('sabri_public_rate_limited', __('Too many requests. Please try again shortly.', 'sabri-public-experience'), [
                 'status' => 429,
                 'retry_after' => $window,
@@ -198,6 +207,20 @@ final class Rest_Controller
         }
 
         return true;
+    }
+
+    /**
+     * Public rate limits are a security/reliability gate, not a best-effort
+     * cosmetic feature. Never claim the request is rate-limited when no
+     * enforceable bucket exists. The 503 is intentionally safe and retryable.
+     */
+    private static function rate_limit_unavailable(): WP_Error
+    {
+        return new WP_Error(
+            'sabri_public_rate_storage_unavailable',
+            __('Public profiles are temporarily unavailable. Please retry shortly.', 'sabri-public-experience'),
+            ['status' => 503, 'retry_after' => 30]
+        );
     }
 
     public function get_founder_profile(?WP_REST_Request $request = null): WP_REST_Response
