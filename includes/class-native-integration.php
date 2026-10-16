@@ -677,9 +677,17 @@ final class Native_Integration
         }
 
         $visibility = 'public';
-        $filtered = sanitize_key((string) apply_filters('sabri_public_experience/profile_visibility', $visibility, $user_id));
-        if (! in_array($filtered, ['public', 'members', 'private'], true)) {
-            return $visibility;
+        // A malformed privacy-restriction response must not be interpreted as
+        // the original public state. Do not cast arrays/objects to strings.
+        $candidate = apply_filters('sabri_public_experience/profile_visibility', $visibility, $user_id);
+        if (! is_string($candidate) || $candidate === '' || strlen($candidate) > 64) {
+            return 'private';
+        }
+        $filtered = sanitize_key($candidate);
+        if (! hash_equals($filtered, $candidate)
+            || ! in_array($filtered, ['public', 'members', 'private'], true)
+        ) {
+            return 'private';
         }
         $rank = ['public' => 0, 'members' => 1, 'private' => 2];
 

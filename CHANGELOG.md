@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — 2026-10-17 — Reviews 1035–1074: owner RBAC, privacy and metric floors
+
+- Forty distinct source checks: 34 existing source witnesses, six deficient scopes in three root cause groups corrected.
+- Require original File25 admin capability AND any plugin extension capability (which may strengthen, never weaken, RBAC).
+- Malformed native File03 profile visibility hook output fails closed to private, never silently returns public.
+- Malformed native public metric minimum thresholds suppress the affected metric rather than reset to zero.
+- Two governed PHP8.0/PHP8.3 behavior tests. Exact deployed code/DB/migration state, staging and live acceptance remain unverified.
+
+
 ## Unreleased — 2026-10-16 — Reviews 995–1034 public publication and REST rate safeguards
 
 - Forty bounded source inspections: 36 source witnesses; four corrected security check scopes in two underlying root causes.
