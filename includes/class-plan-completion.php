@@ -422,7 +422,13 @@ final class Plan_Completion
         if (! function_exists('is_user_logged_in') || ! is_user_logged_in()) {
             return false;
         }
-        if (! current_user_can(self::capability_for($operation))) {
+        // An extension may demand a *stricter* capability, but must never
+        // replace the File 25 owner-admin capability with a weaker one
+        // (e.g. "read"). This floor is required for both REST and admin-post.
+        $owner_capability = self::OPERATION_CAPABILITIES[$operation] ?? 'manage_options';
+        if (! current_user_can($owner_capability)
+            || ! current_user_can(self::capability_for($operation))
+        ) {
             return false;
         }
         if (in_array($operation, ['rebuild_index', 'migration_execute', 'migration_rollback'], true)) {
@@ -785,7 +791,9 @@ final class Plan_Completion
             }
             $threshold = apply_filters('sabri_public_experience/public_metric_minimum', 0, $key, $user_id, $profile);
             if (! is_int($threshold) || $threshold < 0 || $threshold > self::MAX_METRIC_VALUE) {
-                $threshold = 0;
+                // Invalid privacy thresholds must suppress the count, never
+                // silently lower the aggregation threshold to zero.
+                continue;
             }
             if ($value < $threshold) {
                 continue;
