@@ -563,13 +563,19 @@ final class Rest_Controller
         if (! is_string($value)) {
             return null;
         }
-        $value = trim(wp_strip_all_tags($value));
+        if (strlen($value) > $maximum * 4) {
+            return null;
+        }
+        // Topic and profile-local search share the same bounded Unicode and
+        // format-control safety policy. A byte-count-only limit excludes valid
+        // Urdu and other non-ASCII requests well below 120 characters.
+        $clean = Plan_Completion::normalize_search_query($value);
+        $length = function_exists('mb_strlen')
+            ? mb_strlen($clean, 'UTF-8')
+            : preg_match_all('/./us', $clean);
 
-        return $value !== ''
-            && strlen($value) <= $maximum
-            && preg_match('/[\\x00-\\x1F\\x7F]/', $value) !== 1
-                ? $value
-                : null;
+        return $clean !== '' && $length !== false && $length <= $maximum
+            ? $clean : null;
     }
 
     private static function exact_optional_search(mixed $value): bool
@@ -577,7 +583,7 @@ final class Rest_Controller
         if ($value === '') {
             return true;
         }
-        if (! is_string($value) || strlen($value) > 120) {
+        if (! is_string($value) || strlen($value) > 480) {
             return false;
         }
 
