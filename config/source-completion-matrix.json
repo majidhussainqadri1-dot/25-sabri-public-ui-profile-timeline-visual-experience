@@ -22,14 +22,14 @@
     "production_accepted": false,
     "live_deployed": false,
     "operational": false,
-    "truthful_boundary": "Reviews 995–1034 completed forty separate source/contract inspections against File25, central governing plans and File03/08/17/20/21 native owners. Thirty-six source witnesses, four deficient check scopes grouped into two verified source defects: (1) WordPress Posts compatibility adapter coerced truthy string public approvals into boolean true; now exact true is required. (2) public REST rate-limiter storage/cache unavailable and failed transient writes could silently bypass quotas; now 503 fail-closed for unenforceable buckets, retaining 429 for excess requests. No staging deployment or live version/DB/schema/migration/Founder acceptance verified. WordPress transient fallback is non-atomic under concurrency and needs real load test.",
-    "latest_review_range": "995-1034",
+    "truthful_boundary": "Reviews 1035–1074 are forty independent targeted source/plan inspections, not forty installed WordPress or staging runs. Thirty-four source witnesses and six corrected deficient scopes in three root-cause groups: an extension could weaken required administrator capabilities; malformed File03 native public-visibility restrictions could revert to public; and invalid minimum count thresholds could expose small public metrics. Corrective candidate is unmerged and stacks atop draft PR #27. Live plugin/version/checksum, live DB/schema and migration state, staging and Founder acceptance have not been verified.",
+    "latest_review_range": "1035-1074",
     "exact_head_ci": "external-evidence-required-for-current-head-not-frozen-in-source",
     "exact_deployed_code_verified": false,
     "db_version_verified_live": false,
     "migration_state_verified_live": false,
-    "review_ledger": "config/review995-1034-native-post-rate-guards-audit.json",
-    "historical_review_lineage": "Reviews 515-594, 595-614, 615-634, 635-654, 655-674, 675-694, 695-714, 715-754, 755-794, 795-834, 835-874, 875-914, 915-954, 955-994 are historical targeted source evidence. Reviews 995-1034 are latest 40 targeted scope checks and are not forty complete staging/live tests."
+    "review_ledger": "config/review1035-1074-admin-privacy-metrics-audit.json",
+    "historical_review_lineage": "Reviews 515-594, 595-614, 615-634, 635-654, 655-674, 675-694, 695-714, 715-754, 755-794, 795-834, 835-874, 875-914, 915-954, 955-994 are historical targeted source evidence. Reviews 995-1034 remain historical evidence; Reviews 1035-1074 are latest targeted source inspections, not deployed tests."
   },
   "requirements": [
     {
@@ -527,6 +527,25 @@
         "tests/review995-1034-rest-rate-storage.php",
         "config/review995-1034-native-post-rate-guards-audit.json",
         "docs/REVIEWS-995-1034-NATIVE-POST-RATE-GUARDS-2026-10-16.md"
+      ],
+      "staging_accepted": false,
+      "live_verified": false
+    },
+    {
+      "id": "F25-R1035-R1074-ADMIN-PRIVACY-METRICS",
+      "record_class": "source-review-extension-not-base-requirement",
+      "status": "candidate-source-fixed-retest-in-progress",
+      "review_checks": 40,
+      "source_witnesses": 34,
+      "deficient_checks_corrected": 6,
+      "root_cause_groups": 3,
+      "evidence": [
+        "includes/class-plan-completion.php",
+        "includes/class-native-integration.php",
+        "tests/review1035-1074-owner-capability-metrics.php",
+        "tests/review1035-1074-native-visibility.php",
+        "config/review1035-1074-admin-privacy-metrics-audit.json",
+        "docs/REVIEWS-1035-1074-ADMIN-PRIVACY-METRICS-2026-10-17.md"
       ],
       "staging_accepted": false,
       "live_verified": false
