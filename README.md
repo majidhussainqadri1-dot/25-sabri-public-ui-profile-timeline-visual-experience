@@ -16,7 +16,16 @@ Forty separate source-level completeness inspections were performed against File
 - Neither staging, production, DB/schema/migration state nor exact live deployed parity is verified.
 
 
-## Latest corrective source candidate — Reviews 955–994 (16 October 2026)
+## Latest source candidate — Reviews 995–1034 (16 October 2026)
+
+Forty new targeted plan/source inspections against File25, the consolidated governing plan and native File03/08/17/20/21 ownership: 36 existing source witnesses and four deficient check scopes in two root causes. Fixed File25's WordPress core post compatibility adapter so a public approval extension must return **strict boolean `true`** rather than any truthy value. Hardened public REST read rate limiting so missing storage, invalid bucket, or failed quota persistence produces safe retryable **503**, while a valid exceeded quota still returns **429**. This does not modify native File21 publishing or File24's global abuse authority.
+
+- Full numbered audit: `config/review995-1034-native-post-rate-guards-audit.json`.
+- Technical report: `docs/REVIEWS-995-1034-NATIVE-POST-RATE-GUARDS-2026-10-16.md`.
+- PHP8.0/PHP8.3 behavioral regressions: `tests/review995-1034-wordpress-post-approval.php` and `tests/review995-1034-rest-rate-storage.php`.
+- **40 targeted source checks are not 40 real installed WordPress tests.** This draft is stacked on PR #26 (and all preceding draft PRs); real cache topology, concurrent quotas, File08/17 owner URLs, deployed checksums/DB/migrations, staging and Founder acceptance remain external gates.
+
+## Earlier corrective source candidate — Reviews 955–994 (16 October 2026)
 
 Forty targeted File25 vs central/companion source inspections revealed three deficient source scopes in two root-cause groups. The Founder Timeline REST registration offered only pagination validation while the Doctor/Member Timeline registered all seven required secondary filter schemas. Both routes now use one canonical `$timeline_args` schema. The final `Timeline_Service` previously enforced a byte-based 120-character topic limit and accepted hidden bidi/format controls even though REST and HTML now applied Unicode/codepoint safety. It now shares their bounded Unicode normalization and strict control policy.
 
