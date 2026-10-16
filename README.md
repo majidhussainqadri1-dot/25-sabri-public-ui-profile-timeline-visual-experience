@@ -16,7 +16,17 @@ Forty separate source-level completeness inspections were performed against File
 - Neither staging, production, DB/schema/migration state nor exact live deployed parity is verified.
 
 
-## Latest corrective candidate — Reviews 835–874 (16 October 2026)
+## New source corrective candidate — Reviews 875–914 (16 October 2026)
+
+Forty new, distinct requirement-to-source inspections against File25 v2.0, the Three Central Plans v3.0 and File03/08/09/17/20/21/24 native owners identified **seven** source gaps within two root-cause groups. Corrected REST profile responses now return the same genuinely available native-provider Knowledge/Media/other sections as HTML, subject to File25 enabled-tab preferences. Six optional public Timeline REST filters (`content_type`, `provider`, `year`, `language`, `topic`, `sort`) no longer convert malformed inputs into valid empty/default values before validation. Both changes have actual REST-controller PHPUnit-independent behavioral regressions.
+
+- Audit: `config/review875-914-rest-query-provider-parity-audit.json`.
+- Human report: `docs/REVIEWS-875-914-REST-QUERY-PROVIDER-PARITY-2026-10-16.md`.
+- New governed regression: `tests/review875-914-rest-query-provider-parity.php`.
+- All fixes are **source-only in a stacked unmerged PR**, not evidence of staging, live DB, deployed plugin checksums or production acceptance.
+- File08 Booking and File17 Follow still require owner-approved target-bound destination contracts. Additional native Timeline projections, role-based Hostinger staging, Founder acceptance and live re-test remain outstanding.
+
+## Historical corrective candidate — Reviews 835–874 (16 October 2026)
 
 Forty separate source-level inspections against File25 v2.0, central v3.0 and File03/08/09/17/20/21/24 native owner boundaries found **three** File25 source defects and corrected them on this stacked review branch. Unaccepted File17 Follow and File08 Appointment targets can no longer be restored through subsequent arbitrary `action_url` filters, even with same-site URLs. Invalid REST Timeline `search` input is no longer transformed into an accepted empty/all-results request before validation. A PHP 8.0/8.3 regression uses actual route callbacks and the private action projector. These are 40 focused inspections, **not** 40 Hostinger/Live test cycles.
 
