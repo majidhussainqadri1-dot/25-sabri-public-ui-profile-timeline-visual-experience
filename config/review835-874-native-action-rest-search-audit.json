@@ -1,0 +1,396 @@
+{
+  "schema": 1,
+  "module": 25,
+  "date": "2026-10-16",
+  "review_range": {
+    "first": 835,
+    "last": 874,
+    "count": 40
+  },
+  "frozen": {
+    "repository": "majidhussainqadri1-dot/25-sabri-public-ui-profile-timeline-visual-experience",
+    "baseline_main": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+    "stacked_parent_pr": 22,
+    "parent_commit": "edb226a79769bf15ff4c443ca24ecd139c0c2e6d",
+    "dependency_prs": [
+      20,
+      21,
+      22
+    ]
+  },
+  "plans": [
+    "File25 Complete Public UI, Profile Timeline and Visual Experience Final Harmonized v2.0; §§3-12, 50-57, 64-69, 71, 77, 80-94",
+    "Sabri Social Homeopathy Platform Three Central Plans Consolidated Governing Master Plan 2026 v3.0; owner and deployment laws",
+    "File08 Worldwide Clinic and Appointments, File09 Global Doctor, File21 Home and Feed, File20 Shell, File24 Security owner contracts"
+  ],
+  "contemporary_repository_sources": {
+    "File08": "9dcc8d16ea81d0bbd27184e71bc09ba04d30ba03",
+    "File20": "8a4dbcaf4fef8e926b9b834ecfde16c21a0f00ca",
+    "File21": "f2eb7e95ddea327af36ea725ffb923b029f885e6"
+  },
+  "accounting": {
+    "focused_source_inspections": 40,
+    "source_witnesses": 37,
+    "confirmed_source_defects": 3,
+    "code_defects_corrected_on_branch": 3,
+    "unfixed_file25_defects_from_these_40": 0,
+    "actual_full_end_to_end_staging_runs": 0,
+    "live_retest_runs": 0
+  },
+  "findings": [
+    {
+      "round": 854,
+      "root_cause": "Timeline REST search sanitizer converted oversized, control-character, or nonscalar invalid inputs into an empty search that could become an unfiltered request after sanitizer/validator interaction.",
+      "fix": "Preserve invalid input through validation, normalize only strictly valid values; add callable-based regression tests."
+    },
+    {
+      "round": 855,
+      "root_cause": "Later general-purpose action_url extension could override File17 Follow's current no-destination suppression with an arbitrary same-site link.",
+      "fix": "Fail-closed Follow in the final File25 action presentation function; do not call filter before accepted target-bound owner contract."
+    },
+    {
+      "round": 856,
+      "root_cause": "Same general-purpose filter could restore an invented File08 Appointment action despite absent profile-to-booking owner contract.",
+      "fix": "Fail-closed Appointment in the final File25 action presentation function, independent of filter execution order."
+    }
+  ],
+  "status": {
+    "repo_source": "corrected-on-unmerged-stacked-branch",
+    "current_branch_ci": "check-exact-current-head-externally",
+    "deployed_version": "unverified",
+    "db_version": "unverified",
+    "migration_state": "unverified",
+    "staging": "unverified",
+    "live_verification": "unverified"
+  },
+  "dependencies": [
+    "File08 target-bound booking destination owner contract",
+    "File17 target-bound Follow owner contract",
+    "Expanded approved non-post Timeline provider projections",
+    "Staging role/permission/RTL/privacy/backup and package checksum parity",
+    "Founder approval; merge/deploy/live regression"
+  ],
+  "meaning": "Forty targeted source inspections, not forty entire functional QA cycles. Green source CI cannot establish installed/staging/live truth.",
+  "rounds": [
+    {
+      "round": 835,
+      "area": "File00/03/08/09/20/24",
+      "scope": "File 03 canonical public profile projection",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 836,
+      "area": "File00/03/08/09/20/24",
+      "scope": "File 00/03 public visibility revoke-only",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 837,
+      "area": "File00/03/08/09/20/24",
+      "scope": "Minor contact suppression",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 838,
+      "area": "File00/03/08/09/20/24",
+      "scope": "Public contact consent monotonicity",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 839,
+      "area": "File00/03/08/09/20/24",
+      "scope": "No WordPress biography fallback",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 840,
+      "area": "File00/03/08/09/20/24",
+      "scope": "No WordPress display-name fallback",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 841,
+      "area": "File00/03/08/09/20/24",
+      "scope": "Monotonic approved public text",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 842,
+      "area": "File00/03/08/09/20/24",
+      "scope": "Same-origin canonical public URL",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 843,
+      "area": "File00/03/08/09/20/24",
+      "scope": "Founder/Doctor/Member canonical routes",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 844,
+      "area": "File00/03/08/09/20/24",
+      "scope": "File 03 public identity DTO version",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 845,
+      "area": "File00/03/08/09/20/24",
+      "scope": "File 09 doctor verification freshness",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 846,
+      "area": "File00/03/08/09/20/24",
+      "scope": "File 08 clinic projection version adapter",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 847,
+      "area": "File00/03/08/09/20/24",
+      "scope": "File 20 shell presentation ownership",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 848,
+      "area": "File25 REST/privacy",
+      "scope": "File 24 central policy integration",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 849,
+      "area": "File25 REST/privacy",
+      "scope": "HTML global public visibility preference",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 850,
+      "area": "File25 REST/privacy",
+      "scope": "REST global public visibility preference",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 851,
+      "area": "File25 REST/privacy",
+      "scope": "REST no-store and private cache",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 852,
+      "area": "File25 REST/privacy",
+      "scope": "REST ETag bound to response DTO",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 853,
+      "area": "File25 REST/privacy",
+      "scope": "REST local search preference parity",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 854,
+      "area": "File25 REST/privacy",
+      "scope": "REST invalid-search must not become unfiltered",
+      "source_result": "confirmed-source-defect-corrected-on-review-branch",
+      "evidence": "includes/class-rest-controller.php",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 855,
+      "area": "File08/17 owner actions",
+      "scope": "File 17 Follow action cannot be revived by later filter",
+      "source_result": "confirmed-source-defect-corrected-on-review-branch",
+      "evidence": "includes/class-plan-completion.php",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 856,
+      "area": "File08/17 owner actions",
+      "scope": "File 08 Appointment action cannot be revived by later filter",
+      "source_result": "confirmed-source-defect-corrected-on-review-branch",
+      "evidence": "includes/class-plan-completion.php",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 857,
+      "area": "File08/17 owner actions",
+      "scope": "Profile-action same-site URL guard",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 858,
+      "area": "File08/17 owner actions",
+      "scope": "Preview suppresses action links",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 859,
+      "area": "File21 timeline & File25 presentation",
+      "scope": "Native File 03 edit/privacy destination binding",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 860,
+      "area": "File21 timeline & File25 presentation",
+      "scope": "File 03-approved native message URL consumption",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 861,
+      "area": "File21 timeline & File25 presentation",
+      "scope": "Unpublished File 08 booking-boundary honesty",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 862,
+      "area": "File21 timeline & File25 presentation",
+      "scope": "Bounded timeline provider candidate query",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 863,
+      "area": "File21 timeline & File25 presentation",
+      "scope": "Timeline canonical item deduplication",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 864,
+      "area": "File21 timeline & File25 presentation",
+      "scope": "Timeline public DTO projection",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 865,
+      "area": "File25 providers/public experience",
+      "scope": "Section-provider non-ownership of native content",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 866,
+      "area": "File25 providers/public experience",
+      "scope": "Section batch atomic rejection",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 867,
+      "area": "File25 providers/public experience",
+      "scope": "Section canonical-key deduplication",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 868,
+      "area": "File25 providers/public experience",
+      "scope": "Escaped future-profile JSON payload",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 869,
+      "area": "File25 providers/public experience",
+      "scope": "Future owner-only quality/integrity payload",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 870,
+      "area": "File25 providers/public experience",
+      "scope": "Same-site public citation/relationship URLs",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 871,
+      "area": "Deployment/release",
+      "scope": "Idempotent upgrade and schema checks",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 872,
+      "area": "Deployment/release",
+      "scope": "Data-free Safe Mode and recovery",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 873,
+      "area": "Deployment/release",
+      "scope": "Staging acceptance not self-certified",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    },
+    {
+      "round": 874,
+      "area": "Deployment/release",
+      "scope": "Live deployment not self-certified",
+      "source_result": "source-witness-observed-not-deployed-proof",
+      "evidence": "See governing plan/source trace in human review",
+      "was_tested_end_to_end": false
+    }
+  ]
+}
