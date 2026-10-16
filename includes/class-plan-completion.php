@@ -62,8 +62,8 @@ final class Plan_Completion
         'timeline_page_size' => ['type' => 'int', 'default' => 20, 'minimum' => 5, 'maximum' => 50],
         'default_timeline_filter' => ['type' => 'key', 'default' => '', 'maximum' => 64],
         'enabled_optional_providers' => ['type' => 'list', 'default' => self::OPTIONAL_SECTION_PROVIDERS, 'allowed' => self::OPTIONAL_SECTION_PROVIDERS, 'maximum' => 5, 'allow_empty' => true],
-        'featured_section_order' => ['type' => 'list', 'default' => ['overview', 'timeline', 'about'], 'allowed' => self::SECTIONS, 'maximum' => 12],
-        'enabled_public_tabs' => ['type' => 'list', 'default' => self::SECTIONS, 'allowed' => self::SECTIONS, 'maximum' => 12],
+        'featured_section_order' => ['type' => 'list', 'default' => ['overview', 'timeline', 'about'], 'allowed' => self::SECTIONS, 'maximum' => 14],
+        'enabled_public_tabs' => ['type' => 'list', 'default' => self::SECTIONS, 'allowed' => self::SECTIONS, 'maximum' => 14],
         'cover_focal_point' => ['type' => 'enum', 'default' => 'center', 'allowed' => ['center', 'top', 'bottom', 'left', 'right']],
         'profile_local_search' => ['type' => 'bool', 'default' => true],
         'public_metrics' => ['type' => 'bool', 'default' => true],
@@ -161,7 +161,10 @@ final class Plan_Completion
             $type = (string) $definition['type'];
             if ($type === 'bool') {
                 $parsed = self::exact_boolean($value);
-                $clean[$key] = $parsed ?? (bool) $definition['default'];
+                // Invalid explicit stored settings must not reopen public profile,
+                // metrics or local search after an opt-out or malformed migration.
+                $sensitive = in_array($key, ['public_visibility', 'public_metrics', 'profile_local_search'], true);
+                $clean[$key] = $parsed ?? ($sensitive ? false : (bool) $definition['default']);
                 continue;
             }
             if ($type === 'int') {
@@ -199,7 +202,10 @@ final class Plan_Completion
                     $value,
                     (array) $definition['allowed'],
                     (int) $definition['maximum'],
-                    (array) $definition['default']
+                    // If every key is invalid, fail closed instead of restoring an
+                    // entire previously disabled provider/tab collection.
+                    $key === 'enabled_public_tabs' ? ['overview']
+                        : ($key === 'enabled_optional_providers' ? [] : (array) $definition['default'])
                 );
             }
         }
@@ -689,9 +695,14 @@ final class Plan_Completion
 
     public static function normalize_search_query(string $query): string
     {
+        if (strlen($query) > 480) {
+            return '';
+        }
         $query = trim(wp_strip_all_tags($query));
-        $length = function_exists('mb_strlen') ? mb_strlen($query, 'UTF-8') : strlen($query);
-        if ($query === '' || $length > self::MAX_SEARCH_QUERY) {
+        // Count Unicode codepoints even when mbstring is unavailable; byte
+        // length is an abuse bound, not a language-dependent search limit.
+        $length = function_exists('mb_strlen') ? mb_strlen($query, 'UTF-8') : preg_match_all('/./us', $query);
+        if ($query === '' || $length === false || $length > self::MAX_SEARCH_QUERY) {
             return '';
         }
         if (preg_match('/[\x00-\x1F\x7F]/', $query) === 1
