@@ -42,6 +42,7 @@ function home_url(string $path=''): string {
 function wp_parse_url(string $url,int $part=-1): mixed {
     return parse_url($url,$part);
 }
+require_once dirname(__DIR__) . '/includes/class-public-url.php';
 require_once dirname(__DIR__) . '/includes/class-native-integration.php';
 $native = new \Sabri\PublicExperience\Native_Integration();
 $errors=[];
