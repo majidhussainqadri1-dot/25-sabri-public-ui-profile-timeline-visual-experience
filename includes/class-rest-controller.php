@@ -60,32 +60,33 @@ final class Rest_Controller
             ],
             'content_type' => [
                 'default' => '',
-                'sanitize_callback' => static fn ($value): string => is_string($value) ? $value : '',
+                'sanitize_callback' => static fn ($value): mixed => $value,
                 'validate_callback' => static fn ($value): bool => self::exact_optional_key($value) !== null,
             ],
             'provider' => [
                 'default' => '',
-                'sanitize_callback' => static fn ($value): string => is_string($value) ? $value : '',
+                'sanitize_callback' => static fn ($value): mixed => $value,
                 'validate_callback' => static fn ($value): bool => self::exact_optional_key($value) !== null,
             ],
             'year' => [
                 'default' => '',
-                'sanitize_callback' => static fn ($value): string => is_string($value) ? $value : '',
+                'sanitize_callback' => static fn ($value): mixed => $value,
                 'validate_callback' => static fn ($value): bool => self::exact_optional_year($value) !== null,
             ],
             'language' => [
                 'default' => '',
-                'sanitize_callback' => static fn ($value): string => is_string($value) ? $value : '',
+                'sanitize_callback' => static fn ($value): mixed => $value,
                 'validate_callback' => static fn ($value): bool => self::exact_optional_language($value) !== null,
             ],
             'topic' => [
                 'default' => '',
-                'sanitize_callback' => static fn ($value): string => is_string($value) ? trim(wp_strip_all_tags($value)) : '',
+                'sanitize_callback' => static fn ($value): mixed => is_string($value) && self::exact_optional_text($value, 120) !== null
+                    ? trim(wp_strip_all_tags($value)) : $value,
                 'validate_callback' => static fn ($value): bool => self::exact_optional_text($value, 120) !== null,
             ],
             'sort' => [
                 'default' => 'latest',
-                'sanitize_callback' => static fn ($value): string => is_string($value) ? $value : 'latest',
+                'sanitize_callback' => static fn ($value): mixed => $value,
                 'validate_callback' => static fn ($value): bool => is_string($value) && in_array($value, ['latest', 'oldest'], true),
             ],
             'search' => [
@@ -251,7 +252,20 @@ final class Rest_Controller
             return $this->response(['code' => 'profile_not_found'], 404, $request);
         }
 
-        // REST and HTML must honor the same administrator-selected tabs.
+        // Resolve only already-approved public section projections, just as
+        // the HTML renderer does. Dynamic provider tabs must agree with REST
+        // without granting any new File 03 profile visibility.
+        $provider_labels = $this->sections->available_for_profile((int) $user->ID, $profile);
+        $available_sections = array_values(array_filter(
+            (array) ($profile['available_sections'] ?? ['overview']), 'is_string'
+        ));
+        $profile['available_sections'] = array_values(array_unique(array_merge(
+            $available_sections, array_keys($provider_labels)
+        )));
+        $profile['section_labels'] = array_merge(
+            (array) ($profile['section_labels'] ?? []), $provider_labels
+        );
+
         return $this->response(Plan_Completion::apply_profile_preferences($profile), 200, $request);
     }
 
