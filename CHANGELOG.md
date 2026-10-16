@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — 2026-10-16 — Reviews 995–1034 public publication and REST rate safeguards
+
+- Forty bounded source inspections: 36 source witnesses; four corrected security check scopes in two underlying root causes.
+- Require native WordPress post public-approval filter to return exact boolean true; deny truthy strings and malformed consent flags.
+- Return safe 503 instead of silently granting requests if REST rate limit has no enforceable storage/bucket, transient persistence fails, or counter is unavailable. Existing 429 threshold behavior retained.
+- Two governed executable PHP8.0/PHP8.3 regressions; production plugin, database/migration, high-concurrency quota behavior and staging/live parity remain unverified.
+
+
 ## Unreleased — 2026-10-16 — Reviews 955–994: Founder Timeline validators & Unicode service
 
 - Forty distinct targeted plan/source inspections; 37 source witnesses, three corrected requirement scopes in two root-cause groups.
