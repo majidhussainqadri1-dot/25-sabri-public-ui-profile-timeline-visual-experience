@@ -1,0 +1,350 @@
+{
+  "file": 25,
+  "range": {
+    "first": 955,
+    "last": 994,
+    "count": 40
+  },
+  "date": "2026-10-16",
+  "review_method": "Forty discrete source-presence/contract inspections mapped to governing DOCXs; not 40 full WordPress CI cycles or staging/live executions.",
+  "governing_sources": [
+    "File 25 Complete Public UI, Profile Timeline and Visual Experience Final (§§29–30,37,44–47,53–54,60–65,68,72,80–90)",
+    "Sabri Social Homeopathy Platform Three Central Plans Consolidated Governing Master Plan 2026 (canonical owner law, strict input validation, release-status separation)",
+    "File03/08/09/17/20/21/24 companion ownership and acceptance boundaries"
+  ],
+  "source_baseline": {
+    "main_repository_sha": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+    "unmerged_parent_pr": 25,
+    "parent_commit": "e899ad92b74f59ef728a4ed28f35eebdf13c18c4"
+  },
+  "counts": {
+    "inspections": 40,
+    "source_witness": 37,
+    "gap_scopes": 3,
+    "distinct_root_causes": 2,
+    "corrected_gap_scopes": 3,
+    "unverified_staging_tests": 40,
+    "actual_live_retests": 0
+  },
+  "root_causes": [
+    {
+      "reviews": [
+        955
+      ],
+      "defect": "Founder Timeline REST registers only page/per_page, whereas the ordinary Profile Timeline registers content_type/provider/year/language/topic/sort/search validators. Founder route therefore does not share strict validation of its actually consumed filters.",
+      "source_fix": "Register both Founder and standard Profile Timeline from a shared comprehensive validated argument schema ($timeline_args).",
+      "regression": "Actual register_routes() schema callbacks and negative/positive input checks."
+    },
+    {
+      "reviews": [
+        962,
+        963
+      ],
+      "defect": "Internal Timeline_Service::exact_optional_text rejected Urdu/emoji topic strings by 120 byte length and checked ASCII control characters only, although public HTML and REST already permit up to 120 Unicode characters and reject invisible bidi marks.",
+      "source_fix": "Unicode-codepoint length with bounded UTF-8 byte check and Plan_Completion::normalize_search_query invisible/bidi policy in the final service gate.",
+      "regression": "Actual Timeline_Service::get_for_author() fixture registry detects native provider invocation for 120 Unicode and suppression for 121 characters/bidi/oversize."
+    }
+  ],
+  "regression": "tests/review955-994-founder-timeline-rest-unicode.php",
+  "owner_dependency": [
+    "File03 profile/consent projection owner",
+    "File08 booking target absent accepted contract",
+    "File17 follow target absent accepted contract",
+    "File20 shell and navigation",
+    "File21 publication author/visibility owner",
+    "File24 security and incident response"
+  ],
+  "completion": {
+    "github_candidate": "source-corrected-unmerged",
+    "main_merged": false,
+    "exact_deployed_code": false,
+    "deployed_version": "unverified",
+    "db_schema_version": "unverified",
+    "migration": "unverified",
+    "staging": false,
+    "live_verification": false,
+    "founder_acceptance": false
+  },
+  "checks": [
+    {
+      "round": 955,
+      "requirement": "Founder timeline REST uses common strict filter schemas",
+      "evidence": "includes/class-rest-controller.php",
+      "classification": "confirmed-source-gap-fixed-on-candidate",
+      "release_verified": false
+    },
+    {
+      "round": 956,
+      "requirement": "Doctor/member timeline exposes governed filters",
+      "evidence": "includes/class-rest-controller.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 957,
+      "requirement": "Founder timeline resolves same timeline_response",
+      "evidence": "includes/class-rest-controller.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 958,
+      "requirement": "REST per_page bound of 50",
+      "evidence": "includes/class-rest-controller.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 959,
+      "requirement": "REST optional year exact validation",
+      "evidence": "includes/class-rest-controller.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 960,
+      "requirement": "REST language BCP-style bounded validation",
+      "evidence": "includes/class-rest-controller.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 961,
+      "requirement": "REST Unicode topic normalizer",
+      "evidence": "includes/class-rest-controller.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 962,
+      "requirement": "Timeline service accepts 120 Unicode Urdu topic chars",
+      "evidence": "includes/class-timeline-service.php",
+      "classification": "confirmed-source-gap-fixed-on-candidate",
+      "release_verified": false
+    },
+    {
+      "round": 963,
+      "requirement": "Timeline service rejects hidden bidi/format controls",
+      "evidence": "includes/class-timeline-service.php",
+      "classification": "confirmed-source-gap-fixed-on-candidate",
+      "release_verified": false
+    },
+    {
+      "round": 964,
+      "requirement": "Timeline service fails closed on invalid search",
+      "evidence": "includes/class-timeline-service.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 965,
+      "requirement": "HTML timeline topic Unicode bound",
+      "evidence": "includes/class-profile-renderer.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 966,
+      "requirement": "HTML profile search disabled preference",
+      "evidence": "includes/class-profile-renderer.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 967,
+      "requirement": "Founder books/research public visual section",
+      "evidence": "includes/class-profile-repository.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 968,
+      "requirement": "File03 authorization remains mandatory",
+      "evidence": "includes/class-visibility-policy.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 969,
+      "requirement": "Minor contact public redaction",
+      "evidence": "includes/class-visibility-policy.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 970,
+      "requirement": "Native File09 Doctor verification owner",
+      "evidence": "includes/class-native-integration.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 971,
+      "requirement": "Canonical profile route contracts",
+      "evidence": "includes/class-profile-repository.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 972,
+      "requirement": "File20 single-shell integration",
+      "evidence": "includes/class-profile-router.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 973,
+      "requirement": "File24 security integration owner",
+      "evidence": "includes/class-file-24-integration.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 974,
+      "requirement": "REST global public privacy opt-out",
+      "evidence": "includes/class-rest-controller.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 975,
+      "requirement": "REST tabs discover normalized native providers",
+      "evidence": "includes/class-rest-controller.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 976,
+      "requirement": "REST tab selection applies admin preferences",
+      "evidence": "includes/class-rest-controller.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 977,
+      "requirement": "REST local search opt-out",
+      "evidence": "includes/class-rest-controller.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 978,
+      "requirement": "REST ETag + LastModified",
+      "evidence": "includes/class-rest-controller.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 979,
+      "requirement": "REST no-store private cache",
+      "evidence": "includes/class-rest-controller.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 980,
+      "requirement": "Timeline provider atomic batch and metadata",
+      "evidence": "includes/class-timeline-service.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 981,
+      "requirement": "Timeline canonical cross-provider dedup",
+      "evidence": "includes/class-timeline-service.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 982,
+      "requirement": "Timeline bounded candidate window",
+      "evidence": "includes/class-timeline-service.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 983,
+      "requirement": "Timeline provider read-only maturity gate",
+      "evidence": "includes/class-timeline-service.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 984,
+      "requirement": "Content card public allow-list",
+      "evidence": "includes/class-content-cards.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 985,
+      "requirement": "Section approved provider IDs",
+      "evidence": "includes/class-section-registry.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 986,
+      "requirement": "Section invalid batch atomic rejection",
+      "evidence": "includes/class-section-service.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 987,
+      "requirement": "Public profile media from native owner",
+      "evidence": "includes/class-profile-repository.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 988,
+      "requirement": "14 public tabs allowed after admin save",
+      "evidence": "includes/class-plan-completion.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 989,
+      "requirement": "Invalid public preference booleans fail closed",
+      "evidence": "includes/class-plan-completion.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 990,
+      "requirement": "File17 Follow native action suppresses unknown target",
+      "evidence": "includes/class-plan-completion.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 991,
+      "requirement": "File08 Appointment does not invent user-to-booking",
+      "evidence": "includes/class-current-companion-2026-08-10.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 992,
+      "requirement": "Safe Mode profile robots privacy",
+      "evidence": "includes/class-safe-mode-public.php",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 993,
+      "requirement": "Public visual reduced motion CSS",
+      "evidence": "assets/css/public.css",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    },
+    {
+      "round": 994,
+      "requirement": "GitHub CI not promoted to deployed live truth",
+      "evidence": "config/source-completion-matrix.json",
+      "classification": "source-witness-not-runtime-proof",
+      "release_verified": false
+    }
+  ]
+}
