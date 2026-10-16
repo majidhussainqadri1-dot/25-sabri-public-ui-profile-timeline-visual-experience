@@ -22,14 +22,14 @@
     "production_accepted": false,
     "live_deployed": false,
     "operational": false,
-    "truthful_boundary": "Reviews 915–954 verified forty separate File25 plan/source scopes against its final governing Word specification, the Three Central Consolidated Master Plan, and File03/08/09/17/20/21/24 owners. Twenty-seven source witnesses and thirteen deficient checks were identified in five root-cause groups: 14 tabs exceeding configured maximum 12, invalid provider/tab lists re-enabling defaults, malformed public/privacy booleans re-enabling exposure/search/metrics, Unicode byte-vs-character mismatches in REST/HTML query filters, and REST topic invisible bidi/format controls. All thirteen check-scope defects corrected in unmerged branch with governed PHP regressions. No installed staging package, DB/schema, migration or live parity asserted.",
-    "latest_review_range": "915-954",
+    "truthful_boundary": "Reviews 955-994 are 40 targeted source inspections against File25 final Word plan §§44/72, central governing plan and native owner contracts. 37 source witnesses, 3 corrected source-gap checks across 2 root causes: Founder Timeline REST filter validation differed from standard Profile Timeline (R955), and the core Timeline Service still imposed 120-byte topic limit plus ASCII-only controls, inconsistent with HTML/REST Unicode rules (R962-R963). Fixed in unmerged stacked candidate; governed PHP test checks actual REST registration and native service provider invocation. No live deployed version, DB/schema/migration, staging or Founder acceptance established.",
+    "latest_review_range": "955-994",
     "exact_head_ci": "external-evidence-required-for-current-head-not-frozen-in-source",
     "exact_deployed_code_verified": false,
     "db_version_verified_live": false,
     "migration_state_verified_live": false,
-    "review_ledger": "config/review915-954-settings-unicode-audit.json",
-    "historical_review_lineage": "Reviews 515-594, 595-614, 615-634, 635-654, 655-674, 675-694, 695-714, 715-754, 755-794, 795-834, 835-874, 875-914 remain preserved as historical source review evidence. Reviews 915-954 are latest forty targeted source inspections. Historical CI/PRs cannot prove live deployment."
+    "review_ledger": "config/review955-994-founder-timeline-unicode-audit.json",
+    "historical_review_lineage": "Reviews 515-594, 595-614, 615-634, 635-654, 655-674, 675-694, 695-714, 715-754, 755-794, 795-834, 835-874, 875-914, 915-954 are historical source review evidence. Reviews 955-994 are latest forty targeted source checks and are not forty full live tests."
   },
   "requirements": [
     {
@@ -488,6 +488,26 @@
         "tests/review915-954-rest-html-unicode-parity.php",
         "config/review915-954-settings-unicode-audit.json",
         "docs/REVIEWS-915-954-SETTINGS-PRIVACY-UNICODE-2026-10-16.md"
+      ],
+      "staging_accepted": false,
+      "live_verified": false
+    },
+    {
+      "id": "F25-R955-R994-FOUNDER-TIMELINE-UNICODE",
+      "record_class": "source-review-extension-not-base-requirement",
+      "status": "implemented-source-candidate-pending-final-exact-head-ci",
+      "findings": {
+        "review_checks": 40,
+        "source_witnesses": 37,
+        "confirmed_corrected_scope_gaps": 3,
+        "root_cause_groups": 2
+      },
+      "evidence": [
+        "includes/class-rest-controller.php",
+        "includes/class-timeline-service.php",
+        "tests/review955-994-founder-timeline-rest-unicode.php",
+        "config/review955-994-founder-timeline-unicode-audit.json",
+        "docs/REVIEWS-955-994-FOUNDER-TIMELINE-UNICODE-2026-10-16.md"
       ],
       "staging_accepted": false,
       "live_verified": false

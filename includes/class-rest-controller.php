@@ -47,7 +47,7 @@ final class Rest_Controller
                 return sanitize_title($value) === $value;
             },
         ];
-        $pagination = [
+        $timeline_args = [
             'page' => [
                 'default' => 1,
                 'sanitize_callback' => [self::class, 'sanitize_exact_positive_integer'],
@@ -107,7 +107,10 @@ final class Rest_Controller
         register_rest_route('sabri-public/v1', '/founder/timeline', $public + [
             'methods' => 'GET',
             'callback' => [$this, 'get_founder_timeline'],
-            'args' => $pagination,
+            // Founder and doctor/member Timeline requests use the same
+            // strict owner-neutral argument contract. A route with only
+            // page/per_page let arbitrary filters bypass REST validation.
+            'args' => $timeline_args,
         ]);
         register_rest_route('sabri-public/v1', '/founder/knowledge', $public + [
             'methods' => 'GET',
@@ -125,7 +128,7 @@ final class Rest_Controller
         register_rest_route('sabri-public/v1', '/profiles/(?P<slug>[a-zA-Z0-9_-]+)/timeline', $public + [
             'methods' => 'GET',
             'callback' => [$this, 'get_timeline'],
-            'args' => ['slug' => $slug] + $pagination,
+            'args' => ['slug' => $slug] + $timeline_args,
         ]);
         register_rest_route('sabri-public/v1', '/profiles/(?P<slug>[a-zA-Z0-9_-]+)/knowledge', $public + [
             'methods' => 'GET',

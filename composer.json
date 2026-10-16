@@ -53,7 +53,8 @@
       "tests/review835-874-native-action-rest-search.php",
       "tests/review875-914-rest-query-provider-parity.php",
       "tests/review915-954-preferences-privacy-unicode.php",
-      "tests/review915-954-rest-html-unicode-parity.php"
+      "tests/review915-954-rest-html-unicode-parity.php",
+      "tests/review955-994-founder-timeline-rest-unicode.php"
     ]
   }
 }
