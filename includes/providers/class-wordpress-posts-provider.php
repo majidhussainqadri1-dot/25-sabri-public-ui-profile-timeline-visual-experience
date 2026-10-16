@@ -91,13 +91,15 @@ final class WordPress_Posts_Provider implements Timeline_Provider
                 continue;
             }
 
-            $approved = (bool) apply_filters(
+            // Permission hooks are revocation-only at File 25's visual
+            // boundary. Truthy strings such as "false" are NOT owner approval.
+            $approved = apply_filters(
                 'sabri_public_experience/wordpress_post_is_public_approved',
                 true,
                 $post,
                 $author_id
             );
-            if (! $approved) {
+            if ($approved !== true) {
                 continue;
             }
 
