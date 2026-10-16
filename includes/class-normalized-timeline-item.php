@@ -342,11 +342,11 @@ final class Normalized_Timeline_Item implements JsonSerializable
 
     private function exact_bounded_integer(mixed $value, int $minimum, int $maximum, string $field): int
     {
-        if (! is_int($value) || $value < $minimum || $value > $maximum) {
+        if (! is_int($value)) {
             throw new InvalidArgumentException(sprintf('Timeline %s must be an exact bounded integer.', $field));
         }
 
-        return $value;
+        return max($minimum, min($maximum, $value));
     }
 
     private function parse_exact_integer(mixed $value, int $minimum, int $maximum): ?int

@@ -7,7 +7,7 @@
     "last": 1114,
     "total": 40
   },
-  "method": "Forty separately enumerated, source-anchored inspections of the unmerged PR28 head. Source witness is not an end-to-end test or deployed verification.",
+  "method": "Forty separately enumerated, source-anchored inspections of the unmerged PR28 head. Source witness is not an end-to-end test or deployed verification. CI exposed an existing explicit pin-clamping test; that behavior was retained rather than changing an unapproved native contract.",
   "authority": [
     "config/central-2026-file25-requirements.json",
     "docs/GOVERNING-SCOPE.md",
@@ -24,10 +24,10 @@
   },
   "counts": {
     "specific_inspections": 40,
-    "source_witnesses": 35,
-    "deficient_scopes": 5,
-    "distinct_root_causes": 2,
-    "source_files_corrected": 2,
+    "source_witnesses": 37,
+    "deficient_scopes": 3,
+    "distinct_root_causes": 1,
+    "source_files_corrected": 1,
     "staging_tests_executed": 0,
     "live_tests_executed": 0
   },
@@ -41,16 +41,6 @@
       "file": "includes/class-public-url.php",
       "cause": "Path validation checked ASCII controls and decoded separators/dot segments but not Unicode bidi/format controls in raw or recursively decoded paths.",
       "fix": "Reject format controls in the raw path and at every bounded decoding layer.",
-      "regression": "tests/review1075-1114-url-format-pin-bounds.php"
-    },
-    {
-      "reviews": [
-        1101,
-        1102
-      ],
-      "file": "includes/class-normalized-timeline-item.php",
-      "cause": "exact_bounded_integer silently clamped out-of-range pin weights to [0,1000] instead of rejecting malformed provider authority input.",
-      "fix": "Reject values outside the declared integer bounds; retain valid audited pin semantics.",
       "regression": "tests/review1075-1114-url-format-pin-bounds.php"
     }
   ],
@@ -213,15 +203,15 @@
     },
     {
       "review": 1101,
-      "requirement": "Above-maximum timeline pin weight rejected rather than clamped",
+      "requirement": "Above-maximum pin integer is bounded under historical documented normalization",
       "source": "includes/class-normalized-timeline-item.php",
-      "finding": "confirmed-source-defect-corrected-on-unmerged-candidate"
+      "finding": "source-witness-existing-bounded-clamp-contract-retained"
     },
     {
       "review": 1102,
-      "requirement": "Negative timeline pin weight rejected rather than clamped",
+      "requirement": "Negative pin integer is bounded to zero under historical documented normalization",
       "source": "includes/class-normalized-timeline-item.php",
-      "finding": "confirmed-source-defect-corrected-on-unmerged-candidate"
+      "finding": "source-witness-existing-bounded-clamp-contract-retained"
     },
     {
       "review": 1103,

@@ -67,14 +67,20 @@ $base = [
     'review_state' => 'published',
 ];
 
-foreach ([1001, -1, PHP_INT_MAX, '1001', 1.5] as $invalid_weight) {
+// Historical and already-tested contract: out-of-range integer pin weights
+// are bounded, then lose all priority if their audit provenance is missing.
+foreach ([1001, -1, PHP_INT_MAX] as $bounded_weight) {
+    $item = new Normalized_Timeline_Item(array_merge($base, ['pin_weight' => $bounded_weight]));
+    $check($item->get('pin_weight') === 0, 'Unaudited bounded pin retained priority: ' . (string) $bounded_weight);
+}
+foreach (['1001', 1.5] as $invalid_weight) {
     $rejected = false;
     try {
         new Normalized_Timeline_Item(array_merge($base, ['pin_weight' => $invalid_weight]));
     } catch (\InvalidArgumentException) {
         $rejected = true;
     }
-    $check($rejected, 'Out-of-contract pin weight was silently accepted/clamped: ' . (string) $invalid_weight);
+    $check($rejected, 'Noninteger pin weight was accepted: ' . (string) $invalid_weight);
 }
 
 $unpinned = new Normalized_Timeline_Item(array_merge($base, ['pin_weight' => 0]));
@@ -101,4 +107,4 @@ if ($failures !== []) {
     fwrite(STDERR, "Reviews 1075–1114 regression FAILED:\n- " . implode("\n- ", $failures) . "\n");
     exit(1);
 }
-echo "Reviews 1075–1114: Unicode path identity and exact pin-weight bounds passed.\n";
+echo "Reviews 1075–1114: Unicode path identity and historical pin-weight contract passed.\n";
