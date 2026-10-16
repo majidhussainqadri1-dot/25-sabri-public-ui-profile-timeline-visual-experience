@@ -16,7 +16,16 @@ Forty separate source-level completeness inspections were performed against File
 - Neither staging, production, DB/schema/migration state nor exact live deployed parity is verified.
 
 
-## Latest review candidate — Reviews 915–954 (16 October 2026)
+## Latest corrective source candidate — Reviews 955–994 (16 October 2026)
+
+Forty targeted File25 vs central/companion source inspections revealed three deficient source scopes in two root-cause groups. The Founder Timeline REST registration offered only pagination validation while the Doctor/Member Timeline registered all seven required secondary filter schemas. Both routes now use one canonical `$timeline_args` schema. The final `Timeline_Service` previously enforced a byte-based 120-character topic limit and accepted hidden bidi/format controls even though REST and HTML now applied Unicode/codepoint safety. It now shares their bounded Unicode normalization and strict control policy.
+
+- Full 40-row scope/owner ledger: `config/review955-994-founder-timeline-unicode-audit.json`.
+- Technical report: `docs/REVIEWS-955-994-FOUNDER-TIMELINE-UNICODE-2026-10-16.md`.
+- Governed executable test: `tests/review955-994-founder-timeline-rest-unicode.php`, using actual route registrations and a native-provider fixture to confirm accepted/rejected Topic filtering.
+- **Do not confuse 40 targeted source checks with 40 end-to-end live test runs.** This candidate is stacked on unmerged draft PR #25 (and #24–#20); native File08 Booking, File17 Follow, role/RTL/a11y staging, exact installed version/checksum, DB/migrations, Founder approval, deploy and live retest remain pending.
+
+## Earlier source review candidate — Reviews 915–954 (16 October 2026)
 
 Forty **targeted source checks**, not forty full live/staging E2E runs, found 13 deficient plan/source scopes grouped into five root causes. The candidate branch corrects (1) the 14-vs-12 public-tab and section-order save truncation, (2) malformed enabled-tab/provider lists that could reopen disabled features, (3) explicit malformed public_visibility/public_metrics/profile_local_search booleans that could fail open, (4) 120-byte instead of 120-Unicode-character REST/HTML search and topic limits and (5) missing strict bidi/format-control rejection in REST topics. Two actual PHP8.0/8.3 behavior regressions cover saving, readback, approved public sections and Unicode RTL text, without asserting installed runtime parity.
 
