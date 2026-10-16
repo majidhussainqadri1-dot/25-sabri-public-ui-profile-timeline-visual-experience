@@ -1,0 +1,217 @@
+{
+  "range": "1115-1154",
+  "main": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+  "parent": "263fd0387dae7cfae936367f38d499848b32a64b",
+  "source": "File25 source and central requirements; original DOCX full parity unverified",
+  "files": "includes/class-profile-renderer.php, class-plan-completion.php, class-profile-repository.php, class-rest-controller.php, class-timeline-service.php, class-public-url.php; config/central-2026-file25-requirements.json",
+  "counts": {
+    "checks": 40,
+    "witnesses": 36,
+    "defects": 4,
+    "root_causes": 1,
+    "corrections": 0
+  },
+  "cause": "R1139-1142: HTML invalid/disabled profile_q still invokes Timeline_Service with empty search",
+  "items": [
+    [
+      1115,
+      "route gate",
+      "witness"
+    ],
+    [
+      1116,
+      "HTML no-store",
+      "witness"
+    ],
+    [
+      1117,
+      "native visibility",
+      "witness"
+    ],
+    [
+      1118,
+      "preview denial",
+      "witness"
+    ],
+    [
+      1119,
+      "owner opt-out",
+      "witness"
+    ],
+    [
+      1120,
+      "provider lookup",
+      "witness"
+    ],
+    [
+      1121,
+      "enabled tabs",
+      "witness"
+    ],
+    [
+      1122,
+      "canonical section",
+      "witness"
+    ],
+    [
+      1123,
+      "role redirect",
+      "witness"
+    ],
+    [
+      1124,
+      "404 fallback",
+      "witness"
+    ],
+    [
+      1125,
+      "scoped robots",
+      "witness"
+    ],
+    [
+      1126,
+      "meta privacy",
+      "witness"
+    ],
+    [
+      1127,
+      "type validation",
+      "witness"
+    ],
+    [
+      1128,
+      "provider allowlist",
+      "witness"
+    ],
+    [
+      1129,
+      "year bound",
+      "witness"
+    ],
+    [
+      1130,
+      "language bound",
+      "witness"
+    ],
+    [
+      1131,
+      "Unicode topic",
+      "witness"
+    ],
+    [
+      1132,
+      "sort allowlist",
+      "witness"
+    ],
+    [
+      1133,
+      "array error",
+      "witness"
+    ],
+    [
+      1134,
+      "bidi error",
+      "witness"
+    ],
+    [
+      1135,
+      "length bound",
+      "witness"
+    ],
+    [
+      1136,
+      "search opt-out",
+      "witness"
+    ],
+    [
+      1137,
+      "valid normalization",
+      "witness"
+    ],
+    [
+      1138,
+      "empty default",
+      "witness"
+    ],
+    [
+      1139,
+      "array no-broadening",
+      "defect"
+    ],
+    [
+      1140,
+      "bidi no-broadening",
+      "defect"
+    ],
+    [
+      1141,
+      "oversize no-broadening",
+      "defect"
+    ],
+    [
+      1142,
+      "disabled no-broadening",
+      "defect"
+    ],
+    [
+      1143,
+      "page bound",
+      "witness"
+    ],
+    [
+      1144,
+      "provider limit",
+      "witness"
+    ],
+    [
+      1145,
+      "author match",
+      "witness"
+    ],
+    [
+      1146,
+      "provider isolation",
+      "witness"
+    ],
+    [
+      1147,
+      "same-origin URL",
+      "witness"
+    ],
+    [
+      1148,
+      "native DTO",
+      "witness"
+    ],
+    [
+      1149,
+      "REST search validation",
+      "witness"
+    ],
+    [
+      1150,
+      "REST search opt-out",
+      "witness"
+    ],
+    [
+      1151,
+      "REST no-store",
+      "witness"
+    ],
+    [
+      1152,
+      "REST ETag",
+      "witness"
+    ],
+    [
+      1153,
+      "URL format controls",
+      "witness"
+    ],
+    [
+      1154,
+      "historical lineage",
+      "witness"
+    ]
+  ]
+}
