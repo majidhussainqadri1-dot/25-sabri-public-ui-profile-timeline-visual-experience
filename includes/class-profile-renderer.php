@@ -513,12 +513,18 @@ final class Profile_Renderer
         if (! isset($_GET[$query_key]) || ! is_scalar($_GET[$query_key])) {
             return '';
         }
-        $value = trim(wp_strip_all_tags((string) wp_unslash($_GET[$query_key])));
-        if ($value === '' || strlen($value) > $maximum || preg_match('/[\\x00-\\x1F\\x7F]/', $value) === 1) {
+        $raw = (string) wp_unslash($_GET[$query_key]);
+        if (strlen($raw) > $maximum * 4) {
             return '';
         }
-
-        return $value;
+        // Keep the server-rendered Timeline topic filter in parity with the
+        // native REST source: Unicode character count, bounded bytes and
+        // rejection of invisible bidi/format controls.
+        $value = Plan_Completion::normalize_search_query($raw);
+        $length = function_exists('mb_strlen')
+            ? mb_strlen($value, 'UTF-8')
+            : preg_match_all('/./us', $value);
+        return $value !== '' && $length !== false && $length <= $maximum ? $value : '';
     }
 
     private function requested_timeline_sort(): string
