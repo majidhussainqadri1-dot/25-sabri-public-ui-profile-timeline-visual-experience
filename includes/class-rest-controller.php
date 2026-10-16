@@ -90,7 +90,11 @@ final class Rest_Controller
             ],
             'search' => [
                 'default' => '',
-                'sanitize_callback' => static fn ($value): string => is_string($value) ? Plan_Completion::normalize_search_query($value) : '',
+                // Preserve invalid input until validation can reject it.
+                // Normalizing malformed/oversized text to an empty search
+                // silently turns an invalid request into "all public items".
+                'sanitize_callback' => static fn ($value): mixed => is_string($value) && self::exact_optional_search($value)
+                    ? Plan_Completion::normalize_search_query($value) : $value,
                 'validate_callback' => static fn ($value): bool => self::exact_optional_search($value),
             ],
         ];
