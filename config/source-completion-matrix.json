@@ -22,14 +22,14 @@
     "production_accepted": false,
     "live_deployed": false,
     "operational": false,
-    "truthful_boundary": "Reviews 875-914 performed forty distinct source-plan inspections against File25 v2.0, central consolidated master plan v3.0 and native File03/08/09/17/20/21/24 owner boundaries. Seven source gaps found and corrected in two groups: HTML-equivalent approved provider tabs included in REST profile manifest (R885); malformed optional REST content_type/provider/year/language/topic/sort filters cannot be changed into accepted empty/default parameters before validation (R891-R896). Earlier R835-R874 remains preserved. Corrected source is unmerged, not installed, and no staging/live/DB/schema/migration evidence was obtained.",
-    "latest_review_range": "875-914",
+    "truthful_boundary": "Reviews 915–954 verified forty separate File25 plan/source scopes against its final governing Word specification, the Three Central Consolidated Master Plan, and File03/08/09/17/20/21/24 owners. Twenty-seven source witnesses and thirteen deficient checks were identified in five root-cause groups: 14 tabs exceeding configured maximum 12, invalid provider/tab lists re-enabling defaults, malformed public/privacy booleans re-enabling exposure/search/metrics, Unicode byte-vs-character mismatches in REST/HTML query filters, and REST topic invisible bidi/format controls. All thirteen check-scope defects corrected in unmerged branch with governed PHP regressions. No installed staging package, DB/schema, migration or live parity asserted.",
+    "latest_review_range": "915-954",
     "exact_head_ci": "external-evidence-required-for-current-head-not-frozen-in-source",
     "exact_deployed_code_verified": false,
     "db_version_verified_live": false,
     "migration_state_verified_live": false,
-    "review_ledger": "config/review875-914-rest-query-provider-parity-audit.json",
-    "historical_review_lineage": "Reviews 515-594, 595-614, 615-634, 635-654, 655-674, 675-694, 695-714, 715-754, 755-794, 795-834 and 835-874 are preserved as historical source audits. Reviews 875-914 are current targeted source inspections, not 40 completed live testing cycles."
+    "review_ledger": "config/review915-954-settings-unicode-audit.json",
+    "historical_review_lineage": "Reviews 515-594, 595-614, 615-634, 635-654, 655-674, 675-694, 695-714, 715-754, 755-794, 795-834, 835-874, 875-914 remain preserved as historical source review evidence. Reviews 915-954 are latest forty targeted source inspections. Historical CI/PRs cannot prove live deployment."
   },
   "requirements": [
     {
@@ -466,6 +466,28 @@
         "tests/review875-914-rest-query-provider-parity.php",
         "config/review875-914-rest-query-provider-parity-audit.json",
         "docs/REVIEWS-875-914-REST-QUERY-PROVIDER-PARITY-2026-10-16.md"
+      ],
+      "staging_accepted": false,
+      "live_verified": false
+    },
+    {
+      "id": "F25-R915-R954-TABS-PRIVACY-UNICODE",
+      "record_class": "source-review-extension-not-base-requirement",
+      "status": "source-corrected-on-unmerged-review-branch-await-exact-head-ci",
+      "findings": {
+        "review_checks": 40,
+        "source_witness": 27,
+        "corrected_defective_scopes": 13,
+        "root_cause_groups": 5
+      },
+      "evidence": [
+        "includes/class-plan-completion.php",
+        "includes/class-rest-controller.php",
+        "includes/class-profile-renderer.php",
+        "tests/review915-954-preferences-privacy-unicode.php",
+        "tests/review915-954-rest-html-unicode-parity.php",
+        "config/review915-954-settings-unicode-audit.json",
+        "docs/REVIEWS-915-954-SETTINGS-PRIVACY-UNICODE-2026-10-16.md"
       ],
       "staging_accepted": false,
       "live_verified": false
