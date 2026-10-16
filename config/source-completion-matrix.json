@@ -22,14 +22,14 @@
     "production_accepted": false,
     "live_deployed": false,
     "operational": false,
-    "truthful_boundary": "Reviews 835-874 performed 40 distinct source inspections grounded in File25 final plan v2.0 and consolidated central plan v3.0, with File03/08/09/17/20/21/24 ownership checks. Three source defects corrected: invalid REST search must never be rewritten into an allowed empty search, and File17 Follow / File08 Appointment buttons must not be revived through later filters while official target-bound native contract is unavailable. The corrected candidate is stacked upon PRs 22/21/20, not merged, and not live-verified. Hostinger staging, deployed package, live DB/schema/migration and owner acceptance remain unverified.",
-    "latest_review_range": "835-874",
+    "truthful_boundary": "Reviews 875-914 performed forty distinct source-plan inspections against File25 v2.0, central consolidated master plan v3.0 and native File03/08/09/17/20/21/24 owner boundaries. Seven source gaps found and corrected in two groups: HTML-equivalent approved provider tabs included in REST profile manifest (R885); malformed optional REST content_type/provider/year/language/topic/sort filters cannot be changed into accepted empty/default parameters before validation (R891-R896). Earlier R835-R874 remains preserved. Corrected source is unmerged, not installed, and no staging/live/DB/schema/migration evidence was obtained.",
+    "latest_review_range": "875-914",
     "exact_head_ci": "external-evidence-required-for-current-head-not-frozen-in-source",
     "exact_deployed_code_verified": false,
     "db_version_verified_live": false,
     "migration_state_verified_live": false,
-    "review_ledger": "config/review835-874-native-action-rest-search-audit.json",
-    "historical_review_lineage": "Reviews 515-594, 595-614, 615-634, 635-654, 655-674, 675-694, 695-714, 715-754, 755-794 and 795-834 remain preserved as historical source audit evidence. Reviews 835-874 are the latest targeted source review; historical runs are not live acceptance."
+    "review_ledger": "config/review875-914-rest-query-provider-parity-audit.json",
+    "historical_review_lineage": "Reviews 515-594, 595-614, 615-634, 635-654, 655-674, 675-694, 695-714, 715-754, 755-794, 795-834 and 835-874 are preserved as historical source audits. Reviews 875-914 are current targeted source inspections, not 40 completed live testing cycles."
   },
   "requirements": [
     {
@@ -452,6 +452,20 @@
         "tests/review835-874-native-action-rest-search.php",
         "config/review835-874-native-action-rest-search-audit.json",
         "docs/REVIEWS-835-874-NATIVE-ACTIONS-REST-SEARCH-2026-10-16.md"
+      ],
+      "staging_accepted": false,
+      "live_verified": false
+    },
+    {
+      "id": "F25-R875-R914-REST-QUERY-PROVIDER-PARITY",
+      "record_class": "source-review-extension-not-base-requirement",
+      "status": "corrected-on-unmerged-review-branch-check-exact-latest-ci",
+      "scope": "File25 public REST profile provider tab projections consistent with HTML; exact optional REST query validation for 6 filter fields.",
+      "evidence": [
+        "includes/class-rest-controller.php",
+        "tests/review875-914-rest-query-provider-parity.php",
+        "config/review875-914-rest-query-provider-parity-audit.json",
+        "docs/REVIEWS-875-914-REST-QUERY-PROVIDER-PARITY-2026-10-16.md"
       ],
       "staging_accepted": false,
       "live_verified": false
