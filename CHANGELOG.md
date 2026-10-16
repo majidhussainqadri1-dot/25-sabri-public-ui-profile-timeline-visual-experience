@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — 2026-10-16 — Reviews 835–874 native action / REST input boundaries
+
+- Forty new targeted source inspections; three File25 defects corrected and tested.
+- While File17 Follow and File08 Appointment lack approved target-specific native destination contracts, final File25 action presenter rejects them even after late same-site URL filters.
+- REST Timeline search preserves invalid input for strict validation instead of normalizing malformed queries into unfiltered retrievals.
+- Source evidence and governed PHP8.0/PHP8.3 regression included; no staged/deployed/live verification claimed.
+
+
 ## Unreleased — 2026-10-15 — Reviews 795–834 SEO/privacy scope
 
 - Forty new independently targeted source checks; five SEO/privacy source defects corrected.

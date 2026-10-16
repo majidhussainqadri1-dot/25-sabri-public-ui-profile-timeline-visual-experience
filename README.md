@@ -16,7 +16,17 @@ Forty separate source-level completeness inspections were performed against File
 - Neither staging, production, DB/schema/migration state nor exact live deployed parity is verified.
 
 
-## Latest source corrective candidate — Reviews 795–834 (15 October 2026)
+## Latest corrective candidate — Reviews 835–874 (16 October 2026)
+
+Forty separate source-level inspections against File25 v2.0, central v3.0 and File03/08/09/17/20/21/24 native owner boundaries found **three** File25 source defects and corrected them on this stacked review branch. Unaccepted File17 Follow and File08 Appointment targets can no longer be restored through subsequent arbitrary `action_url` filters, even with same-site URLs. Invalid REST Timeline `search` input is no longer transformed into an accepted empty/all-results request before validation. A PHP 8.0/8.3 regression uses actual route callbacks and the private action projector. These are 40 focused inspections, **not** 40 Hostinger/Live test cycles.
+
+- Detailed inspection log: `config/review835-874-native-action-rest-search-audit.json`.
+- Human audit: `docs/REVIEWS-835-874-NATIVE-ACTIONS-REST-SEARCH-2026-10-16.md`.
+- Regression: `tests/review835-874-native-action-rest-search.php`.
+- Stacked upon **unmerged** PRs #22, #21 and #20. Check actual candidate SHA CI; do not infer live deployed state from source.
+- Remaining: approved native File08 booking & File17 Follow contracts, additional File21-native Timeline bridges, Hostinger staging, Founder acceptance, DB/schema/migration checks, deployed checksums and live retest.
+
+## Historical corrective candidate — Reviews 795–834 (15 October 2026)
 
 The forty source inspections in `config/review795-834-seo-privacy-boundary-audit.json` identified and corrected **five** File25-owned privacy/SEO issues: File25's global robots filter improperly affected non-File25 pages; private owner-visible profiles lacked mandatory noindex; such profiles could emit social/structured metadata; an existing nofollow could be cleared; member-profile indexing accepted truthy, non-boolean plugin values. These are five source defects corrected on the unmerged branch, not live incidents proven resolved. `tests/review795-834-seo-scope-privacy.php` exercises actual PHP behavior on PHP 8.0 and 8.3. Full report: `docs/REVIEWS-795-834-SEO-PRIVACY-SCOPE-2026-10-15.md`.
 
