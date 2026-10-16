@@ -652,6 +652,13 @@ final class Plan_Completion
 
     private static function action_url(string $action, int $user_id): string
     {
+        // File 17 Follow and File 08 Appointment have not published/accepted
+        // a target-bound profile-action destination contract. An extension
+        // running after the native adapter must not resurrect either link by
+        // returning a plausible but non-authoritative same-site URL.
+        if (in_array($action, ['follow', 'appointment'], true)) {
+            return '';
+        }
         $candidate = apply_filters('sabri_public_experience/action_url', '', $action, $user_id);
         return Public_URL::sanitize_same_site($candidate, false);
     }
