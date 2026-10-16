@@ -1,0 +1,390 @@
+{
+  "schema": 1,
+  "file": 25,
+  "review_range": {
+    "first": 875,
+    "last": 914,
+    "count": 40
+  },
+  "date": "2026-10-16",
+  "interpretation": "Forty separate requirement-to-source inspections, not forty independent full codebase or live/staging end-to-end runs.",
+  "requirements": [
+    "File25 Complete Public UI, Profile Timeline and Visual Experience v2.0 §§29–30,37,46,53–54,60–61,63–65,68,72,75,80–90",
+    "Consolidated Three Central Plans Governing Master Plan 2026, §1.2 release statuses, canonical owner matrix, 40 acceptance journeys",
+    "File03 profile/consent; File08 clinic/appointments; File09 doctor; File17 Follow; File20 shell; File21 feed; File24 security"
+  ],
+  "source_baseline": {
+    "main": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+    "parent_stacked_pr": 23,
+    "parent_sha": "11b8fdc13e41c25728aafaaa371ca896414f15b0"
+  },
+  "counts": {
+    "checks": 40,
+    "source_witness": 33,
+    "defective_scopes": 7,
+    "root_cause_groups": 2,
+    "corrected_in_source": 7,
+    "staging_scenarios_executed": 0,
+    "live_retests_executed": 0
+  },
+  "defect_groups": [
+    {
+      "rounds": [
+        885
+      ],
+      "root_cause": "REST profile response omitted optional source-approved provider section discovery used by HTML, making documented public tab manifest incomplete and inconsistent.",
+      "fix": "Consume same normalized bounded Section_Service::available_for_profile, merge labels and available sections before allowed-tab application; preserve File03 and admin gates."
+    },
+    {
+      "rounds": [
+        891,
+        892,
+        893,
+        894,
+        895,
+        896
+      ],
+      "root_cause": "Several optional REST parameter sanitizers replaced malformed nonscalar inputs with valid empty/default strings, potentially masking strict validation and widening an accidentally malformed filter to unfiltered/default output.",
+      "fix": "Preserve raw filter data for the exact validators for content_type, provider, year, language and sort; only normalize topic when it already passes strict optional text validation. Retain valid empty intentional filters and normalized ordinary topic."
+    }
+  ],
+  "verification": {
+    "behavioral_test": "tests/review875-914-rest-query-provider-parity.php",
+    "exact_head_ci": "requires independent latest SHA check",
+    "main_merged": false,
+    "staging_installed": false,
+    "live_deployed": false,
+    "live_db_verified": false,
+    "migration_verified": false,
+    "live_retest": false
+  },
+  "external_blockers": [
+    "Unaccepted File08 target-bound Booking destination",
+    "Unaccepted File17 target-bound Follow contract",
+    "Native extended author contribution provider staging acceptance",
+    "Hostinger installed package checksum and dependency parity",
+    "Live DB/schema and wp_options/migration proof; role-based staging and Founder acceptance"
+  ],
+  "checks": [
+    {
+      "round": 875,
+      "scope": "File03 UUID public ID and File25 slug route separation",
+      "source": "includes/class-profile-router.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 876,
+      "scope": "Founder Doctor and Member canonical routing",
+      "source": "includes/class-profile-repository.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 877,
+      "scope": "File00 and File03 public profile authority",
+      "source": "includes/class-visibility-policy.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 878,
+      "scope": "File03 owner-approved text and no independent identity",
+      "source": "includes/class-profile-repository.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 879,
+      "scope": "File09 Doctor verification authority",
+      "source": "includes/class-native-integration.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 880,
+      "scope": "Minor contact privacy",
+      "source": "includes/class-visibility-policy.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 881,
+      "scope": "Contact consent and monotonic revocation",
+      "source": "includes/class-visibility-policy.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 882,
+      "scope": "Global SEO hook limited to File25 profile routes",
+      "source": "includes/class-plan-completion.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 883,
+      "scope": "Owner-private OpenGraph metadata suppression",
+      "source": "includes/class-profile-renderer.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 884,
+      "scope": "Global public REST opt-out",
+      "source": "includes/class-rest-controller.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 885,
+      "scope": "REST profile dynamic provider tabs match HTML",
+      "source": "includes/class-rest-controller.php",
+      "result": "source-gap-confirmed-corrected",
+      "test_scope": "tests/review875-914-rest-query-provider-parity.php",
+      "live_assertion": false
+    },
+    {
+      "round": 886,
+      "scope": "REST profile respects administrator selected public tabs",
+      "source": "includes/class-rest-controller.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 887,
+      "scope": "REST Timeline can be hidden administratively",
+      "source": "includes/class-rest-controller.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 888,
+      "scope": "REST Knowledge/Media hidden sections unavailable",
+      "source": "includes/class-rest-controller.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 889,
+      "scope": "Profile-local REST search preference",
+      "source": "includes/class-rest-controller.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 890,
+      "scope": "Strict invalid REST search preservation",
+      "source": "includes/class-rest-controller.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 891,
+      "scope": "Strict content_type optional REST validation",
+      "source": "includes/class-rest-controller.php",
+      "result": "source-gap-confirmed-corrected",
+      "test_scope": "tests/review875-914-rest-query-provider-parity.php",
+      "live_assertion": false
+    },
+    {
+      "round": 892,
+      "scope": "Strict provider optional REST validation",
+      "source": "includes/class-rest-controller.php",
+      "result": "source-gap-confirmed-corrected",
+      "test_scope": "tests/review875-914-rest-query-provider-parity.php",
+      "live_assertion": false
+    },
+    {
+      "round": 893,
+      "scope": "Strict year optional REST validation",
+      "source": "includes/class-rest-controller.php",
+      "result": "source-gap-confirmed-corrected",
+      "test_scope": "tests/review875-914-rest-query-provider-parity.php",
+      "live_assertion": false
+    },
+    {
+      "round": 894,
+      "scope": "Strict language optional REST validation",
+      "source": "includes/class-rest-controller.php",
+      "result": "source-gap-confirmed-corrected",
+      "test_scope": "tests/review875-914-rest-query-provider-parity.php",
+      "live_assertion": false
+    },
+    {
+      "round": 895,
+      "scope": "Strict topic optional REST validation",
+      "source": "includes/class-rest-controller.php",
+      "result": "source-gap-confirmed-corrected",
+      "test_scope": "tests/review875-914-rest-query-provider-parity.php",
+      "live_assertion": false
+    },
+    {
+      "round": 896,
+      "scope": "Strict sort optional REST validation",
+      "source": "includes/class-rest-controller.php",
+      "result": "source-gap-confirmed-corrected",
+      "test_scope": "tests/review875-914-rest-query-provider-parity.php",
+      "live_assertion": false
+    },
+    {
+      "round": 897,
+      "scope": "REST per_page strict upper bound 50",
+      "source": "includes/class-rest-controller.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 898,
+      "scope": "REST page exact positive integer",
+      "source": "includes/class-rest-controller.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 899,
+      "scope": "REST no-store private response",
+      "source": "includes/class-rest-controller.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 900,
+      "scope": "REST ETag and Last-Modified support",
+      "source": "includes/class-rest-controller.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 901,
+      "scope": "Provider registration metadata invariant",
+      "source": "includes/class-section-registry.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 902,
+      "scope": "Read-only native provider ownership",
+      "source": "includes/class-section-registry.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 903,
+      "scope": "Section all-or-nothing public card batch",
+      "source": "includes/class-section-service.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 904,
+      "scope": "Canonical public card deduplication",
+      "source": "includes/class-section-service.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 905,
+      "scope": "Bounded author-centric Timeline provider queries",
+      "source": "includes/class-timeline-service.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 906,
+      "scope": "Timeline provider identity invariant",
+      "source": "includes/class-timeline-service.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 907,
+      "scope": "File17 Follow destination fails closed",
+      "source": "includes/class-plan-completion.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 908,
+      "scope": "File08 Appointment destination fails closed",
+      "source": "includes/class-current-companion-2026-08-10.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 909,
+      "scope": "File20 owns global shell and skip navigation",
+      "source": "includes/class-profile-router.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 910,
+      "scope": "RTL logical properties and base tokens",
+      "source": "assets/css/public.css",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 911,
+      "scope": "Reduced-motion public visual system",
+      "source": "assets/css/public.css",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 912,
+      "scope": "File24 central security integration",
+      "source": "includes/class-file-24-integration.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 913,
+      "scope": "Safe Mode public noindex/transparent fallback",
+      "source": "includes/class-safe-mode-public.php",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    },
+    {
+      "round": 914,
+      "scope": "Staging and live acceptance flags not self-certified",
+      "source": "config/source-completion-matrix.json",
+      "result": "source-witness-reviewed",
+      "test_scope": "existing-owner/source-inspection",
+      "live_assertion": false
+    }
+  ]
+}

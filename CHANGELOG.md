@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — 2026-10-16 — Reviews 875–914 strict REST and provider parity
+
+- Forty distinct targeted source inspections: 33 witnesses and seven REST contract gaps corrected in two root-cause groups.
+- Public REST profile now includes the same actually available approved provider tabs as the HTML profile, honoring enabled section settings.
+- Strict optional REST filters preserve malformed input for rejection instead of silently converting it to empty/default filters.
+- Added PHP8.0/PHP8.3 behavioral contract tests and historic source-audit traceability; staging/deployment/live verification is not claimed.
+
+
 ## Unreleased — 2026-10-16 — Reviews 835–874 native action / REST input boundaries
 
 - Forty new targeted source inspections; three File25 defects corrected and tested.
