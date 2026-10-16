@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — 2026-10-16 — Reviews 955–994: Founder Timeline validators & Unicode service
+
+- Forty distinct targeted plan/source inspections; 37 source witnesses, three corrected requirement scopes in two root-cause groups.
+- Founder Timeline REST and Doctor/Member Timeline REST now share one strict schema for all supported filters and pagination.
+- Native Timeline Service now accepts bounded 120-codepoint Unicode topics and rejects invisible bidi/format controls, matching HTML/REST.
+- Added governed PHP8.0/PHP8.3 behavioral test and source evidence ledger; no deployed/staging/live acceptance is claimed.
+
+
 ## Unreleased — 2026-10-16 — Reviews 915–954: section-limit, privacy fail-closed, Unicode
 
 - Forty targeted source checks; thirteen defective requirement/source scopes corrected in five root causes.
