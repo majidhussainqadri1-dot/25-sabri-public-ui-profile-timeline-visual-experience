@@ -1,0 +1,315 @@
+{
+  "schema": 1,
+  "module": 25,
+  "date": "2026-10-16",
+  "review_range": {
+    "first": 995,
+    "last": 1034,
+    "total": 40
+  },
+  "method": "Forty distinct targeted code/contract inspections traced to source; NOT forty complete end-to-end tests and NOT a live incident diagnosis.",
+  "governing_documents": [
+    "File 25 Complete Public UI, Profile Timeline and Visual Experience Final (1).docx §§40–48, 60–65, 72, 80–90",
+    "Sabri Social Homeopathy Platform Three Central Plans Consolidated Governing Master Plan 2026 §§11, 12, 16, 23–25, 36–42, 47–50",
+    "File21 Home and News Feed Master Plan §§12,22,26,27,32–36; File03/08/17/20/24 native owners"
+  ],
+  "frozen_repository_heads": {
+    "File25 main": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+    "File25 stacked parent PR26": "70ad2ad8856b3938114931ba27904d3820b910ec",
+    "File03 main": "636e3ef965423887f810718abec3cd1c11c3659d",
+    "File08 main": "9dcc8d16ea81d0bbd27184e71bc09ba04d30ba03",
+    "File17 main": "8ae656e51796d1f05865d8be5dca2480443d79ca",
+    "File20 main": "8a4dbcaf4fef8e926b9b834ecfde16c21a0f00ca",
+    "File21 main": "f2eb7e95ddea327af36ea725ffb923b029f885e6",
+    "File24": "repository HEAD not independently established in this turn"
+  },
+  "totals": {
+    "inspections": 40,
+    "source_witness_checks": 36,
+    "defect_check_scopes": 4,
+    "distinct_root_causes": 2,
+    "corrected_check_scopes": 4,
+    "full_wordpress_staging_tests": 0,
+    "live_retests": 0
+  },
+  "defect_groups": [
+    {
+      "checks": [
+        996,
+        997
+      ],
+      "root_cause": "WordPress_Posts_Provider coerced public-approval extension result with (bool); strings such as 'false' and 'yes' silently became approval despite native read-only privacy boundary.",
+      "fix": "Use apply_filters unchanged and require exact PHP boolean true before projecting a native public post.",
+      "regression": "tests/review995-1034-wordpress-post-approval.php: real adapter with stub WordPress published post and eight malformed/truthy permission values."
+    },
+    {
+      "checks": [
+        1005,
+        1006
+      ],
+      "root_cause": "Public REST rate limiter returned true with no usable transient/cache backend or empty rate bucket and did not check transient write success. These paths silently allowed requests without enforceable quotas.",
+      "fix": "Return safe 503 WP_Error when storage is unavailable, bucket is not usable, quota cannot be persisted or count not resolved; preserve expected 429 after exceeding quota.",
+      "regression": "tests/review995-1034-rest-rate-storage.php: real REST controller rate path with simulated write failures and repeated writes."
+    }
+  ],
+  "excluded_false_positive": {
+    "round": 1030,
+    "reason": "The File20 structural shell and its explicit owner boundaries are implemented separately in File25 includes/class-file-20-integration.php; a narrow search of profile renderer/repository omitted the actual integration class."
+  },
+  "known_residual_risks": [
+    "Default WordPress transient get+set fallback is not an atomic distributed rate counter under high concurrency; test with real cache/storage topology and File24 abuse policy.",
+    "File08 target-bound booking and File17 target-bound Follow action owner contracts remain unaccepted.",
+    "Exact active deployed plugin/package/checksum, DB/schema, wp_options migrations, staging role QA and Founder acceptance remain unverified."
+  ],
+  "release": {
+    "corrective_source_branch": "unmerged stacked candidate",
+    "production_deployed": false,
+    "staging_accepted": false,
+    "live_version_verified": false,
+    "live_db_schema_verified": false,
+    "live_migration_verified": false,
+    "live_retested": false
+  },
+  "checks": [
+    {
+      "review": 995,
+      "scope": "WordPress native fallback limited to post type",
+      "evidence": "includes/providers/class-wordpress-posts-provider.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 996,
+      "scope": "WordPress public post approval requires explicit true",
+      "evidence": "includes/providers/class-wordpress-posts-provider.php",
+      "status": "defect-scope-corrected-on-candidate"
+    },
+    {
+      "review": 997,
+      "scope": "WordPress public approval rejects truthy strings",
+      "evidence": "includes/providers/class-wordpress-posts-provider.php",
+      "status": "defect-scope-corrected-on-candidate"
+    },
+    {
+      "review": 998,
+      "scope": "WordPress post excludes password protection",
+      "evidence": "includes/providers/class-wordpress-posts-provider.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 999,
+      "scope": "WordPress exact author ID recheck",
+      "evidence": "includes/providers/class-wordpress-posts-provider.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1000,
+      "scope": "WordPress publish status only",
+      "evidence": "includes/providers/class-wordpress-posts-provider.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1001,
+      "scope": "File21 native ProfileTimeline projection owner",
+      "evidence": "includes/providers/class-file-21-provider.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1002,
+      "scope": "File21 native status error gate",
+      "evidence": "includes/providers/class-file-21-provider.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1003,
+      "scope": "File21 bounded native pagination",
+      "evidence": "includes/providers/class-file-21-provider.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1004,
+      "scope": "File21 safe Normalized_Timeline_Item construction",
+      "evidence": "includes/providers/class-file-21-provider.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1005,
+      "scope": "REST rate limit requires usable storage",
+      "evidence": "includes/class-rest-controller.php",
+      "status": "defect-scope-corrected-on-candidate"
+    },
+    {
+      "review": 1006,
+      "scope": "REST quota writes cannot fail open",
+      "evidence": "includes/class-rest-controller.php",
+      "status": "defect-scope-corrected-on-candidate"
+    },
+    {
+      "review": 1007,
+      "scope": "REST anonymous/user IP bucket HMAC",
+      "evidence": "includes/class-rest-controller.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1008,
+      "scope": "REST rate-limit window bounded",
+      "evidence": "includes/class-rest-controller.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1009,
+      "scope": "REST per-window threshold bounded",
+      "evidence": "includes/class-rest-controller.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1010,
+      "scope": "REST public response Cache-Control no-store",
+      "evidence": "includes/class-rest-controller.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1011,
+      "scope": "REST conditional ETag",
+      "evidence": "includes/class-rest-controller.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1012,
+      "scope": "REST Last-Modified guard",
+      "evidence": "includes/class-rest-controller.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1013,
+      "scope": "REST global profile visibility opt-out",
+      "evidence": "includes/class-rest-controller.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1014,
+      "scope": "REST Founder timeline strict filter schemas",
+      "evidence": "includes/class-rest-controller.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1015,
+      "scope": "REST profiles via File03-approved public projection",
+      "evidence": "includes/class-rest-controller.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1016,
+      "scope": "File03 public visibility cannot be enlarged by filter",
+      "evidence": "includes/class-visibility-policy.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1017,
+      "scope": "File00 membership DTO strict Boolean fields",
+      "evidence": "includes/class-native-integration.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1018,
+      "scope": "File09 Doctor verification contract version",
+      "evidence": "includes/class-native-integration.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1019,
+      "scope": "File08 native clinic contract version gate",
+      "evidence": "includes/class-native-integration.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1020,
+      "scope": "File17 Follow target absent fails closed",
+      "evidence": "includes/class-plan-completion.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1021,
+      "scope": "Timeline provider maturity/contract checks",
+      "evidence": "includes/class-timeline-service.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1022,
+      "scope": "Timeline exact author/profile ID checks",
+      "evidence": "includes/class-timeline-service.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1023,
+      "scope": "Timeline provider batch atomic source identity",
+      "evidence": "includes/class-timeline-service.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1024,
+      "scope": "Timeline canonical item dedup across providers",
+      "evidence": "includes/class-timeline-service.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1025,
+      "scope": "Timeline public DTO omits raw native identity",
+      "evidence": "includes/class-normalized-timeline-item.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1026,
+      "scope": "Timeline pin temporal and actor audit boundaries",
+      "evidence": "includes/class-normalized-timeline-item.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1027,
+      "scope": "Public section card DTO normalization",
+      "evidence": "includes/class-section-service.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1028,
+      "scope": "Public section malformed provider batch rejection",
+      "evidence": "includes/class-section-service.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1029,
+      "scope": "File03 public profile does not fall back to raw WP bio",
+      "evidence": "includes/class-profile-repository.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1030,
+      "scope": "File20 exclusive shell structural ownership",
+      "evidence": "includes/class-file-20-integration.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1031,
+      "scope": "File24 separated security integration",
+      "evidence": "includes/class-file-24-integration.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1032,
+      "scope": "Profile canonical same-site URL sanitizer",
+      "evidence": "includes/class-public-url.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1033,
+      "scope": "Safe Mode public robots noindex",
+      "evidence": "includes/class-safe-mode-public.php",
+      "status": "source-witness-not-live-proof"
+    },
+    {
+      "review": 1034,
+      "scope": "GitHub staging/live deployment evidence separated",
+      "evidence": "config/source-completion-matrix.json",
+      "status": "source-witness-not-live-proof"
+    }
+  ]
+}
