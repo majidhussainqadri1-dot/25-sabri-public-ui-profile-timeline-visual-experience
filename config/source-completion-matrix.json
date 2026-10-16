@@ -22,14 +22,14 @@
     "production_accepted": false,
     "live_deployed": false,
     "operational": false,
-    "truthful_boundary": "Reviews 955-994 are 40 targeted source inspections against File25 final Word plan §§44/72, central governing plan and native owner contracts. 37 source witnesses, 3 corrected source-gap checks across 2 root causes: Founder Timeline REST filter validation differed from standard Profile Timeline (R955), and the core Timeline Service still imposed 120-byte topic limit plus ASCII-only controls, inconsistent with HTML/REST Unicode rules (R962-R963). Fixed in unmerged stacked candidate; governed PHP test checks actual REST registration and native service provider invocation. No live deployed version, DB/schema/migration, staging or Founder acceptance established.",
-    "latest_review_range": "955-994",
+    "truthful_boundary": "Reviews 995–1034 completed forty separate source/contract inspections against File25, central governing plans and File03/08/17/20/21 native owners. Thirty-six source witnesses, four deficient check scopes grouped into two verified source defects: (1) WordPress Posts compatibility adapter coerced truthy string public approvals into boolean true; now exact true is required. (2) public REST rate-limiter storage/cache unavailable and failed transient writes could silently bypass quotas; now 503 fail-closed for unenforceable buckets, retaining 429 for excess requests. No staging deployment or live version/DB/schema/migration/Founder acceptance verified. WordPress transient fallback is non-atomic under concurrency and needs real load test.",
+    "latest_review_range": "995-1034",
     "exact_head_ci": "external-evidence-required-for-current-head-not-frozen-in-source",
     "exact_deployed_code_verified": false,
     "db_version_verified_live": false,
     "migration_state_verified_live": false,
-    "review_ledger": "config/review955-994-founder-timeline-unicode-audit.json",
-    "historical_review_lineage": "Reviews 515-594, 595-614, 615-634, 635-654, 655-674, 675-694, 695-714, 715-754, 755-794, 795-834, 835-874, 875-914, 915-954 are historical source review evidence. Reviews 955-994 are latest forty targeted source checks and are not forty full live tests."
+    "review_ledger": "config/review995-1034-native-post-rate-guards-audit.json",
+    "historical_review_lineage": "Reviews 515-594, 595-614, 615-634, 635-654, 655-674, 675-694, 695-714, 715-754, 755-794, 795-834, 835-874, 875-914, 915-954, 955-994 are historical targeted source evidence. Reviews 995-1034 are latest 40 targeted scope checks and are not forty complete staging/live tests."
   },
   "requirements": [
     {
@@ -508,6 +508,25 @@
         "tests/review955-994-founder-timeline-rest-unicode.php",
         "config/review955-994-founder-timeline-unicode-audit.json",
         "docs/REVIEWS-955-994-FOUNDER-TIMELINE-UNICODE-2026-10-16.md"
+      ],
+      "staging_accepted": false,
+      "live_verified": false
+    },
+    {
+      "id": "F25-R995-R1034-NATIVE-POST-RATE-GUARDS",
+      "record_class": "source-review-extension-not-base-requirement",
+      "status": "source-corrective-candidate-pending-final-exact-head-ci",
+      "checks": 40,
+      "source_witnesses": 36,
+      "corrected_deficient_check_scopes": 4,
+      "distinct_root_causes": 2,
+      "evidence": [
+        "includes/providers/class-wordpress-posts-provider.php",
+        "includes/class-rest-controller.php",
+        "tests/review995-1034-wordpress-post-approval.php",
+        "tests/review995-1034-rest-rate-storage.php",
+        "config/review995-1034-native-post-rate-guards-audit.json",
+        "docs/REVIEWS-995-1034-NATIVE-POST-RATE-GUARDS-2026-10-16.md"
       ],
       "staging_accepted": false,
       "live_verified": false
