@@ -16,7 +16,16 @@ Forty separate source-level completeness inspections were performed against File
 - Neither staging, production, DB/schema/migration state nor exact live deployed parity is verified.
 
 
-## New source corrective candidate — Reviews 875–914 (16 October 2026)
+## Latest review candidate — Reviews 915–954 (16 October 2026)
+
+Forty **targeted source checks**, not forty full live/staging E2E runs, found 13 deficient plan/source scopes grouped into five root causes. The candidate branch corrects (1) the 14-vs-12 public-tab and section-order save truncation, (2) malformed enabled-tab/provider lists that could reopen disabled features, (3) explicit malformed public_visibility/public_metrics/profile_local_search booleans that could fail open, (4) 120-byte instead of 120-Unicode-character REST/HTML search and topic limits and (5) missing strict bidi/format-control rejection in REST topics. Two actual PHP8.0/8.3 behavior regressions cover saving, readback, approved public sections and Unicode RTL text, without asserting installed runtime parity.
+
+- Full 40-inspection ledger: `config/review915-954-settings-unicode-audit.json`.
+- Root-cause report: `docs/REVIEWS-915-954-SETTINGS-PRIVACY-UNICODE-2026-10-16.md`.
+- Governed regressions: `tests/review915-954-preferences-privacy-unicode.php`, `tests/review915-954-rest-html-unicode-parity.php`.
+- Source change is stacked above **unmerged draft PR #24** (and #23–#20); current `main` and live deployment are separate realities. File08 Booking, File17 Follow, Hostinger staging/migrations, Founder acceptance and exact installed checksums remain unverified.
+
+## Previous review candidate — Reviews 875–914 (16 October 2026)
 
 Forty new, distinct requirement-to-source inspections against File25 v2.0, the Three Central Plans v3.0 and File03/08/09/17/20/21/24 native owners identified **seven** source gaps within two root-cause groups. Corrected REST profile responses now return the same genuinely available native-provider Knowledge/Media/other sections as HTML, subject to File25 enabled-tab preferences. Six optional public Timeline REST filters (`content_type`, `provider`, `year`, `language`, `topic`, `sort`) no longer convert malformed inputs into valid empty/default values before validation. Both changes have actual REST-controller PHPUnit-independent behavioral regressions.
 

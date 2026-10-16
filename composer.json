@@ -51,7 +51,9 @@
       "tests/review755-794-rest-policy-parity.php",
       "tests/review795-834-seo-scope-privacy.php",
       "tests/review835-874-native-action-rest-search.php",
-      "tests/review875-914-rest-query-provider-parity.php"
+      "tests/review875-914-rest-query-provider-parity.php",
+      "tests/review915-954-preferences-privacy-unicode.php",
+      "tests/review915-954-rest-html-unicode-parity.php"
     ]
   }
 }

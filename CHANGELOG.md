@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — 2026-10-16 — Reviews 915–954: section-limit, privacy fail-closed, Unicode
+
+- Forty targeted source checks; thirteen defective requirement/source scopes corrected in five root causes.
+- Ensure fourteen approved public tabs and full featured-section ordering survive explicit admin save/readback.
+- Fail closed invalid public-tab/optional-provider lists, public visibility, metrics, and profile-local search settings.
+- Accept up to 120 Unicode characters (480 raw UTF8 bytes maximum) across search, REST topic, and HTML topic; reject hidden bidi/format controls.
+- Two governed executable PHP8.0/PHP8.3 regressions. Staging, installed DB/migration, Founder acceptance and live deployed parity are NOT verified.
+
+
 ## Unreleased — 2026-10-16 — Reviews 875–914 strict REST and provider parity
 
 - Forty distinct targeted source inspections: 33 witnesses and seven REST contract gaps corrected in two root-cause groups.
