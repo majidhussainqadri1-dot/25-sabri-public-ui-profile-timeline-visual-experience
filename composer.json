@@ -58,7 +58,8 @@
       "tests/review995-1034-wordpress-post-approval.php",
       "tests/review995-1034-rest-rate-storage.php",
       "tests/review1035-1074-owner-capability-metrics.php",
-      "tests/review1035-1074-native-visibility.php"
+      "tests/review1035-1074-native-visibility.php",
+      "tests/review1075-1114-url-format-pin-bounds.php"
     ]
   }
 }

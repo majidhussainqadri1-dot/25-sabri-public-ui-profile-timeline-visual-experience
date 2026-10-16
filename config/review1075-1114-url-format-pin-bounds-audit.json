@@ -1,0 +1,310 @@
+{
+  "schema": 1,
+  "module": "File25",
+  "date": "2026-10-17",
+  "review_range": {
+    "first": 1075,
+    "last": 1114,
+    "total": 40
+  },
+  "method": "Forty separately enumerated, source-anchored inspections of the unmerged PR28 head. Source witness is not an end-to-end test or deployed verification.",
+  "authority": [
+    "config/central-2026-file25-requirements.json",
+    "docs/GOVERNING-SCOPE.md",
+    "File25 Final v2.0 plan clauses: public URL/RTL/Timeline safety and QA",
+    "Three Central Consolidated Governing Master Plan: native ownership, privacy, acceptance",
+    "File03/08/09/17/20/21/24 owner boundaries as described in repo governing records"
+  ],
+  "authority_limit": "Original complete File25/Three Central DOCX files were not available for direct full-text reread during this run; source contracts and prior audited governing records were consulted. Do not claim independent complete DOCX parity.",
+  "baseline": {
+    "main": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+    "parent_pr": 28,
+    "parent_sha": "2c0c022d225b7c638574d7395aa566e2584d1fa4",
+    "parent_is_unmerged": true
+  },
+  "counts": {
+    "specific_inspections": 40,
+    "source_witnesses": 35,
+    "deficient_scopes": 5,
+    "distinct_root_causes": 2,
+    "source_files_corrected": 2,
+    "staging_tests_executed": 0,
+    "live_tests_executed": 0
+  },
+  "root_causes": [
+    {
+      "reviews": [
+        1075,
+        1076,
+        1077
+      ],
+      "file": "includes/class-public-url.php",
+      "cause": "Path validation checked ASCII controls and decoded separators/dot segments but not Unicode bidi/format controls in raw or recursively decoded paths.",
+      "fix": "Reject format controls in the raw path and at every bounded decoding layer.",
+      "regression": "tests/review1075-1114-url-format-pin-bounds.php"
+    },
+    {
+      "reviews": [
+        1101,
+        1102
+      ],
+      "file": "includes/class-normalized-timeline-item.php",
+      "cause": "exact_bounded_integer silently clamped out-of-range pin weights to [0,1000] instead of rejecting malformed provider authority input.",
+      "fix": "Reject values outside the declared integer bounds; retain valid audited pin semantics.",
+      "regression": "tests/review1075-1114-url-format-pin-bounds.php"
+    }
+  ],
+  "checks": [
+    {
+      "review": 1075,
+      "requirement": "Raw Unicode bidi controls in public URL paths",
+      "source": "includes/class-public-url.php",
+      "finding": "confirmed-source-defect-corrected-on-unmerged-candidate"
+    },
+    {
+      "review": 1076,
+      "requirement": "Percent-encoded bidi controls in public URL paths",
+      "source": "includes/class-public-url.php",
+      "finding": "confirmed-source-defect-corrected-on-unmerged-candidate"
+    },
+    {
+      "review": 1077,
+      "requirement": "Recursively encoded bidi controls in public URL paths",
+      "source": "includes/class-public-url.php",
+      "finding": "confirmed-source-defect-corrected-on-unmerged-candidate"
+    },
+    {
+      "review": 1078,
+      "requirement": "Legitimate Urdu UTF-8 path remains accepted",
+      "source": "includes/class-public-url.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1079,
+      "requirement": "Fragment component rejects format controls",
+      "source": "includes/class-public-url.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1080,
+      "requirement": "Query component rejects format controls",
+      "source": "includes/class-public-url.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1081,
+      "requirement": "Dot-only route segments rejected at each decoding layer",
+      "source": "includes/class-public-url.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1082,
+      "requirement": "Percent-encoded path slash rejected",
+      "source": "includes/class-public-url.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1083,
+      "requirement": "Percent-encoded path backslash rejected",
+      "source": "includes/class-public-url.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1084,
+      "requirement": "CR/LF control bytes rejected in paths",
+      "source": "includes/class-public-url.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1085,
+      "requirement": "Cross-origin absolute URL rejected",
+      "source": "includes/class-public-url.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1086,
+      "requirement": "HTTP downgrade from HTTPS site rejected",
+      "source": "includes/class-public-url.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1087,
+      "requirement": "Mismatched port rejected",
+      "source": "includes/class-public-url.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1088,
+      "requirement": "Credential-bearing URL rejected",
+      "source": "includes/class-public-url.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1089,
+      "requirement": "Canonical fragment forbidden when disabled",
+      "source": "includes/class-public-url.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1090,
+      "requirement": "Safe root-relative URL accepted",
+      "source": "includes/class-public-url.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1091,
+      "requirement": "Canonical URL identity preserves path case",
+      "source": "includes/class-public-url.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1092,
+      "requirement": "Content cards apply same-site destination policy",
+      "source": "includes/class-content-cards.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1093,
+      "requirement": "Content cards apply same-site image policy",
+      "source": "includes/class-content-cards.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1094,
+      "requirement": "Timeline canonical URL requires same-site absolute destination",
+      "source": "includes/class-normalized-timeline-item.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1095,
+      "requirement": "Timeline public thumbnail strips unapproved remote URLs",
+      "source": "includes/class-normalized-timeline-item.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1096,
+      "requirement": "File03-approved avatar URL remains monotonic",
+      "source": "includes/class-profile-repository.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1097,
+      "requirement": "File03-approved cover URL remains monotonic",
+      "source": "includes/class-profile-repository.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1098,
+      "requirement": "File03 contact consent and minor eligibility retained",
+      "source": "includes/class-visibility-policy.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1099,
+      "requirement": "Timeline author and public profile IDs checked",
+      "source": "includes/class-timeline-service.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1100,
+      "requirement": "Timeline provider ID/version matches registered metadata",
+      "source": "includes/class-timeline-service.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1101,
+      "requirement": "Above-maximum timeline pin weight rejected rather than clamped",
+      "source": "includes/class-normalized-timeline-item.php",
+      "finding": "confirmed-source-defect-corrected-on-unmerged-candidate"
+    },
+    {
+      "review": 1102,
+      "requirement": "Negative timeline pin weight rejected rather than clamped",
+      "source": "includes/class-normalized-timeline-item.php",
+      "finding": "confirmed-source-defect-corrected-on-unmerged-candidate"
+    },
+    {
+      "review": 1103,
+      "requirement": "Noninteger pin weight rejected",
+      "source": "includes/class-normalized-timeline-item.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1104,
+      "requirement": "Zero pin weight accepted",
+      "source": "includes/class-normalized-timeline-item.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1105,
+      "requirement": "Maximum valid audited pin weight accepted",
+      "source": "includes/class-normalized-timeline-item.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1106,
+      "requirement": "Missing pin audit cannot elevate ordering",
+      "source": "includes/class-normalized-timeline-item.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1107,
+      "requirement": "Pin audit surface limited to profile-timeline",
+      "source": "includes/class-normalized-timeline-item.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1108,
+      "requirement": "Pin audit window must be currently active",
+      "source": "includes/class-normalized-timeline-item.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1109,
+      "requirement": "Timeline updated_at cannot predate published_at",
+      "source": "includes/class-normalized-timeline-item.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1110,
+      "requirement": "Native publication status allowlist enforced",
+      "source": "includes/class-normalized-timeline-item.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1111,
+      "requirement": "Review approval status allowlist enforced",
+      "source": "includes/class-normalized-timeline-item.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1112,
+      "requirement": "Public timeline excerpt reduced to plain text",
+      "source": "includes/class-normalized-timeline-item.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1113,
+      "requirement": "Internal provider/object IDs omitted from public DTO",
+      "source": "includes/class-normalized-timeline-item.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    },
+    {
+      "review": 1114,
+      "requirement": "Timeline requested page overflow guarded",
+      "source": "includes/class-timeline-service.php",
+      "finding": "source-witness-no-installed-runtime-proof"
+    }
+  ],
+  "external_release_gates": {
+    "file08_booking_target": "unaccepted",
+    "file17_follow_target": "unaccepted",
+    "hostinger_staging": "not-executed",
+    "production_deployed_code": "unverified",
+    "database_schema": "unverified",
+    "wp_options_migration": "unverified",
+    "live_logs": "unverified",
+    "founder_acceptance": "not-recorded",
+    "main_merged": false
+  }
+}
