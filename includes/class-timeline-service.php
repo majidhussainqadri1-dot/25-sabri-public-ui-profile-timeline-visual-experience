@@ -344,12 +344,19 @@ final class Timeline_Service
         if (! is_string($value)) {
             return null;
         }
-        $value = trim(wp_strip_all_tags($value));
-        if ($value === '' || strlen($value) > $maximum || preg_match('/[\\x00-\\x1F\\x7F]/', $value) === 1) {
+        // All public Timeline entry points must obey the same bounded
+        // Unicode/format-control policy. REST and HTML already count
+        // characters, not UTF-8 bytes; this service is the final gate.
+        if (strlen($value) > $maximum * 4) {
             return null;
         }
+        $clean = Plan_Completion::normalize_search_query($value);
+        $length = function_exists('mb_strlen')
+            ? mb_strlen($clean, 'UTF-8')
+            : preg_match_all('/./us', $clean);
 
-        return $value;
+        return $clean !== '' && $length !== false && $length <= $maximum
+            ? $clean : null;
     }
 
     private static function exact_sort(mixed $value): ?string
