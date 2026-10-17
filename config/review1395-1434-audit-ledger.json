@@ -1,0 +1,215 @@
+{
+  "range": "1395-1434",
+  "parent": "1355-1394",
+  "main": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+  "candidate": "fec404318f29d564d3438e46867d5b4153b00d18",
+  "checks": 40,
+  "witnesses": 39,
+  "defects": 1,
+  "root_causes": 1,
+  "corrections": 1,
+  "root_cause": "Invalid HTML profile_q had search_error but timeline retrieval was unguarded",
+  "source_fix": "e0593d3d6ea487c0cb24d7b4db94ac1fbc3caf8d",
+  "records": [
+    {
+      "id": 1395,
+      "label": "route scope",
+      "status": "source_witness"
+    },
+    {
+      "id": 1396,
+      "label": "no-store",
+      "status": "source_witness"
+    },
+    {
+      "id": 1397,
+      "label": "profile DTO",
+      "status": "source_witness"
+    },
+    {
+      "id": 1398,
+      "label": "preview deny",
+      "status": "source_witness"
+    },
+    {
+      "id": 1399,
+      "label": "visibility",
+      "status": "source_witness"
+    },
+    {
+      "id": 1400,
+      "label": "canonical redirect",
+      "status": "source_witness"
+    },
+    {
+      "id": 1401,
+      "label": "section deny",
+      "status": "source_witness"
+    },
+    {
+      "id": 1402,
+      "label": "timeline gate",
+      "status": "source_witness"
+    },
+    {
+      "id": 1403,
+      "label": "array search",
+      "status": "source_witness"
+    },
+    {
+      "id": 1404,
+      "label": "normalization",
+      "status": "source_witness"
+    },
+    {
+      "id": 1405,
+      "label": "invalid error",
+      "status": "source_witness"
+    },
+    {
+      "id": 1406,
+      "label": "disabled error",
+      "status": "source_witness"
+    },
+    {
+      "id": 1407,
+      "label": "error context",
+      "status": "source_witness"
+    },
+    {
+      "id": 1408,
+      "label": "retrieval guard",
+      "status": "defect_fixed"
+    },
+    {
+      "id": 1409,
+      "label": "result count",
+      "status": "source_witness"
+    },
+    {
+      "id": 1410,
+      "label": "filtered noindex",
+      "status": "source_witness"
+    },
+    {
+      "id": 1411,
+      "label": "privacy noindex",
+      "status": "source_witness"
+    },
+    {
+      "id": 1412,
+      "label": "404 meta",
+      "status": "source_witness"
+    },
+    {
+      "id": 1413,
+      "label": "same-site canonical",
+      "status": "source_witness"
+    },
+    {
+      "id": 1414,
+      "label": "JSON-LD escaping",
+      "status": "source_witness"
+    },
+    {
+      "id": 1415,
+      "label": "type allowlist",
+      "status": "source_witness"
+    },
+    {
+      "id": 1416,
+      "label": "provider allowlist",
+      "status": "source_witness"
+    },
+    {
+      "id": 1417,
+      "label": "year validation",
+      "status": "source_witness"
+    },
+    {
+      "id": 1418,
+      "label": "language validation",
+      "status": "source_witness"
+    },
+    {
+      "id": 1419,
+      "label": "topic Unicode",
+      "status": "source_witness"
+    },
+    {
+      "id": 1420,
+      "label": "sort allowlist",
+      "status": "source_witness"
+    },
+    {
+      "id": 1421,
+      "label": "filter presence",
+      "status": "source_witness"
+    },
+    {
+      "id": 1422,
+      "label": "escaped input",
+      "status": "source_witness"
+    },
+    {
+      "id": 1423,
+      "label": "error display",
+      "status": "source_witness"
+    },
+    {
+      "id": 1424,
+      "label": "search preference",
+      "status": "source_witness"
+    },
+    {
+      "id": 1425,
+      "label": "service validation",
+      "status": "source_witness"
+    },
+    {
+      "id": 1426,
+      "label": "candidate cap",
+      "status": "source_witness"
+    },
+    {
+      "id": 1427,
+      "label": "provider metadata",
+      "status": "source_witness"
+    },
+    {
+      "id": 1428,
+      "label": "batch atomicity",
+      "status": "source_witness"
+    },
+    {
+      "id": 1429,
+      "label": "author match",
+      "status": "source_witness"
+    },
+    {
+      "id": 1430,
+      "label": "canonical guard",
+      "status": "source_witness"
+    },
+    {
+      "id": 1431,
+      "label": "deduplication",
+      "status": "source_witness"
+    },
+    {
+      "id": 1432,
+      "label": "provider isolation",
+      "status": "source_witness"
+    },
+    {
+      "id": 1433,
+      "label": "REST search disabled",
+      "status": "source_witness"
+    },
+    {
+      "id": 1434,
+      "label": "REST no-store",
+      "status": "source_witness"
+    }
+  ]
+}
