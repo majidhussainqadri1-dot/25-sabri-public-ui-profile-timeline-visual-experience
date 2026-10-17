@@ -1,0 +1,349 @@
+{
+  "range": "1475-1514",
+  "prior_range": "1435-1474",
+  "source_commit": "eed35e80ca93ff6ef86982e8ef88b95b870ff02b",
+  "main_commit": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+  "stack_base_branch": "fix/file25-reviews1435-1474-preview-class-20261017",
+  "scope": "File25 source-only; original File25 and all companion governing contracts not fully available",
+  "checks_total": 40,
+  "source_witnesses": 39,
+  "defect_scopes": 1,
+  "independent_root_causes": 1,
+  "source_corrections": 1,
+  "root_cause": "A generic div has aria-label but lacks a nameable semantic role; screen-reader announcement is not guaranteed",
+  "correction": "Add role=group to the existing translated, labelled profile actions container",
+  "historical_lineage": [
+    "1395-1434 HTML search guard",
+    "1435-1474 preview URL class resolution",
+    "1475-1514 action-group ARIA semantics"
+  ],
+  "external_gates": {
+    "deployed_version": "unverified",
+    "db_version": "unverified",
+    "migration_state": "unverified",
+    "live_verification": "unverified",
+    "complete_original_contract_reconciliation": false
+  },
+  "records": [
+    {
+      "review": 1475,
+      "check": "palette-primary",
+      "source": "assets/css/design-system.css:4",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1476,
+      "check": "palette-dark",
+      "source": "assets/css/design-system.css:5",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1477,
+      "check": "palette-light",
+      "source": "assets/css/design-system.css:6",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1478,
+      "check": "reduced-motion",
+      "source": "assets/css/public.css:306",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1479,
+      "check": "focus-indicator",
+      "source": "assets/css/design-system.css:164",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1480,
+      "check": "rtl-support",
+      "source": "assets/css/design-system.css:299",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1481,
+      "check": "style-dependency",
+      "source": "includes/class-assets.php:39",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1482,
+      "check": "profile-assets-gate",
+      "source": "includes/class-assets.php:51",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1483,
+      "check": "public-script-defer",
+      "source": "includes/class-assets.php:74",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1484,
+      "check": "future-script-dependency",
+      "source": "includes/class-future-public-experience.php:113",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1485,
+      "check": "server-rendered-profile",
+      "source": "templates/public-profile.php:73",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1486,
+      "check": "founder-route",
+      "source": "includes/class-profile-router.php:35",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1487,
+      "check": "doctor-route",
+      "source": "includes/class-profile-router.php:40",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1488,
+      "check": "file03-id-reservation",
+      "source": "includes/class-profile-router.php:49",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1489,
+      "check": "doctor-eligibility",
+      "source": "includes/class-native-integration.php:590",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1490,
+      "check": "file09-decision",
+      "source": "includes/class-native-integration.php:593",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1491,
+      "check": "contact-consent",
+      "source": "includes/class-visibility-policy.php:62",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1492,
+      "check": "file08-gate",
+      "source": "includes/class-native-integration.php:253",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1493,
+      "check": "file21-provider",
+      "source": "includes/providers/class-file-21-provider.php:5",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1494,
+      "check": "file24-contract",
+      "source": "includes/class-file-24-integration.php:12",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1495,
+      "check": "tracking-owner-denial",
+      "source": "includes/class-future-public-experience.php:63",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1496,
+      "check": "canonical-sanitizer",
+      "source": "includes/class-profile-renderer.php:121",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1497,
+      "check": "display-name-escaping",
+      "source": "templates/partials/profile-hero.php:43",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1498,
+      "check": "cover-decorative-alt",
+      "source": "templates/partials/profile-hero.php:24",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1499,
+      "check": "avatar-descriptive-alt",
+      "source": "templates/partials/profile-hero.php:37",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1500,
+      "check": "actions-group-accessible-name",
+      "source": "templates/partials/profile-hero.php:53",
+      "result": "defect_corrected_in_candidate",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1501,
+      "check": "share-live-announcement",
+      "source": "templates/partials/profile-hero.php:69",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1502,
+      "check": "preview-url-validation",
+      "source": "templates/public-profile.php:84",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1503,
+      "check": "edit-url-validation",
+      "source": "templates/public-profile.php:163",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1504,
+      "check": "tab-current-indicator",
+      "source": "templates/public-profile.php:197",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1505,
+      "check": "search-label",
+      "source": "templates/partials/timeline.php:65",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1506,
+      "check": "search-max-length",
+      "source": "templates/partials/timeline.php:67",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1507,
+      "check": "search-fail-closed",
+      "source": "includes/class-profile-renderer.php:148",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1508,
+      "check": "year-filter-format",
+      "source": "templates/partials/timeline.php:119",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1509,
+      "check": "canonical-timeline-escaping",
+      "source": "templates/partials/timeline.php:172",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1510,
+      "check": "share-busy-state",
+      "source": "assets/js/public.js:84",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1511,
+      "check": "share-copy-fallback",
+      "source": "assets/js/public.js:40",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1512,
+      "check": "local-storage-guard",
+      "source": "assets/js/future-public-experience.js:69",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1513,
+      "check": "deterministic-package",
+      "source": ".github/workflows/ci.yml:91",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    },
+    {
+      "review": 1514,
+      "check": "independent-package-verifier",
+      "source": ".github/workflows/ci.yml:147",
+      "result": "source_witness",
+      "method": "static_source_read",
+      "runtime_verified": false
+    }
+  ]
+}

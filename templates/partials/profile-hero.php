@@ -50,7 +50,7 @@ if ($canonical_url !== '' && function_exists('apply_filters')) {
             <?php if (! empty($profile['headline'])) : ?><p class="spux-headline"><?php echo esc_html((string) $profile['headline']); ?></p><?php endif; ?>
             <?php if ($location !== '') : ?><p class="spux-location"><?php echo esc_html($location); ?></p><?php endif; ?>
         </div>
-        <div class="spux-actions" aria-label="<?php esc_attr_e('Profile actions', 'sabri-public-experience'); ?>">
+        <div class="spux-actions" role="group" aria-label="<?php esc_attr_e('Profile actions', 'sabri-public-experience'); ?>">
             <?php foreach ((array) ($profile['contacts'] ?? []) as $type => $value) : ?>
                 <?php
                 $digits = preg_replace('/[^0-9+]/', '', (string) $value) ?? '';
