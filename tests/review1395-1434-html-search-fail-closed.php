@@ -24,13 +24,13 @@ if (preg_match($guard, $renderer) !== 1) {
 if (substr_count($renderer, $retrieval) !== 1) {
     $failures[] = 'Expected exactly one guarded HTML timeline retrieval.';
 }
-if (! str_contains($renderer, "$context['timeline_search_error'] = $search_error;")) {
+if (! str_contains($renderer, '$context[\'timeline_search_error\'] = $search_error;')) {
     $failures[] = 'Search error must be available to the view.';
 }
-if (! str_contains($renderer, "$search_error = isset($_GET['profile_q']) ? 'search_disabled' : '';")) {
+if (! str_contains($renderer, '$search_error = isset($_GET[\'profile_q\']) ? \'search_disabled\' : \'\';')) {
     $failures[] = 'Disabled local search must retain an explicit error.';
 }
-if (! str_contains($renderer, "! is_scalar($_GET['profile_q'])")) {
+if (! str_contains($renderer, '! is_scalar($_GET[\'profile_q\'])')) {
     $failures[] = 'Array search input must be rejected.';
 }
 foreach ([
