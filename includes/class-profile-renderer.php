@@ -172,17 +172,21 @@ final class Profile_Renderer
             $context['timeline_search_query'] = $search_query;
             $context['timeline_search_error'] = $search_error;
             $context['timeline_filtered_request'] = $this->timeline_filter_request_present();
-            $timeline = $this->timeline->get_for_author((int) $user->ID, [
-                'page' => max(1, (int) get_query_var('paged')),
-                'per_page' => $timeline_page_size,
-                'content_type' => $content_type,
-                'provider' => $provider,
-                'year' => $year,
-                'language' => $language,
-                'topic' => $topic,
-                'sort' => $sort,
-                'search' => $search_query,
-            ]);
+            // Invalid or disabled local searches must not become an unfiltered public timeline.
+            if ($search_error === '') {
+                $timeline = $this->timeline->get_for_author((int) $user->ID, [
+                    'page' => max(1, (int) get_query_var('paged')),
+                    'per_page' => $timeline_page_size,
+                    'content_type' => $content_type,
+                    'provider' => $provider,
+                    'year' => $year,
+                    'language' => $language,
+                    'topic' => $topic,
+                    'sort' => $sort,
+                    'search' => $search_query,
+                ]);
+
+            }
             $context['timeline_search_result_count'] = count((array) ($timeline['items'] ?? []));
         }
 
