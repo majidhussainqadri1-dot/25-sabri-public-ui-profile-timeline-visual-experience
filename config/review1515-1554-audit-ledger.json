@@ -1,0 +1,218 @@
+{
+  "range": "1515-1554",
+  "parent": "1475-1514",
+  "audited_head": "0a71cbfa66dfed33902a567a066ef3e88ee1db84",
+  "main": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+  "counts": {
+    "checks": 40,
+    "witnesses": 39,
+    "defect_scopes": 1,
+    "root_causes": 1,
+    "source_fixes": 0,
+    "test_fixes": 1
+  },
+  "checks": [
+    {
+      "review": 1515,
+      "title": "Hero landmark",
+      "status": "source_witness"
+    },
+    {
+      "review": 1516,
+      "title": "Cover URL escaping",
+      "status": "source_witness"
+    },
+    {
+      "review": 1517,
+      "title": "Decorative cover",
+      "status": "source_witness"
+    },
+    {
+      "review": 1518,
+      "title": "Avatar alt escaping",
+      "status": "source_witness"
+    },
+    {
+      "review": 1519,
+      "title": "Avatar fallback translation",
+      "status": "source_witness"
+    },
+    {
+      "review": 1520,
+      "title": "Initials escaping",
+      "status": "source_witness"
+    },
+    {
+      "review": 1521,
+      "title": "Action semantic group",
+      "status": "source_witness"
+    },
+    {
+      "review": 1522,
+      "title": "Translated action label",
+      "status": "source_witness"
+    },
+    {
+      "review": 1523,
+      "title": "Contact normalization",
+      "status": "source_witness"
+    },
+    {
+      "review": 1524,
+      "title": "Contact consent",
+      "status": "source_witness"
+    },
+    {
+      "review": 1525,
+      "title": "Contact length",
+      "status": "source_witness"
+    },
+    {
+      "review": 1526,
+      "title": "Telephone action",
+      "status": "source_witness"
+    },
+    {
+      "review": 1527,
+      "title": "WhatsApp action",
+      "status": "source_witness"
+    },
+    {
+      "review": 1528,
+      "title": "QR same-site",
+      "status": "source_witness"
+    },
+    {
+      "review": 1529,
+      "title": "QR description",
+      "status": "source_witness"
+    },
+    {
+      "review": 1530,
+      "title": "Share hook",
+      "status": "source_witness"
+    },
+    {
+      "review": 1531,
+      "title": "Share status",
+      "status": "source_witness"
+    },
+    {
+      "review": 1532,
+      "title": "Native share",
+      "status": "source_witness"
+    },
+    {
+      "review": 1533,
+      "title": "Clipboard fallback",
+      "status": "source_witness"
+    },
+    {
+      "review": 1534,
+      "title": "Share busy state",
+      "status": "source_witness"
+    },
+    {
+      "review": 1535,
+      "title": "Unavailable profile",
+      "status": "source_witness"
+    },
+    {
+      "review": 1536,
+      "title": "Breadcrumb navigation",
+      "status": "source_witness"
+    },
+    {
+      "review": 1537,
+      "title": "Breadcrumb URL",
+      "status": "source_witness"
+    },
+    {
+      "review": 1538,
+      "title": "Preview toolbar",
+      "status": "source_witness"
+    },
+    {
+      "review": 1539,
+      "title": "Preview URL",
+      "status": "source_witness"
+    },
+    {
+      "review": 1540,
+      "title": "Exit preview",
+      "status": "source_witness"
+    },
+    {
+      "review": 1541,
+      "title": "Active tab",
+      "status": "source_witness"
+    },
+    {
+      "review": 1542,
+      "title": "Timeline invalid-search guard",
+      "status": "source_witness"
+    },
+    {
+      "review": 1543,
+      "title": "Preview noindex",
+      "status": "source_witness"
+    },
+    {
+      "review": 1544,
+      "title": "REST search validation",
+      "status": "source_witness"
+    },
+    {
+      "review": 1545,
+      "title": "REST topic validation",
+      "status": "source_witness"
+    },
+    {
+      "review": 1546,
+      "title": "File03 contract",
+      "status": "source_witness"
+    },
+    {
+      "review": 1547,
+      "title": "File08 contract",
+      "status": "source_witness"
+    },
+    {
+      "review": 1548,
+      "title": "File09 contract",
+      "status": "source_witness"
+    },
+    {
+      "review": 1549,
+      "title": "File20 shell boundary",
+      "status": "source_witness"
+    },
+    {
+      "review": 1550,
+      "title": "Timeline provider bound",
+      "status": "source_witness"
+    },
+    {
+      "review": 1551,
+      "title": "Reduced motion",
+      "status": "source_witness"
+    },
+    {
+      "review": 1552,
+      "title": "PHP version matrix",
+      "status": "source_witness"
+    },
+    {
+      "review": 1553,
+      "title": "ZIP reproducibility",
+      "status": "source_witness"
+    },
+    {
+      "review": 1554,
+      "title": "ARIA regression PHP delimiter",
+      "status": "test_defect_fixed"
+    }
+  ],
+  "root_cause": "Embedded PHP delimiter terminates naive HTML tag regex; test matcher corrected",
+  "release": "unmerged, undeployed; live/DB/migrations unverified"
+}
