@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 /** File25 R1438-1443: actual HTML Timeline filter request guard regression. */
+if (! defined('ABSPATH')) { define('ABSPATH', __DIR__ . '/fixtures/'); }
 if (! function_exists('wp_unslash')) {
     function wp_unslash($value) { return $value; }
 }
