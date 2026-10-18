@@ -43,8 +43,17 @@ final class Upgrade_Manager
             }
             Profile_Router::flush();
             update_option(self::SCHEMA_OPTION, (string) $target, false);
+            // A false update_option() return can mean unchanged or write failure.
+            // Confirm actual stored schema before recording any runtime success.
+            if ((int) get_option(self::SCHEMA_OPTION, 0) !== $target) {
+                throw new \UnexpectedValueException('File 25 schema version was not persisted.');
+            }
             if (defined('SABRI_PUBLIC_EXPERIENCE_VERSION')) {
-                update_option(self::RUNTIME_OPTION, (string) SABRI_PUBLIC_EXPERIENCE_VERSION, false);
+                $version = (string) SABRI_PUBLIC_EXPERIENCE_VERSION;
+                update_option(self::RUNTIME_OPTION, $version, false);
+                if (get_option(self::RUNTIME_OPTION, '') !== $version) {
+                    throw new \UnexpectedValueException('File 25 runtime version was not persisted.');
+                }
             }
         } catch (\Throwable $exception) {
             if (class_exists(Safe_Mode::class)) {
