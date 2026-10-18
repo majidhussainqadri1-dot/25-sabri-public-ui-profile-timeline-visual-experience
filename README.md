@@ -5,6 +5,15 @@
 WordPress module for the **Sabri Social Homeopathy Platform**. This is the existing File 25; no duplicate File 26 is created.
 
 
+## Latest manual source audit — Reviews 1595–1634 (18 October 2026)
+
+**40 targeted plan/source checks:** 31 existing code witnesses, **nine affected checks in two independent root causes**, corrected in this unmerged stacked draft candidate. Index Rebuild cannot call the native builder until the running generation is persisted, and cannot report success or emit a rebuilt event until the final index state is persisted. Administrator Rebuild and Repair notices now reflect actual busy/failed/partial results and Repair checks its own index/journal writes.
+
+- [Complete technical report](docs/REVIEWS-1595-1634-INDEX-REBUILD-REPAIR-PERSISTENCE-2026-10-18.md).
+- 40-row ledger: `config/review1595-1634-index-rebuild-admin-status-audit.json`.
+- New PHP failure-injection regressions: `tests/review1595-1634-index-persistence.php` and `tests/review1595-1634-admin-repair-status.php`.
+- **Not an installed WordPress, DB or Staging proof:** exact live artifact, database/schema, migrations, File24 owner head, real native index builder and Founder acceptance unverified.
+
 ## Latest manual source audit — Reviews 1555–1594 (18 October 2026)
 
 Forty distinct source/contract inspections of File25 Final, the consolidated governing master and native owner interfaces: **35 existing source witnesses and five defective check scopes in two actual root causes**. REST admin idempotency responses now bind a SHA-256 canonical request fingerprint and reject reused keys for different preference payloads/target profiles with 409; missing native public-projection reconciliation can no longer report success from an auto-accepted default. An isolated real-PHP-method regression covers accepted/rejected/replay/error cases.

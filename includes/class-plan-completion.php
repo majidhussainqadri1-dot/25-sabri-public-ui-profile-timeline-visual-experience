@@ -1011,15 +1011,26 @@ final class Plan_Completion
     public function handle_repair(): void
     {
         $this->guard_admin_post('spux_repair', 'repair');
-        update_option(self::REPAIR_OPTION, $this->repair(), false);
-        $this->redirect_admin('repair_complete');
+        $result = $this->repair();
+        update_option(self::REPAIR_OPTION, $result, false);
+        $persisted = get_option(self::REPAIR_OPTION, null) === $result;
+        $this->redirect_admin(
+            ($result['status'] ?? '') === 'complete' && $persisted
+                ? 'repair_complete'
+                : 'repair_partial'
+        );
     }
 
     public function handle_rebuild(): void
     {
         $this->guard_admin_post('spux_rebuild_index', 'rebuild_index');
-        $this->rebuild_index();
-        $this->redirect_admin('index_rebuild_finished');
+        $result = $this->rebuild_index();
+        $notice = match ($result['status'] ?? '') {
+            'complete' => 'index_rebuild_finished',
+            'busy' => 'index_rebuild_busy',
+            default => 'index_rebuild_failed',
+        };
+        $this->redirect_admin($notice);
     }
 
     public function handle_migration_dry_run(): void
@@ -1170,6 +1181,18 @@ final class Plan_Completion
         $started = gmdate('Y-m-d H:i:s');
         $running = ['status' => 'running', 'rebuildable' => true, 'generation' => $generation, 'started_at_utc' => $started, 'updated_at_utc' => $started];
         update_option(self::INDEX_OPTION, $running, false);
+        if (get_option(self::INDEX_OPTION, null) !== $running) {
+            // A builder should never run if its ownership/generation marker
+            // cannot be recorded. Do not report the old stored index as new.
+            delete_option(self::INDEX_LOCK_OPTION);
+            return [
+                'status' => 'failed',
+                'rebuildable' => true,
+                'generation' => $generation,
+                'updated_at_utc' => gmdate('Y-m-d H:i:s'),
+                'error_code' => 'index_state_persistence_failed',
+            ];
+        }
         try {
             $result = apply_filters('sabri_public_experience/timeline_index_build', [
                 'accepted' => false,
@@ -1217,7 +1240,22 @@ final class Plan_Completion
             delete_option(self::INDEX_LOCK_OPTION);
         }
         update_option(self::INDEX_OPTION, $state, false);
-        do_action('sabri_public_experience/timeline_index_rebuilt', $state);
+        if (get_option(self::INDEX_OPTION, null) !== $state) {
+            // A verified native builder result is not a completed index until
+            // WordPress persisted the rebuild projection and its checksum.
+            $failure = [
+                'status' => 'failed',
+                'rebuildable' => true,
+                'generation' => $generation,
+                'updated_at_utc' => gmdate('Y-m-d H:i:s'),
+                'error_code' => 'index_state_persistence_failed',
+            ];
+            do_action('sabri_public_experience/timeline_index_storage_failed', $failure);
+            return $failure;
+        }
+        if ($state['status'] === 'complete') {
+            do_action('sabri_public_experience/timeline_index_rebuilt', $state);
+        }
         return $state;
     }
 
@@ -1255,9 +1293,12 @@ final class Plan_Completion
                 $index['error_code'] = 'stale_rebuild_reconciled';
                 $index['updated_at_utc'] = gmdate('Y-m-d H:i:s');
                 update_option(self::INDEX_OPTION, $index, false);
+                $operations['stale_index'] = get_option(self::INDEX_OPTION, null) === $index;
             }
         }
-        $operations['stale_index'] = true;
+        if (! isset($operations['stale_index'])) {
+            $operations['stale_index'] = true;
+        }
         $operations['rewrite_rules'] = true;
         Profile_Router::flush();
         $status = ! in_array(false, $operations, true) ? 'complete' : 'partial';

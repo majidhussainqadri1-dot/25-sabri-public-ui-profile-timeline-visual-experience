@@ -1,0 +1,307 @@
+{
+  "schema": 1,
+  "file": 25,
+  "date": "2026-10-18",
+  "range": {
+    "start": 1595,
+    "end": 1634,
+    "count": 40
+  },
+  "method": "40 individually numbered targeted source-to-governing-plan checks. All source inspections completed before correction. Existing code witnesses are not full WordPress/staging tests or deployed-code proof.",
+  "governing_sources": [
+    "Original File25 Complete Public UI Profile Timeline Visual Experience Final §§64–65 (security/privacy), §71 admin, §72 REST, §74 observability, §75 Safe Mode, §76 repair, §§80–90 QA and deployed release",
+    "Original Three Central Consolidated Governing Master Plan §24 canonical owner/idempotent consumers, §25 mutation API/access/audit, §38 domain security, §§47–50 staging/release evidence and RCD034–036",
+    "Original File21 NG30 Amended §33.7–33.8 schema/index/rollback tests, §35 postdeploy acceptance"
+  ],
+  "base_repository": {
+    "main": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+    "parent_unmerged_draft_pr": 33,
+    "parent_sha": "37e228baa3f6affdb98cd8ab9d7c2cb797b61367"
+  },
+  "counts": {
+    "targeted_checks": 40,
+    "positive_source_witnesses": 31,
+    "deficient_check_scopes": 9,
+    "independent_root_causes": 2,
+    "corrected_source_scopes": 9
+  },
+  "root_causes": [
+    {
+      "id": "F25-R1595-1599-INDEX-PERSISTENCE",
+      "scopes": [
+        1595,
+        1596,
+        1597,
+        1598,
+        1599
+      ],
+      "cause": "rebuild_index() ignored WordPress option persistence failures both when recording running generation and committing final completed index; it could run a native builder without a persisted generation marker, emit completed success despite storage failure, and allow REST HTTP200 with incomplete state.",
+      "correction": "Verify read-back of running-state option before builder, stop/release lock if unavailable; verify final option read-back before emitting completed rebuild event or returning complete. Return bounded storage error status on failed write.",
+      "test": "tests/review1595-1634-index-persistence.php"
+    },
+    {
+      "id": "F25-R1600-1603-ADMIN-STATUS",
+      "scopes": [
+        1600,
+        1601,
+        1602,
+        1603
+      ],
+      "cause": "Admin handlers used unconditional index_rebuild_finished or repair_complete notices even when rebuild was busy/failed or repair partially failed; repair stale-index option update failure was marked successful.",
+      "correction": "Admin rebuild notices follow actual complete/busy/failed states. Admin repair notice requires complete operation and persisted repair journal. Stale-index repair verifies option read-back and reports partial on failure.",
+      "test": "tests/review1595-1634-admin-repair-status.php"
+    }
+  ],
+  "checks": [
+    {
+      "review": 1595,
+      "requirement": "Index running generation must persist before builder executes",
+      "path": "includes/class-plan-completion.php",
+      "result": "confirmed-deficient-source-check-corrected-in-candidate"
+    },
+    {
+      "review": 1596,
+      "requirement": "Do not invoke builder if running-state write failed",
+      "path": "includes/class-plan-completion.php",
+      "result": "confirmed-deficient-source-check-corrected-in-candidate"
+    },
+    {
+      "review": 1597,
+      "requirement": "Index complete-state write must be read back",
+      "path": "includes/class-plan-completion.php",
+      "result": "confirmed-deficient-source-check-corrected-in-candidate"
+    },
+    {
+      "review": 1598,
+      "requirement": "Only persisted completed index may emit success event",
+      "path": "includes/class-plan-completion.php",
+      "result": "confirmed-deficient-source-check-corrected-in-candidate"
+    },
+    {
+      "review": 1599,
+      "requirement": "REST rebuild must return 503 on failure to persist completed index",
+      "path": "includes/class-plan-completion.php",
+      "result": "confirmed-deficient-source-check-corrected-in-candidate"
+    },
+    {
+      "review": 1600,
+      "requirement": "Admin rebuild must report busy distinctly",
+      "path": "includes/class-plan-completion.php",
+      "result": "confirmed-deficient-source-check-corrected-in-candidate"
+    },
+    {
+      "review": 1601,
+      "requirement": "Admin rebuild must report failed distinctly",
+      "path": "includes/class-plan-completion.php",
+      "result": "confirmed-deficient-source-check-corrected-in-candidate"
+    },
+    {
+      "review": 1602,
+      "requirement": "Admin repair must report partial distinctly",
+      "path": "includes/class-plan-completion.php",
+      "result": "confirmed-deficient-source-check-corrected-in-candidate"
+    },
+    {
+      "review": 1603,
+      "requirement": "Failed repair state or audit record cannot report complete",
+      "path": "includes/class-plan-completion.php",
+      "result": "confirmed-deficient-source-check-corrected-in-candidate"
+    },
+    {
+      "review": 1604,
+      "requirement": "Rebuild guarded by File25 capability floor",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1605,
+      "requirement": "Rebuild REST requires idempotency key",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1606,
+      "requirement": "Atomic owner index lock creation",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1607,
+      "requirement": "Index busy status under held unexpired lock",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1608,
+      "requirement": "Stale index lock recovery",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1609,
+      "requirement": "UUID index generation",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1610,
+      "requirement": "Native index builder defaults to unaccepted",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1611,
+      "requirement": "Index accepted strictly as boolean true",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1612,
+      "requirement": "Index item count integer 0–1,000,000",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1613,
+      "requirement": "Index checksum strict 64-char hexadecimal",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1614,
+      "requirement": "Index source_versions must be an array",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1615,
+      "requirement": "Malformed builder produces failed state",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1616,
+      "requirement": "Index state uses safe machine error code",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1617,
+      "requirement": "Index error event is separate",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1618,
+      "requirement": "Index source version keys validated",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1619,
+      "requirement": "Source version dictionary deterministically sorted",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1620,
+      "requirement": "File25 repair explicitly does not touch foreign owner data",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1621,
+      "requirement": "File25 repair normalizes own preference option",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1622,
+      "requirement": "Provider registry transient may be cleared",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1623,
+      "requirement": "Stale in-progress index recovery path",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1624,
+      "requirement": "File24 remains assurance adapter not data-owner replacement",
+      "path": "includes/class-file-24-integration.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1625,
+      "requirement": "Admin-post nonce requirement",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1626,
+      "requirement": "Immutable File25 administrator operation capability floor",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1627,
+      "requirement": "REST error responses use safe codes and no-store",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1628,
+      "requirement": "Upgrade exception activates Safe Mode",
+      "path": "includes/class-upgrade-manager.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1629,
+      "requirement": "Native File03 public-profile contract boundary",
+      "path": "includes/class-native-integration.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1630,
+      "requirement": "Native File21 Timeline canonical author validation",
+      "path": "includes/class-timeline-service.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1631,
+      "requirement": "Invalid local search and filters prevent broad Timeline retrieval",
+      "path": "includes/class-profile-renderer.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1632,
+      "requirement": "File20 separate structural shell",
+      "path": "includes/class-file-20-integration.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1633,
+      "requirement": "Public REST storage unavailable produces quota error",
+      "path": "includes/class-rest-controller.php",
+      "result": "source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1634,
+      "requirement": "PHP test runner discovers governed PHP files",
+      "path": "tests/run-governed-suite.sh",
+      "result": "source-witness-not-runtime-proof"
+    }
+  ],
+  "release_status": {
+    "deployed_version": "unverified",
+    "db_schema": "unverified",
+    "migration_state": "unverified",
+    "file24_exact_source": "unverified",
+    "real_staging_mysql_repair": "not performed",
+    "founder_acceptance": "not established",
+    "live_retest": "not performed",
+    "exact_final_head_ci": "external verification required"
+  }
+}
