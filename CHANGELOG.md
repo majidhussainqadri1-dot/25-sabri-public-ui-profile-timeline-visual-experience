@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — 2026-10-18 — Reviews 1475–1514: migration/upgrade persistence verification
+
+- Forty targeted source inspections: 30 source witnesses, ten corrected check scopes across three root causes.
+- Reject 501+ legacy redirect-map input instead of silently approving the first 500 records.
+- Migration execute/rollback validate active option read-back; admin journal commit verifies persisted record and reports blocked on failure, with attempted compensation and failure event.
+- Upgrade manager verifies schema and runtime stored versions, triggers Safe Mode on failed persistence and always releases its lock.
+- Two isolated PHP failure-injection tests; no installed DB, Staging, deployed package or Live parity implied.
+
 ## Unreleased — 2026-10-18 — Reviews 1435–1474: null privacy, invalid Timeline filters and preview class parity
 
 - Forty distinct targeted File25 and central-plan source reviews: 29 source witnesses and 11 deficient check scopes across three root causes corrected.
