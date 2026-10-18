@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — 2026-10-18 — Reviews 1435–1474: null privacy, invalid Timeline filters and preview class parity
+
+- Forty distinct targeted File25 and central-plan source reviews: 29 source witnesses and 11 deficient check scopes across three root causes corrected.
+- Explicit `null` on sensitive owner public visibility, metrics or profile-local search settings now denies rather than restoring public defaults.
+- Invalid HTML `type/provider/year/language/topic/sort` refinements fail closed, not widened to unfiltered Timeline retrieval.
+- Three preview/public link references use the actual `Sabri\\PublicExperience\\Public_URL` canonical class.
+- Three isolated PHP regressions and source ledger; not evidence of deployed WordPress, Staging, DB/schema/migration or live verification.
+
 ## Unreleased — 2026-10-17 — Reviews 1035–1074: owner RBAC, privacy and metric floors
 
 - Forty distinct source checks: 34 existing source witnesses, six deficient scopes in three root cause groups corrected.
