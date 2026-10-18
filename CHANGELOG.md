@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — 2026-10-18 — Reviews 1515–1554: runtime metadata retry, privacy preference persistence and revisions
+
+- Forty targeted plan/source reviews: 30 source witnesses, ten corrected defective scopes across three independent root causes.
+- Runtime-version metadata retry now runs even when schema already reached the target, without needless rewrite flush.
+- File25 preferences, revision metadata and history require stored-state readback; failed writes trigger bounded compensation, a failure event and REST 503/admin warning, never success.
+- Malformed explicit REST revision returns HTTP 400; missing/invalid admin revision cannot suppress conflict control.
+- Two isolated failure-injection regressions. Real WordPress/MariaDB/MySQL transaction semantics, deployed artifacts and live acceptance remain unverified.
+
 ## Unreleased — 2026-10-18 — Reviews 1475–1514: migration/upgrade persistence verification
 
 - Forty targeted source inspections: 30 source witnesses, ten corrected check scopes across three root causes.

@@ -5,6 +5,15 @@
 WordPress module for the **Sabri Social Homeopathy Platform**. This is the existing File 25; no duplicate File 26 is created.
 
 
+## Latest manual source audit — Reviews 1515–1554 (18 October 2026)
+
+Forty new File25/central/cross-file source checks: 30 source witnesses and **10 deficient check scopes in three root causes**. Corrected partial upgrade's stale runtime version, made all three preferences/history/revision options verify persistence before success (with bounded compensation and HTTP503/admin failure if persistence fails), and rejected malformed REST/admin revision tokens. Two new isolated PHP failure-injection regressions.
+
+- [Full R1515–1554 report](docs/REVIEWS-1515-1554-UPGRADE-PREFERENCES-REVISION-2026-10-18.md)
+- JSON evidence: `config/review1515-1554-upgrade-preferences-revision-audit.json`.
+- Tests: `tests/review1515-1554-upgrade-runtime-retry.php`, `tests/review1515-1554-preferences-write-integrity.php`.
+- **These are not 40 installed runtime acceptance tests.** No merge/deploy or verified live DB/schema/migration state; cross-owner acceptance and Founder approval remain outstanding.
+
 ## File25 latest manual source review — R1475–1514 (18 October 2026)
 
 Forty separate targeted File25/central/companion source checks on previous unmerged PR30: 30 source witnesses, ten deficient checks clustered into **three independent root causes**. Source-only corrections reject silent >500 legacy redirect truncation, verify actual stored migration/rollback state and admin status before claiming success, and detect failed schema/runtime option writes via Safe Mode. New isolated tests: `tests/review1475-1514-migration-persistence.php` and `tests/review1475-1514-upgrade-version-persistence.php`. Full report `docs/REVIEWS-1475-1514-MIGRATION-UPGRADE-PERSISTENCE-2026-10-18.md`; 40-row ledger `config/review1475-1514-migration-upgrade-persistence-audit.json`. **Not a deployed fix:** PR stack draft, live source, DB/schema/migrations, File24 exact contract, real staging rollback and Founder approval remain unverified.

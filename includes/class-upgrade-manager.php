@@ -26,7 +26,15 @@ final class Upgrade_Manager
         $target = defined('SABRI_PUBLIC_EXPERIENCE_SCHEMA_VERSION')
             ? (int) SABRI_PUBLIC_EXPERIENCE_SCHEMA_VERSION
             : 0;
-        if ($target < 1 || (int) get_option(self::SCHEMA_OPTION, 0) >= $target) {
+        $runtime_version = defined('SABRI_PUBLIC_EXPERIENCE_VERSION')
+            ? (string) SABRI_PUBLIC_EXPERIENCE_VERSION
+            : '';
+        $schema_pending = (int) get_option(self::SCHEMA_OPTION, 0) < $target;
+        $runtime_pending = $runtime_version !== ''
+            && get_option(self::RUNTIME_OPTION, '') !== $runtime_version;
+        // After a schema write succeeds but the runtime metadata write fails,
+        // the next request must repair the latter without redoing schema work.
+        if ($target < 1 || (! $schema_pending && ! $runtime_pending)) {
             return;
         }
 
@@ -38,20 +46,24 @@ final class Upgrade_Manager
         }
 
         try {
-            if ((int) get_option(self::SCHEMA_OPTION, 0) >= $target) {
+            $schema_pending = (int) get_option(self::SCHEMA_OPTION, 0) < $target;
+            $runtime_pending = $runtime_version !== ''
+                && get_option(self::RUNTIME_OPTION, '') !== $runtime_version;
+            if (! $schema_pending && ! $runtime_pending) {
                 return;
             }
-            Profile_Router::flush();
-            update_option(self::SCHEMA_OPTION, (string) $target, false);
-            // A false update_option() return can mean unchanged or write failure.
-            // Confirm actual stored schema before recording any runtime success.
-            if ((int) get_option(self::SCHEMA_OPTION, 0) !== $target) {
-                throw new \UnexpectedValueException('File 25 schema version was not persisted.');
+            if ($schema_pending) {
+                Profile_Router::flush();
+                update_option(self::SCHEMA_OPTION, (string) $target, false);
+                // A false update_option() return can mean unchanged or write
+                // failure. Read back the actual persisted schema state.
+                if ((int) get_option(self::SCHEMA_OPTION, 0) !== $target) {
+                    throw new \UnexpectedValueException('File 25 schema version was not persisted.');
+                }
             }
-            if (defined('SABRI_PUBLIC_EXPERIENCE_VERSION')) {
-                $version = (string) SABRI_PUBLIC_EXPERIENCE_VERSION;
-                update_option(self::RUNTIME_OPTION, $version, false);
-                if (get_option(self::RUNTIME_OPTION, '') !== $version) {
+            if ($runtime_pending) {
+                update_option(self::RUNTIME_OPTION, $runtime_version, false);
+                if (get_option(self::RUNTIME_OPTION, '') !== $runtime_version) {
                     throw new \UnexpectedValueException('File 25 runtime version was not persisted.');
                 }
             }

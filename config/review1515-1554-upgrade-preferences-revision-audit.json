@@ -1,0 +1,313 @@
+{
+  "schema": 1,
+  "module": "File25",
+  "audit_date": "2026-10-18",
+  "range": {
+    "start": 1515,
+    "end": 1554,
+    "total": 40
+  },
+  "method": "40 distinct target-focused plan/source checks completed read-only before patch. Positive source witnesses are NOT installed runtime, staging or forty whole-site automated tests.",
+  "basis": {
+    "file25": "Complete Public UI Profile Timeline Visual Experience Final, §§64–65,71–72,74–77,79,89–90: privacy, strict REST/administrator validation, auditable options, safe upgrade/repair/migration, rollback and release acceptance.",
+    "central": "Three Central Plans Consolidated Governing Master Plan: §§24.9 RCD-030–038—source hierarchy, nondestructive repeatable migrations, exact state truth, release tests.",
+    "file21": "Home/News NG30 Amended, §§33.7–33.8 migration smoke/log/rollback evidence, §35 production backup and rollback."
+  },
+  "frozen": {
+    "main_sha": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+    "parent_draft_pr": 31,
+    "parent_sha": "900893b7a65c542df30a77a6752c493733964d90"
+  },
+  "tally": {
+    "checks": 40,
+    "source_witnesses": 30,
+    "deficient_check_scopes": 10,
+    "root_causes": 3,
+    "corrections_in_source": 10
+  },
+  "root_causes": [
+    {
+      "scopes": [
+        1515,
+        1516,
+        1517
+      ],
+      "issue": "Upgrade_Manager returns early when schema reaches target even if runtime-version option write failed, preventing automatic metadata repair and retaining Safe Mode/stale parity.",
+      "fix": "Compute independent schema/runtime pending gates, reconcile runtime-only metadata under upgrade lock without redundant schema rewrite/flush.",
+      "test": "tests/review1515-1554-upgrade-runtime-retry.php"
+    },
+    {
+      "scopes": [
+        1518,
+        1519,
+        1520,
+        1521,
+        1522
+      ],
+      "issue": "Plan_Completion preference/history/revision update_option outcomes ignored and changes reported updated/HTTP200 even on failed persisted writes, potentially misrepresenting public privacy state.",
+      "fix": "Read back each of three File25-owned option records, try compensating prior values on any failure, report failed+compensation flag, emit bounded failure event and respond HTTP503/admin warning instead of success.",
+      "test": "tests/review1515-1554-preferences-write-integrity.php"
+    },
+    {
+      "scopes": [
+        1523,
+        1524
+      ],
+      "issue": "An explicitly invalid or missing admin revision could be normalized to null, disabling intended optimistic concurrency guard; REST invalid revision accepted as absent.",
+      "fix": "Explicit invalid REST revision -> HTTP400; admin form revision absent/invalid -> invalid revision notice with no write.",
+      "test": "tests/review1515-1554-preferences-write-integrity.php"
+    }
+  ],
+  "checks": [
+    {
+      "review": 1515,
+      "contract": "Runtime marker must be reconciled if schema target is already stored",
+      "source": "includes/class-upgrade-manager.php",
+      "outcome": "confirmed-deficiency-source-corrected"
+    },
+    {
+      "review": 1516,
+      "contract": "Failed runtime marker write must be retryable without schema downgrade",
+      "source": "includes/class-upgrade-manager.php",
+      "outcome": "confirmed-deficiency-source-corrected"
+    },
+    {
+      "review": 1517,
+      "contract": "Runtime-only reconciliation must not reflush rewrite routes",
+      "source": "includes/class-upgrade-manager.php",
+      "outcome": "confirmed-deficiency-source-corrected"
+    },
+    {
+      "review": 1518,
+      "contract": "Preferences option write must be persisted before success",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "confirmed-deficiency-source-corrected"
+    },
+    {
+      "review": 1519,
+      "contract": "Preference revision metadata must persist before success",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "confirmed-deficiency-source-corrected"
+    },
+    {
+      "review": 1520,
+      "contract": "Preference audit-history must be persisted before success",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "confirmed-deficiency-source-corrected"
+    },
+    {
+      "review": 1521,
+      "contract": "Explicit public opt-out must survive a denied DB update",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "confirmed-deficiency-source-corrected"
+    },
+    {
+      "review": 1522,
+      "contract": "REST preference write failure must return 503 not 200",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "confirmed-deficiency-source-corrected"
+    },
+    {
+      "review": 1523,
+      "contract": "Explicit invalid REST revision must not bypass conflict checks",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "confirmed-deficiency-source-corrected"
+    },
+    {
+      "review": 1524,
+      "contract": "Invalid admin-post revision must not be interpreted as missing",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "confirmed-deficiency-source-corrected"
+    },
+    {
+      "review": 1525,
+      "contract": "Owner capability floor for File25 admin",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1526,
+      "contract": "Legacy redirect limit rejects 501 entries",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1527,
+      "contract": "Migration active redirect map read-back",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1528,
+      "contract": "Migration rollback active map read-back",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1529,
+      "contract": "Migration journal write read-back",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1530,
+      "contract": "Migration checksum verification",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1531,
+      "contract": "Migration 301/308 status allowlist",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1532,
+      "contract": "Bounded admin revision and nonce",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1533,
+      "contract": "REST allowlist for preference fields",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1534,
+      "contract": "High-risk operations require owner authorization",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1535,
+      "contract": "Malformed explicit privacy preferences fail closed",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1536,
+      "contract": "Null stored privacy settings deny",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1537,
+      "contract": "Public metrics minimum invalid fails closed",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1538,
+      "contract": "REST quota backend unavailable fails closed",
+      "source": "includes/class-rest-controller.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1539,
+      "contract": "Public REST responses marked private/no-store",
+      "source": "includes/class-rest-controller.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1540,
+      "contract": "Native File03 public profile truth",
+      "source": "includes/class-native-integration.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1541,
+      "contract": "File00 membership authorization",
+      "source": "includes/class-native-integration.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1542,
+      "contract": "File09 doctor owner verification",
+      "source": "includes/class-native-integration.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1543,
+      "contract": "File08 Clinic projection owner",
+      "source": "includes/class-native-integration.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1544,
+      "contract": "File17 native Follow integration boundary",
+      "source": "includes/class-current-companion-2026-08-10.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1545,
+      "contract": "Minor contact privacy",
+      "source": "includes/class-visibility-policy.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1546,
+      "contract": "Native eligibility cannot be broadened by filter",
+      "source": "includes/class-visibility-policy.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1547,
+      "contract": "File21 author equality",
+      "source": "includes/class-timeline-service.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1548,
+      "contract": "Timeline provider maturity/metadata",
+      "source": "includes/class-timeline-service.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1549,
+      "contract": "Timeline invalid provider batch atomicity",
+      "source": "includes/class-timeline-service.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1550,
+      "contract": "Public section owner boundary",
+      "source": "includes/class-section-service.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1551,
+      "contract": "Same-site canonical URL normalization",
+      "source": "includes/class-public-url.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1552,
+      "contract": "File20 structural shell authority",
+      "source": "includes/class-file-20-integration.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1553,
+      "contract": "File24 security assurance authority",
+      "source": "includes/class-file-24-integration.php",
+      "outcome": "source-witness"
+    },
+    {
+      "review": 1554,
+      "contract": "Governed PHP test auto-discovery",
+      "source": "tests/run-governed-suite.sh",
+      "outcome": "source-witness"
+    }
+  ],
+  "boundaries": {
+    "file03_08_09_17_20_21_24_owner_data_modified": false,
+    "live_package_checksum": "unverified",
+    "db_schema": "unverified",
+    "wp_options_and_migrations": "unverified",
+    "staging": "not accepted",
+    "founder": "not accepted",
+    "live_retest": "not performed",
+    "ci": "requires external exact final sha validation"
+  }
+}

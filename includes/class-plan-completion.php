@@ -459,10 +459,18 @@ final class Plan_Completion
             }
         }
         $revision = array_key_exists('revision', $params) ? self::exact_integer($params['revision']) : null;
+        if (array_key_exists('revision', $params) && $revision === null) {
+            return $this->error_response('invalid_revision', 400);
+        }
         unset($params['revision']);
         $result = $this->write_preferences($params, true, $revision, 'rest');
         if ($result['status'] === 'conflict') {
             return $this->error_response('revision_conflict', 409, ['revision' => $result['revision']]);
+        }
+        if ($result['status'] !== 'updated') {
+            return $this->error_response('preferences_persistence_failed', 503, [
+                'compensated' => ($result['compensated'] ?? false) === true,
+            ], 30);
         }
         $response = $this->response($result, 200, (string) $result['updated_at_utc']);
         $this->store_idempotent_response('preferences', $request, $response);
@@ -944,8 +952,17 @@ final class Plan_Completion
             ? wp_unslash($_POST[self::OPTION])
             : [];
         $revision = isset($_POST['revision']) ? self::exact_integer(wp_unslash($_POST['revision'])) : null;
+        if ($revision === null) {
+            $this->redirect_admin('revision_invalid');
+            return;
+        }
         $result = $this->write_preferences((array) $raw, false, $revision, 'admin');
-        $this->redirect_admin($result['status'] === 'conflict' ? 'revision_conflict' : 'preferences_saved');
+        $notice = match ($result['status'] ?? '') {
+            'updated' => 'preferences_saved',
+            'conflict' => 'revision_conflict',
+            default => 'preferences_persistence_failed',
+        };
+        $this->redirect_admin($notice);
     }
 
     public function handle_repair(): void
@@ -1027,20 +1044,56 @@ final class Plan_Completion
             return ['status' => 'conflict', 'revision' => (int) $meta['revision'], 'updated_at_utc' => (string) $meta['updated_at_utc']];
         }
         $clean = self::normalize_preferences($patch, $current, $partial);
-        $history = get_option(self::OPTION_HISTORY, []);
-        $history = is_array($history) ? $history : [];
+        $stored_preferences = get_option(self::OPTION, []);
+        $stored_meta = get_option(self::OPTION_META, []);
+        $stored_history = get_option(self::OPTION_HISTORY, []);
+        $history = is_array($stored_history) ? $stored_history : [];
         array_unshift($history, ['revision' => (int) $meta['revision'], 'preferences' => $current, 'updated_at_utc' => (string) $meta['updated_at_utc']]);
         $history = array_slice($history, 0, 10);
         $updated = gmdate('Y-m-d H:i:s');
         $revision = (int) $meta['revision'] + 1;
-        update_option(self::OPTION_HISTORY, $history, false);
-        update_option(self::OPTION, $clean, false);
-        update_option(self::OPTION_META, [
+        $next_meta = [
             'revision' => $revision,
             'updated_at_utc' => $updated,
             'source' => $source,
             'hash' => hash('sha256', (string) wp_json_encode(self::canonicalize_for_hash($clean))),
-        ], false);
+        ];
+        $updates = [
+            self::OPTION => $clean,
+            self::OPTION_META => $next_meta,
+            self::OPTION_HISTORY => $history,
+        ];
+        foreach ($updates as $option => $intended) {
+            update_option($option, $intended, false);
+            if (get_option($option, null) !== $intended) {
+                // WordPress option updates are not a multi-key transaction.
+                // Never report a successful privacy/admin mutation if a write
+                // failed. Attempt to restore each prior File25-owned option
+                // and expose the compensation result for operator recovery.
+                $prior = [
+                    self::OPTION => $stored_preferences,
+                    self::OPTION_META => $stored_meta,
+                    self::OPTION_HISTORY => $stored_history,
+                ];
+                $compensated = true;
+                foreach ($prior as $old_key => $old_value) {
+                    if (get_option($old_key, null) === $old_value) {
+                        continue;
+                    }
+                    update_option($old_key, $old_value, false);
+                    if (get_option($old_key, null) !== $old_value) {
+                        $compensated = false;
+                    }
+                }
+                do_action('sabri_public_experience/preferences_commit_failed', $option, $compensated, $source);
+                return [
+                    'status' => 'failed',
+                    'error_code' => 'preferences_persistence_failed',
+                    'compensated' => $compensated,
+                    'revision' => (int) $meta['revision'],
+                ];
+            }
+        }
         do_action('sabri_public_experience/preferences_updated', $clean, $current, $revision, $source);
         return ['status' => 'updated', 'preferences' => $clean, 'revision' => $revision, 'updated_at_utc' => $updated];
     }
