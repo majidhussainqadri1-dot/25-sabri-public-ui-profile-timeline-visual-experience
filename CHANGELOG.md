@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — 2026-10-18 — Reviews 1595–1634: index persistence and repair/admin result truth
+
+- Forty independent plan/source inspections: 31 existing source witnesses, nine defective check scopes corrected in two root-cause groups.
+- Require actual stored running and final File25 index states before native rebuild execution and reported success; emit index rebuilt only for persisted complete state.
+- Admin rebuild reports busy/failed distinctly; admin repair status is complete only with a complete operation and persisted File25 repair journal, and stale index repair checks write read-back.
+- Two isolated PHP write-failure regressions; no claim that source CI proves installed WordPress/MySQL, Staging or Live.
+
 ## Unreleased — 2026-10-18 — Reviews 1555–1594: REST mutation replay intent / reconciled projection
 
 - Forty targeted plan/source checks: 35 existing source witnesses, five corrected defective check scopes in two independent root causes.
