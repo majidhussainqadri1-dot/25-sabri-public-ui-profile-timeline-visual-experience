@@ -161,6 +161,19 @@ final class Profile_Renderer
                 $search_query = '';
                 $search_error = isset($_GET['profile_q']) ? 'search_disabled' : '';
             }
+            // Reject malformed local filters before calling the native timeline.
+            // Otherwise a bad filter becomes an empty key and silently broadens
+            // a targeted request to the full public author timeline.
+            if ($search_error === '' && $this->invalid_timeline_filter_request([
+                'type' => $content_type,
+                'provider' => $provider,
+                'year' => $year,
+                'language' => $language,
+                'topic' => $topic,
+                'sort' => $sort,
+            ])) {
+                $search_error = 'invalid_timeline_filters';
+            }
             $context['timeline_filters'] = $timeline_filters;
             $context['timeline_content_type'] = $content_type;
             $context['timeline_provider_filters'] = $provider_filters;
@@ -451,6 +464,38 @@ final class Profile_Renderer
         }
 
         return array_key_exists($requested, $filters) ? $requested : '';
+    }
+
+    /**
+     * @param array<string,string> $validated Bounded, server-normalized filters
+     *
+     * An explicitly empty filter means "All", but an invalid nonempty value
+     * must never be silently converted into an unfiltered author timeline.
+     */
+    private function invalid_timeline_filter_request(array $validated): bool
+    {
+        foreach ($validated as $key => $normalized) {
+            if (! array_key_exists($key, $_GET)) {
+                continue;
+            }
+            if (! is_scalar($_GET[$key])) {
+                return true;
+            }
+            $raw = (string) wp_unslash($_GET[$key]);
+            if ($raw === '') {
+                continue;
+            }
+            if ($key === 'sort') {
+                if (! in_array($raw, ['latest', 'oldest'], true)) {
+                    return true;
+                }
+                continue;
+            }
+            if ($normalized === '') {
+                return true;
+            }
+        }
+        return false;
     }
 
     private function timeline_filter_request_present(): bool
