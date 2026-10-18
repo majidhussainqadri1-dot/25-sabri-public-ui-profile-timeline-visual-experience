@@ -23,6 +23,7 @@ function get_transient(string $key): mixed { return $GLOBALS['r1555_receipts'][$
 function set_transient(string $key, mixed $value, int $ttl = 0): bool {
     $GLOBALS['r1555_receipts'][$key] = $value; return true;
 }
+function sanitize_key(string $value): string { return (string) preg_replace('/[^a-z0-9_-]/', '', strtolower($value)); }
 function get_current_user_id(): int { return 42; }
 function get_user_by(string $field, int $id): mixed { return $field === 'id' && $id > 0 ? (object) ['ID' => $id] : false; }
 function clean_user_cache(int $id): void {}
