@@ -1,0 +1,323 @@
+{
+  "schema": 1,
+  "file": 25,
+  "date": "2026-10-18",
+  "range": "1475-1514",
+  "method": "Forty individually numbered targeted source/owner/plan checks read-only before any correction; source witnesses are NOT full end-to-end passes or live-deployed proof.",
+  "parent": {
+    "pr": 30,
+    "head": "bc0d362756e4ef012667c63794fc4eb6b654236d",
+    "unmerged": true,
+    "main": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e"
+  },
+  "plans": [
+    "File25 Complete Public UI Profile Timeline Visual Experience Final: §§64-65,71-77,89-90 (security, privacy, admin REST, Safe Mode, Repair, Migration, rollback)",
+    "Sabri Three Central Consolidated Governing Master Plan: chapter 24 central owner/visual architecture and chapter 38 security + evidence-first release gates",
+    "File21 NG30 amended: §33 staged immutable package / migrations / rollback acceptance"
+  ],
+  "companion_main": {
+    "File03": "636e3ef965423887f810718abec3cd1c11c3659d",
+    "File08": "92e2422d6a235632810ed4981f151fc3250784aa",
+    "File09": "cfc5f781a766330314dc98c42abeca0eb7786eba",
+    "File17": "8ae656e51796d1f05865d8be5dca2480443d79ca",
+    "File20": "8a4dbcaf4fef8e926b9b834ecfde16c21a0f00ca",
+    "File21": "f2eb7e95ddea327af36ea725ffb923b029f885e6",
+    "File24": "exact active source path/HEAD unverified (attempted candidate repo 404)"
+  },
+  "counts": {
+    "targeted_checks": 40,
+    "existing_source_witnesses": 30,
+    "deficient_scopes": 10,
+    "distinct_root_causes": 3,
+    "source_correction_scopes": 10
+  },
+  "root_causes": [
+    {
+      "scopes": [
+        1475,
+        1476,
+        1477
+      ],
+      "root": "Redirect dry-run validator sliced the first 500 of 501+ requests, incorrectly approved a partial map as complete.",
+      "fix": "Reject 501+ inventory as invalid and do not persist any subset; 500 bounded valid entries remain supported.",
+      "test": "tests/review1475-1514-migration-persistence.php"
+    },
+    {
+      "scopes": [
+        1478,
+        1479,
+        1480,
+        1481,
+        1482
+      ],
+      "root": "Migration execute/rollback ignored WordPress option persistence, and admin actions unconditionally reported success even for blocked or failed write states.",
+      "fix": "Read back active redirect map, block failed transitions, read back migration journal, compensate active map on journal write failure and redirect admin to blocked status.",
+      "test": "tests/review1475-1514-migration-persistence.php"
+    },
+    {
+      "scopes": [
+        1483,
+        1484
+      ],
+      "root": "Upgrade manager advanced runtime metadata without proving stored schema/version writes succeeded.",
+      "fix": "Read back schema and runtime versions; persistence failures raise exception and enter existing safe-mode path without recording false runtime parity.",
+      "test": "tests/review1475-1514-upgrade-version-persistence.php"
+    }
+  ],
+  "checks": [
+    {
+      "n": 1475,
+      "label": "Oversize 501 redirect source validation",
+      "path": "includes/class-plan-completion.php",
+      "result": "deficient-corrected"
+    },
+    {
+      "n": 1476,
+      "label": "No hidden migration inventory truncation",
+      "path": "includes/class-plan-completion.php",
+      "result": "deficient-corrected"
+    },
+    {
+      "n": 1477,
+      "label": "Dry-run cannot approve missing redirects",
+      "path": "includes/class-plan-completion.php",
+      "result": "deficient-corrected"
+    },
+    {
+      "n": 1478,
+      "label": "Execute redirect option persistence readback",
+      "path": "includes/class-plan-completion.php",
+      "result": "deficient-corrected"
+    },
+    {
+      "n": 1479,
+      "label": "Rollback redirect option persistence readback",
+      "path": "includes/class-plan-completion.php",
+      "result": "deficient-corrected"
+    },
+    {
+      "n": 1480,
+      "label": "Do not mark executed after denied active map write",
+      "path": "includes/class-plan-completion.php",
+      "result": "deficient-corrected"
+    },
+    {
+      "n": 1481,
+      "label": "Admin Execute cannot misreport blocked as success",
+      "path": "includes/class-plan-completion.php",
+      "result": "deficient-corrected"
+    },
+    {
+      "n": 1482,
+      "label": "Admin Rollback cannot misreport blocked as success",
+      "path": "includes/class-plan-completion.php",
+      "result": "deficient-corrected"
+    },
+    {
+      "n": 1483,
+      "label": "Schema version persistence proven before advancing runtime",
+      "path": "includes/class-upgrade-manager.php",
+      "result": "deficient-corrected"
+    },
+    {
+      "n": 1484,
+      "label": "Runtime version persistence failure enters Safe Mode",
+      "path": "includes/class-upgrade-manager.php",
+      "result": "deficient-corrected"
+    },
+    {
+      "n": 1485,
+      "label": "Approved migration checksum",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1486,
+      "label": "Rollback only after executed migration",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1487,
+      "label": "Same-site sanitized migration targets",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1488,
+      "label": "301/308 redirect status allowlist",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1489,
+      "label": "Self-redirect collision check",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1490,
+      "label": "Legacy redirect exact request pathname",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1491,
+      "label": "Legacy redirects exclude admin/ajax/REST",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1492,
+      "label": "High-risk owner-authorized migrations",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1493,
+      "label": "Admin nonce validation",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1494,
+      "label": "Administrative immutable capability floor",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1495,
+      "label": "Idempotency key syntax and bounds",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1496,
+      "label": "REST admin rate-limit preflight",
+      "path": "includes/class-plan-completion.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1497,
+      "label": "REST missing public quota backend fails closed",
+      "path": "includes/class-rest-controller.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1498,
+      "label": "REST profile no-store private caching",
+      "path": "includes/class-rest-controller.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1499,
+      "label": "Native File03 approved profile DTO",
+      "path": "includes/class-native-integration.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1500,
+      "label": "Native File00 membership state",
+      "path": "includes/class-native-integration.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1501,
+      "label": "File09 versioned approved doctor decision",
+      "path": "includes/class-native-integration.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1502,
+      "label": "File08 versioned Clinic owner projection",
+      "path": "includes/class-native-integration.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1503,
+      "label": "Minor contact suppression",
+      "path": "includes/class-visibility-policy.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1504,
+      "label": "Profile native authoritativeness intersection",
+      "path": "includes/class-visibility-policy.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1505,
+      "label": "HTML invalid local search denies Timeline query",
+      "path": "includes/class-profile-renderer.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1506,
+      "label": "HTML invalid six filters deny Timeline query",
+      "path": "includes/class-profile-renderer.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1507,
+      "label": "Timeline author and public projection identity",
+      "path": "includes/class-timeline-service.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1508,
+      "label": "Timeline bad provider batch atomicity",
+      "path": "includes/class-timeline-service.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1509,
+      "label": "Strict same-site canonical URL",
+      "path": "includes/class-public-url.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1510,
+      "label": "Provider section invalid batch isolation",
+      "path": "includes/class-section-service.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1511,
+      "label": "File20 structural shell boundary",
+      "path": "includes/class-file-20-integration.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1512,
+      "label": "File24 security assurance external authority",
+      "path": "includes/class-file-24-integration.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1513,
+      "label": "Component API one timeline registry",
+      "path": "includes/class-component-api.php",
+      "result": "source-witness"
+    },
+    {
+      "n": 1514,
+      "label": "Governed suite executes PHP tests",
+      "path": "tests/run-governed-suite.sh",
+      "result": "source-witness"
+    }
+  ],
+  "external_gates": {
+    "deployed_build": "unknown",
+    "deployed_checksum": "unknown",
+    "installed_schema": "unknown",
+    "wp_options": "unknown",
+    "migration_state": "unknown",
+    "staging_acceptance": false,
+    "founder_acceptance": false,
+    "live_retest": false
+  },
+  "ci": {
+    "exact_final_sha": "must-verify-after-last-write",
+    "pass_count": null
+  }
+}

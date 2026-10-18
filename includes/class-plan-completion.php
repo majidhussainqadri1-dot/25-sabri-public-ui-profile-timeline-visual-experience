@@ -965,22 +965,43 @@ final class Plan_Completion
     public function handle_migration_dry_run(): void
     {
         $this->guard_admin_post('spux_migration_dry_run', 'migration_dry_run');
-        update_option(self::MIGRATION_OPTION, $this->migration('dry-run'), false);
-        $this->redirect_admin('migration_dry_run');
+        $this->persist_migration_result($this->migration('dry-run'), 'ready', 'migration_dry_run');
     }
 
     public function handle_migration_execute(): void
     {
         $this->guard_admin_post('spux_migration_execute', 'migration_execute');
-        update_option(self::MIGRATION_OPTION, $this->migration('executed'), false);
-        $this->redirect_admin('migration_executed');
+        $this->persist_migration_result($this->migration('executed'), 'executed', 'migration_executed');
     }
 
     public function handle_migration_rollback(): void
     {
         $this->guard_admin_post('spux_migration_rollback', 'migration_rollback');
-        update_option(self::MIGRATION_OPTION, $this->migration('rolled-back'), false);
-        $this->redirect_admin('migration_rolled_back');
+        $this->persist_migration_result($this->migration('rolled-back'), 'rolled-back', 'migration_rolled_back');
+    }
+
+    /** @param array<string,mixed> $result */
+    private function persist_migration_result(array $result, string $expected_status, string $success_notice): void
+    {
+        $previous = get_option(self::MIGRATION_OPTION, []);
+        $previous = is_array($previous) ? $previous : [];
+        update_option(self::MIGRATION_OPTION, $result, false);
+        $recorded = get_option(self::MIGRATION_OPTION, null);
+        if (($result['status'] ?? '') !== $expected_status || $recorded !== $result) {
+            // If the redirect-map write succeeded but the migration journal
+            // failed, compensate to the prior active map. Do not advertise
+            // success; report a blocked migration to the operator.
+            if ($recorded !== $result && in_array($expected_status, ['executed', 'rolled-back'], true)) {
+                $restore = $expected_status === 'executed'
+                    ? (array) ($previous['previous_active_map'] ?? [])
+                    : (array) ($previous['redirect_map'] ?? []);
+                update_option(self::MIGRATION_ACTIVE_OPTION, $restore, false);
+                do_action('sabri_public_experience/migration_commit_failed', $expected_status, $result, get_option(self::MIGRATION_ACTIVE_OPTION, null) === $restore);
+            }
+            $this->redirect_admin('migration_blocked');
+            return;
+        }
+        $this->redirect_admin($success_notice);
     }
 
     private function guard_admin_post(string $nonce_action, string $operation): void
@@ -1183,6 +1204,11 @@ final class Plan_Completion
                 return ['status' => 'blocked', 'requested_action' => 'executed', 'error_code' => 'approved_dry_run_required', 'updated_at_utc' => gmdate('Y-m-d H:i:s'), 'rollback_available' => false];
             }
             update_option(self::MIGRATION_ACTIVE_OPTION, $previous['redirect_map'], false);
+            // update_option() can return false for both unchanged values and
+            // failed writes. The read-back is the actual persisted-state gate.
+            if (get_option(self::MIGRATION_ACTIVE_OPTION, null) !== $previous['redirect_map']) {
+                return ['status' => 'blocked', 'requested_action' => 'executed', 'error_code' => 'redirect_map_persistence_failed', 'updated_at_utc' => gmdate('Y-m-d H:i:s'), 'rollback_available' => false];
+            }
             Profile_Router::flush();
             $previous['status'] = 'executed';
             $previous['requested_action'] = 'executed';
@@ -1197,6 +1223,9 @@ final class Plan_Completion
             }
             $restore = is_array($previous['previous_active_map'] ?? null) ? $previous['previous_active_map'] : [];
             update_option(self::MIGRATION_ACTIVE_OPTION, $restore, false);
+            if (get_option(self::MIGRATION_ACTIVE_OPTION, null) !== $restore) {
+                return ['status' => 'blocked', 'requested_action' => 'rolled-back', 'error_code' => 'redirect_map_restore_failed', 'updated_at_utc' => gmdate('Y-m-d H:i:s'), 'rollback_available' => true];
+            }
             Profile_Router::flush();
             $previous['status'] = 'rolled-back';
             $previous['requested_action'] = 'rolled-back';
@@ -1214,11 +1243,17 @@ final class Plan_Completion
         if (! is_array($candidate)) {
             return ['map' => [], 'collisions' => 0, 'invalid' => 1];
         }
+        // This limit is a validation boundary, not a silent truncation.
+        // Otherwise dry-run could approve 500 routes while silently dropping
+        // the remaining routes of a larger legacy migration inventory.
+        if (count($candidate) > 500) {
+            return ['map' => [], 'collisions' => 0, 'invalid' => count($candidate) - 500];
+        }
         $map = [];
         $seen = [];
         $collisions = 0;
         $invalid = 0;
-        foreach (array_slice($candidate, 0, 500) as $entry) {
+        foreach ($candidate as $entry) {
             if (! is_array($entry)) {
                 $invalid++;
                 continue;

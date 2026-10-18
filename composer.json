@@ -64,7 +64,9 @@
       "tests/review1395-1434-html-search-fail-closed.php",
       "tests/review1435-1474-null-privacy-preferences.php",
       "tests/review1435-1474-timeline-filters.php",
-      "tests/review1435-1474-preview-url-namespace.php"
+      "tests/review1435-1474-preview-url-namespace.php",
+      "tests/review1475-1514-migration-persistence.php",
+      "tests/review1475-1514-upgrade-version-persistence.php"
     ]
   }
 }
