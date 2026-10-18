@@ -5,6 +5,10 @@
 WordPress module for the **Sabri Social Homeopathy Platform**. This is the existing File 25; no duplicate File 26 is created.
 
 
+## File25 latest manual source review — R1475–1514 (18 October 2026)
+
+Forty separate targeted File25/central/companion source checks on previous unmerged PR30: 30 source witnesses, ten deficient checks clustered into **three independent root causes**. Source-only corrections reject silent >500 legacy redirect truncation, verify actual stored migration/rollback state and admin status before claiming success, and detect failed schema/runtime option writes via Safe Mode. New isolated tests: `tests/review1475-1514-migration-persistence.php` and `tests/review1475-1514-upgrade-version-persistence.php`. Full report `docs/REVIEWS-1475-1514-MIGRATION-UPGRADE-PERSISTENCE-2026-10-18.md`; 40-row ledger `config/review1475-1514-migration-upgrade-persistence-audit.json`. **Not a deployed fix:** PR stack draft, live source, DB/schema/migrations, File24 exact contract, real staging rollback and Founder approval remain unverified.
+
 ## Latest targeted source audit — Reviews 1435–1474 (18 October 2026)
 
 **40 separate plan/source checks:** 29 existing source witnesses and **11 deficient check scopes in three independent root causes**, corrected in this **unmerged draft branch**. Explicit null in three privacy-sensitive preferences no longer restores public defaults; six malformed HTML Timeline filter types no longer broaden native retrieval; and three nonexistent preview URL class call sites now reference the loaded canonical `Public_URL` class.
