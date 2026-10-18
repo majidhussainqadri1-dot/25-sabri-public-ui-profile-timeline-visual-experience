@@ -1,0 +1,328 @@
+{
+  "schema": 1,
+  "module": "File 25 — Complete Public UI, Profile Timeline and Visual Experience",
+  "audit_date": "2026-10-18",
+  "review_range": "1435-1474",
+  "parent_range": "1395-1434",
+  "snapshot": {
+    "main": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+    "stacked_parent": "cd4a146e17fa83aec340efa5257af91dc77b5222",
+    "parent_pr": 29,
+    "companion_main_heads": {
+      "File03": "636e3ef965423887f810718abec3cd1c11c3659d",
+      "File08": "92e2422d6a235632810ed4981f151fc3250784aa",
+      "File09": "cfc5f781a766330314dc98c42abeca0eb7786eba",
+      "File17": "8ae656e51796d1f05865d8be5dca2480443d79ca",
+      "File20": "8a4dbcaf4fef8e926b9b834ecfde16c21a0f00ca",
+      "File21": "f2eb7e95ddea327af36ea725ffb923b029f885e6",
+      "File24": "repo_exact_head_unverified"
+    }
+  },
+  "sources": [
+    "File25 governing Word §§42–47,54,64–65,69,71–72,89–90",
+    "Consolidated Three-Central-Plan Word §§20–24,37–38,50",
+    "File21 NG30 amended Word §§26.2,27,31.3,32",
+    "Fresh File03/08/09/17/20/21 GitHub main branch source identity; File24 exact repository unresolved"
+  ],
+  "method": "Forty discrete targeted plan-to-source assertions on exact unmerged parent. These are not 40 full automated application runs, nor staging or deployed-source verification.",
+  "counts": {
+    "checks": 40,
+    "source_witnesses": 29,
+    "deficient_check_scopes": 11,
+    "independent_root_causes": 3,
+    "source_corrections": 11,
+    "preview_broken_references": 3
+  },
+  "issues": [
+    {
+      "id": "F25-1435-NULL-PRIVACY",
+      "rounds": [
+        1435,
+        1436,
+        1437
+      ],
+      "defect": "An explicit null stored or patched preference uses $input[$key] ?? default, converting null to a valid public-facing default true for public_visibility, public_metrics and profile_local_search.",
+      "root_cause": "Conflated key absence with explicitly present null.",
+      "fix": "Use array_key_exists to distinguish missing field from explicit null, feed null into strict boolean parser and fail-closed sensitive booleans.",
+      "regression": "tests/review1435-1474-null-privacy-preferences.php"
+    },
+    {
+      "id": "F25-1438-INVALID-HTML-FILTER",
+      "rounds": [
+        1438,
+        1439,
+        1440,
+        1441,
+        1442,
+        1443
+      ],
+      "defect": "Malformed nonempty HTML Timeline type/provider/year/language/topic/sort requests silently normalized to empty/default and could retrieve a broader public timeline than targeted.",
+      "root_cause": "Filter normalization silently fell back without request validity gate while search_error only guarded profile_q.",
+      "fix": "Validate supplied six filter keys against their normalized representation, reject nonscalar/invalid nonempty values before timeline retrieval, reuse existing HTML error/empty state.",
+      "regression": "tests/review1435-1474-timeline-filters.php"
+    },
+    {
+      "id": "F25-1444-BROKEN-PREVIEW-CLASS",
+      "rounds": [
+        1444,
+        1445
+      ],
+      "defect": "Three call sites in template use non-existent SabriPublicExperiencePublic_URL class; preview and public links could fail at runtime.",
+      "root_cause": "Lost namespace slashes in template class name.",
+      "fix": "Replace all three call sites with canonical \\Sabri\\PublicExperience\\Public_URL helper.",
+      "regression": "tests/review1435-1474-preview-url-namespace.php"
+    }
+  ],
+  "checks": [
+    {
+      "id": 1435,
+      "scope": "Explicit null public_visibility opt-out",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "confirmed-source-defect-corrected-in-draft"
+    },
+    {
+      "id": 1436,
+      "scope": "Explicit null public_metrics opt-out",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "confirmed-source-defect-corrected-in-draft"
+    },
+    {
+      "id": 1437,
+      "scope": "Explicit null profile_local_search opt-out",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "confirmed-source-defect-corrected-in-draft"
+    },
+    {
+      "id": 1438,
+      "scope": "HTML malformed Timeline type must not broaden",
+      "source": "includes/class-profile-renderer.php",
+      "outcome": "confirmed-source-defect-corrected-in-draft"
+    },
+    {
+      "id": 1439,
+      "scope": "HTML unknown native provider must not broaden",
+      "source": "includes/class-profile-renderer.php",
+      "outcome": "confirmed-source-defect-corrected-in-draft"
+    },
+    {
+      "id": 1440,
+      "scope": "HTML invalid year must not broaden",
+      "source": "includes/class-profile-renderer.php",
+      "outcome": "confirmed-source-defect-corrected-in-draft"
+    },
+    {
+      "id": 1441,
+      "scope": "HTML invalid language must not broaden",
+      "source": "includes/class-profile-renderer.php",
+      "outcome": "confirmed-source-defect-corrected-in-draft"
+    },
+    {
+      "id": 1442,
+      "scope": "HTML invalid Unicode topic must not broaden",
+      "source": "includes/class-profile-renderer.php",
+      "outcome": "confirmed-source-defect-corrected-in-draft"
+    },
+    {
+      "id": 1443,
+      "scope": "HTML invalid sort must not broaden",
+      "source": "includes/class-profile-renderer.php",
+      "outcome": "confirmed-source-defect-corrected-in-draft"
+    },
+    {
+      "id": 1444,
+      "scope": "Preview mode URL helper correct PHP class",
+      "source": "templates/public-profile.php",
+      "outcome": "confirmed-source-defect-corrected-in-draft"
+    },
+    {
+      "id": 1445,
+      "scope": "Preview exit/public link helper correct PHP class",
+      "source": "templates/public-profile.php",
+      "outcome": "confirmed-source-defect-corrected-in-draft"
+    },
+    {
+      "id": 1446,
+      "scope": "Profile public visibility preference gate",
+      "source": "includes/class-profile-renderer.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1447,
+      "scope": "Private profile robots suppression",
+      "source": "includes/class-profile-renderer.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1448,
+      "scope": "Private response no-store",
+      "source": "includes/class-profile-renderer.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1449,
+      "scope": "HTML local search fail-closed retrieval",
+      "source": "includes/class-profile-renderer.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1450,
+      "scope": "Timeline search error exposed in UI",
+      "source": "templates/partials/timeline.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1451,
+      "scope": "Filtered Timeline no-result UX",
+      "source": "templates/partials/timeline.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1452,
+      "scope": "Profile-local search opt-out enforced",
+      "source": "includes/class-profile-renderer.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1453,
+      "scope": "REST schema strict positive pagination",
+      "source": "includes/class-rest-controller.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1454,
+      "scope": "Public REST permission callback",
+      "source": "includes/class-rest-controller.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1455,
+      "scope": "Public REST quota store fail-close",
+      "source": "includes/class-rest-controller.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1456,
+      "scope": "Public REST private cache policy",
+      "source": "includes/class-rest-controller.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1457,
+      "scope": "REST validators conditional requests",
+      "source": "includes/class-rest-controller.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1458,
+      "scope": "File03 versioned public profile DTO",
+      "source": "includes/class-native-integration.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1459,
+      "scope": "File09 owner-approved doctor verification",
+      "source": "includes/class-native-integration.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1460,
+      "scope": "File08 canonical Clinic version/owner bridge",
+      "source": "includes/class-native-integration.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1461,
+      "scope": "File00 membership assertions",
+      "source": "includes/class-native-integration.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1462,
+      "scope": "File20 canonical structural shell bridge",
+      "source": "includes/class-file-20-integration.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1463,
+      "scope": "File24 central assurance adapter",
+      "source": "includes/class-file-24-integration.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1464,
+      "scope": "File21 native Timeline provider canonical URL guard",
+      "source": "includes/class-timeline-service.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1465,
+      "scope": "Timeline deduplication canonical identity",
+      "source": "includes/class-timeline-service.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1466,
+      "scope": "Timeline author/projection equality",
+      "source": "includes/class-timeline-service.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1467,
+      "scope": "Timeline bounded numeric pagination",
+      "source": "includes/class-timeline-service.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1468,
+      "scope": "Public profile eligibility strict monotonicity",
+      "source": "includes/class-visibility-policy.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1469,
+      "scope": "Minor public contact suppression",
+      "source": "includes/class-visibility-policy.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1470,
+      "scope": "Safe same-site public URL primitive",
+      "source": "includes/class-public-url.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1471,
+      "scope": "Section owner public allowlists",
+      "source": "includes/class-section-service.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1472,
+      "scope": "Safe Mode unindexable presentation",
+      "source": "includes/class-safe-mode-public.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1473,
+      "scope": "Admin operation immutable owner capability floor",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    },
+    {
+      "id": 1474,
+      "scope": "Public metrics invalid threshold denial",
+      "source": "includes/class-plan-completion.php",
+      "outcome": "source-witness-not-complete-runtime-verification"
+    }
+  ],
+  "truth": {
+    "branch_draft_only": true,
+    "main_unchanged": true,
+    "staging_verified": false,
+    "live_deployed_verified": false,
+    "installed_db_schema_verified": false,
+    "migration_verified": false,
+    "founder_acceptance": false,
+    "exact_final_sha_ci": "requires-fresh-github-checks"
+  }
+}

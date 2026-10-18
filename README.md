@@ -5,6 +5,15 @@
 WordPress module for the **Sabri Social Homeopathy Platform**. This is the existing File 25; no duplicate File 26 is created.
 
 
+## Latest targeted source audit — Reviews 1435–1474 (18 October 2026)
+
+**40 separate plan/source checks:** 29 existing source witnesses and **11 deficient check scopes in three independent root causes**, corrected in this **unmerged draft branch**. Explicit null in three privacy-sensitive preferences no longer restores public defaults; six malformed HTML Timeline filter types no longer broaden native retrieval; and three nonexistent preview URL class call sites now reference the loaded canonical `Public_URL` class.
+
+- Full source ledger: `config/review1435-1474-null-privacy-html-filter-preview-audit.json`.
+- Technical report: `docs/REVIEWS-1435-1474-NULL-PRIVACY-HTML-FILTER-PREVIEW-2026-10-18.md`.
+- Actual isolated tests: `tests/review1435-1474-null-privacy-preferences.php`, `tests/review1435-1474-timeline-filters.php`, `tests/review1435-1474-preview-url-namespace.php`.
+- WordPress/browser/staging/live acceptance, DB/schema, deployed artifact parity, File24 exact repository source and Founder sign-off remain unverified. No GitHub source result proves a live fix.
+
 ## Focused source privacy correction — 15 October 2026 (draft PR #20)
 
 Forty separate source-level completeness inspections were performed against File 25's governing plan, central v3.0 and the declared companion ownership boundaries. These are **40 focused checks**, not 40 full staging/live regression runs. Four related File 03 public-profile ownership defects were found: raw WordPress biography fallback, raw display-name fallback, and unconstrained filtered biography/headline substitution. The corrective branch now fails closed when no approved display name is present and permits only redaction/preservation of approved public text.
