@@ -501,13 +501,16 @@ final class Plan_Completion
             return $this->error_response('profile_not_found', 404);
         }
         clean_user_cache($user_id);
+        // Cache invalidation by itself is not reconciliation. An explicit
+        // accepted response from the native projection adapter is required.
         $result = apply_filters('sabri_public_experience/reconcile_profile_projection', [
-            'accepted' => true,
+            'accepted' => false,
             'scope' => 'file-25-public-projection',
             'owner_data_mutated' => false,
         ], $user_id);
         if (! is_array($result)
             || ($result['accepted'] ?? null) !== true
+            || ($result['scope'] ?? null) !== 'file-25-public-projection'
             || ($result['owner_data_mutated'] ?? null) !== false
         ) {
             return $this->error_response('reconciliation_contract_failed', 502);
@@ -527,9 +530,27 @@ final class Plan_Completion
         if ($idempotency === '') {
             return $this->error_response('idempotency_key_required', 400);
         }
+        $fingerprint = $this->request_fingerprint($operation, $request);
+        if ($fingerprint === '') {
+            return $this->error_response('invalid_idempotent_request', 400);
+        }
         $cached = get_transient($this->idempotency_cache_key($operation, $idempotency));
-        if (is_array($cached) && isset($cached['data'], $cached['status'], $cached['modified'])) {
-            return $this->response((array) $cached['data'], (int) $cached['status'], (string) $cached['modified']);
+        if (is_array($cached)) {
+            // An idempotency key represents ONE mutation intent, including
+            // the preference payload and the reconciled profile target.
+            // Never replay a success response for a DIFFERENT mutation.
+            if (! is_string($cached['fingerprint'] ?? null)
+                || ! hash_equals($cached['fingerprint'], $fingerprint)
+            ) {
+                return $this->error_response('idempotency_payload_conflict', 409);
+            }
+            if (is_array($cached['data'] ?? null)
+                && is_int($cached['status'] ?? null)
+                && is_string($cached['modified'] ?? null)
+            ) {
+                return $this->response($cached['data'], $cached['status'], $cached['modified']);
+            }
+            return $this->error_response('idempotency_receipt_invalid', 503, [], 30);
         }
         $retry_after = $this->rate_limit($operation);
         if ($retry_after > 0) {
@@ -569,6 +590,23 @@ final class Plan_Completion
                 : '';
     }
 
+    /**
+     * @return string SHA-256 of the canonical mutation intent, or '' on JSON failure
+     */
+    private function request_fingerprint(string $operation, \WP_REST_Request $request): string
+    {
+        // Mutating preference values (including revision) are part of the
+        // payload. The reconcile target belongs in the fingerprint even if it
+        // arrived in route/query params instead of the JSON body.
+        $intent = match ($operation) {
+            'preferences' => ['body' => $request->get_json_params()],
+            'reconcile_profile' => ['user_id' => $request->get_param('user_id')],
+            default => ['operation' => $operation],
+        };
+        $json = wp_json_encode(self::canonicalize_for_hash($intent), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        return is_string($json) ? hash('sha256', $json) : '';
+    }
+
     private function idempotency_cache_key(string $operation, string $key): string
     {
         return 'spux_idem_' . hash('sha256', get_current_user_id() . ':' . $operation . ':' . $key);
@@ -580,8 +618,13 @@ final class Plan_Completion
         if ($key === '') {
             return;
         }
+        $fingerprint = $this->request_fingerprint($operation, $request);
+        if ($fingerprint === '') {
+            return;
+        }
         $headers = $response->get_headers();
         set_transient($this->idempotency_cache_key($operation, $key), [
+            'fingerprint' => $fingerprint,
             'data' => $response->get_data(),
             'status' => $response->get_status(),
             'modified' => (string) ($headers['Last-Modified'] ?? gmdate('D, d M Y H:i:s') . ' GMT'),

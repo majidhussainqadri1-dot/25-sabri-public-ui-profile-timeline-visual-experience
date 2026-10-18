@@ -1,0 +1,298 @@
+{
+  "schema": 1,
+  "module": "File25 — Public UI / Profile Timeline / Visual Experience",
+  "date": "2026-10-18",
+  "range": "1555-1594",
+  "parent_review_range": "1515-1554",
+  "source_main_sha": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+  "source_parent_sha": "be1ce45a4caee03b7498ccc9cf7287d3e12866f1",
+  "parent_draft_pr": 32,
+  "method": "Forty separate scoped plan/source inspections completed before any code patch. A witness is source-level evidence, not end-to-end/staging/deployed verification.",
+  "sources": [
+    "File25 Final Word §64–65 security/privacy and §71–72 authenticated REST endpoints, §74 observability, §§80–90 QA/release gates",
+    "Three Central Consolidated Governing Plan §24 and §25 mutating API idempotency/replay/ownership, §38 security and §47–48 staging QA",
+    "File21 NG30 Amended §§21.4–21.5 auditable state, §§29/32–35 diagnostics, retry and postdeploy parity; companion File03/08/09/17/20/21/24 owner boundaries"
+  ],
+  "counts": {
+    "checks": 40,
+    "source_witnesses": 35,
+    "deficient_check_scopes": 5,
+    "independent_root_causes": 2,
+    "corrected_source_scopes": 5
+  },
+  "root_causes": [
+    {
+      "checks": [
+        1555,
+        1556,
+        1557
+      ],
+      "issue": "Mutation receipt keyed only on user, endpoint operation and client idempotency key; cached successes could be replayed for different privacy preference payloads or different target profile IDs.",
+      "correction": "Hash canonical JSON preference request (including revision) or reconciled target user ID in idempotency receipt; compare in preflight and fail closed 409 on mismatch or legacy unbound receipts.",
+      "regression": "tests/review1555-1594-idempotency-reconcile.php"
+    },
+    {
+      "checks": [
+        1562,
+        1563
+      ],
+      "issue": "Reconcile-profile extension filter defaulted to accepted=true, so no native reconciliation adapter was sufficient to emit a reconciliation success event and HTTP200.",
+      "correction": "Default accepted=false; require explicit accepted true, exact File25 public-projection scope, owner_data_mutated=false; only then emit reconciled success/event.",
+      "regression": "tests/review1555-1594-idempotency-reconcile.php"
+    }
+  ],
+  "checks": [
+    {
+      "round": 1555,
+      "title": "Idempotent receipt binds request payload fingerprint",
+      "path": "includes/class-plan-completion.php",
+      "result": "confirmed-gap-fixed-in-draft"
+    },
+    {
+      "round": 1556,
+      "title": "Idempotency-key reused on different preferences returns 409",
+      "path": "includes/class-plan-completion.php",
+      "result": "confirmed-gap-fixed-in-draft"
+    },
+    {
+      "round": 1557,
+      "title": "Reconcile target user ID bound to idempotent intent",
+      "path": "includes/class-plan-completion.php",
+      "result": "confirmed-gap-fixed-in-draft"
+    },
+    {
+      "round": 1558,
+      "title": "Idempotent receipt scoped to user+operation+key",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1559,
+      "title": "Idempotency keys length and syntax bounded",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1560,
+      "title": "Idempotency receipt TTL bounded",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1561,
+      "title": "REST mutations use preflight",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1562,
+      "title": "Reconcile defaults to unaccepted until native adapter confirms",
+      "path": "includes/class-plan-completion.php",
+      "result": "confirmed-gap-fixed-in-draft"
+    },
+    {
+      "round": 1563,
+      "title": "No missing-adapter profile_reconciled event",
+      "path": "includes/class-plan-completion.php",
+      "result": "confirmed-gap-fixed-in-draft"
+    },
+    {
+      "round": 1564,
+      "title": "Reconcile target user ID strict positive",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1565,
+      "title": "Adapter must not claim native owner mutation",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1566,
+      "title": "REST preference JSON keys allowlisted",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1567,
+      "title": "Explicit invalid revision returns HTTP 400",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1568,
+      "title": "Failed preference persistence returns HTTP 503",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1569,
+      "title": "Admin capability owner floor immutable",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1570,
+      "title": "High-risk administrator filter strict true",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1571,
+      "title": "Preferences option readback required",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1572,
+      "title": "Redirect migration >500 fails closed",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1573,
+      "title": "Redirect migration verifies active-map persistence",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1574,
+      "title": "Upgrade can retry stale runtime marker",
+      "path": "includes/class-upgrade-manager.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1575,
+      "title": "Upgrade enters Safe Mode on failed persistence",
+      "path": "includes/class-upgrade-manager.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1576,
+      "title": "Public REST quota storage fails closed",
+      "path": "includes/class-rest-controller.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1577,
+      "title": "REST response uses no-store private cache",
+      "path": "includes/class-rest-controller.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1578,
+      "title": "REST pagination bounded and strict",
+      "path": "includes/class-rest-controller.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1579,
+      "title": "File03 public profile contract versioned",
+      "path": "includes/class-native-integration.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1580,
+      "title": "File09 doctor verification owner versioned",
+      "path": "includes/class-native-integration.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1581,
+      "title": "File08 clinic public projection owner versioned",
+      "path": "includes/class-native-integration.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1582,
+      "title": "Native profile public eligibility strictly monotonic",
+      "path": "includes/class-visibility-policy.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1583,
+      "title": "Minor contact forced private",
+      "path": "includes/class-visibility-policy.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1584,
+      "title": "Invalid HTML profile search denies timeline retrieval",
+      "path": "includes/class-profile-renderer.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1585,
+      "title": "Invalid HTML timeline filters deny broadening",
+      "path": "includes/class-profile-renderer.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1586,
+      "title": "Timeline author and public identity verified",
+      "path": "includes/class-timeline-service.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1587,
+      "title": "Timeline provider batch remains atomic",
+      "path": "includes/class-timeline-service.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1588,
+      "title": "Canonical URL source validated",
+      "path": "includes/class-timeline-service.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1589,
+      "title": "Public section native allowlist",
+      "path": "includes/class-section-service.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1590,
+      "title": "Canonical same-site URL helper",
+      "path": "includes/class-public-url.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1591,
+      "title": "File20 shell remains structural owner",
+      "path": "includes/class-file-20-integration.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1592,
+      "title": "File24 security integration remains distinct adapter",
+      "path": "includes/class-file-24-integration.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1593,
+      "title": "Component API avoids second timeline owner",
+      "path": "includes/class-component-api.php",
+      "result": "existing-source-witness-not-live-proof"
+    },
+    {
+      "round": 1594,
+      "title": "Governed test runner invokes PHP suite",
+      "path": "tests/run-governed-suite.sh",
+      "result": "existing-source-witness-not-live-proof"
+    }
+  ],
+  "external_gates": {
+    "live_installed_version": "unverified",
+    "live_database_version": "unverified",
+    "live_migration_state": "unverified",
+    "exact_deployed_checksum": "unverified",
+    "staging_acceptance": false,
+    "founder_acceptance": false,
+    "live_retest": false
+  },
+  "qa": {
+    "exact_final_head_ci": "pending"
+  }
+}

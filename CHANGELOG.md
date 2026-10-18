@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — 2026-10-18 — Reviews 1555–1594: REST mutation replay intent / reconciled projection
+
+- Forty targeted plan/source checks: 35 existing source witnesses, five corrected defective check scopes in two independent root causes.
+- Admin REST idempotency receipts now bind canonical mutation intent, disallowing prior receipts from being replayed against a different privacy payload or target profile. Mismatch and legacy unbound receipts return HTTP 409.
+- `reconcile_profile_projection` fails closed by default; requires explicit adapter acceptance, exact File25 projection scope, and assurance that owner data was not edited before reporting reconciled success.
+- One isolated PHP REST behavior regression added, with review ledger. Actual deployed version, persistent cache concurrency, MySQL, Staging and Live remain separate unverified gates.
+
 ## Unreleased — 2026-10-18 — Reviews 1515–1554: runtime metadata retry, privacy preference persistence and revisions
 
 - Forty targeted plan/source reviews: 30 source witnesses, ten corrected defective scopes across three independent root causes.

@@ -5,6 +5,15 @@
 WordPress module for the **Sabri Social Homeopathy Platform**. This is the existing File 25; no duplicate File 26 is created.
 
 
+## Latest manual source audit — Reviews 1555–1594 (18 October 2026)
+
+Forty distinct source/contract inspections of File25 Final, the consolidated governing master and native owner interfaces: **35 existing source witnesses and five defective check scopes in two actual root causes**. REST admin idempotency responses now bind a SHA-256 canonical request fingerprint and reject reused keys for different preference payloads/target profiles with 409; missing native public-projection reconciliation can no longer report success from an auto-accepted default. An isolated real-PHP-method regression covers accepted/rejected/replay/error cases.
+
+- Audit: `config/review1555-1594-idempotency-reconciliation-audit.json`.
+- Technical report: `docs/REVIEWS-1555-1594-IDEMPOTENCY-RECONCILIATION-2026-10-18.md`.
+- Test: `tests/review1555-1594-idempotency-reconcile.php`.
+- **Draft source candidate, not deployed:** native File24, cache persistence/concurrency, real WP roles/DB/migrations, staging and Founder acceptance remain unverified.
+
 ## Latest manual source audit — Reviews 1515–1554 (18 October 2026)
 
 Forty new File25/central/cross-file source checks: 30 source witnesses and **10 deficient check scopes in three root causes**. Corrected partial upgrade's stale runtime version, made all three preferences/history/revision options verify persistence before success (with bounded compensation and HTTP503/admin failure if persistence fails), and rejected malformed REST/admin revision tokens. Two new isolated PHP failure-injection regressions.
