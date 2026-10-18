@@ -21,6 +21,7 @@ namespace {
         }
         $GLOBALS['r1600_options'][$key]=$value;return true;
     }
+    function do_action(string $hook,mixed ...$args):void {}
     function delete_transient(string $name):bool{return true;}
     function get_transient(string $name):mixed{return false;}
     function sanitize_key(string $name):string{return (string)preg_replace('/[^a-z0-9_-]/','',strtolower($name));}
