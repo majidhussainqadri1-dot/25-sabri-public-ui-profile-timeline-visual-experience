@@ -157,7 +157,9 @@ final class Plan_Completion
             if ($partial && ! array_key_exists($key, $input)) {
                 continue;
             }
-            $value = $input[$key] ?? $definition['default'];
+            // Presence and value are distinct: explicit null is invalid, not
+            // absence. Null on privacy-sensitive settings must fail closed.
+            $value = array_key_exists($key, $input) ? $input[$key] : $definition['default'];
             $type = (string) $definition['type'];
             if ($type === 'bool') {
                 $parsed = self::exact_boolean($value);
