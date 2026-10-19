@@ -1180,7 +1180,9 @@ final class Plan_Completion
             if ($latest !== $lock) {
                 return ['status' => 'busy', 'updated_at_utc' => gmdate('Y-m-d H:i:s'), 'retry_after' => 300];
             }
-            delete_option(self::INDEX_LOCK_OPTION);
+            if (! $this->compare_delete_index_lock($lock)) {
+                return ['status' => 'busy', 'updated_at_utc' => gmdate('Y-m-d H:i:s'), 'retry_after' => 300];
+            }
         }
         $generation = wp_generate_uuid4();
         if (! add_option(self::INDEX_LOCK_OPTION, ['generation' => $generation, 'expires' => $now + 300], '', false)) {
@@ -1267,8 +1269,7 @@ final class Plan_Completion
                     'error_code' => 'index_generation_superseded',
                 ];
             }
-            update_option(self::INDEX_OPTION, $state, false);
-            if (get_option(self::INDEX_OPTION, null) !== $state) {
+            if (! $this->compare_commit_index_state($generation, $current, $state)) {
                 $failure = [
                     'status' => 'failed',
                     'rebuildable' => true,
@@ -1304,10 +1305,109 @@ final class Plan_Completion
 
     private function release_index_lock_if_owned(string $generation): void
     {
-        // Never intentionally delete another worker's generation.
-        if ($this->index_lock_is_owned($generation)) {
-            delete_option(self::INDEX_LOCK_OPTION);
+        // A stale worker must never delete the replacement worker's lease.
+        // Do not use read-then-delete_option here: deletion must compare the
+        // expected serialized generation atomically in the WordPress DB.
+        $record = get_option(self::INDEX_LOCK_OPTION, []);
+        if (is_array($record) && ($record['generation'] ?? null) === $generation) {
+            $this->compare_delete_index_lock($record);
         }
+    }
+
+    /**
+     * Atomically delete ONLY the same expected lock row. In WordPress, index
+     * and lock options are written with autoload=false. On a real WP runtime
+     * the database conditional DELETE is mandatory; isolated CLI fixtures
+     * without wpdb exercise deterministic behavior only, never DB atomicity.
+     *
+     * @param array<string,mixed> $expected
+     */
+    private function compare_delete_index_lock(array $expected): bool
+    {
+        global $wpdb;
+        if (is_object($wpdb ?? null)
+            && is_string($wpdb->options ?? null)
+            && preg_match('/^[A-Za-z0-9_]+$/', $wpdb->options) === 1
+            && method_exists($wpdb, 'prepare')
+            && method_exists($wpdb, 'query')
+            && function_exists('maybe_serialize')
+        ) {
+            $query = $wpdb->prepare(
+                "DELETE FROM {$wpdb->options} WHERE option_name = %s AND BINARY option_value = %s",
+                self::INDEX_LOCK_OPTION,
+                maybe_serialize($expected)
+            );
+            $deleted = is_string($query) ? $wpdb->query($query) : false;
+            if (function_exists('wp_cache_delete')) {
+                wp_cache_delete(self::INDEX_LOCK_OPTION, 'options');
+            }
+            return $deleted === 1;
+        }
+        if (PHP_SAPI !== 'cli') {
+            // Do not silently fall back to unsafe read-delete in production.
+            return false;
+        }
+        if (get_option(self::INDEX_LOCK_OPTION, null) !== $expected) {
+            return false;
+        }
+        return delete_option(self::INDEX_LOCK_OPTION) === true;
+    }
+
+    /**
+     * Single conditional SQL statement fences BOTH the lock generation and
+     * the still-running projection. A replaced lock or index yields zero rows,
+     * so an old worker can never publish a late completion through this path.
+     *
+     * @param array<string,mixed> $running
+     * @param array<string,mixed> $state
+     */
+    private function compare_commit_index_state(string $generation, array $running, array $state): bool
+    {
+        $lock = get_option(self::INDEX_LOCK_OPTION, []);
+        if (! is_array($lock)
+            || ($lock['generation'] ?? null) !== $generation
+            || ! is_int($lock['expires'] ?? null)
+            || $lock['expires'] <= time()
+        ) {
+            return false;
+        }
+        global $wpdb;
+        if (is_object($wpdb ?? null)
+            && is_string($wpdb->options ?? null)
+            && preg_match('/^[A-Za-z0-9_]+$/', $wpdb->options) === 1
+            && method_exists($wpdb, 'prepare')
+            && method_exists($wpdb, 'query')
+            && function_exists('maybe_serialize')
+        ) {
+            $query = $wpdb->prepare(
+                "UPDATE {$wpdb->options} AS idx INNER JOIN {$wpdb->options} AS lease"
+                . " ON lease.option_name = %s SET idx.option_value = %s"
+                . " WHERE idx.option_name = %s AND BINARY idx.option_value = %s"
+                . " AND BINARY lease.option_value = %s",
+                self::INDEX_LOCK_OPTION,
+                maybe_serialize($state),
+                self::INDEX_OPTION,
+                maybe_serialize($running),
+                maybe_serialize($lock)
+            );
+            $committed = is_string($query) ? $wpdb->query($query) : false;
+            if (function_exists('wp_cache_delete')) {
+                wp_cache_delete(self::INDEX_OPTION, 'options');
+            }
+            return $committed === 1 && get_option(self::INDEX_OPTION, null) === $state;
+        }
+        if (PHP_SAPI !== 'cli') {
+            return false;
+        }
+        // CLI-only functional fixtures have no WordPress DB. They cannot
+        // establish the deployment acceptance gate for cross-worker atomicity.
+        if (get_option(self::INDEX_OPTION, null) !== $running
+            || get_option(self::INDEX_LOCK_OPTION, null) !== $lock
+        ) {
+            return false;
+        }
+        update_option(self::INDEX_OPTION, $state, false);
+        return get_option(self::INDEX_OPTION, null) === $state;
     }
 
     /** @param array<mixed> $versions @return array<string,string> */
