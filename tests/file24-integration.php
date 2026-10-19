@@ -33,10 +33,10 @@ $check = static function (bool $condition, string $message) use (&$failures): vo
 };
 
 $contract = File_24_Integration::contract();
-$check(($contract['contract_version'] ?? '') === '1.1.0', 'File 25/File 24 integration contract version must be current.');
+$check(($contract['contract_version'] ?? '') === '1.2.0', 'File 25/File 24 integration contract version must be current.');
 $check(($contract['file_24_constant'] ?? '') === 'SPCRC_VERSION', 'The exact File 24 runtime constant must be SPCRC_VERSION.');
-$check(($contract['reviewed_source_commit'] ?? '') === '0be43b3f424d7b53865587b2770479ca33f51a0b', 'File 24 exact reviewed current-main source must remain pinned.');
-$check(($contract['module_manifest_contract'] ?? '') === '1.0.0', 'Current File 24 module-manifest contract must be explicit.');
+$check(($contract['reviewed_source_commit'] ?? '') === 'a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb', 'File 24 exact reviewed current-main source must remain pinned.');
+$check(($contract['module_manifest_contract'] ?? '') === '1.2.0', 'Current File 24 module-manifest contract must be explicit.');
 $check(($contract['module_key'] ?? '') === 'file-25-public-experience', 'File 25 must have one canonical File 24 module key.');
 $check(($contract['staging_probe_cli'] ?? '') === 'wp sabri file25 staging-probe --expected-commit=<sha>', 'CLI staging probe must remain outside the File 24 route manifest.');
 $check(($contract['owns_security_governance'] ?? true) === false, 'File 25 must not own security governance.');
@@ -55,11 +55,25 @@ $check(($manifest['module_key'] ?? '') === File_24_Integration::MODULE_KEY, 'Man
 $check(($manifest['version'] ?? '') === '0.14.0', 'Manifest version must match the File 25 runtime.');
 $check(($manifest['owner'] ?? '') === 'File 25', 'Manifest ownership must remain File 25.');
 $check(($manifest['posture'] ?? '') === 'foundation', 'Source integration must not claim operational acceptance.');
-$check(($manifest['contract_version'] ?? '') === '1.0.0', 'Manifest contract version must match current File 24 validation.');
+$check(($manifest['contract_version'] ?? '') === '1.2.0', 'Manifest contract version must match current File 24 validation.');
 $check(($manifest['canonical_data_owner'] ?? '') === 'File 25', 'Manifest must publish File 25 data ownership explicitly.');
 $check(str_contains((string) ($manifest['canonical_action_owner'] ?? ''), 'native domain owners'), 'Manifest must preserve native action ownership.');
 $check(($manifest['privacy_operations'] ?? null) === [], 'File 25 must not claim privacy operations.');
 $check(($manifest['capabilities'] ?? null) === [], 'File 25 must not claim File 24 operational capabilities.');
+$required12 = ['tables','files','capabilities','external_vendors','secret_classes',
+    'privacy_operations','exporters','erasers','emergency_callbacks',
+    'last_security_test','verification_level','contract_version',
+    'canonical_data_owner','canonical_action_owner','evidence_source',
+    'degraded_behavior','release_gate'];
+foreach ($required12 as $field) {
+    $check(array_key_exists($field, $manifest), 'Current File24 1.2 manifest field missing: '.$field);
+}
+$check(($manifest['last_security_test'] ?? null) === '',
+    'Without real Staging evidence, File25 must remain unassessed; no security test date may be invented.');
+$check(($manifest['verification_level'] ?? '') === 'asvs-l2',
+    'Current v1.2 manifest must declare the intended verification tier without claiming a passed test.');
+$check(($manifest['tables'] ?? null) === [] && ($manifest['secret_classes'] ?? null) === [],
+    'Current File25 manifest must not invent owned DB tables or secrets.');
 $check(in_array('/founder/', (array) ($manifest['public_routes'] ?? []), true), 'Founder public route must be declared.');
 $check(in_array('/wp-admin/site-health.php', (array) ($manifest['private_routes'] ?? []), true), 'Site Health must be declared as a private operational route.');
 foreach (array_merge((array) ($manifest['public_routes'] ?? []), (array) ($manifest['private_routes'] ?? [])) as $route) {
