@@ -5,6 +5,15 @@
 WordPress module for the **Sabri Social Homeopathy Platform**. This is the existing File 25; no duplicate File 26 is created.
 
 
+## Latest manual source audit — Reviews 1675–1714 (19 October 2026)
+
+Forty targeted File25/central and native-owner **source checks**: **30 existing code witnesses**, **10 deficient check scopes in two root causes**. This unmerged candidate prevents File25 legacy-profile URL maps from redirecting WordPress homepage, login, admin, REST, cron or XMLRPC entrypoints and rejects all internal multi-hop redirect chains/cycles (including slash/query variants) before approved dry run.
+
+- [Complete R1675–1714 evidence](docs/REVIEWS-1675-1714-MIGRATION-ROUTE-CHAIN-2026-10-19.md).
+- JSON numbered ledger: `config/review1675-1714-migration-route-chain-audit.json`.
+- New PHP regression: `tests/review1675-1714-migration-route-guards.php`.
+- Source checks are not 40 installed E2E tests; unrelated custom route inventories, real WP DB, schema/migration backups, staging, Founder acceptance and deployed version parity remain unverified.
+
 ## Latest manual source audit — Reviews 1635–1674 (19 October 2026)
 
 Forty new targeted File25/central-plan/source checks: **33 source witnesses; seven deficient check scopes in two root causes**. Index Rebuild now checks generation ownership through final state persistence, refusing a superseded builder's success and preserving a newer worker's observed lock. Invalid owner `source_versions` metadata now rejects the index builder rather than silently disappearing.
