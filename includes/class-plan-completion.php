@@ -1450,6 +1450,7 @@ final class Plan_Completion
             $to = Public_URL::sanitize_same_site($entry['to'] ?? '', false);
             $redirect_status = self::exact_integer($entry['status'] ?? 301);
             if ($from === ''
+                || self::protected_legacy_redirect_source($from)
                 || strlen($from) > 512
                 || ! str_starts_with($from, '/')
                 || str_starts_with($from, '//')
@@ -1468,8 +1469,44 @@ final class Plan_Completion
             $seen[$from] = true;
             $map[] = ['from' => $from, 'to' => $to, 'status' => $redirect_status];
         }
+        // Redirect maps are used on public URL requests. Reject ALL internal
+        // chains, including multi-hop cycles and targets differing only by a
+        // trailing slash or containing a query. A chain can break auth, SEO,
+        // rollback evidence and the migration dry-run acceptance guarantee.
+        $source_paths = [];
+        foreach ($map as $entry) {
+            $source_paths[self::redirect_path_identity($entry['from'])] = true;
+        }
+        foreach ($map as $entry) {
+            $target_path = parse_url($entry['to'], PHP_URL_PATH);
+            if (is_string($target_path)
+                && isset($source_paths[self::redirect_path_identity($target_path)])
+            ) {
+                $collisions++;
+            }
+        }
         usort($map, static fn (array $left, array $right): int => strcmp($left['from'], $right['from']));
         return ['map' => $map, 'collisions' => $collisions, 'invalid' => $invalid];
+    }
+
+    /** Only retired public profile URLs may be redirected by File25. */
+    private static function protected_legacy_redirect_source(string $path): bool
+    {
+        if ($path === '/') {
+            return true;
+        }
+        // WordPress authentication, administration and infrastructure paths
+        // are not legacy File22/File24 public profiles. Works when WordPress
+        // is installed in a subdirectory as well as at the domain root.
+        return preg_match(
+            '~(?:^|/)(?:wp-login\\.php|wp-admin|wp-json|wp-cron\\.php|xmlrpc\\.php)(?:/|$)~i',
+            $path
+        ) === 1;
+    }
+
+    private static function redirect_path_identity(string $path): string
+    {
+        return $path === '/' ? '/' : rtrim($path, '/');
     }
 
     public function apply_legacy_redirects(): void

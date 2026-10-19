@@ -1,0 +1,304 @@
+{
+  "schema": 1,
+  "module": "File25",
+  "date": "2026-10-19",
+  "review_range": "1675-1714",
+  "review_count": 40,
+  "inspection_method": "40 distinct and numbered targeted plan/source checks performed read-only before corrective writes. Existing source witnesses do not assert complete module coverage, live deployment or 40 full integration tests.",
+  "frozen": {
+    "repository_main": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+    "parent_unmerged_draft_pr": 35,
+    "parent_sha": "8d6f957816b01d41783469b3c8eb37531f6bca2c"
+  },
+  "governing_plans": [
+    "File25 Complete Public UI Profile Timeline Final §77 URL migration: identify old profile routes, map, dry-run, collision detection, execute, verify, rollback and redirect-chain tests; §64 security integration and §83 unsafe redirects; §80/89 QA",
+    "Three Central Consolidated Governing Master Plan: §24 canonical ownership (File20 shell, File00 authentication), §25 protected mutation validation, §38 security, §47–48 migration/concurrency staging and rollback",
+    "File17 Communication Network plan: File17 owns /network/ and /messages/ navigation and social actions; File25 only presentation. File21/26 own public publication/search canonical sources."
+  ],
+  "counts": {
+    "checks": 40,
+    "existing_source_witnesses": 30,
+    "deficient_check_scopes": 10,
+    "distinct_root_causes": 2,
+    "corrected_source_scopes": 10
+  },
+  "root_causes": [
+    {
+      "scopes": [
+        1675,
+        1676,
+        1677,
+        1678,
+        1679
+      ],
+      "cause": "File25 validated_redirect_map accepted arbitrary root/auth/infrastructure WordPress paths as from URL and could activate redirects for homepage, wp-login, wp-admin, wp-json, wp-cron or XMLRPC despite migration requiring old public profiles only.",
+      "fix": "Refuse root and protected WordPress core/auth/infrastructure paths, including subdirectory deployment. Preserve valid retired profile route redirects.",
+      "test": "tests/review1675-1714-migration-route-guards.php"
+    },
+    {
+      "scopes": [
+        1680,
+        1681,
+        1682,
+        1683,
+        1684
+      ],
+      "cause": "Migration validator detected exact same-route and duplicate source but did not compare destinations to OTHER source routes, allowing two-hop chains and cycles. No slash/query equivalence tests.",
+      "fix": "After validating map, compare normalized destination path with all normalized source paths, mark collision and block dry-run for any internal map chain/cycle; preserve independent valid maps.",
+      "test": "tests/review1675-1714-migration-route-guards.php"
+    }
+  ],
+  "checks": [
+    {
+      "review": 1675,
+      "contract": "Root homepage cannot be legacy redirect source",
+      "path": "includes/class-plan-completion.php",
+      "result": "deficiency-corrected-in-unmerged-source"
+    },
+    {
+      "review": 1676,
+      "contract": "WordPress login route cannot be legacy redirect source",
+      "path": "includes/class-plan-completion.php",
+      "result": "deficiency-corrected-in-unmerged-source"
+    },
+    {
+      "review": 1677,
+      "contract": "WordPress admin routes cannot be legacy redirect sources",
+      "path": "includes/class-plan-completion.php",
+      "result": "deficiency-corrected-in-unmerged-source"
+    },
+    {
+      "review": 1678,
+      "contract": "REST API core routes cannot be legacy redirect sources",
+      "path": "includes/class-plan-completion.php",
+      "result": "deficiency-corrected-in-unmerged-source"
+    },
+    {
+      "review": 1679,
+      "contract": "Cron/XMLRPC entrypoints cannot be redirected",
+      "path": "includes/class-plan-completion.php",
+      "result": "deficiency-corrected-in-unmerged-source"
+    },
+    {
+      "review": 1680,
+      "contract": "Reject two-hop migration chain",
+      "path": "includes/class-plan-completion.php",
+      "result": "deficiency-corrected-in-unmerged-source"
+    },
+    {
+      "review": 1681,
+      "contract": "Reject two-entry redirect cycle",
+      "path": "includes/class-plan-completion.php",
+      "result": "deficiency-corrected-in-unmerged-source"
+    },
+    {
+      "review": 1682,
+      "contract": "Reject three-entry redirect cycle",
+      "path": "includes/class-plan-completion.php",
+      "result": "deficiency-corrected-in-unmerged-source"
+    },
+    {
+      "review": 1683,
+      "contract": "Reject target/source chain ignoring trailing slash",
+      "path": "includes/class-plan-completion.php",
+      "result": "deficiency-corrected-in-unmerged-source"
+    },
+    {
+      "review": 1684,
+      "contract": "Reject source-target chain with query destination",
+      "path": "includes/class-plan-completion.php",
+      "result": "deficiency-corrected-in-unmerged-source"
+    },
+    {
+      "review": 1685,
+      "contract": "Strict redirect map input limit 500",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1686,
+      "contract": "Sanitize redirect destinations to same-origin",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1687,
+      "contract": "301 and 308 redirect status allowed",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1688,
+      "contract": "Duplicate from route collision accounting",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1689,
+      "contract": "Reject exact canonical self redirects",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1690,
+      "contract": "Dry-run includes deterministic redirect-map checksum",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1691,
+      "contract": "Executed migration requires ready dry-run state",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1692,
+      "contract": "Executed migration validates approved checksum",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1693,
+      "contract": "Executed map requires option read-back",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1694,
+      "contract": "Rollback retains previous active map reference",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1695,
+      "contract": "Rollback map option persistence checked",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1696,
+      "contract": "Migration journal option read-back",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1697,
+      "contract": "Actual redirect compares only URI path",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1698,
+      "contract": "Do not process admin/REST/AJAX requests in redirects",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1699,
+      "contract": "Immutable administrative capability floor",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1700,
+      "contract": "Admin POST nonce authentication",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1701,
+      "contract": "High-risk migration needs extra explicit authorization",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1702,
+      "contract": "Dry-run stores invalid and collision counts",
+      "path": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1703,
+      "contract": "Schema upgrade checks actual stored schema version",
+      "path": "includes/class-upgrade-manager.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1704,
+      "contract": "Runtime version stale-state recovery",
+      "path": "includes/class-upgrade-manager.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1705,
+      "contract": "File03 canonical profile projection version gate",
+      "path": "includes/class-native-integration.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1706,
+      "contract": "File08 native clinic owner contract consumed",
+      "path": "includes/class-native-integration.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1707,
+      "contract": "File09 native doctor verification consumed",
+      "path": "includes/class-native-integration.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1708,
+      "contract": "Minor contact privacy inherited from File00",
+      "path": "includes/class-visibility-policy.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1709,
+      "contract": "Public REST rate limit backend fail-closed",
+      "path": "includes/class-rest-controller.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1710,
+      "contract": "Invalid HTML Timeline filters deny broad fetch",
+      "path": "includes/class-profile-renderer.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1711,
+      "contract": "File21 Timeline canonical link identity guard",
+      "path": "includes/class-timeline-service.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1712,
+      "contract": "File20 structural shell ownership isolation",
+      "path": "includes/class-file-20-integration.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1713,
+      "contract": "File24 security assurance remains distinct",
+      "path": "includes/class-file-24-integration.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1714,
+      "contract": "Governed PHP suite discovers tests automatically",
+      "path": "tests/run-governed-suite.sh",
+      "result": "existing-source-witness"
+    }
+  ],
+  "known_boundaries": {
+    "redirect_guard_scope": "Root and core WordPress routes are excluded; arbitrary other plugin routes are NOT conclusively proven disjoint until site-specific legacy inventory is accepted.",
+    "production_wordpress_test": false,
+    "installed_artifact_checksum": null,
+    "db_schema": null,
+    "migration_state": null,
+    "staging_accepted": false,
+    "founder_accepted": false,
+    "live_verified": false,
+    "exact_final_sha_ci": "pending"
+  }
+}

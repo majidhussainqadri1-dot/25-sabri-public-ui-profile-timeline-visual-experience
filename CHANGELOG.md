@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — 2026-10-19 — Reviews 1675–1714: Legacy redirect route ownership and chain safety
+
+- Forty targeted plan/source checks: thirty existing source witnesses, ten deficient check scopes in two independently documented root causes.
+- Block legacy profile redirect maps from hijacking WordPress homepage, authentication, administration, REST, cron and XMLRPC routes including subdirectory variants.
+- Reject multi-hop redirect chains and cycles; detect trailing-slash-equivalent and query-bearing chain destinations in dry run.
+- Add executable PHP tests for protected routes, 2/3 hop chains and valid 500/501-entry bounds. No actual staging/live acceptance claim.
+
 ## Unreleased — 2026-10-19 — Reviews 1635–1674: index generation fencing and strict source version contract
 
 - Forty source/plan inspections: 33 existing source witnesses; seven deficient scopes in two root-cause groups addressed.
