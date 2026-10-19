@@ -103,12 +103,16 @@ final class File_24_Integration
             $filtered[] = $manifest;
         }
 
-        // Current File 24 accepts at most 99 external manifests after its own
-        // self-manifest. Keep File 25 inside that bounded collection without
-        // inventing data for or mutating any other module.
-        $filtered = array_slice($filtered, 0, 98);
+        // File24 0.99.0 allows 99 external manifests after its self-manifest.
+        // At capacity, preserve other owners instead of silently evicting
+        // their manifests to force File25's slot; surface an operator event.
+        if (count($filtered) >= 99) {
+            if (function_exists('do_action')) {
+                do_action('sabri_public_experience/file24_manifest_capacity_blocked', count($filtered));
+            }
+            return $filtered;
+        }
         array_unshift($filtered, self::manifest());
-
         return $filtered;
     }
 
