@@ -21,6 +21,10 @@ if (! function_exists('sanitize_key')) {
     }
 }
 
+if (! function_exists('do_action')) {
+    function do_action(string $hook, mixed ...$args): void {}
+}
+
 require_once dirname(__DIR__) . '/includes/class-file-24-integration.php';
 
 use Sabri\PublicExperience\File_24_Integration;
