@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Sabri\PublicExperience;
 
+require_once __DIR__ . '/class-index-atomic-options.php';
+
 if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
     exit;
 }
@@ -1180,7 +1182,11 @@ final class Plan_Completion
             if ($latest !== $lock) {
                 return ['status' => 'busy', 'updated_at_utc' => gmdate('Y-m-d H:i:s'), 'retry_after' => 300];
             }
-            delete_option(self::INDEX_LOCK_OPTION);
+            // A stale lock can be reclaimed only with a conditional SQL
+            // DELETE. A replacement lock must never be removed.
+            if (! Index_Atomic_Options::compare_delete(self::INDEX_LOCK_OPTION, $latest)) {
+                return ['status' => 'busy', 'updated_at_utc' => gmdate('Y-m-d H:i:s'), 'retry_after' => 300];
+            }
         }
         $generation = wp_generate_uuid4();
         if (! add_option(self::INDEX_LOCK_OPTION, ['generation' => $generation, 'expires' => $now + 300], '', false)) {
@@ -1188,8 +1194,18 @@ final class Plan_Completion
         }
         $started = gmdate('Y-m-d H:i:s');
         $running = ['status' => 'running', 'rebuildable' => true, 'generation' => $generation, 'started_at_utc' => $started, 'updated_at_utc' => $started];
-        update_option(self::INDEX_OPTION, $running, false);
-        if (get_option(self::INDEX_OPTION, null) !== $running) {
+        // Ensure the derived File25 option exists on a fresh install, then
+        // fence its running-state transition by both the observed index
+        // value and this generation's exact persistent lease.
+        if (get_option(self::INDEX_OPTION, null) === null) {
+            add_option(self::INDEX_OPTION, [], '', false);
+        }
+        $previous_index = get_option(self::INDEX_OPTION, []);
+        $lease = ['generation' => $generation, 'expires' => $now + 300];
+        if (! Index_Atomic_Options::compare_replace(
+            self::INDEX_OPTION, $previous_index, $running,
+            self::INDEX_LOCK_OPTION, $lease
+        ) || get_option(self::INDEX_OPTION, null) !== $running) {
             // A builder should never run if its ownership/generation marker
             // cannot be recorded. Do not report the old stored index as new.
             $this->release_index_lock_if_owned($generation);
@@ -1267,8 +1283,10 @@ final class Plan_Completion
                     'error_code' => 'index_generation_superseded',
                 ];
             }
-            update_option(self::INDEX_OPTION, $state, false);
-            if (get_option(self::INDEX_OPTION, null) !== $state) {
+            if (! Index_Atomic_Options::compare_replace(
+                self::INDEX_OPTION, $running, $state,
+                self::INDEX_LOCK_OPTION, $lease
+            ) || get_option(self::INDEX_OPTION, null) !== $state) {
                 $failure = [
                     'status' => 'failed',
                     'rebuildable' => true,
@@ -1289,9 +1307,9 @@ final class Plan_Completion
     }
 
     /**
-     * Lease fencing for the File25 projection. WordPress option reads/deletes
-     * are not an atomic CAS; a full live multi-worker race/DB test is required
-     * before claiming linearizable locking across a distributed cache.
+     * The preliminary generation check is only an optimization. Commit and
+     * deletion use a guarded SQL CAS on File25-owned options; never use this
+     * preliminary read as final proof of atomic ownership.
      */
     private function index_lock_is_owned(string $generation): bool
     {
@@ -1304,9 +1322,14 @@ final class Plan_Completion
 
     private function release_index_lock_if_owned(string $generation): void
     {
-        // Never intentionally delete another worker's generation.
-        if ($this->index_lock_is_owned($generation)) {
-            delete_option(self::INDEX_LOCK_OPTION);
+        // Compare against the exact option value in one SQL DELETE. A changed
+        // lease cannot be deleted by an earlier generation, even in the race
+        // after this read. An expired but still-owned lease can be cleaned up.
+        $observed = get_option(self::INDEX_LOCK_OPTION, []);
+        if (is_array($observed)
+            && ($observed['generation'] ?? null) === $generation
+        ) {
+            Index_Atomic_Options::compare_delete(self::INDEX_LOCK_OPTION, $observed);
         }
     }
 

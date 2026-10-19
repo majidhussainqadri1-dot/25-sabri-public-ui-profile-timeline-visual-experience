@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — 2026-10-19 — Reviews 1675–1714: atomic index lock CAS and File24 v1.2 current contract
+
+- Forty targeted plan/source/cross-file reviews: 30 witnesses, 10 deficient check scopes in two root causes.
+- Replace separate generation lease read/delete and index state update with atomic, prepared SQL conditional UPDATE JOIN and exact-lock DELETE; invalidate File25 option caches, fail closed if unavailable.
+- Discover and pin File24 actual repository current main; upgrade File25 contract/manifest schema to File24 current v1.2, with complete inventory fields and honest unassessed security-test status.
+- Add SQL race-injection and File24 manifest tests. MySQL/staging and deployed runtime still unverified.
+
 ## Unreleased — 2026-10-19 — Reviews 1635–1674: index generation fencing and strict source version contract
 
 - Forty source/plan inspections: 33 existing source witnesses; seven deficient scopes in two root-cause groups addressed.

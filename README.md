@@ -5,6 +5,15 @@
 WordPress module for the **Sabri Social Homeopathy Platform**. This is the existing File 25; no duplicate File 26 is created.
 
 
+## Latest source audit — Reviews 1675–1714 (19 October 2026)
+
+Forty separate File25/master-plan/current-File24 source checks, **30 existing source witnesses and ten deficient scopes in two root causes**. New `Index_Atomic_Options` applies a conditional database CAS to both File25 index generation and final state, plus guarded lock reclaim/release; fail closed if no DB CAS. File24 actual repository `main` was located and reviewed (commit `a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb`), and its current `1.2.0` module-manifest contract is now declared; real Security Test still blank/**unassessed**.
+
+- [Detailed report](docs/REVIEWS-1675-1714-ATOMIC-LOCK-FILE24-CONTRACT-2026-10-19.md).
+- `config/review1675-1714-atomic-lock-file24-contract-audit.json` contains the forty individually numbered findings.
+- `tests/review1675-1714-atomic-index-concurrency.php`, `tests/file24-integration.php` and history regressions.
+- **Still blocked on installed WordPress:** WPVibe shows zero connected sites; MySQL multi-worker stress, deployed package/schema/migrations, Staging and Founder acceptance cannot be declared resolved.
+
 ## Latest manual source audit — Reviews 1635–1674 (19 October 2026)
 
 Forty new targeted File25/central-plan/source checks: **33 source witnesses; seven deficient check scopes in two root causes**. Index Rebuild now checks generation ownership through final state persistence, refusing a superseded builder's success and preserving a newer worker's observed lock. Invalid owner `source_versions` metadata now rejects the index builder rather than silently disappearing.

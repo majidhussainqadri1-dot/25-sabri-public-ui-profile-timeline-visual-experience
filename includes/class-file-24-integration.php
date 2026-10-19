@@ -19,11 +19,11 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
  */
 final class File_24_Integration
 {
-    public const CONTRACT_VERSION = '1.1.0';
+    public const CONTRACT_VERSION = '1.2.0';
     public const MODULE_KEY = 'file-25-public-experience';
     public const REVIEWED_MINIMUM_VERSION = '0.99.0';
     public const REVIEWED_MAXIMUM_VERSION = '1.0.0';
-    public const REVIEWED_SOURCE_COMMIT = '0be43b3f424d7b53865587b2770479ca33f51a0b';
+    public const REVIEWED_SOURCE_COMMIT = 'a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb';
 
     private static bool $pending_safe_mode_request = false;
 
@@ -50,7 +50,7 @@ final class File_24_Integration
             'file_24_constant' => 'SPCRC_VERSION',
             'reviewed_version_range' => '>=' . self::REVIEWED_MINIMUM_VERSION . ' <' . self::REVIEWED_MAXIMUM_VERSION,
             'reviewed_source_commit' => self::REVIEWED_SOURCE_COMMIT,
-            'module_manifest_contract' => '1.0.0',
+            'module_manifest_contract' => '1.2.0',
             'module_key' => self::MODULE_KEY,
             'manifest_filter' => 'spcrc/module_manifests',
             'security_state_action' => 'spcrc/request_security_state',
@@ -123,7 +123,7 @@ final class File_24_Integration
                 : '',
             'owner' => 'File 25',
             'posture' => 'foundation',
-            'contract_version' => '1.0.0',
+            'contract_version' => '1.2.0',
             'canonical_data_owner' => 'File 25',
             'canonical_action_owner' => 'File 25 presentation; native domain owners execute domain actions',
             'evidence_source' => 'file25-source-contract',
@@ -145,10 +145,22 @@ final class File_24_Integration
             'private_routes' => [
                 '/wp-admin/site-health.php',
             ],
+            // File24 main at a5b8d499 now requires the v1.2 manifest
+            // inventory. These are truthful File25-owned scopes only:
+            // empty lists are real "none registered", not fabricated assets.
+            'tables' => [],
+            'files' => [],
             'capabilities' => [],
             'external_vendors' => [],
+            'secret_classes' => [],
             'privacy_operations' => [],
+            'exporters' => [],
+            'erasers' => [],
+            'emergency_callbacks' => [],
+            // A blank test timestamp intentionally leaves the manifest
+            // UNASSESSED until an independent File24 staging test exists.
             'last_security_test' => '',
+            'verification_level' => 'asvs-l2',
         ];
     }
 
