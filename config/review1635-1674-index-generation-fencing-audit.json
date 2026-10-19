@@ -1,0 +1,306 @@
+{
+  "schema": 1,
+  "module": "File25",
+  "audit_date": "2026-10-19",
+  "review_range": {
+    "start": 1635,
+    "end": 1674,
+    "count": 40
+  },
+  "method": "Forty distinct source/plan checks on exact PR34 ancestor, all conducted before corrective writes. Checks are not entire WordPress E2E runs and cannot establish deployed parity.",
+  "frozen": {
+    "main_head": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+    "unmerged_parent_pr": 34,
+    "unmerged_parent_head": "75b66c1a565c81759d74486c2cf59a966ecbb5d0"
+  },
+  "sources": [
+    "Attached File25 Complete Public UI Profile Timeline Visual Experience Final: heading 48 Optional Timeline Index; Index Properties at paragraph 703 (rebuildable, idempotent, resumable, pauseable, auditable, duplicate-safe), §§71–76 admin/index, §89 testing of index rebuild pause/resume",
+    "Attached Three Central Consolidated Governing Master Plan: §24 separate canonical owner and derivative projection, concurrency/replay/locking; §41 observability; §47 staging data/index upgrade and rollback",
+    "Attached File21 NG30 Amended: native publication ownership, duplicate submission concurrency, safe retries and staging overlap tests"
+  ],
+  "counts": {
+    "checks": 40,
+    "existing_source_witnesses": 33,
+    "deficient_check_scopes": 7,
+    "distinct_root_causes": 2,
+    "source_guard_corrections": 7,
+    "real_multi_worker_atomic_locking_verified": false
+  },
+  "root_causes": [
+    {
+      "rounds": [
+        1635,
+        1636,
+        1637,
+        1638,
+        1639
+      ],
+      "cause": "Index rebuild released its lease in finally BEFORE the final index option write, without identifying generation. An older/expired generation could remove a newer owner's lease and overwrite or publish stale completion.",
+      "correction": "Keep owned lease through final write, require matching unexpired generation and its still-running projection before commit; release only when generation matches; return bounded index_generation_superseded error on observed takeover. Recheck stale lock before reclaim.",
+      "test": "tests/review1635-1674-index-generation-fencing.php",
+      "limitation": "WordPress read/delete operations are non-atomic without a compare-and-swap/conditional SQL strategy. The new regression validates deterministic overlapping ownership scenarios but not a truly simultaneous multi-process race."
+    },
+    {
+      "rounds": [
+        1640,
+        1641
+      ],
+      "cause": "Accepted index provider source_versions previously normalized by silently dropping invalid owner/version entries, then published a successful partial manifest.",
+      "correction": "Compare validated owner/version entry count with original; reject entire builder response upon malformed entries, yielding a safe failed state.",
+      "test": "tests/review1635-1674-index-generation-fencing.php"
+    }
+  ],
+  "checks": [
+    {
+      "review": 1635,
+      "requirement": "Index lease must cover final result write",
+      "source": "includes/class-plan-completion.php",
+      "result": "confirmed-source-gap-corrected-in-unmerged-candidate"
+    },
+    {
+      "review": 1636,
+      "requirement": "Stale worker must not release newer lock",
+      "source": "includes/class-plan-completion.php",
+      "result": "confirmed-source-gap-corrected-in-unmerged-candidate"
+    },
+    {
+      "review": 1637,
+      "requirement": "Stale worker result must not overwrite newer index",
+      "source": "includes/class-plan-completion.php",
+      "result": "confirmed-source-gap-corrected-in-unmerged-candidate"
+    },
+    {
+      "review": 1638,
+      "requirement": "Index cleanup must check generation ownership",
+      "source": "includes/class-plan-completion.php",
+      "result": "confirmed-source-gap-corrected-in-unmerged-candidate"
+    },
+    {
+      "review": 1639,
+      "requirement": "Superseded builder must return explicit failure",
+      "source": "includes/class-plan-completion.php",
+      "result": "confirmed-source-gap-corrected-in-unmerged-candidate"
+    },
+    {
+      "review": 1640,
+      "requirement": "Index source owner-version entries must not be silently discarded",
+      "source": "includes/class-plan-completion.php",
+      "result": "confirmed-source-gap-corrected-in-unmerged-candidate"
+    },
+    {
+      "review": 1641,
+      "requirement": "Malformed source-version keys/values must fail the full builder contract",
+      "source": "includes/class-plan-completion.php",
+      "result": "confirmed-source-gap-corrected-in-unmerged-candidate"
+    },
+    {
+      "review": 1642,
+      "requirement": "Held lock responds busy with retry_after",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1643,
+      "requirement": "Index lock uses add_option guard",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1644,
+      "requirement": "Index lease lifetime is finite",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1645,
+      "requirement": "Generation identifier is UUID",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1646,
+      "requirement": "Running generation stored before builder",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1647,
+      "requirement": "External index builder defaults denied",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1648,
+      "requirement": "Accepted builder boolean exact true",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1649,
+      "requirement": "Index maximum item count bounded",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1650,
+      "requirement": "Index checksum exactly SHA256 hex",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1651,
+      "requirement": "Builder source versions typed collection",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1652,
+      "requirement": "Invalid builder contract yields failed state",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1653,
+      "requirement": "Final index record requires readback",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1654,
+      "requirement": "Success event only on completed persisted index",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1655,
+      "requirement": "Failed index option write emits separate event",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1656,
+      "requirement": "REST index rebuild unsuccessful returns HTTP503",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1657,
+      "requirement": "Admin index busy/failure notices differ from success",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1658,
+      "requirement": "Admin partial repair cannot show complete",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1659,
+      "requirement": "Stale index repair uses a machine failure code",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1660,
+      "requirement": "Repair does not mutate owner native master tables",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1661,
+      "requirement": "Admin operation capability has immutable owner floor",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1662,
+      "requirement": "Admin POST nonce checked",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1663,
+      "requirement": "REST idempotency key bounded TTL",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1664,
+      "requirement": "REST replay key binds request fingerprint",
+      "source": "includes/class-plan-completion.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1665,
+      "requirement": "Public REST quota backend fails closed",
+      "source": "includes/class-rest-controller.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1666,
+      "requirement": "File03 public profile native contract version gate",
+      "source": "includes/class-native-integration.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1667,
+      "requirement": "File08 clinic projection kept native owner",
+      "source": "includes/class-native-integration.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1668,
+      "requirement": "File09 Doctor verification stays owner-sourced",
+      "source": "includes/class-native-integration.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1669,
+      "requirement": "Minor contact privacy enforced",
+      "source": "includes/class-visibility-policy.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1670,
+      "requirement": "Invalid HTML public search does not broaden results",
+      "source": "includes/class-profile-renderer.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1671,
+      "requirement": "File21 timeline canonical URL ownership",
+      "source": "includes/class-timeline-service.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1672,
+      "requirement": "Public sections use bounded native owner keys",
+      "source": "includes/class-section-service.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1673,
+      "requirement": "File20 owns global structural shell",
+      "source": "includes/class-file-20-integration.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    },
+    {
+      "review": 1674,
+      "requirement": "File24 remains distinct security authority adapter",
+      "source": "includes/class-file-24-integration.php",
+      "result": "existing-source-witness-not-runtime-proof"
+    }
+  ],
+  "external_release_gates": {
+    "deployed_version": "unverified",
+    "db_schema": "unverified",
+    "migration_state": "unverified",
+    "live_checksum_parity": "unverified",
+    "file24_exact_source": "unverified",
+    "real_database_multi_worker_concurrency": "unverified",
+    "staging": "unverified",
+    "founder": "unverified",
+    "live_retest": "not performed"
+  }
+}
