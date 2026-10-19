@@ -23,7 +23,7 @@ final class File_24_Integration
     public const MODULE_KEY = 'file-25-public-experience';
     public const REVIEWED_MINIMUM_VERSION = '0.99.0';
     public const REVIEWED_MAXIMUM_VERSION = '1.0.0';
-    public const REVIEWED_SOURCE_COMMIT = '0be43b3f424d7b53865587b2770479ca33f51a0b';
+    public const REVIEWED_SOURCE_COMMIT = 'a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb';
 
     private static bool $pending_safe_mode_request = false;
 
@@ -103,12 +103,14 @@ final class File_24_Integration
             $filtered[] = $manifest;
         }
 
-        // Current File 24 accepts at most 99 external manifests after its own
-        // self-manifest. Keep File 25 inside that bounded collection without
-        // inventing data for or mutating any other module.
-        $filtered = array_slice($filtered, 0, 98);
+        // File24 reserves one of its 100 records for its own self-manifest,
+        // leaving 99 external slots. Never silently evict another owner from
+        // an already-full manifest collection merely to prioritize File25.
+        if (count($filtered) >= 99) {
+            do_action('sabri_public_experience/file24_manifest_capacity_blocked', self::MODULE_KEY, count($filtered));
+            return $filtered;
+        }
         array_unshift($filtered, self::manifest());
-
         return $filtered;
     }
 
@@ -145,9 +147,20 @@ final class File_24_Integration
             'private_routes' => [
                 '/wp-admin/site-health.php',
             ],
+            // Current File24 0.99.0's exact ModuleRegistry validates this
+            // complete set of manifest fields. Empty arrays truthfully mean
+            // none owned; a blank test date explicitly leaves posture
+            // unassessed until actual security testing is evidenced.
+            'tables' => [],
+            'files' => [],
             'capabilities' => [],
             'external_vendors' => [],
+            'secret_classes' => [],
             'privacy_operations' => [],
+            'exporters' => [],
+            'erasers' => [],
+            'emergency_callbacks' => [],
+            'verification_level' => '',
             'last_security_test' => '',
         ];
     }
