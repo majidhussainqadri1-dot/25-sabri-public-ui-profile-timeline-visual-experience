@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — 2026-10-19 — Reviews 1675–1714: conditional index SQL CAS and File24 manifest parity
+
+- Forty bounded source inspections: thirty existing witnesses, nine affected check scopes corrected within three independent source causes, one separate security assurance evidence blocker.
+- Protected Index lock reclaim/release and initial/final index projection writes via exact-value conditional MySQL SQL compare-and-swap with WordPress cache invalidation; production bootstraps without atomic DB support fail closed.
+- New deterministic fake-wpdb interleaving and failed-write regression; real concurrent WordPress/DB staging acceptance remains outstanding.
+- Reconcile File24 exact current GitHub main HEAD and source tests; prevent silently truncating other owners' manifests when File24's 99-external-module capacity is full.
+- Declare current File24 optional schema metadata truthfully. Do not forge ASVS test signoff, date or staging acceptance.
+- Draft only; source tests cannot establish deployed code, DB/migration, backup/rollback or Founder signoff.
+
 ## Unreleased — 2026-10-19 — Reviews 1635–1674: index generation fencing and strict source version contract
 
 - Forty source/plan inspections: 33 existing source witnesses; seven deficient scopes in two root-cause groups addressed.
