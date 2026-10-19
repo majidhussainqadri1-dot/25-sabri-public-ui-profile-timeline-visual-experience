@@ -372,7 +372,7 @@
       "name": "Platform Security, Privacy, Compliance and Resilience Center",
       "reviewed_package_version": "0.99.0",
       "reviewed_source_version": "0.99.0",
-      "reviewed_source_commit": "0be43b3f424d7b53865587b2770479ca33f51a0b",
+      "reviewed_source_commit": "a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb",
       "accepted_source_range": ">=0.99.0 <1.0.0",
       "required_symbols": [
         "SPCRC_VERSION",
