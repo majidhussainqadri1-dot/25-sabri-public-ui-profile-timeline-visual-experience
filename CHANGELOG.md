@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — 2026-10-19 — Reviews 1635–1674: index generation fencing and strict source version contract
+
+- Forty source/plan inspections: 33 existing source witnesses; seven deficient scopes in two root-cause groups addressed.
+- Hold owned index generation lease through final write; require matching, unexpired owner and running projection before completion; do not deliberately free or overwrite a newer observed generation.
+- Reject malformed native provider source version entries rather than publishing a partial manifest as complete.
+- One real-method PHP regression for stale worker and malformed versions. **Atomic multi-worker locking remains unverified**; source-only change is not live/staging acceptance.
+
 ## Unreleased — 2026-10-18 — Reviews 1595–1634: index persistence and repair/admin result truth
 
 - Forty independent plan/source inspections: 31 existing source witnesses, nine defective check scopes corrected in two root-cause groups.

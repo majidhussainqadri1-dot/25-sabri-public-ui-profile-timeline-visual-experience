@@ -5,6 +5,15 @@
 WordPress module for the **Sabri Social Homeopathy Platform**. This is the existing File 25; no duplicate File 26 is created.
 
 
+## Latest manual source audit — Reviews 1635–1674 (19 October 2026)
+
+Forty new targeted File25/central-plan/source checks: **33 source witnesses; seven deficient check scopes in two root causes**. Index Rebuild now checks generation ownership through final state persistence, refusing a superseded builder's success and preserving a newer worker's observed lock. Invalid owner `source_versions` metadata now rejects the index builder rather than silently disappearing.
+
+- Full numbered ledger: `config/review1635-1674-index-generation-fencing-audit.json`.
+- Detailed source report: `docs/REVIEWS-1635-1674-INDEX-GENERATION-FENCING-2026-10-19.md`.
+- Native-method regression: `tests/review1635-1674-index-generation-fencing.php`.
+- **Release blocker:** these WordPress option-based ownership checks are not atomic across concurrent workers. Only isolated deterministic takeovers tested, not real MySQL/distributed-cache CAS. Draft PRs not deployed; live, DB, File24 and Founder acceptance unverified.
+
 ## Latest manual source audit — Reviews 1595–1634 (18 October 2026)
 
 **40 targeted plan/source checks:** 31 existing code witnesses, **nine affected checks in two independent root causes**, corrected in this unmerged stacked draft candidate. Index Rebuild cannot call the native builder until the running generation is persisted, and cannot report success or emit a rebuilt event until the final index state is persisted. Administrator Rebuild and Repair notices now reflect actual busy/failed/partial results and Repair checks its own index/journal writes.

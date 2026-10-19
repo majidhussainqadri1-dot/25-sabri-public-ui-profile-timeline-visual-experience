@@ -71,7 +71,8 @@
       "tests/review1515-1554-preferences-write-integrity.php",
       "tests/review1555-1594-idempotency-reconcile.php",
       "tests/review1595-1634-index-persistence.php",
-      "tests/review1595-1634-admin-repair-status.php"
+      "tests/review1595-1634-admin-repair-status.php",
+      "tests/review1635-1674-index-generation-fencing.php"
     ]
   }
 }
