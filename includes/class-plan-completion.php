@@ -1173,7 +1173,15 @@ final class Plan_Completion
         if (is_array($lock) && (int) ($lock['expires'] ?? 0) > $now) {
             return ['status' => 'busy', 'updated_at_utc' => gmdate('Y-m-d H:i:s'), 'retry_after' => max(1, (int) $lock['expires'] - $now)];
         }
-        delete_option(self::INDEX_LOCK_OPTION);
+        // A fresh owner may have claimed the lock after the first read.
+        // Recheck the expired generation before attempting stale recovery.
+        if (is_array($lock) && $lock !== []) {
+            $latest = get_option(self::INDEX_LOCK_OPTION, []);
+            if ($latest !== $lock) {
+                return ['status' => 'busy', 'updated_at_utc' => gmdate('Y-m-d H:i:s'), 'retry_after' => 300];
+            }
+            delete_option(self::INDEX_LOCK_OPTION);
+        }
         $generation = wp_generate_uuid4();
         if (! add_option(self::INDEX_LOCK_OPTION, ['generation' => $generation, 'expires' => $now + 300], '', false)) {
             return ['status' => 'busy', 'updated_at_utc' => gmdate('Y-m-d H:i:s'), 'retry_after' => 300];
@@ -1184,7 +1192,7 @@ final class Plan_Completion
         if (get_option(self::INDEX_OPTION, null) !== $running) {
             // A builder should never run if its ownership/generation marker
             // cannot be recorded. Do not report the old stored index as new.
-            delete_option(self::INDEX_LOCK_OPTION);
+            $this->release_index_lock_if_owned($generation);
             return [
                 'status' => 'failed',
                 'rebuildable' => true,
@@ -1211,6 +1219,10 @@ final class Plan_Completion
             ) {
                 throw new \UnexpectedValueException('No accepted timeline-index builder contract was available.');
             }
+            $validated_versions = self::canonical_source_versions($result['source_versions']);
+            if (count($validated_versions) !== count($result['source_versions'])) {
+                throw new \UnexpectedValueException('Invalid index provider source-version metadata.');
+            }
             $completed = gmdate('Y-m-d H:i:s');
             $state = [
                 'status' => 'complete',
@@ -1221,7 +1233,7 @@ final class Plan_Completion
                 'updated_at_utc' => $completed,
                 'items' => $result['items'],
                 'checksum' => $result['checksum'],
-                'source_versions' => self::canonical_source_versions($result['source_versions']),
+                'source_versions' => $validated_versions,
                 'source' => 'federated-provider-pointers',
             ];
         } catch (\Throwable $exception) {
@@ -1236,27 +1248,66 @@ final class Plan_Completion
                 'error_code' => 'builder_contract_unavailable',
             ];
             do_action('sabri_public_experience/timeline_index_error', $state, $exception);
+        }
+        // The owner lock must extend THROUGH the final stored state and event.
+        // A 300s overrun may allow a new generation to take ownership. A stale
+        // builder must neither overwrite that generation nor release its lock.
+        try {
+            $current = get_option(self::INDEX_OPTION, []);
+            if (! $this->index_lock_is_owned($generation)
+                || ! is_array($current)
+                || ($current['status'] ?? null) !== 'running'
+                || ($current['generation'] ?? null) !== $generation
+            ) {
+                return [
+                    'status' => 'failed',
+                    'rebuildable' => true,
+                    'generation' => $generation,
+                    'updated_at_utc' => gmdate('Y-m-d H:i:s'),
+                    'error_code' => 'index_generation_superseded',
+                ];
+            }
+            update_option(self::INDEX_OPTION, $state, false);
+            if (get_option(self::INDEX_OPTION, null) !== $state) {
+                $failure = [
+                    'status' => 'failed',
+                    'rebuildable' => true,
+                    'generation' => $generation,
+                    'updated_at_utc' => gmdate('Y-m-d H:i:s'),
+                    'error_code' => 'index_state_persistence_failed',
+                ];
+                do_action('sabri_public_experience/timeline_index_storage_failed', $failure);
+                return $failure;
+            }
+            if ($state['status'] === 'complete') {
+                do_action('sabri_public_experience/timeline_index_rebuilt', $state);
+            }
+            return $state;
         } finally {
+            $this->release_index_lock_if_owned($generation);
+        }
+    }
+
+    /**
+     * Lease fencing for the File25 projection. WordPress option reads/deletes
+     * are not an atomic CAS; a full live multi-worker race/DB test is required
+     * before claiming linearizable locking across a distributed cache.
+     */
+    private function index_lock_is_owned(string $generation): bool
+    {
+        $lock = get_option(self::INDEX_LOCK_OPTION, []);
+        return is_array($lock)
+            && ($lock['generation'] ?? null) === $generation
+            && is_int($lock['expires'] ?? null)
+            && $lock['expires'] > time();
+    }
+
+    private function release_index_lock_if_owned(string $generation): void
+    {
+        // Never intentionally delete another worker's generation.
+        if ($this->index_lock_is_owned($generation)) {
             delete_option(self::INDEX_LOCK_OPTION);
         }
-        update_option(self::INDEX_OPTION, $state, false);
-        if (get_option(self::INDEX_OPTION, null) !== $state) {
-            // A verified native builder result is not a completed index until
-            // WordPress persisted the rebuild projection and its checksum.
-            $failure = [
-                'status' => 'failed',
-                'rebuildable' => true,
-                'generation' => $generation,
-                'updated_at_utc' => gmdate('Y-m-d H:i:s'),
-                'error_code' => 'index_state_persistence_failed',
-            ];
-            do_action('sabri_public_experience/timeline_index_storage_failed', $failure);
-            return $failure;
-        }
-        if ($state['status'] === 'complete') {
-            do_action('sabri_public_experience/timeline_index_rebuilt', $state);
-        }
-        return $state;
     }
 
     /** @param array<mixed> $versions @return array<string,string> */
