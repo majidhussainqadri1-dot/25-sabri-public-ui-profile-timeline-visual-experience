@@ -1,0 +1,322 @@
+{
+  "schema": 1,
+  "module": "File25 — Public UI, Profile and Timeline",
+  "date": "2026-10-19",
+  "range": {
+    "start": 1675,
+    "end": 1714,
+    "count": 40
+  },
+  "method": "Forty independent targeted source-to-original-plan checks completed read-only before modifications, then root-cause-first source corrections. Each witness is scoped; 40 checks are not 40 WordPress end-to-end executions.",
+  "governing_documents": [
+    "Original attached File25 Final Plan: §48 Optional Timeline Index; §71 Owner Administration; §72 REST; §74 Diagnostics; §75 Safe Mode; §76 Repair; §89 QA including index pause/resume",
+    "Original attached Three Central Consolidated Governing Plans: canonical source-of-truth and derivative pointers, §40–41 performance/cron overlap locks, §47–48 staged upgrade, atomic replay/rollback, Founder approval",
+    "Original File17 Network and Communication Plan: File25 only renders action UI; File17 authorizes/executed Follow/Message",
+    "Verified File24 GitHub main: majidhussainqadri1-dot/24-sabri-platform-security-privacy-compliance-and-resilience-center, HEAD a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb, module registry MAX_MANIFESTS=100 incl self; runtime version SPCRC_VERSION=0.99.0"
+  ],
+  "source_freeze": {
+    "file25_main_sha": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+    "parent_unmerged_pr": 35,
+    "parent_sha": "8d6f957816b01d41783469b3c8eb37531f6bca2c",
+    "file24_main_sha": "a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb"
+  },
+  "counts": {
+    "checks": 40,
+    "scoped_existing_witnesses": 30,
+    "deficient_check_scopes": 10,
+    "independent_root_causes": 3,
+    "source_corrected_scopes": 10
+  },
+  "root_causes": [
+    {
+      "rounds": [
+        1675,
+        1676,
+        1677,
+        1678,
+        1679
+      ],
+      "cause": "File25 index lease stale reclaim, owner release and final state publish still used non-atomic WordPress read/delete and read/update patterns; SQL race could overwrite or delete newer generation after PHP check.",
+      "fix": "Conditional BINARY serialized-value SQL DELETE for expected lease; conditional joined SQL UPDATE matches both lease and old running index before commit. WordPress cache invalidation after SQL. Production missing DB CAS backend fails closed.",
+      "regression": "tests/review1675-1714-atomic-db-lock-races.php",
+      "remaining": "Actual MySQL/InnoDB/distributed object-cache and multi-worker stress acceptance not yet performed; isolated fake-WPDB query-level interleaving is narrower."
+    },
+    {
+      "rounds": [
+        1680,
+        1681,
+        1682
+      ],
+      "cause": "UpgradeManager conditional owner check followed by delete_option, so expired/finished worker could remove successor lock between PHP read and deletion.",
+      "fix": "Stale upgrade-lease reclamation and owned release now use conditional database SQL DELETE matching exact serialized lock; missing production backend refuses non-atomic fallback.",
+      "regression": "tests/review1675-1714-atomic-db-lock-races.php",
+      "remaining": "Full production-like lock timing, migration and rollback not verified."
+    },
+    {
+      "rounds": [
+        1683,
+        1684
+      ],
+      "cause": "File25's File24 integration sliced the other modules to 98 and unconditionally unshifted its own manifest; when collection reached capacity this silently displaced other source-owner manifests.",
+      "fix": "Checked File24 v0.99.0 registry MAX_MANIFESTS=100 (self+99). Preserve unrelated module inputs; defer File25 under full registry, emit capacity blocked event and avoid truncation. Modify existing manifest behavioral test to cover limit boundary.",
+      "regression": "tests/file24-integration.php",
+      "remaining": "Large over-capacity File24 registry itself reads its own bounded 99-item slice; File25 no longer introduces silent owner displacement."
+    }
+  ],
+  "checks": [
+    {
+      "number": 1675,
+      "scope": "Index stale lease conditional deletion",
+      "source": "includes/class-plan-completion.php",
+      "status": "source-deficiency-corrected-in-unmerged-candidate"
+    },
+    {
+      "number": 1676,
+      "scope": "Index owned lease conditional deletion",
+      "source": "includes/class-plan-completion.php",
+      "status": "source-deficiency-corrected-in-unmerged-candidate"
+    },
+    {
+      "number": 1677,
+      "scope": "Index final state atomic conditional compare",
+      "source": "includes/class-plan-completion.php",
+      "status": "source-deficiency-corrected-in-unmerged-candidate"
+    },
+    {
+      "number": 1678,
+      "scope": "Index gate protects lock and running projection atomically",
+      "source": "includes/class-plan-completion.php",
+      "status": "source-deficiency-corrected-in-unmerged-candidate"
+    },
+    {
+      "number": 1679,
+      "scope": "Index prevents after-expiry overwrites during SQL commit",
+      "source": "includes/class-plan-completion.php",
+      "status": "source-deficiency-corrected-in-unmerged-candidate"
+    },
+    {
+      "number": 1680,
+      "scope": "Upgrade Manager conditional stale lease reclamation",
+      "source": "includes/class-upgrade-manager.php",
+      "status": "source-deficiency-corrected-in-unmerged-candidate"
+    },
+    {
+      "number": 1681,
+      "scope": "Upgrade Manager conditional lease release",
+      "source": "includes/class-upgrade-manager.php",
+      "status": "source-deficiency-corrected-in-unmerged-candidate"
+    },
+    {
+      "number": 1682,
+      "scope": "Upgrade stale worker cannot clear new lease",
+      "source": "includes/class-upgrade-manager.php",
+      "status": "source-deficiency-corrected-in-unmerged-candidate"
+    },
+    {
+      "number": 1683,
+      "scope": "File24 manifests capacity must not silently displace other owners",
+      "source": "includes/class-file-24-integration.php",
+      "status": "source-deficiency-corrected-in-unmerged-candidate"
+    },
+    {
+      "number": 1684,
+      "scope": "File24 oversubscribed registry must report bounded capacity failure",
+      "source": "includes/class-file-24-integration.php",
+      "status": "source-deficiency-corrected-in-unmerged-candidate"
+    },
+    {
+      "number": 1685,
+      "scope": "File24 actual repository identity cross-checked",
+      "source": "includes/class-file-24-integration.php",
+      "status": "cross-file-source-verified"
+    },
+    {
+      "number": 1686,
+      "scope": "File24 version within versioned contract",
+      "source": "includes/class-file-24-integration.php",
+      "status": "witness"
+    },
+    {
+      "number": 1687,
+      "scope": "File24 never replaces security authority",
+      "source": "includes/class-file-24-integration.php",
+      "status": "witness"
+    },
+    {
+      "number": 1688,
+      "scope": "File24 no-store public profile policy",
+      "source": "includes/class-file-24-integration.php",
+      "status": "witness"
+    },
+    {
+      "number": 1689,
+      "scope": "File24 module contract-version constant",
+      "source": "includes/class-file-24-integration.php",
+      "status": "witness"
+    },
+    {
+      "number": 1690,
+      "scope": "File24 same canonical module key",
+      "source": "includes/class-file-24-integration.php",
+      "status": "witness"
+    },
+    {
+      "number": 1691,
+      "scope": "Index lease duration bounded",
+      "source": "includes/class-plan-completion.php",
+      "status": "witness"
+    },
+    {
+      "number": 1692,
+      "scope": "Index lock uses unique WordPress option acquisition",
+      "source": "includes/class-plan-completion.php",
+      "status": "witness"
+    },
+    {
+      "number": 1693,
+      "scope": "Index running projection readback before builder",
+      "source": "includes/class-plan-completion.php",
+      "status": "witness"
+    },
+    {
+      "number": 1694,
+      "scope": "External index builder default denies",
+      "source": "includes/class-plan-completion.php",
+      "status": "witness"
+    },
+    {
+      "number": 1695,
+      "scope": "Index accepted builder strictly boolean",
+      "source": "includes/class-plan-completion.php",
+      "status": "witness"
+    },
+    {
+      "number": 1696,
+      "scope": "Index item count finite bounded",
+      "source": "includes/class-plan-completion.php",
+      "status": "witness"
+    },
+    {
+      "number": 1697,
+      "scope": "Index checksum SHA256 hex",
+      "source": "includes/class-plan-completion.php",
+      "status": "witness"
+    },
+    {
+      "number": 1698,
+      "scope": "Builder source version metadata fully validated",
+      "source": "includes/class-plan-completion.php",
+      "status": "witness"
+    },
+    {
+      "number": 1699,
+      "scope": "Index success state checks persisted value",
+      "source": "includes/class-plan-completion.php",
+      "status": "witness"
+    },
+    {
+      "number": 1700,
+      "scope": "Index storage errors have dedicated event",
+      "source": "includes/class-plan-completion.php",
+      "status": "witness"
+    },
+    {
+      "number": 1701,
+      "scope": "REST mutation fingerprint bound to intent",
+      "source": "includes/class-plan-completion.php",
+      "status": "witness"
+    },
+    {
+      "number": 1702,
+      "scope": "Admin rebuild idempotency preflight",
+      "source": "includes/class-plan-completion.php",
+      "status": "witness"
+    },
+    {
+      "number": 1703,
+      "scope": "Immutable administrator capability floor",
+      "source": "includes/class-plan-completion.php",
+      "status": "witness"
+    },
+    {
+      "number": 1704,
+      "scope": "Admin POST checks nonce",
+      "source": "includes/class-plan-completion.php",
+      "status": "witness"
+    },
+    {
+      "number": 1705,
+      "scope": "Public REST rate limit storage failure denied",
+      "source": "includes/class-rest-controller.php",
+      "status": "witness"
+    },
+    {
+      "number": 1706,
+      "scope": "Public REST private no-store cache",
+      "source": "includes/class-rest-controller.php",
+      "status": "witness"
+    },
+    {
+      "number": 1707,
+      "scope": "File03 public profile native versioned owner",
+      "source": "includes/class-native-integration.php",
+      "status": "witness"
+    },
+    {
+      "number": 1708,
+      "scope": "File08 Clinic owner versioned public projection",
+      "source": "includes/class-native-integration.php",
+      "status": "witness"
+    },
+    {
+      "number": 1709,
+      "scope": "File09 doctor source verification native",
+      "source": "includes/class-native-integration.php",
+      "status": "witness"
+    },
+    {
+      "number": 1710,
+      "scope": "File17 follow and message actions remain owner-executed",
+      "source": "includes/class-plan-completion.php",
+      "status": "witness"
+    },
+    {
+      "number": 1711,
+      "scope": "HTML invalid timeline filter denied",
+      "source": "includes/class-profile-renderer.php",
+      "status": "witness"
+    },
+    {
+      "number": 1712,
+      "scope": "File21 canonical timeline URL eligibility",
+      "source": "includes/class-timeline-service.php",
+      "status": "witness"
+    },
+    {
+      "number": 1713,
+      "scope": "Minors cannot expose sensitive contacts",
+      "source": "includes/class-visibility-policy.php",
+      "status": "witness"
+    },
+    {
+      "number": 1714,
+      "scope": "Governed runner discovers PHP behavioral tests",
+      "source": "tests/run-governed-suite.sh",
+      "status": "witness"
+    }
+  ],
+  "release_truth": {
+    "live_deployed_build": "unverified",
+    "installed_wp_options": "unverified",
+    "db_schema": "unverified",
+    "migration_state": "unverified",
+    "file24_source": "verified-main-HEAD-not-deployed-parity",
+    "wordpress_connection": "WPVibe site listing reports no registered sites",
+    "actual_multi_worker_db_concurrency": "not tested",
+    "staging_acceptance": "not established",
+    "founder_acceptance": "not established",
+    "live_retest": "not performed",
+    "exact_candidate_ci": "pending-final-head"
+  },
+  "scope_note": "Parallel 40-source-check ledger from superseded PR39 retained for evidence only; overlaps PR37 1675-1714, DO NOT add checks cumulatively or present as another fresh 40."
+}
