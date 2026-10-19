@@ -5,6 +5,16 @@
 WordPress module for the **Sabri Social Homeopathy Platform**. This is the existing File 25; no duplicate File 26 is created.
 
 
+## Latest manually verified source audit — R1675–1714 (19 October 2026)
+
+Forty scoped reviews against original File25/three central plans and the **verified live GitHub File24 repository**: **30 pre-existing source witnesses, nine deficient source scopes clustered in three root causes, one independent security-acceptance evidence blocker**.
+
+- File25 index leases now use conditional WordPress MySQL SQL compare-and-swap for stale reclaim, owner release and running/final index writes (with explicit option-cache invalidation); fail closed if actual WP database atomic capability is unavailable. Deterministic fake-wpdb interleaving test added. **Real MySQL/WordPress concurrent staging behavior remains unverified.**
+- File24 exact current repository HEAD `a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb` reconciled in code/contract tests/staging matrix; its 99-external-manifest capacity no longer causes File25 to silently evict other module manifests.
+- File24 0.99.0 optional manifest schema fields declared explicitly, while last security test date and verification level intentionally remain blank/unassessed pending real security sign-off.
+- [Review report](docs/REVIEWS-1675-1714-ATOMIC-INDEX-FILE24-PARITY-2026-10-19.md) and [40-row ledger](config/review1675-1714-atomic-index-file24-parity-audit.json).
+- Outstanding: connected WordPress staging site (none registered via WPVibe), production-equivalent MySQL concurrency/restore/RTL/role testing, File08/File17 target-action acceptance, File24 assessed security evidence, Founder authorization and deployed source/package parity.
+
 ## Latest manual source audit — Reviews 1635–1674 (19 October 2026)
 
 Forty new targeted File25/central-plan/source checks: **33 source witnesses; seven deficient check scopes in two root causes**. Index Rebuild now checks generation ownership through final state persistence, refusing a superseded builder's success and preserving a newer worker's observed lock. Invalid owner `source_versions` metadata now rejects the index builder rather than silently disappearing.
