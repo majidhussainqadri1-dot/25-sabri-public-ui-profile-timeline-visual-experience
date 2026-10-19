@@ -1180,16 +1180,18 @@ final class Plan_Completion
             if ($latest !== $lock) {
                 return ['status' => 'busy', 'updated_at_utc' => gmdate('Y-m-d H:i:s'), 'retry_after' => 300];
             }
-            delete_option(self::INDEX_LOCK_OPTION);
+            if (! $this->delete_index_lock_if_matches($lock)) {
+                return ['status' => 'busy', 'updated_at_utc' => gmdate('Y-m-d H:i:s'), 'retry_after' => 300];
+            }
         }
         $generation = wp_generate_uuid4();
-        if (! add_option(self::INDEX_LOCK_OPTION, ['generation' => $generation, 'expires' => $now + 300], '', false)) {
+        $lease = ['generation' => $generation, 'expires' => $now + 300];
+        if (! add_option(self::INDEX_LOCK_OPTION, $lease, '', false)) {
             return ['status' => 'busy', 'updated_at_utc' => gmdate('Y-m-d H:i:s'), 'retry_after' => 300];
         }
         $started = gmdate('Y-m-d H:i:s');
         $running = ['status' => 'running', 'rebuildable' => true, 'generation' => $generation, 'started_at_utc' => $started, 'updated_at_utc' => $started];
-        update_option(self::INDEX_OPTION, $running, false);
-        if (get_option(self::INDEX_OPTION, null) !== $running) {
+        if (! $this->write_index_if_owned($running, get_option(self::INDEX_OPTION, null), $lease)) {
             // A builder should never run if its ownership/generation marker
             // cannot be recorded. Do not report the old stored index as new.
             $this->release_index_lock_if_owned($generation);
@@ -1267,8 +1269,7 @@ final class Plan_Completion
                     'error_code' => 'index_generation_superseded',
                 ];
             }
-            update_option(self::INDEX_OPTION, $state, false);
-            if (get_option(self::INDEX_OPTION, null) !== $state) {
+            if (! $this->write_index_if_owned($state, $current, $lease)) {
                 $failure = [
                     'status' => 'failed',
                     'rebuildable' => true,
@@ -1304,9 +1305,127 @@ final class Plan_Completion
 
     private function release_index_lock_if_owned(string $generation): void
     {
-        // Never intentionally delete another worker's generation.
-        if ($this->index_lock_is_owned($generation)) {
-            delete_option(self::INDEX_LOCK_OPTION);
+        $lock = get_option(self::INDEX_LOCK_OPTION, []);
+        if (is_array($lock)
+            && ($lock['generation'] ?? null) === $generation
+        ) {
+            // The SQL compare-and-delete checks the observed serialized lease,
+            // not just its generation label, so a newer lease survives races.
+            $this->delete_index_lock_if_matches($lock);
+        }
+    }
+
+    /**
+     * Conditionally delete one exact observed lease in the WordPress options
+     * table. A stale worker must not delete a newly claimed generation.
+     * All production writes use SQL compare-and-swap; CLI fixtures use
+     * bounded options stubs only when WordPress itself is not bootstrapped.
+     * @param array<string,mixed> $expected
+     */
+    private function delete_index_lock_if_matches(array $expected): bool
+    {
+        global $wpdb;
+        if (isset($wpdb) && is_object($wpdb)
+            && isset($wpdb->options) && is_string($wpdb->options)
+            && method_exists($wpdb, 'prepare') && method_exists($wpdb, 'query')
+            && function_exists('maybe_serialize')
+        ) {
+            $sql = $wpdb->prepare(
+                "DELETE FROM {$wpdb->options} WHERE option_name = %s AND BINARY option_value = BINARY %s",
+                self::INDEX_LOCK_OPTION,
+                maybe_serialize($expected)
+            );
+            $deleted = $wpdb->query($sql);
+            if ($deleted === 1) {
+                $this->invalidate_index_option_cache(self::INDEX_LOCK_OPTION);
+                return true;
+            }
+            return false;
+        }
+        if (defined('WPINC')) {
+            // The real WordPress runtime must never silently downgrade from
+            // atomic locking to an unguarded get_option/delete_option pair.
+            return false;
+        }
+        if (get_option(self::INDEX_LOCK_OPTION, null) !== $expected) {
+            return false;
+        }
+        return delete_option(self::INDEX_LOCK_OPTION);
+    }
+
+    /**
+     * Persist one File25-owned index projection atomically, contingent on the
+     * exact current lock record AND the exact previous index record. This
+     * prevents an expired worker from overwriting another worker's new state
+     * even if the persistent object cache served a stale get_option result.
+     * @param array<string,mixed> $next
+     * @param mixed $previous
+     * @param array<string,mixed> $lease
+     */
+    private function write_index_if_owned(array $next, mixed $previous, array $lease): bool
+    {
+        global $wpdb;
+        if (($lease['expires'] ?? 0) <= time()) {
+            return false;
+        }
+        if (isset($wpdb) && is_object($wpdb)
+            && isset($wpdb->options) && is_string($wpdb->options)
+            && method_exists($wpdb, 'prepare') && method_exists($wpdb, 'query')
+            && function_exists('maybe_serialize')
+        ) {
+            $table = $wpdb->options;
+            $serialized_lock = maybe_serialize($lease);
+            $serialized_next = maybe_serialize($next);
+            if ($previous === null) {
+                $sql = $wpdb->prepare(
+                    "INSERT INTO {$table} (option_name, option_value, autoload) " .
+                    "SELECT %s, %s, 'no' FROM {$table} AS lease " .
+                    "WHERE lease.option_name = %s AND BINARY lease.option_value = BINARY %s " .
+                    "AND NOT EXISTS (SELECT 1 FROM {$table} AS existing WHERE existing.option_name = %s)",
+                    self::INDEX_OPTION,
+                    $serialized_next,
+                    self::INDEX_LOCK_OPTION,
+                    $serialized_lock,
+                    self::INDEX_OPTION
+                );
+            } else {
+                $sql = $wpdb->prepare(
+                    "UPDATE {$table} AS idx INNER JOIN {$table} AS lease " .
+                    "ON lease.option_name = %s SET idx.option_value = %s " .
+                    "WHERE idx.option_name = %s AND BINARY idx.option_value = BINARY %s " .
+                    "AND BINARY lease.option_value = BINARY %s",
+                    self::INDEX_LOCK_OPTION,
+                    $serialized_next,
+                    self::INDEX_OPTION,
+                    maybe_serialize($previous),
+                    $serialized_lock
+                );
+            }
+            $written = $wpdb->query($sql);
+            if ($written !== 1) {
+                return false;
+            }
+            $this->invalidate_index_option_cache(self::INDEX_OPTION);
+            return get_option(self::INDEX_OPTION, null) === $next;
+        }
+        if (defined('WPINC')) {
+            return false;
+        }
+        if (get_option(self::INDEX_LOCK_OPTION, null) !== $lease
+            || get_option(self::INDEX_OPTION, null) !== $previous
+        ) {
+            return false;
+        }
+        update_option(self::INDEX_OPTION, $next, false);
+        return get_option(self::INDEX_OPTION, null) === $next;
+    }
+
+    private function invalidate_index_option_cache(string $option): void
+    {
+        if (function_exists('wp_cache_delete')) {
+            wp_cache_delete($option, 'options');
+            wp_cache_delete('notoptions', 'options');
+            wp_cache_delete('alloptions', 'options');
         }
     }
 
