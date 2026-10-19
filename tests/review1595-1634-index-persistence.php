@@ -39,7 +39,9 @@ namespace {
         return $default;
     }
     function do_action(string $hook,mixed ...$args):void {$GLOBALS['r1595_events'][]=[$hook,$args];}
-    require_once dirname(__DIR__).'/includes/class-plan-completion.php';
+    require_once __DIR__.'/fixtures/fake-atomic-index-wpdb.php';
+$GLOBALS['wpdb']=new \F25_Fake_Atomic_Wpdb('r1595_options');
+require_once dirname(__DIR__).'/includes/class-plan-completion.php';
     $service=new \Sabri\PublicExperience\Plan_Completion();
     $method=new \ReflectionMethod($service,'rebuild_index');
     $method->setAccessible(true);
