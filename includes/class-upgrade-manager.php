@@ -89,8 +89,9 @@ final class Upgrade_Manager
             return false;
         }
 
-        delete_option(self::LOCK_OPTION);
-
+        if (! self::compare_delete_lock($existing)) {
+            return false;
+        }
         return add_option(self::LOCK_OPTION, $record, '', false);
     }
 
@@ -98,7 +99,39 @@ final class Upgrade_Manager
     {
         $existing = get_option(self::LOCK_OPTION, []);
         if (is_array($existing) && hash_equals((string) ($existing['token'] ?? ''), $token)) {
-            delete_option(self::LOCK_OPTION);
+            self::compare_delete_lock($existing);
         }
+    }
+
+    /** Atomically delete ONLY an exact same upgrade lock; otherwise fail closed. */
+    private static function compare_delete_lock(array $expected): bool
+    {
+        global $wpdb;
+        if (is_object($wpdb ?? null)
+            && is_string($wpdb->options ?? null)
+            && preg_match('/^[A-Za-z0-9_]+$/', $wpdb->options) === 1
+            && method_exists($wpdb, 'prepare')
+            && method_exists($wpdb, 'query')
+            && function_exists('maybe_serialize')
+        ) {
+            $sql = $wpdb->prepare(
+                "DELETE FROM {$wpdb->options} WHERE option_name = %s AND BINARY option_value = %s",
+                self::LOCK_OPTION,
+                maybe_serialize($expected)
+            );
+            $result = is_string($sql) ? $wpdb->query($sql) : false;
+            if (function_exists('wp_cache_delete')) {
+                wp_cache_delete(self::LOCK_OPTION, 'options');
+            }
+            return $result === 1;
+        }
+        if (PHP_SAPI !== 'cli') {
+            return false;
+        }
+        // CLI-only stubs model the logical state but do not prove DB atomicity.
+        if (get_option(self::LOCK_OPTION, null) !== $expected) {
+            return false;
+        }
+        return delete_option(self::LOCK_OPTION) === true;
     }
 }

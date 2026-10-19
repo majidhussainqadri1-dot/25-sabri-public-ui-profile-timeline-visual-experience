@@ -103,8 +103,14 @@ for ($index = 0; $index < 150; $index++) {
     $many[] = ['module_key' => 'module-' . $index];
 }
 $bounded = File_24_Integration::filter_manifests($many);
-$check(count($bounded) === 99, 'File 25 plus external manifests must respect File 24 collection bounds.');
-$check(($bounded[0]['module_key'] ?? '') === File_24_Integration::MODULE_KEY, 'File 25 manifest must remain present under collection pressure.');
+$check(count($bounded) === 150 && ($bounded[149]['module_key'] ?? '') === 'module-149',
+    'File25 must not silently truncate or displace unrelated File24 manifests at capacity.');
+$check(! in_array(File_24_Integration::MODULE_KEY, array_column($bounded, 'module_key'), true),
+    'Over-full registry must defer File25 rather than evict another owner.');
+$room = File_24_Integration::filter_manifests(array_slice($many, 0, 98));
+$check(count($room) === 99 && ($room[0]['module_key'] ?? '') === File_24_Integration::MODULE_KEY
+    && ($room[98]['module_key'] ?? '') === 'module-97',
+    'Exactly one free external slot must preserve the 98 native manifests and add File25.');
 
 if ($failures !== []) {
     fwrite(STDERR, "FAILED\n- " . implode("\n- ", $failures) . "\n");
