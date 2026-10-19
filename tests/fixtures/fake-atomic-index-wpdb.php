@@ -40,6 +40,11 @@ final class F25_Fake_Atomic_Wpdb {
                 $store[$lockKey]=['generation'=>'rival','expires'=>time()+300];
                 $store[$indexKey]=['status'=>'running','generation'=>'rival'];
             }
+            if($this->scope==='r1595_options'
+                && (($GLOBALS['r1595_failure']??'')==='running'
+                    && ($new['status']??'')==='running')) {
+                return 0;
+            }
             if($this->scope==='r1595_options' && ($GLOBALS['r1595_failure']??'')==='complete'
                 && ($new['status']??'')==='complete') {
                 return 0;
