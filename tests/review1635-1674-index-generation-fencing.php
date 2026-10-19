@@ -47,6 +47,8 @@ function apply_filters(string $hook,mixed $initial,mixed ...$args):mixed {
             ? ['File21-invalid'=>'bad_version'] : ['file-21'=>'1.2.3'],
     ];
 }
+require_once __DIR__.'/fixtures/fake-atomic-index-wpdb.php';
+$GLOBALS['wpdb']=new \F25_Fake_Atomic_Wpdb('r1635_options');
 require_once dirname(__DIR__).'/includes/class-plan-completion.php';
 $service=new \Sabri\PublicExperience\Plan_Completion();
 $rebuild=new ReflectionMethod($service,'rebuild_index');$rebuild->setAccessible(true);
