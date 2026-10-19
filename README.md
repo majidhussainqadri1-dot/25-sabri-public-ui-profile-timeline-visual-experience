@@ -5,6 +5,15 @@
 WordPress module for the **Sabri Social Homeopathy Platform**. This is the existing File 25; no duplicate File 26 is created.
 
 
+## Current File25 targeted source review — Reviews 1675–1714 (19 October 2026)
+
+Forty independent source/plan/companion checks: **30 existing code/owner witnesses, 10 affected scopes across 3 root causes**. Index final commit and owned/stale lease cleanup now use conditional SQL CAS; upgrade lease cleanup similarly prevents clearing a changed owner; File24 manifest collection no longer silently displaces unrelated owner modules. Real File24 source discovered: `majidhussainqadri1-dot/24-sabri-platform-security-privacy-compliance-and-resilience-center` main `a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb`, runtime 0.99.0 in source.
+
+- Complete 40-check ledger: `config/review1675-1714-atomic-leases-file24-contract-audit.json`.
+- Technical report: `docs/REVIEWS-1675-1714-ATOMIC-LOCK-FILE24-CONTRACT-2026-10-19.md`.
+- New fake-$wpdb SQL-boundary race injection: `tests/review1675-1714-atomic-db-lock-races.php`, plus current File24 contract integration regression.
+- **Staging/Live cannot be asserted:** WordPress connector lists zero registered sites, so deployed artifact checksum, DB, migrations and real InnoDB concurrency/restore remain unverified. Draft PR, no merge or deploy.
+
 ## Latest manual source audit — Reviews 1635–1674 (19 October 2026)
 
 Forty new targeted File25/central-plan/source checks: **33 source witnesses; seven deficient check scopes in two root causes**. Index Rebuild now checks generation ownership through final state persistence, refusing a superseded builder's success and preserving a newer worker's observed lock. Invalid owner `source_versions` metadata now rejects the index builder rather than silently disappearing.
