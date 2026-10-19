@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — 2026-10-19 — Reviews 1675–1714: conditional index/upgrade option locks and File24 source truth
+
+- Forty targeted inspections: 30 source/owner witnesses; ten corrected deficient scopes in three root causes.
+- Index lease reclaim/owned release now use exact conditional SQL DELETE, and index final projection uses a single joined conditional SQL UPDATE matching both generation lock and running index.
+- Upgrade lease reclamation and release similarly use exact-value conditional SQL DELETE instead of non-atomic PHP read-then-delete.
+- File24 owner repo and current `main` verified at `a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb`, version 0.99.0. File25 no longer silently truncates external ModuleRegistry manifests.
+- Source-level SQL race-injection regression added. Real MySQL/InnoDB, object cache and Staging/Founder/Live parity **not** proved.
+
 ## Unreleased — 2026-10-19 — Reviews 1635–1674: index generation fencing and strict source version contract
 
 - Forty source/plan inspections: 33 existing source witnesses; seven deficient scopes in two root-cause groups addressed.
