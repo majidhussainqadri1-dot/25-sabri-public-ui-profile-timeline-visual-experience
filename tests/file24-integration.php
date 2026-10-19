@@ -35,7 +35,7 @@ $check = static function (bool $condition, string $message) use (&$failures): vo
 $contract = File_24_Integration::contract();
 $check(($contract['contract_version'] ?? '') === '1.1.0', 'File 25/File 24 integration contract version must be current.');
 $check(($contract['file_24_constant'] ?? '') === 'SPCRC_VERSION', 'The exact File 24 runtime constant must be SPCRC_VERSION.');
-$check(($contract['reviewed_source_commit'] ?? '') === '0be43b3f424d7b53865587b2770479ca33f51a0b', 'File 24 exact reviewed current-main source must remain pinned.');
+$check(($contract['reviewed_source_commit'] ?? '') === 'a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb', 'File 24 exact reviewed current-main source must remain pinned.');
 $check(($contract['module_manifest_contract'] ?? '') === '1.0.0', 'Current File 24 module-manifest contract must be explicit.');
 $check(($contract['module_key'] ?? '') === 'file-25-public-experience', 'File 25 must have one canonical File 24 module key.');
 $check(($contract['staging_probe_cli'] ?? '') === 'wp sabri file25 staging-probe --expected-commit=<sha>', 'CLI staging probe must remain outside the File 24 route manifest.');
@@ -89,8 +89,19 @@ for ($index = 0; $index < 150; $index++) {
     $many[] = ['module_key' => 'module-' . $index];
 }
 $bounded = File_24_Integration::filter_manifests($many);
-$check(count($bounded) === 99, 'File 25 plus external manifests must respect File 24 collection bounds.');
-$check(($bounded[0]['module_key'] ?? '') === File_24_Integration::MODULE_KEY, 'File 25 manifest must remain present under collection pressure.');
+$check(count($bounded) === 150, 'File25 must never silently drop unrelated provider manifests on capacity overflow.');
+$check(($bounded[0]['module_key'] ?? '') === 'module-0', 'File25 must not preempt already full owner collection.');
+$check(! in_array(File_24_Integration::MODULE_KEY, array_column($bounded, 'module_key'), true), 'Overflow leaves File25 unregistered, explicitly blocked pending capacity.');
+$nearly_full = array_slice($many, 0, 98);
+$room = File_24_Integration::filter_manifests($nearly_full);
+$check(count($room) === 99, 'Exactly 98 other owner manifests must fit alongside File25.');
+$check(($room[0]['module_key'] ?? '') === File_24_Integration::MODULE_KEY, 'File25 appears only when its legitimate slot exists.');
+$complete_fields = ['tables','files','capabilities','external_vendors','secret_classes','privacy_operations','exporters','erasers','emergency_callbacks','verification_level','last_security_test','contract_version','canonical_data_owner','canonical_action_owner','evidence_source','degraded_behavior','release_gate'];
+foreach ($complete_fields as $required_field) {
+    $check(array_key_exists($required_field, $manifest), 'Current File24 manifest contract must declare ' . $required_field);
+}
+$check(($manifest['last_security_test'] ?? null) === '', 'No fabricated security test date before actual accepted staging proof.');
+$check(($manifest['verification_level'] ?? null) === '', 'Unverified ASVS target must remain explicitly unassessed.');
 
 if ($failures !== []) {
     fwrite(STDERR, "FAILED\n- " . implode("\n- ", $failures) . "\n");
