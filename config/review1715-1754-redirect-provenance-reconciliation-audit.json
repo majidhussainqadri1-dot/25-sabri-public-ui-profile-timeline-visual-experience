@@ -1,0 +1,328 @@
+{
+  "schema": 1,
+  "file_number": 25,
+  "date": "2026-10-20",
+  "range": {
+    "from": 1715,
+    "to": 1754,
+    "count": 40
+  },
+  "method": "40 individually numbered scoped code-to-Word-plan/owner source inspections, completed BEFORE any code correction. Source witnesses are not 40 full WordPress/staging tests; no deployed state inferred.",
+  "base": {
+    "repository_main_at_freeze": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+    "source_parent_draft_pr": 40,
+    "source_parent_head": "3580641ed896ec14ac79a829e8d23fd36c1f1b75",
+    "unmerged": true
+  },
+  "governing_sources": [
+    "Original File25 Complete Public UI Profile Timeline Visual Experience Final: §48 Optional Timeline Index paragraphs 679–713, §77 URL Migration paragraphs 1186–1194, §71 Admin, §72 REST, §89 QA",
+    "Consolidated Three Central Governing Master Plans: §§23–25 derivative/canonical ownership, URL/redirect authority, signed/replay-safe mutating API, §§40–41 bounded production operations and locking, §§47–50 staging and rollback",
+    "File17 Communication canonical follow; File20 shell routes; File21 publication; File24 native security manifest v1.2; File26 search index canon owner (distinguished from File25 derivative timeline)"
+  ],
+  "tally": {
+    "checks": 40,
+    "positive_existing_witnesses": 33,
+    "source_gaps": 7,
+    "already_identified_in_independent_unmerged_pr36": 2,
+    "newly_confirmed_gaps": 5,
+    "code_root_cause_groups_new": 2,
+    "carryforward_reconciliation_groups": 1,
+    "correction_scopes": 7
+  },
+  "root_groups": [
+    {
+      "id": "prior-PR36-branch-integration",
+      "checks": [
+        1715,
+        1716
+      ],
+      "type": "historical-confirmed-unmerged-not-new-discovery",
+      "cause": "The PR36 source corrections for protected WordPress auth/admin/REST routes and redirect chains were not integrated into PR40 and must not disappear; duplicate review number R1675–1714 on distinct draft branches is not a new independent audit.",
+      "correction": "Reapply existing approved narrow source guards and retained previously tested PR36 regression on top of PR40."
+    },
+    {
+      "id": "new-migration-source-alias-and-revalidation",
+      "checks": [
+        1717,
+        1718
+      ],
+      "type": "newly-confirmed-source-defect",
+      "cause": "The legacy migration validator distinguished '/old' and '/old/' as unrelated source paths; an executed migration relied only on stored ready state and checksum without rechecking current route owner/chain safety guards.",
+      "correction": "Detect slash-equivalent source identity collision; re-run the full current validator immediately before activating stored ready map, requiring exact sorted/matched approved map.",
+      "test": "tests/review1715-1754-redirect-execute-index-provenance.php"
+    },
+    {
+      "id": "new-index-provenance-bounds",
+      "checks": [
+        1719,
+        1720,
+        1721
+      ],
+      "type": "newly-confirmed-source-defect",
+      "cause": "Accepted File25 materialized timeline index with positive items could declare no canonical owner versions. Source-version map had no explicit entry or field-length limits, so a provider filter could submit excessive metadata into a WordPress index option.",
+      "correction": "Reject positive items with empty owner provenance; reject >64 source owners, >64-byte owner keys or >64-byte source versions, while continuing to allow valid File21 owner version identifiers.",
+      "test": "tests/review1715-1754-redirect-execute-index-provenance.php"
+    }
+  ],
+  "checks": [
+    {
+      "review": 1715,
+      "subject": "Reserved WP core URL sources must be blocked",
+      "file": "includes/class-plan-completion.php",
+      "result": "previously-confirmed-PR36-reconciled"
+    },
+    {
+      "review": 1716,
+      "subject": "Redirect chain/cycle must be rejected in same map",
+      "file": "includes/class-plan-completion.php",
+      "result": "previously-confirmed-PR36-reconciled"
+    },
+    {
+      "review": 1717,
+      "subject": "Trailing slash-equivalent source duplicates must collide",
+      "file": "includes/class-plan-completion.php",
+      "result": "newly-confirmed-corrected"
+    },
+    {
+      "review": 1718,
+      "subject": "Execution must revalidate a stored approved dry-run map",
+      "file": "includes/class-plan-completion.php",
+      "result": "newly-confirmed-corrected"
+    },
+    {
+      "review": 1719,
+      "subject": "Nonempty index must have canonical source-version provenance",
+      "file": "includes/class-plan-completion.php",
+      "result": "newly-confirmed-corrected"
+    },
+    {
+      "review": 1720,
+      "subject": "Owner source_versions map must have bounded number of entries",
+      "file": "includes/class-plan-completion.php",
+      "result": "newly-confirmed-corrected"
+    },
+    {
+      "review": 1721,
+      "subject": "Owner source/version field lengths must be bounded",
+      "file": "includes/class-plan-completion.php",
+      "result": "newly-confirmed-corrected"
+    },
+    {
+      "review": 1722,
+      "subject": "Index source version key sanitation",
+      "file": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1723,
+      "subject": "Invalid source-version map rejected not truncated",
+      "file": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1724,
+      "subject": "Native index builder accepted exact boolean",
+      "file": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1725,
+      "subject": "Index checksum strict SHA256 hex",
+      "file": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1726,
+      "subject": "Index item count maximum enforced",
+      "file": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1727,
+      "subject": "Index lock uses unique add_option claim",
+      "file": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1728,
+      "subject": "Index start/complete uses guarded SQL compare-and-swap",
+      "file": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1729,
+      "subject": "Atomic index compare checks current serialized lock",
+      "file": "includes/class-index-atomic-options.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1730,
+      "subject": "Atomic lock DELETE compares exact previous value",
+      "file": "includes/class-index-atomic-options.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1731,
+      "subject": "Index CAS purges WordPress cached option values",
+      "file": "includes/class-index-atomic-options.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1732,
+      "subject": "Upgrade lease stale reclaim guarded by SQL compare-delete",
+      "file": "includes/class-upgrade-manager.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1733,
+      "subject": "Upgrade lease release guarded by SQL compare-delete",
+      "file": "includes/class-upgrade-manager.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1734,
+      "subject": "Redirect maps reject larger than 500 entries",
+      "file": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1735,
+      "subject": "Only HTTP 301 and 308 permanent redirects permitted",
+      "file": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1736,
+      "subject": "Migration targets use same-site URL sanitizer",
+      "file": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1737,
+      "subject": "Dry-run manifest hash compared before execution",
+      "file": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1738,
+      "subject": "Migration active option write readback",
+      "file": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1739,
+      "subject": "Rollback active option write readback",
+      "file": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1740,
+      "subject": "Migration journal status persistence verification",
+      "file": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1741,
+      "subject": "Admin mutation nonce checked",
+      "file": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1742,
+      "subject": "Immutable File25 administrator capability floor",
+      "file": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1743,
+      "subject": "REST replay key bound to canonical mutation intent",
+      "file": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1744,
+      "subject": "REST failed public preference write returns failure",
+      "file": "includes/class-plan-completion.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1745,
+      "subject": "File24 manifest must not evict other module at capacity",
+      "file": "includes/class-file-24-integration.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1746,
+      "subject": "File24 security test timestamp not fabricated",
+      "file": "includes/class-file-24-integration.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1747,
+      "subject": "File24 manifest v1.2 contract metadata",
+      "file": "includes/class-file-24-integration.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1748,
+      "subject": "File03 remains public profile canonical authority",
+      "file": "includes/class-native-integration.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1749,
+      "subject": "File08 remains native clinic owner",
+      "file": "includes/class-native-integration.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1750,
+      "subject": "File09 doctor eligibility remains native owner",
+      "file": "includes/class-native-integration.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1751,
+      "subject": "File20 remains global shell owner",
+      "file": "includes/class-file-20-integration.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1752,
+      "subject": "File21 Timeline owner-sourced canonical link",
+      "file": "includes/class-timeline-service.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1753,
+      "subject": "Minor privacy contact suppression",
+      "file": "includes/class-visibility-policy.php",
+      "result": "existing-source-witness"
+    },
+    {
+      "review": 1754,
+      "subject": "Public REST quota storage unavailable fails closed",
+      "file": "includes/class-rest-controller.php",
+      "result": "existing-source-witness"
+    }
+  ],
+  "tests": [
+    "tests/review1675-1714-migration-route-guards.php",
+    "tests/review1715-1754-redirect-execute-index-provenance.php"
+  ],
+  "open_gates": {
+    "independent_pr36_merging": "source-reconciled-unmerged-draft",
+    "external_custom_site_route_inventory": "unverified",
+    "file08_booking_native_acceptance": "unverified",
+    "file17_follow_native_acceptance": "unverified",
+    "file24_installed_assurance": "unverified",
+    "file26_search_staging_parity": "unverified",
+    "real_mysql_multi_worker": "unverified",
+    "deployed_plugin_version": "unverified",
+    "database_schema": "unverified",
+    "migration_state": "unverified",
+    "staging_and_rollback": "not_accepted",
+    "founder_approval": "not_accepted",
+    "live_retest": "not_performed"
+  }
+}
