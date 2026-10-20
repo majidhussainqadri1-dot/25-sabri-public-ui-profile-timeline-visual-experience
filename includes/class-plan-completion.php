@@ -1366,26 +1366,77 @@ final class Plan_Completion
         $normalized = self::normalize_preferences($current, self::default_preferences(), true);
         $operations['preferences'] = update_option(self::OPTION, $normalized, false) || $current === $normalized;
         $operations['provider_registry_cache'] = delete_transient('sabri_public_experience_provider_registry') || get_transient('sabri_public_experience_provider_registry') === false;
-        $index = get_option(self::INDEX_OPTION, []);
-        if (is_array($index) && ($index['status'] ?? '') === 'running') {
-            $started = strtotime((string) ($index['started_at_utc'] ?? '') . ' UTC');
-            if ($started !== false && $started < time() - 600) {
-                $index['status'] = 'failed';
-                $index['error_code'] = 'stale_rebuild_reconciled';
-                $index['updated_at_utc'] = gmdate('Y-m-d H:i:s');
-                update_option(self::INDEX_OPTION, $index, false);
-                $operations['stale_index'] = get_option(self::INDEX_OPTION, null) === $index;
-            }
-        }
-        if (! isset($operations['stale_index'])) {
-            $operations['stale_index'] = true;
-        }
+        // Repair is a writer too. Never use a plain update_option() on the
+        // derived index: a fresh rebuild can take ownership after our read.
+        $operations['stale_index'] = $this->reconcile_stale_index();
         $operations['rewrite_rules'] = true;
         Profile_Router::flush();
         $status = ! in_array(false, $operations, true) ? 'complete' : 'partial';
         $state = ['status' => $status, 'repaired_at_utc' => gmdate('Y-m-d H:i:s'), 'operations' => $operations, 'foreign_owner_data_touched' => false];
         do_action('sabri_public_experience/repaired', $state);
         return $state;
+    }
+
+    /**
+     * Safely mark a genuinely abandoned derived index as failed.
+     *
+     * Reuse the same File25 lease and SQL CAS contract as rebuild_index().
+     * An active rebuild, malformed lease, changed index generation, or missing
+     * atomic database support is a PARTIAL repair, not a successful mutation.
+     * Native File21 publications and all other owners are never written.
+     */
+    private function reconcile_stale_index(): bool
+    {
+        $observed = get_option(self::INDEX_OPTION, []);
+        if (! is_array($observed) || ($observed['status'] ?? '') !== 'running') {
+            return true;
+        }
+
+        $started = strtotime((string) ($observed['started_at_utc'] ?? '') . ' UTC');
+        if ($started === false || $started >= time() - 600) {
+            return true;
+        }
+
+        // A live worker may have a very old start time yet still own its
+        // lease. Reclaim only expired, exactly observed File25 lock values.
+        $lock = get_option(self::INDEX_LOCK_OPTION, null);
+        if ($lock !== null) {
+            if (! is_array($lock)
+                || ! is_int($lock['expires'] ?? null)
+                || $lock['expires'] > time()
+                || ! Index_Atomic_Options::compare_delete(self::INDEX_LOCK_OPTION, $lock)
+            ) {
+                return false;
+            }
+        }
+
+        $lease = [
+            'generation' => wp_generate_uuid4(),
+            'expires' => time() + 300,
+        ];
+        if (! add_option(self::INDEX_LOCK_OPTION, $lease, '', false)) {
+            return false;
+        }
+
+        try {
+            // A fresh rebuild may have replaced the entire observed index
+            // while repair was acquiring the lock. Do not overwrite it.
+            if (get_option(self::INDEX_OPTION, null) !== $observed) {
+                return false;
+            }
+            $failed = $observed;
+            $failed['status'] = 'failed';
+            $failed['error_code'] = 'stale_rebuild_reconciled';
+            $failed['updated_at_utc'] = gmdate('Y-m-d H:i:s');
+
+            return Index_Atomic_Options::compare_replace(
+                self::INDEX_OPTION, $observed, $failed,
+                self::INDEX_LOCK_OPTION, $lease
+            ) && get_option(self::INDEX_OPTION, null) === $failed;
+        } finally {
+            // This conditional DELETE cannot release a newer worker's lock.
+            Index_Atomic_Options::compare_delete(self::INDEX_LOCK_OPTION, $lease);
+        }
     }
 
     /** @return array<string,mixed> */
