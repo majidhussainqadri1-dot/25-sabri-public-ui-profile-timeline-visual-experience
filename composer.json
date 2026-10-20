@@ -74,7 +74,9 @@
       "tests/review1595-1634-admin-repair-status.php",
       "tests/review1635-1674-index-generation-fencing.php",
       "tests/review1675-1714-atomic-index-concurrency.php",
-      "tests/review1675-1714-upgrade-lock-cas.php"
+      "tests/review1675-1714-upgrade-lock-cas.php",
+      "tests/review1675-1714-migration-route-guards.php",
+      "tests/review1715-1754-redirect-execute-index-provenance.php"
     ]
   }
 }

@@ -1236,7 +1236,12 @@ final class Plan_Completion
                 throw new \UnexpectedValueException('No accepted timeline-index builder contract was available.');
             }
             $validated_versions = self::canonical_source_versions($result['source_versions']);
-            if (count($validated_versions) !== count($result['source_versions'])) {
+            // A non-empty index without any owner version cannot prove which
+            // canonical source snapshot its pointers represent.
+            if (count($validated_versions) !== count($result['source_versions'])
+                || count($validated_versions) > 64
+                || ($result['items'] > 0 && $validated_versions === [])
+            ) {
                 throw new \UnexpectedValueException('Invalid index provider source-version metadata.');
             }
             $completed = gmdate('Y-m-d H:i:s');
@@ -1339,6 +1344,8 @@ final class Plan_Completion
         $clean = [];
         foreach ($versions as $id => $version) {
             if (! is_string($id) || ! is_string($version)
+                || $id === '' || strlen($id) > 64
+                || strlen($version) > 64
                 || sanitize_key($id) !== $id
                 || preg_match('/^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/', $version) !== 1
             ) {
@@ -1414,6 +1421,15 @@ final class Plan_Completion
             ) {
                 return ['status' => 'blocked', 'requested_action' => 'executed', 'error_code' => 'approved_dry_run_required', 'updated_at_utc' => gmdate('Y-m-d H:i:s'), 'rollback_available' => false];
             }
+            // State/checksum alone are not executable approval. The stored
+            // map may predate new owner or redirect-chain safety rules.
+            $verified_map = self::validated_redirect_map($previous['redirect_map']);
+            if ($verified_map['invalid'] !== 0
+                || $verified_map['collisions'] !== 0
+                || $verified_map['map'] !== $previous['redirect_map']
+            ) {
+                return ['status' => 'blocked', 'requested_action' => 'executed', 'error_code' => 'approved_map_revalidation_failed', 'updated_at_utc' => gmdate('Y-m-d H:i:s'), 'rollback_available' => false];
+            }
             update_option(self::MIGRATION_ACTIVE_OPTION, $previous['redirect_map'], false);
             // update_option() can return false for both unchanged values and
             // failed writes. The read-back is the actual persisted-state gate.
@@ -1473,6 +1489,7 @@ final class Plan_Completion
             $to = Public_URL::sanitize_same_site($entry['to'] ?? '', false);
             $redirect_status = self::exact_integer($entry['status'] ?? 301);
             if ($from === ''
+                || self::protected_legacy_redirect_source($from)
                 || strlen($from) > 512
                 || ! str_starts_with($from, '/')
                 || str_starts_with($from, '//')
@@ -1484,15 +1501,45 @@ final class Plan_Completion
                 $invalid++;
                 continue;
             }
-            if (isset($seen[$from])) {
+            $source_identity = self::redirect_path_identity($from);
+            if (isset($seen[$source_identity])) {
                 $collisions++;
                 continue;
             }
-            $seen[$from] = true;
+            $seen[$source_identity] = true;
             $map[] = ['from' => $from, 'to' => $to, 'status' => $redirect_status];
+        }
+        // A later source pathname cannot also be an earlier redirect target.
+        // Reject multi-hop and cycles, including query/slash aliases, rather
+        // than approving a partial redirect inventory with misleading status.
+        foreach ($map as $entry) {
+            $target_path = parse_url($entry['to'], PHP_URL_PATH);
+            if (is_string($target_path)
+                && isset($seen[self::redirect_path_identity($target_path)])
+            ) {
+                $collisions++;
+            }
         }
         usort($map, static fn (array $left, array $right): int => strcmp($left['from'], $right['from']));
         return ['map' => $map, 'collisions' => $collisions, 'invalid' => $invalid];
+    }
+
+    /** WordPress/auth/REST core routes are not retired File25 profiles. */
+    private static function protected_legacy_redirect_source(string $path): bool
+    {
+        if ($path === '/') {
+            return true;
+        }
+        return preg_match(
+            '~(?:^|/)(?:wp-login\\.php|wp-admin|wp-json|wp-cron\\.php|xmlrpc\\.php)(?:/|$)~i',
+            $path
+        ) === 1;
+    }
+
+    /** The source-path identity excludes slash-only aliases, not case. */
+    private static function redirect_path_identity(string $path): string
+    {
+        return $path === '/' ? '/' : rtrim($path, '/');
     }
 
     public function apply_legacy_redirects(): void

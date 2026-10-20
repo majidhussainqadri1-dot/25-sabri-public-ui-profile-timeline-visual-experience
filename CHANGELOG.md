@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — 2026-10-20 — Reviews 1715–1754: safe legacy profile migration and canonical index provenance
+
+- Forty targeted source/plan inspections: 33 existing code witnesses, seven affected scopes (**two pre-existing PR36 findings reconciled, five new gaps**).
+- Integrate unmerged PR36's root/auth/admin/REST/cron/JSON-RPC historical-redirect prohibitions and internal chain/cycle blocking without representing those as newly discovered.
+- Reject slash-equivalent duplicate legacy source paths and revalidate previously approved maps immediately before execution; stale map checksum alone is not sufficient.
+- Require at least one native source version for any nonempty index; cap owner count to 64, and owner/version strings to 64 bytes each. Malformed provider metadata fails closed.
+- Carry forward old route-regression and add new PHP migration and index provenance failure-injection tests. Production live deployment, WordPress/MySQL concurrency, rollback and Founder signoff remain unverified.
+
 ## Unreleased — 2026-10-19 — Reviews 1675–1714: atomic index lock CAS and File24 v1.2 current contract
 
 - Forty targeted plan/source/cross-file reviews: 30 witnesses, 10 deficient check scopes in two root causes.

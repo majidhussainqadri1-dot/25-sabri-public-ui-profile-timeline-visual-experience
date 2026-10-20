@@ -5,6 +5,15 @@
 WordPress module for the **Sabri Social Homeopathy Platform**. This is the existing File 25; no duplicate File 26 is created.
 
 
+## Latest unique 40-check source audit — Reviews 1715–1754 (20 October 2026)
+
+Forty new, targeted File25/central/owner-contract source checks: **33 existing source witnesses; 7 correction/reconciliation scopes**, comprising **2 previously known PR36 guards** carried forward (not newly rediscovered) plus **5 newly confirmed gaps** in redirect slash/approved-map replay and owner-index provenance bounds. Retained PR40 atomic SQL CAS and File24 current v1.2 manifest unchanged. Restored old WordPress core-route/redirect-chain protections from independent unmerged PR36; added fresh execute-time map validation and bounded, owner-attributed positive index metadata.
+
+- Technical report: `docs/REVIEWS-1715-1754-REDIRECT-PROVENANCE-2026-10-20.md`
+- 40 numbered scoped checks: `config/review1715-1754-redirect-provenance-reconciliation-audit.json`
+- Behavioral PHP regressions: `tests/review1675-1714-migration-route-guards.php` (carry-forward) and `tests/review1715-1754-redirect-execute-index-provenance.php`.
+- Draft/Unmerged: real installed WordPress/MySQL/object-cache, route inventory, File08/17 native acceptance, rollback, Founder acceptance and live parity are **unverified**.
+
 ## Latest source audit — Reviews 1675–1714 (19 October 2026)
 
 Forty separate File25/master-plan/current-File24 source checks, **30 existing source witnesses and ten deficient scopes in two root causes**. New `Index_Atomic_Options` applies a conditional database CAS to both File25 index generation and final state, plus guarded lock reclaim/release; fail closed if no DB CAS. File24 actual repository `main` was located and reviewed (commit `a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb`), and its current `1.2.0` module-manifest contract is now declared; real Security Test still blank/**unassessed**.
