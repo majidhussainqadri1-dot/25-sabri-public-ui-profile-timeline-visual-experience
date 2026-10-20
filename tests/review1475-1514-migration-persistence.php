@@ -47,8 +47,8 @@ namespace {
     $check(($valid['invalid'] ?? -1) === 0 && ($valid['collisions'] ?? -1) === 0
         && count((array) ($valid['map'] ?? [])) === 500,
         '500 valid redirects should remain accepted under configured limit.');
-    $old = [['from'=>'/old/', 'to'=>'https://example.test/old/', 'status'=>301]];
-    $new = [['from'=>'/new/', 'to'=>'https://example.test/new/', 'status'=>301]];
+    $old = [['from'=>'/old/', 'to'=>'https://example.test/profile-old/', 'status'=>301]];
+    $new = [['from'=>'/new/', 'to'=>'https://example.test/profile-new/', 'status'=>301]];
     $journal = [
         'status'=>'ready', 'requested_action'=>'dry-run',
         'redirect_map'=>$new, 'map_checksum'=>hash('sha256', json_encode($new)),
