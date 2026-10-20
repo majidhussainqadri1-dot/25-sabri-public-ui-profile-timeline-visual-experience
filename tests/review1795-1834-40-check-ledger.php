@@ -102,7 +102,7 @@ foreach (['hostinger_staging_accepted', 'founder_acceptance',
         'External evidence must not be silently promoted: ' . $gate);
 }
 $check(($ledger['live_verification_status'] ?? null) === 'not-tested'
-    && ($ledger['deployed_version'] ?? 'must-be-unverified') === null,
+    && array_key_exists('deployed_version', $ledger) && $ledger['deployed_version'] === null,
     'Audit ledger must remain explicit about unknown installed/live truth.');
 
 if ($errors !== []) {
