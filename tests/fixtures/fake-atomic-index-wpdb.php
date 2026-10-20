@@ -40,6 +40,19 @@ final class F25_Fake_Atomic_Wpdb {
                 $store[$lockKey]=['generation'=>'rival','expires'=>time()+300];
                 $store[$indexKey]=['status'=>'running','generation'=>'rival'];
             }
+            // R1795-1834: simulate stale Repair failing at the same atomic
+            // SQL boundary, or a newer worker acquiring both rows mid-race.
+            if($this->scope==='r1600_options'
+                && ($new['error_code']??'')==='stale_rebuild_reconciled') {
+                if(($GLOBALS['r1600_repair_race']??'')==='replace_on_repair') {
+                    $GLOBALS['r1600_repair_race']='';
+                    $store[$lockKey]=['generation'=>'newer-worker','expires'=>time()+300];
+                    $store[$indexKey]=['status'=>'running','generation'=>'newer-worker'];
+                }
+                if(($GLOBALS['r1600_fail_stale']??false)===true) {
+                    return 0;
+                }
+            }
             if($this->scope==='r1595_options'
                 && (($GLOBALS['r1595_failure']??'')==='running'
                     && ($new['status']??'')==='running')) {
