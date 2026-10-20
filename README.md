@@ -5,6 +5,15 @@
 WordPress module for the **Sabri Social Homeopathy Platform**. This is the existing File 25; no duplicate File 26 is created.
 
 
+## Latest File25 source audit — Reviews 1755–1794 (20 October 2026)
+
+Forty new individually scoped File25/central-plan/owner-contract checks: **28 existing source witnesses, 12 deficient scopes in four root causes**. Fixed self-redirect loops for absolute-vs-relative and query-only destinations; encoded protected WordPress routes; unsafe or corrupted active redirect maps; and slash-only alias inconsistencies.
+
+- Full report: `docs/REVIEWS-1755-1794-REDIRECT-RUNTIME-SAFETY-2026-10-20.md`
+- 40-row ledger: `config/review1755-1794-redirect-runtime-safety-audit.json`
+- Actual PHP method regression: `tests/review1755-1794-redirect-validation-runtime.php`
+- **Unmerged draft source only.** WordPress has no connected site; deployed version/checksum, DB/schema/migrations, File08/17 native acceptance, real MySQL/staging/RTL/privacy/rollback, Founder signoff and live re-test remain external gates.
+
 ## Latest unique 40-check source audit — Reviews 1715–1754 (20 October 2026)
 
 Forty new, targeted File25/central/owner-contract source checks: **33 existing source witnesses; 7 correction/reconciliation scopes**, comprising **2 previously known PR36 guards** carried forward (not newly rediscovered) plus **5 newly confirmed gaps** in redirect slash/approved-map replay and owner-index provenance bounds. Retained PR40 atomic SQL CAS and File24 current v1.2 manifest unchanged. Restored old WordPress core-route/redirect-chain protections from independent unmerged PR36; added fresh execute-time map validation and bounded, owner-attributed positive index metadata.
