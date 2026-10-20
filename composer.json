@@ -77,7 +77,8 @@
       "tests/review1675-1714-upgrade-lock-cas.php",
       "tests/review1675-1714-migration-route-guards.php",
       "tests/review1715-1754-redirect-execute-index-provenance.php",
-      "tests/review1755-1794-redirect-validation-runtime.php"
+      "tests/review1755-1794-redirect-validation-runtime.php",
+    "tests/review1795-1834-40-check-ledger.php"
     ]
   }
 }
