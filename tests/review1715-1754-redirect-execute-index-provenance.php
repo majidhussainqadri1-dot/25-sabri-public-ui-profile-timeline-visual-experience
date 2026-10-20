@@ -26,6 +26,8 @@ function apply_filters(string $hook,mixed $default,mixed ...$args):mixed{
     if($hook==='sabri_public_experience/timeline_index_build'){return $GLOBALS['r1715_builder'];}
     return $default;
 }
+class F25_R1715_Profile_Router { public static function flush():void {} }
+class_alias(F25_R1715_Profile_Router::class, 'Sabri\\PublicExperience\\Profile_Router');
 require_once __DIR__.'/fixtures/fake-atomic-index-wpdb.php';
 $GLOBALS['wpdb']=new F25_Fake_Atomic_Wpdb('r1715_options');
 require_once dirname(__DIR__).'/includes/class-public-url.php';
