@@ -13,7 +13,7 @@
   ],
   "summary": {
     "checks": 40,
-    "source_witnesses": 35,
+    "source_witnesses": 34,
     "owner_contract_pending": 2,
     "partial_owner_contract_pending": 1,
     "documented_contract_only": 2,
