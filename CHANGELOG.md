@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — 2026-10-20 — Reviews 1755–1794: legacy redirect safety
+
+- Forty targeted File25/central/owner source inspections: 28 existing guards and twelve newly corrected scopes across four root causes.
+- Forbid same-path redirects despite full vs relative URL spelling, target query differences, or query-only destinations.
+- Reject percent-encoded WordPress admin/login/REST source paths, traversal and ambiguous unsafe encoding.
+- Fail closed on malformed or oversized active redirect option maps, protected core routes and runtime self-redirects.
+- Align runtime slash-only alias handling with validator collision identity; add executable isolated PHP route regression.
+- No installed WordPress, DB/schema/migration or staging/live verification is implied.
+
 ## Unreleased — 2026-10-20 — Reviews 1715–1754: safe legacy profile migration and canonical index provenance
 
 - Forty targeted source/plan inspections: 33 existing code witnesses, seven affected scopes (**two pre-existing PR36 findings reconciled, five new gaps**).

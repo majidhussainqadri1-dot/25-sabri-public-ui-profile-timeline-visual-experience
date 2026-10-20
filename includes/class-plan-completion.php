@@ -1488,15 +1488,21 @@ final class Plan_Completion
             $from = is_string($entry['from'] ?? null) ? $entry['from'] : '';
             $to = Public_URL::sanitize_same_site($entry['to'] ?? '', false);
             $redirect_status = self::exact_integer($entry['status'] ?? 301);
-            if ($from === ''
-                || self::protected_legacy_redirect_source($from)
-                || strlen($from) > 512
-                || ! str_starts_with($from, '/')
-                || str_starts_with($from, '//')
-                || preg_match('/[\x00-\x20\x7F\\?#]/', $from) === 1
+            // A destination may be a same-site absolute URL or absolute
+            // pathname, never a query-only relative URL that resolves back
+            // to this request and creates an infinite redirect loop.
+            $destination_is_path = str_starts_with($to, '/') && ! str_starts_with($to, '//');
+            $destination_is_url = preg_match('~^https?://~i', $to) === 1;
+            $destination_path = parse_url($to, PHP_URL_PATH);
+            $destination_path = is_string($destination_path) && $destination_path !== ''
+                ? $destination_path : '/';
+            if (! self::legacy_source_is_safe($from)
                 || $to === ''
+                || (! $destination_is_path && ! $destination_is_url)
                 || ! in_array($redirect_status, [301, 308], true)
-                || Public_URL::canonical_same_site_identity($from, false) === Public_URL::canonical_same_site_identity($to, false)
+                // Query, trailing slash and relative-vs-absolute URL spelling
+                // must never hide a self-redirect to the same request path.
+                || self::redirect_path_identity($from) === self::redirect_path_identity($destination_path)
             ) {
                 $invalid++;
                 continue;
@@ -1530,10 +1536,34 @@ final class Plan_Completion
         if ($path === '/') {
             return true;
         }
-        return preg_match(
-            '~(?:^|/)(?:wp-login\\.php|wp-admin|wp-json|wp-cron\\.php|xmlrpc\\.php)(?:/|$)~i',
-            $path
-        ) === 1;
+        // Redirect sources are compared against raw REQUEST_URI, but web
+        // servers/proxies may decode percent escapes. Recheck all bounded
+        // decoded spellings so encoded wp-login/wp-admin cannot be claimed.
+        for ($depth = 0; $depth <= 6; $depth++) {
+            if (preg_match(
+                '~(?:^|/)(?:wp-login\\.php|wp-admin|wp-json|wp-cron\\.php|xmlrpc\\.php)(?:/|;|$)~i',
+                $path
+            ) === 1) {
+                return true;
+            }
+            $decoded = rawurldecode($path);
+            if ($decoded === $path) {
+                break;
+            }
+            $path = $decoded;
+        }
+        return false;
+    }
+
+    private static function legacy_source_is_safe(string $path): bool
+    {
+        return $path !== ''
+            && strlen($path) <= 512
+            && str_starts_with($path, '/')
+            && ! str_starts_with($path, '//')
+            && preg_match('/[\x00-\x20\x7F\\?#]/', $path) !== 1
+            && Public_URL::sanitize_same_site($path, false) !== ''
+            && ! self::protected_legacy_redirect_source($path);
     }
 
     /** The source-path identity excludes slash-only aliases, not case. */
@@ -1548,21 +1578,33 @@ final class Plan_Completion
             return;
         }
         $map = get_option(self::MIGRATION_ACTIVE_OPTION, []);
-        if (! is_array($map) || $map === []) {
+        if (! is_array($map) || $map === [] || count($map) > 500) {
             return;
         }
         $request_uri = isset($_SERVER['REQUEST_URI']) && is_string($_SERVER['REQUEST_URI']) ? wp_unslash($_SERVER['REQUEST_URI']) : '';
         $path = parse_url($request_uri, PHP_URL_PATH);
-        if (! is_string($path) || $path === '') {
+        if (! is_string($path) || ! self::legacy_source_is_safe($path)) {
             return;
         }
+        $request_identity = self::redirect_path_identity($path);
         foreach ($map as $entry) {
-            if (! is_array($entry) || ($entry['from'] ?? '') !== $path) {
+            if (! is_array($entry)
+                || ! is_string($entry['from'] ?? null)
+                || ! self::legacy_source_is_safe($entry['from'])
+                || self::redirect_path_identity($entry['from']) !== $request_identity
+            ) {
                 continue;
             }
             $to = Public_URL::sanitize_same_site($entry['to'] ?? '', false);
             $status = self::exact_integer($entry['status'] ?? null);
-            if ($to !== '' && in_array($status, [301, 308], true)) {
+            $destination_path = parse_url($to, PHP_URL_PATH);
+            $destination_path = is_string($destination_path) && $destination_path !== ''
+                ? $destination_path : '/';
+            if ($to !== ''
+                && (str_starts_with($to, '/') || preg_match('~^https?://~i', $to) === 1)
+                && self::redirect_path_identity($destination_path) !== $request_identity
+                && in_array($status, [301, 308], true)
+            ) {
                 wp_safe_redirect($to, $status);
                 exit;
             }
