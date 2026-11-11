@@ -118,7 +118,13 @@ final class Normalized_Timeline_Item implements JsonSerializable
         ) {
             throw new InvalidArgumentException('Timeline update date must be an absolute, valid UTC or offset timestamp.');
         }
-        if ($updated_at !== null && strcmp($updated_at, $published_at) < 0) {
+        // Compare original validated absolute instants BEFORE reducing the
+        // public wire representation to UTC seconds. Comparing only those
+        // strings loses sub-second chronology (e.g. .100 before .900).
+        if ($updated_at !== null
+            && $this->validated_absolute_instant((string) $data['updated_at'])
+                < $this->validated_absolute_instant((string) $data['published_at'])
+        ) {
             throw new InvalidArgumentException('Timeline update date cannot precede its publication date.');
         }
 
@@ -461,6 +467,17 @@ final class Normalized_Timeline_Item implements JsonSerializable
         }
 
         return $url;
+    }
+
+    /**
+     * Values reach this helper only AFTER strict_absolute_date() approves
+     * their absolute syntax and calendar. Use UTC as the default timezone for
+     * legacy WordPress "Y-m-d H:i:s" values, preserving microseconds and
+     * supplied offsets for chronology comparisons.
+     */
+    private function validated_absolute_instant(string $value): DateTimeImmutable
+    {
+        return new DateTimeImmutable(trim($value), new \DateTimeZone('UTC'));
     }
 
     private function required_date(string $value): string

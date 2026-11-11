@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — 2026-11-11 — V12.1 PR47 sign-off chronology and precision hardening
+
+- Fail closed when Founder visual acceptance predates the required screenshot/staging evidence, permitting no more than a bounded 300-second clock skew. Direct PHP regression covers later screenshots, later staging and tolerated skew.
+- Recover the original absolute microsecond Timeline chronology guarantee independently observed on historical PR #16, without overwriting PR #46's current published/updated provenance, client-clock independence or native trust boundaries. Original event instants compare before UTC-second DTO serialization; new governed PHP regression covers reversed fractional/offset dates.
+- Add these cases to unexecuted Staging acceptance. This candidate remains an **unmerged Draft source**; PHP/JS CI and deterministic ZIP do not prove real evidence bytes, installed WordPress, native owner acceptance or Live resolution.
+
 ## Unreleased — 2026-11-11 — PR16 owner-truth safety restored on PR46
 
 - Confirmed one File25 presentation trust-boundary defect across five unsupported public-claim surfaces. Reapply independent unmerged PR16's fail-closed governance only for Trust Capsule, translated profile copy, public relationships, citations and Profile-wide generic freshness.

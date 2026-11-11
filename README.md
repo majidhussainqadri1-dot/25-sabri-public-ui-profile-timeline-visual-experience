@@ -5,6 +5,13 @@
 WordPress module for the **Sabri Social Homeopathy Platform**. This is the existing File 25; no duplicate File 26 is created.
 
 
+## V12.1 fourth-round integrity review — 11 November 2026 (Draft PR #47)
+
+- **Exactly two newly verified File25 source causes** above PR #46 (not two installed Live failures): (1) a Founder visual-acceptance sign-off could predate the required staging/screenshot records; (2) Timeline normalized full-precision update timestamps after discarding microseconds and then compared UTC-second strings, potentially accepting a genuinely earlier update. Both now fail closed in source.
+- **Behavioral checks:** `tests/visual-acceptance.php` validates chronological evidence/sign-off ordering and bounded clock skew; `tests/v12-1-timeline-instant-precision.php` exercises original UTC/offset microsecond instants, including the earlier unmerged PR #16 regression, preserving public wire compatibility.
+- **Independent source reports:** `docs/V12.1-FILE25-ACCEPTANCE-CHRONOLOGY-2026-11-11.md` and `docs/V12.1-FILE25-TIMELINE-INSTANT-PRECISION-2026-11-11.md`. PR #47 stacks on PR #46; independent PR #16/#19/#45 are not blindly merged.
+- **Release boundary:** Source QA is not actual File24 cryptographic screenshot verification, installed File20, authorized File21 providers, real MySQL/WordPress, Hostinger Staging, Founder approval, rollback or Live parity.
+
 ## V12.1 independent PR16 native-claim safety reconciliation — 11 November 2026 (Draft PR #46)
 
 - **One owner-truth root cause in five UI families:** ordinary WordPress filters cannot invent translated profiles, institutional relationships, source citations, arbitrary profile last-updated claims, or extra Trust Capsule verification/issuer/correction details. Reconciled the fail-closed source remedy from independent unmerged PR #16, without copying its older source/date code or requiring new File25 owner tables.

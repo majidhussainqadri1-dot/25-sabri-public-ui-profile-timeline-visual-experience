@@ -118,6 +118,27 @@ $check(Visual_Acceptance::validate_evidence($missingV12) !== [], 'A staging mani
 $summary = Visual_Acceptance::summarize($complete);
 $check(($summary['accepted'] ?? false) === true && ($summary['error_count'] ?? 1) === 0, 'Complete evidence summary must be accepted.');
 
+// V12.1 chronology: an older approval cannot authorize a later test.
+// Both timestamps are valid and in the past; it is the order that fails.
+$chronologyReference = gmdate('Y-m-d\\TH:i:s\\Z', time() - 86400);
+$chronologyLater = gmdate('Y-m-d\\TH:i:s\\Z', time() - 3600);
+$chronology = $complete;
+$chronology['founder_signoff']['recorded_at'] = $chronologyReference;
+$chronology['surfaces']['founder-overview']['recorded_at'] = $chronologyLater;
+$check(Visual_Acceptance::validate_evidence($chronology) !== [],
+    'A Founder sign-off from yesterday cannot approve a screenshot recorded today.');
+$chronologyStaging = $complete;
+$chronologyStaging['founder_signoff']['recorded_at'] = $chronologyReference;
+$chronologyStaging['staging_environment']['recorded_at'] = $chronologyLater;
+$check(Visual_Acceptance::validate_evidence($chronologyStaging) !== [],
+    'A Founder sign-off cannot precede the recorded staging evidence.');
+$chronologyWithinSkew = $complete;
+$chronologyWithinSkew['founder_signoff']['recorded_at'] = $chronologyReference;
+$chronologyWithinSkew['surfaces']['founder-overview']['recorded_at'] =
+    gmdate('Y-m-d\\TH:i:s\\Z', strtotime($chronologyReference) + 120);
+$check(Visual_Acceptance::validate_evidence($chronologyWithinSkew) === [],
+    'A bounded two-minute clock offset may not falsely reject valid evidence metadata.');
+
 $forged = $complete;
 $forged['viewports']['mobile-small'] = true;
 $forged['founder_signoff']['commit_sha'] = str_repeat('d', 40);
