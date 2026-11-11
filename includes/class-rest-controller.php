@@ -405,12 +405,12 @@ final class Rest_Controller
         if ($status === 200 && $etag !== '' && self::request_matches_etag($request, $etag)) {
             return new WP_REST_Response(null, 304, $headers);
         }
-        if ($status === 200 && $last_modified !== '' && ! self::request_has_if_none_match($request)
-            && self::request_matches_last_modified($request, $last_modified)
-        ) {
-            return new WP_REST_Response(null, 304, $headers);
-        }
-
+        // Last-Modified is advisory: a nested item timestamp is NOT a
+        // representation-wide revision watermark. It cannot establish that
+        // bio, privacy, visibility, other cards or owner-approved fields stayed
+        // unchanged. Only an ETag of the complete canonical public response
+        // may justify an empty 304 until native owners supply a verified
+        // representation-wide, consent-safe modification contract.
         return new WP_REST_Response($data, $status, $headers);
     }
 
@@ -465,28 +465,6 @@ final class Rest_Controller
         }
 
         return false;
-    }
-
-    private static function request_has_if_none_match(?WP_REST_Request $request): bool
-    {
-        return $request instanceof WP_REST_Request
-            && method_exists($request, 'get_header')
-            && trim((string) $request->get_header('if-none-match')) !== '';
-    }
-
-    private static function request_matches_last_modified(?WP_REST_Request $request, string $last_modified): bool
-    {
-        if (! $request instanceof WP_REST_Request || ! method_exists($request, 'get_header')) {
-            return false;
-        }
-        $header = trim((string) $request->get_header('if-modified-since'));
-        if ($header === '' || strlen($header) > 128 || preg_match('/[\x00-\x1F\x7F]/', $header) === 1) {
-            return false;
-        }
-        $requested = strtotime($header);
-        $current = strtotime($last_modified);
-
-        return is_int($requested) && is_int($current) && $requested >= $current;
     }
 
     /** @param array<string,mixed> $data */

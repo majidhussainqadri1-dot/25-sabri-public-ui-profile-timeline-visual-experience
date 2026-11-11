@@ -87,7 +87,8 @@
     "tests/v12-1-native-owner-index-metrics.php",
     "tests/review1039-section-provider-atomicity-recovery.php",
     "tests/v12-1-timeline-provider-truncation.php",
-    "tests/review1016-file03-professional-projection-privacy.php"
+    "tests/review1016-file03-professional-projection-privacy.php",
+    "tests/review37-rest-etag-revalidation.php"
     ]
   }
 }
