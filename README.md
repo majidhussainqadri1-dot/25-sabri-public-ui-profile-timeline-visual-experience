@@ -5,6 +5,14 @@
 WordPress module for the **Sabri Social Homeopathy Platform**. This is the existing File 25; no duplicate File 26 is created.
 
 
+## V12.1 third-round source reconciliation — 11 November 2026 (Draft PR #46)
+
+- **Fresh PR45 reconciliation without safety regressions:** Published and Updated are distinct source dates. The current `safe_update_time()` server guard remains in force; neither future timestamp rejection nor the visitor-clock independence is lost. Existing server-rendered published dates are not duplicated. Additive Future Public Experience contract: `1.1.0`.
+- **Provenance badge:** Previous code tested internal `provider_id` even though the canonical public item redacts it. A badge now requires explicit native-public `verification_state === 'verified'` and visibly attributes the status to its source, not to an invented independent File25 review.
+- **Canonical-URL collision:** With two native timeline records sharing a canonical URL, the former last-writer-wins map could misapply dates/verification. Now all ambiguous decoration is suppressed; real public card content remains unchanged. Status icons use existing warning/danger/success/muted colors alongside explanatory text.
+- **Executable source QA:** `tests/v12-1-date-provenance.php` exercises actual PHP projection; `tests/v12-1-timeline-date.test.js` executes the checked-in pure JS date and duplicate-URL helpers. Source CI and reproducible candidate ZIP are not staging or Live acceptance. Details: `docs/V12.1-FILE25-DATE-PROVENANCE-RECONCILIATION-2026-11-11.md`.
+- **Branch relationship:** PR #46 is stacked on the exact latest PR #44. Independent PR #45 is still unmerged and must be reconciled/deduplicated rather than merged blindly.
+
 ## V12.1 second-round integration audit — 11 November 2026 (Draft PR #44)
 
 - **One confirmed Timeline status root cause, five source manifestations:** the File25 Timeline HTML partial treated invalid/disabled searches, source-provider failures, bounded retrieval and empty later pages as if no approved public contributions existed. It now preserves error, unavailable, filtered-empty and ordinary empty distinctions with a truthful, same-site next action and no private-data inference.

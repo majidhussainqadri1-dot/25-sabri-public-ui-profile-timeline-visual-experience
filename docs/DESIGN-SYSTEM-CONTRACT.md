@@ -50,6 +50,8 @@ Reusable component prefix: `sabri-ui-`.
 
 Reusable Components contract version: `1.3.0` (additive V12.1 public-state variants).
 
+Future Public Experience contract version: `1.1.0` (additive, separate `published_at`/`updated_at` public metadata, native-only verified state, no duplicate-canonical decoration). This is a **GitHub draft source contract** until installed companion/version acceptance.
+
 ## Semantic tokens
 
 File 25 exposes globally unique `--sabri-visual-*` semantic tokens. Where File 20 supplies an equivalent `--sabri-shell-*` token, File 25 inherits it and provides a bounded fallback. File 25 does not replace File 20-owned text, surface, page, border, focus, width, radius, gap, or font-scale values when the shell is connected.
