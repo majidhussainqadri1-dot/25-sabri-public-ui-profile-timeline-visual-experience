@@ -13,6 +13,7 @@ if (! function_exists('sanitize_key')) {
 }
 require_once dirname(__DIR__) . '/includes/class-public-url.php';
 require_once dirname(__DIR__) . '/includes/class-future-public-experience.php';
+require_once dirname(__DIR__) . '/includes/class-normalized-timeline-item.php';
 
 $errors = [];
 $check = static function (bool $ok, string $msg) use (&$errors): void {
@@ -94,6 +95,36 @@ foreach ($result as $item) {
     $check(! array_key_exists('provider_id', $item) && ! array_key_exists('native_object_id', $item),
         'Ephemeral visual metadata must not expose private provider/native identifiers.');
 }
+
+// Use the actual canonical native normalized DTO rather than treating the
+// visual method's fixture arrays as a substitute for native source authority.
+$native = new \Sabri\PublicExperience\Normalized_Timeline_Item([
+    'provider_id' => 'file-21',
+    'provider_version' => '1.0.0',
+    'native_object_type' => 'publication',
+    'native_object_id' => 'publication-native-1',
+    'author_id' => 1,
+    'public_profile_id' => 1,
+    'title' => 'Approved public post',
+    'safe_excerpt' => 'Source excerpt',
+    'canonical_url' => 'https://example.test/publication/native-1/',
+    'published_at' => $published,
+    'verification_state' => 'verified',
+    'visibility_state' => 'public',
+    'native_status' => 'published',
+    'review_state' => 'published',
+    'content_type' => 'post',
+]);
+$public = $native->to_public_array();
+$check(! array_key_exists('provider_id', $public)
+    && ! array_key_exists('native_object_id', $public)
+    && ! array_key_exists('author_id', $public),
+    'Actual normalized native public DTO must redact provider, object and actor identifiers.');
+$check(($public['verification_state'] ?? '') === 'verified',
+    'Actual native public DTO must retain the explicit public owner verification state.');
+$fromRealDTO = $method->invoke(null, ['items' => [$public]]);
+$check(count($fromRealDTO) === 1 && ($fromRealDTO[0]['source_verified'] ?? false) === true,
+    'Exact approved native public DTO must produce a source-attributed badge without exposing private IDs.');
 
 $css = (string) file_get_contents(dirname(__DIR__) . '/assets/css/design-system.css');
 foreach (['--error', '--warning', '--permission-denied', '--success', '--offline'] as $kind) {
