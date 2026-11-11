@@ -86,6 +86,7 @@ $check(($year['year'] ?? -1) === 0 && ($year['error'] ?? '') === 'invalid_year',
 
 // V12.1 V12-026: publication must never masquerade as a content update.
 $timelineMetaMethod = new ReflectionMethod(Future_Public_Experience::class, 'timeline_meta');
+$timelineMetaMethod->setAccessible(true); // PHP 8.0 requires explicit access for private-method regression.
 $timelineFixtures = ['items' => [
     ['canonical_url' => 'https://example.test/publication/a/', 'published_at' => '2026-10-01T10:00:00Z'],
     ['canonical_url' => 'https://example.test/publication/b/', 'published_at' => '2026-09-01T10:00:00Z', 'updated_at' => '2026-10-03T11:30:00Z'],
