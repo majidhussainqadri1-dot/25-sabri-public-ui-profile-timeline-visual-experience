@@ -126,6 +126,22 @@ $forged['staging_environment']['site_url'] = 'https://staging.example.test/?prev
 $forged_errors = Visual_Acceptance::validate_evidence($forged);
 $check($forged_errors !== [], 'Placeholders, commit mismatch, normalized dates, and noncanonical staging URLs must be rejected.');
 
+// Source-level proof that an impossible future record cannot pass the
+// metadata acceptance gate. This is not screenshot artifact-byte validation.
+$futureTime = gmdate('Y-m-d\\TH:i:s\\Z', time() + 86400);
+$futureArtifact = $complete;
+$futureArtifact['surfaces']['founder-overview']['recorded_at'] = $futureTime;
+$check(Visual_Acceptance::validate_evidence($futureArtifact) !== [],
+    'Future-dated screenshot metadata cannot count as a completed test.');
+$futureStaging = $complete;
+$futureStaging['staging_environment']['recorded_at'] = $futureTime;
+$check(Visual_Acceptance::validate_evidence($futureStaging) !== [],
+    'Future staging evidence cannot be accepted as performed.');
+$futureSignoff = $complete;
+$futureSignoff['founder_signoff']['recorded_at'] = $futureTime;
+$check(Visual_Acceptance::validate_evidence($futureSignoff) !== [],
+    'Future Founder signoff cannot masquerade as an existing approval.');
+
 $mixed_commit = $complete;
 $mixed_commit['surfaces']['founder-overview']['commit_sha'] = str_repeat('e', 40);
 $check(Visual_Acceptance::validate_evidence($mixed_commit) !== [], 'Evidence from another commit may not be mixed into the target manifest.');

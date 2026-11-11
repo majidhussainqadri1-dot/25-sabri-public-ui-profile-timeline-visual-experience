@@ -339,10 +339,13 @@ final class Visual_Acceptance
         }
 
         try {
-            new \DateTimeImmutable($raw);
+            $date = new \DateTimeImmutable($raw);
             $errors = \DateTimeImmutable::getLastErrors();
-            return ! is_array($errors)
+            $valid = ! is_array($errors)
                 || ((int) ($errors['warning_count'] ?? 0) === 0 && (int) ($errors['error_count'] ?? 0) === 0);
+            // V12.1 release evidence must not carry timestamps from a future
+            // audit. Only a bounded five-minute server clock skew is allowed.
+            return $valid && $date->getTimestamp() <= time() + 300;
         } catch (\Throwable) {
             return false;
         }

@@ -7,6 +7,7 @@
 - Expose the polite, visually hidden welcome announcement status region required by the independent **unmerged File20 PR #41** JavaScript; extend the existing PHP welcome contract regression.
 - Correct V12-026 future update and label-only freshness ambiguity across source and profile/timeline views, add a behavioral PHP regression plus checked JS source invariants, and record exact pending browser/native owner tests.
 - Add 23-scope V12.1 source/owner/staging traceability with explicit evidence-class counts; these are NOT 23 independent complete audits or accepted production tests.
+- Tighten visual-evidence ISO metadata validation: future screenshot, staging and Founder-signoff timestamps cannot pass; preserve the boundary that File24, not a metadata manifest, must prove actual artifacts and real acceptance.
 - Draft PR #44 source candidate only. Main, installed WordPress, DB/schema/migrations, actual keyboard/RTL/real screen reader and live parity remain unverified.
 
 ## Unreleased — 2026-11-11 — V12.1 File25 public states, Skip Intro and exact-source documentation
