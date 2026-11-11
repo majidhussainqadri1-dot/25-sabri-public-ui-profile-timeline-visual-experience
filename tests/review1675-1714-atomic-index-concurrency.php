@@ -86,6 +86,19 @@ $check(count($events('sabri_public_experience/timeline_index_rebuilt'))===1,
     'Normal successful rebuild must publish exactly one completion event.');
 
 $reset();
+$GLOBALS['r1675_cas_race']='fail_initial';
+$initialWriteFailure=$method->invoke($svc);
+$check(($initialWriteFailure['status']??'')==='failed'
+    && ($initialWriteFailure['error_code']??'')==='index_state_persistence_failed',
+    'An explicit SQL refusal before first index write must fail closed.');
+$check($GLOBALS['r1675_calls']===0,
+    'Index builder must not run after denied initial SQL write.');
+$check(!isset($GLOBALS['r1675_options'][$lock]),
+    'A refused first index write must release exactly the original claimed lock.');
+$check($events('sabri_public_experience/timeline_index_rebuilt')===[],
+    'Rejected initial state write must not publish success events.');
+
+$reset();
 unset($GLOBALS['wpdb']);
 $unavailable=$method->invoke($svc);
 $check(($unavailable['status']??'')==='failed'

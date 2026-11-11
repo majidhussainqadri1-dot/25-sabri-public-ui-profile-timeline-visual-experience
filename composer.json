@@ -85,7 +85,8 @@
     "tests/v12-1-native-public-claim-gates.php",
     "tests/v12-1-timeline-instant-precision.php",
     "tests/v12-1-native-owner-index-metrics.php",
-    "tests/review1039-section-provider-atomicity-recovery.php"
+    "tests/review1039-section-provider-atomicity-recovery.php",
+    "tests/v12-1-timeline-provider-truncation.php"
     ]
   }
 }

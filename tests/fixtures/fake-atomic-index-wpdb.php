@@ -32,6 +32,13 @@ final class F25_Fake_Atomic_Wpdb {
             [$lockKey,$newSerialized,$indexKey,$oldSerialized,$expectedLock]=$args;
             $new=@unserialize($newSerialized,['allowed_classes'=>false]);
             if(!is_array($new)){return false;}
+            // Adapt the independent PR38 failed-initial-write test to the
+            // current guarded SQL CAS fixture (not its obsolete helper).
+            if(($GLOBALS['r1675_cas_race']??'')==='fail_initial'
+                && ($new['status']??'')==='running') {
+                $GLOBALS['r1675_cas_race']='';
+                return false;
+            }
             // Force an actual race BETWEEN the caller's preliminary read and
             // this guarded database statement. CAS must refuse to overwrite.
             if(($GLOBALS['r1675_cas_race']??'')==='overwrite_on_commit'
