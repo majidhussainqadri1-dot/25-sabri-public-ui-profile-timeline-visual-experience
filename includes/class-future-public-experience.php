@@ -11,7 +11,7 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
 /** Founder-approved File 25 Future Public Experience Superset (24 enhancements). */
 final class Future_Public_Experience
 {
-    public const CONTRACT_VERSION = '1.0.0';
+    public const CONTRACT_VERSION = '1.1.0';
 
     /** @var array<string,array<string,string>> */
     private const FEATURES = [
@@ -123,6 +123,7 @@ final class Future_Public_Experience
             'eraSummary' => __('Timeline era summary', 'sabri-public-experience'),
             'sourceVerified' => __('Verified source projection', 'sabri-public-experience'),
             'updatedLabel' => __('Updated', 'sabri-public-experience'),
+            'publishedLabel' => __('Published', 'sabri-public-experience'),
             'actionsLabel' => __('Profile actions', 'sabri-public-experience'),
             'toolbarLabel' => __('Reading and accessibility preferences', 'sabri-public-experience'),
             'readingMode' => __('Reading mode', 'sabri-public-experience'),
@@ -389,11 +390,29 @@ final class Future_Public_Experience
                 continue;
             }
             $state = sanitize_key((string) ($item['correction_state'] ?? 'none'));
+            $published_at = self::safe_update_time((string) ($item['published_at'] ?? ''));
+            $updated_at = self::safe_update_time((string) ($item['updated_at'] ?? ''));
+            // An identical or earlier update is not a distinct modification.
+            // A source publication date must never be labelled "Updated".
+            if ($published_at !== '' && $updated_at !== '') {
+                try {
+                    if ((new \DateTimeImmutable($updated_at))->getTimestamp()
+                        <= (new \DateTimeImmutable($published_at))->getTimestamp()) {
+                        $updated_at = '';
+                    }
+                } catch (\Throwable) {
+                    $updated_at = '';
+                }
+            }
             $clean[] = [
                 'url' => $url,
-                'source_verified' => sanitize_key((string) ($item['provider_id'] ?? '')) !== '',
+                // Provider IDs are deliberately omitted by to_public_array().
+                // Only an explicit approved native public verification state
+                // can authorise a verification badge; no inferred provider ID.
+                'source_verified' => ($item['verification_state'] ?? '') === 'verified',
                 'correction_state' => in_array($state, ['corrected', 'retracted'], true) ? $state : 'none',
-                'updated_at' => self::safe_update_time((string) ($item['updated_at'] ?? $item['published_at'] ?? '')),
+                'published_at' => $published_at,
+                'updated_at' => $updated_at,
             ];
         }
         return $clean;

@@ -329,6 +329,27 @@
         }
     }
 
+    // V12-026-DATE-CHOICE-BEGIN: pure projection for deterministic JS tests.
+    const timelineDatePresentation = (meta) => {
+        if (!meta || typeof meta !== 'object') return null;
+        const parse = (stamp) => {
+            if (typeof stamp !== 'string' || stamp.trim() === '') return null;
+            const date = new Date(stamp);
+            return Number.isFinite(date.getTime()) ? date : null;
+        };
+        // Server-side safe_update_time already validates future/invalid dates.
+        // Never rely on a visitor device clock to reject owner data.
+        const published = parse(meta.published_at);
+        const updated = parse(meta.updated_at);
+        if (updated && (!published || updated.getTime() > published.getTime())) {
+            return { kind: 'updated', stamp: meta.updated_at, date: updated };
+        }
+        if (published) {
+            return { kind: 'published', stamp: meta.published_at, date: published };
+        }
+        return null;
+    };
+    // V12-026-DATE-CHOICE-END
     const timelineMeta = Array.isArray(payload.timeline) ? payload.timeline : [];
     const metaByUrl = new Map(timelineMeta.map((row) => [canonicalHref(row.url), row]).filter(([url]) => url !== ''));
     const timelineCards = [...profileRoot.querySelectorAll('.spux-timeline-card')];
@@ -345,12 +366,23 @@
             provenance.appendChild(badge);
             card.querySelector('.spux-card__meta')?.after(provenance);
         }
-        if (meta.updated_at && !card.querySelector('.spux-item-freshness')) {
-            const date = new Date(meta.updated_at);
-            if (Number.isFinite(date.getTime())) {
+        const datePresentation = timelineDatePresentation(meta);
+        if (datePresentation && !card.querySelector('.spux-item-freshness')) {
+            const label = datePresentation.kind === 'updated'
+                ? t('updatedLabel', 'Updated') : t('publishedLabel', 'Published');
+            // Server already prints Published dates: annotate the same time
+            // in place rather than producing two copies of the same date.
+            const existing = datePresentation.kind === 'published'
+                ? card.querySelector('.spux-card__meta time[datetime]') : null;
+            const existingDate = existing ? new Date(existing.getAttribute('datetime') || '') : null;
+            if (existingDate && Number.isFinite(existingDate.getTime())
+                && existingDate.getTime() === datePresentation.date.getTime()) {
+                existing.textContent = `${label} ${existing.textContent.trim()}`;
+                existing.classList.add('spux-item-freshness');
+            } else {
                 const wrap = element('span', 'spux-item-freshness');
-                const time = element('time', '', `${t('updatedLabel', 'Updated')} ${date.toLocaleDateString()}`);
-                time.dateTime = meta.updated_at;
+                const time = element('time', '', `${label} ${datePresentation.date.toLocaleDateString()}`);
+                time.dateTime = datePresentation.stamp;
                 wrap.appendChild(time);
                 card.querySelector('.spux-card__meta')?.appendChild(wrap);
             }
