@@ -171,8 +171,9 @@ final class Three_Plan_Corrections
         $message = self::text($args['message'] ?? '', 600);
         $continue_label = self::text($args['continue_label'] ?? 'Continue', 80);
         $close_label = self::text($args['close_label'] ?? 'Close', 80);
+        $skip_label = self::text($args['skip_label'] ?? 'Skip intro', 80);
         $continue_url = Public_URL::sanitize_same_site($args['continue_url'] ?? home_url('/'));
-        if ($title === '' || $continue_label === '' || $close_label === '' || $continue_url === '') {
+        if ($title === '' || $continue_label === '' || $close_label === '' || $skip_label === '' || $continue_url === '') {
             return '';
         }
 
@@ -189,6 +190,9 @@ final class Three_Plan_Corrections
             . self::escape_html($continue_label) . '</a>'
             . '<button class="sabri-ui-button sabri-ui-button--secondary" type="button" data-sabri-welcome-dismiss>'
             . self::escape_html($close_label) . '</button>'
+            // File 20 retains the same dismissal/frequency owner for Skip.
+            . '<button class="sabri-ui-button sabri-ui-button--secondary" type="button" data-sabri-welcome-skip data-sabri-welcome-dismiss>'
+            . self::escape_html($skip_label) . '</button>'
             . '</div></section>';
     }
 

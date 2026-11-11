@@ -11,15 +11,25 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
 /** Reusable, escaped, low-coupling public components for companion modules. */
 final class Components
 {
-    public const CONTRACT_VERSION = '1.2.0';
+    public const CONTRACT_VERSION = '1.3.0';
 
     private const STATE_TYPES = [
         'loading',
         'empty',
+        'filtered-empty',
+        'permission-denied',
+        'offline',
         'error',
         'success',
         'warning',
         'unavailable',
+    ];
+
+    /** Decorative icons. The visible title remains the accessible meaning. */
+    private const STATE_ICONS = [
+        'loading' => '…', 'empty' => '○', 'filtered-empty' => '⌕',
+        'permission-denied' => '⊘', 'offline' => '↻', 'error' => '!',
+        'success' => '✓', 'warning' => '!', 'unavailable' => '–',
     ];
 
     private const NOTICE_TYPES = [
@@ -70,7 +80,7 @@ final class Components
     }
 
     /**
-     * Render one standard loading/empty/error/success/warning/unavailable state.
+     * Render a bounded and accessible public display state (Master Plan V12-012).
      *
      * @param array<string,mixed> $args
      */
@@ -87,8 +97,9 @@ final class Components
         $action_label = self::text($args['action_label'] ?? '', 120);
         $action_url = Public_URL::sanitize_same_site($args['action_url'] ?? '');
         $compact = ! empty($args['compact']);
-        $role = $type === 'error' ? 'alert' : 'status';
-        $live = $type === 'error' ? 'assertive' : 'polite';
+        $urgent = in_array($type, ['error', 'permission-denied'], true);
+        $role = $urgent ? 'alert' : 'status';
+        $live = $urgent ? 'assertive' : 'polite';
         $classes = 'sabri-ui-state sabri-ui-state--' . $type;
         if ($compact) {
             $classes .= ' sabri-ui-state--compact';
@@ -104,6 +115,7 @@ final class Components
         }
 
         $html = '<section' . $attributes . '>';
+        $html .= '<span class="sabri-ui-state__icon" aria-hidden="true">' . self::escape_html(self::STATE_ICONS[$type]) . '</span>';
         if ($title !== '') {
             $html .= '<h2 class="sabri-ui-state__title">' . self::escape_html($title) . '</h2>';
         }
@@ -162,6 +174,9 @@ final class Components
         if (! function_exists('__')) {
             return match ($type) {
                 'loading' => ['title' => 'Loading', 'message' => 'The requested content is being prepared.'],
+                'filtered-empty' => ['title' => 'No matching results', 'message' => 'No approved public content matches these filters. Adjust the filters and try again.'],
+                'permission-denied' => ['title' => 'Access unavailable', 'message' => 'This view is not available with your current access.'],
+                'offline' => ['title' => 'Connection unavailable', 'message' => 'Check the connection and try again when online.'],
                 'error' => ['title' => 'Unable to load content', 'message' => 'The requested public content could not be loaded safely.'],
                 'success' => ['title' => 'Completed', 'message' => 'The requested action completed successfully.'],
                 'warning' => ['title' => 'Attention required', 'message' => 'Some information may be incomplete or require review.'],
@@ -172,6 +187,9 @@ final class Components
 
         return match ($type) {
             'loading' => ['title' => __('Loading', 'sabri-public-experience'), 'message' => __('The requested content is being prepared.', 'sabri-public-experience')],
+            'filtered-empty' => ['title' => __('No matching results', 'sabri-public-experience'), 'message' => __('No approved public content matches these filters. Adjust the filters and try again.', 'sabri-public-experience')],
+            'permission-denied' => ['title' => __('Access unavailable', 'sabri-public-experience'), 'message' => __('This view is not available with your current access.', 'sabri-public-experience')],
+            'offline' => ['title' => __('Connection unavailable', 'sabri-public-experience'), 'message' => __('Check the connection and try again when online.', 'sabri-public-experience')],
             'error' => ['title' => __('Unable to load content', 'sabri-public-experience'), 'message' => __('The requested public content could not be loaded safely.', 'sabri-public-experience')],
             'success' => ['title' => __('Completed', 'sabri-public-experience'), 'message' => __('The requested action completed successfully.', 'sabri-public-experience')],
             'warning' => ['title' => __('Attention required', 'sabri-public-experience'), 'message' => __('Some information may be incomplete or require review.', 'sabri-public-experience')],

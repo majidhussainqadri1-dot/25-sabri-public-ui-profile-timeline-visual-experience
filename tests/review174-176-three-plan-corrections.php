@@ -114,6 +114,11 @@ namespace Sabri\PublicExperience {
     $welcome = Three_Plan_Corrections::render_welcome_panel(['invoked_by_file_20'=>true,'title'=>'Welcome','message'=>'One coherent Sabri platform experience.','continue_url'=>'/home/','skip_label'=>'Skip']);
     foreach (['data-directive="CHAT-UX-001"','data-frequency-owner="file-20"','data-visual-owner="file-25"','sabri-ui-welcome-panel'] as $marker) { $assert(str_contains($welcome, $marker), 'Welcome ownership marker missing: ' . $marker); }
 
+    // V12.1 File 13: explicit Skip using existing File 20 dismissal owner.
+    $assert(str_contains($welcome, 'data-sabri-welcome-skip data-sabri-welcome-dismiss'), 'Explicit Skip must reuse File 20 dismissal control.');
+    $assert(str_contains($welcome, '>Skip</button>'), 'Skip label must render.');
+    $assert(! str_contains($welcome, 'countdown') && ! str_contains($welcome, 'autoplay'), 'Welcome must be non-blocking.');
+
     $matrixRaw = file_get_contents($root . '/config/all-chats-directive-matrix.json');
     $matrix = is_string($matrixRaw) ? json_decode($matrixRaw, true) : [];
     $ids = array_column((array) ($matrix['directives'] ?? []), 'id');
