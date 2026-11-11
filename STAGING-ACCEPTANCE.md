@@ -21,6 +21,16 @@ It must also verify Founder/Doctor/Member/minor/private/suspended states; anonym
 - **Timeline sub-second chronology (PR #47):** Exercise File21-authorized publications/updates within the same second, including reversed microsecond instants and UTC offset variants. Updates must never predate published instants. Confirm retained public UTC-seconds wire format and honest Published/Updated UI, including archived/retracted items when owner-authorized.
 - **Visual evidence:** Require actual screenshots and keyboard/screen-reader checks for filtered-empty, permission-denied and offline across representative 320px–1920px, Urdu RTL / English LTR, 200%/400% zoom and forced-colors/reduced-motion states. Evidence references must be linked to the exact installed artifact SHA; a manifest validator alone is not screenshot verification.
 
+## Post-audit PR49 new mandatory, still-unexecuted Staging scenarios
+
+- **File03 member index privacy:** A third-party plugin returning boolean `true` for `index_nonprofessional_profile` must not cause a member/patient/teacher or minor to become indexable. Public Doctor/Founder ordinary pages should retain legitimate SEO subject to all other privacy gates. Check robots headers + HTML meta + real search indexing policy rather than relying only on PHP stub.
+- **Public metrics owner authority:** A generic `public_metrics` hook returning high plausible counts must not cause a public profile card or REST payload to publish those numbers. Current dashboard must explicitly say that enabling this setting does not produce approved counters. Test a future typed owner version only after File21 and privacy acceptance.
+- **Provider recovery and revocation:** Invalid late card, query exception, ineligible, unavailable, recoverable and availability flips (including positive→negative→positive) must not reuse a stale cached card or publish phantom truncation; test same-instance and real WordPress callback/permission changes.
+- **500-item Timeline transaction:** 499 valid + invalid final row must generate a provider error but no 500-item truncation claim. A 500-valid source must honestly show the boundary; healthy other sources must remain readable.
+- **File09 withheld credential:** Test verified Doctor whose File03 approved professional DTO deliberately omits qualifications/council/specialty while File09 still has a private approval snapshot. No File09-only fields may render in public metadata, profile, REST or screenshots.
+- **REST full-representation cache:** A public biography changes without an updated nested date; If-Modified-Since must not trigger 304 or suppress new content. Matching full-response ETag may use 304 when valid; Last-Modified alone is informational.
+- **Current index CAS:** Inject initial failed SQL UPDATE; do not build or announce success. Then confirm actual MySQL lock reclaim, competing generations, cache invalidation and rollback on Staging; a fake-wpdb fixture alone is insufficient.
+
 ## Current truth
 
 All external acceptance flags remain **pending**. This document is a checklist/contract, not evidence that Hostinger staging, production, live deployment or operations have passed.

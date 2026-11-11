@@ -5,6 +5,14 @@
 WordPress module for the **Sabri Social Homeopathy Platform**. This is the existing File 25; no duplicate File 26 is created.
 
 
+## V12.1 PR49 — native-owner Privacy / Provider / REST integration correction (Draft, 11 Nov 2026)
+
+- Six confirmed **source-level** root-cause groups, corrected without merging old PR16's divergent tree: unauthorized member indexing through generic visual filter; forged UI metrics in actual public profile render path; stale/failed Section Provider cache and phantom cap; rejected 500-row Timeline phantom truncation; File09 verified snapshot being mistaken for File03 public professional permission; nested date-based REST false 304.
+- Real PHP behavioral regressions from current governed suite and selectively reconciled PR16 tests. Extra PR38 first-write failure simulated against current atomic SQL CAS fixture; this is **not** real MySQL concurrency evidence.
+- Metrics remain deliberately empty until an accepted, public-safe native owner contract exists, even if the admin preference is set true. Admin control center explicitly says the setting is not itself publishing authorization.
+- PR48 audit is immutable provenance; new source correction details in `docs/V12.1-FILE25-PR49-NON-DUPLICATIVE-P0-P1-SOURCE-CORRECTIONS-2026-11-11.md` and `config/v12-1-file25-pr49-post-audit-source-corrections-2026-11-11.json`.
+- Source-only Draft; File03/09/20/21/24 acceptance, staging/RTL/real MySQL, installed WordPress version and DB/migrations, actual screenshots/rollback and live re-test **not proven**.
+
 ## V12.1 fourth-round integrity review — 11 November 2026 (Draft PR #47)
 
 - **Exactly two newly verified File25 source causes** above PR #46 (not two installed Live failures): (1) a Founder visual-acceptance sign-off could predate the required staging/screenshot records; (2) Timeline normalized full-precision update timestamps after discarding microseconds and then compared UTC-second strings, potentially accepting a genuinely earlier update. Both now fail closed in source.
