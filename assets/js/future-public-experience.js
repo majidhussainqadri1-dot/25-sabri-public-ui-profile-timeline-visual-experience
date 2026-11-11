@@ -345,12 +345,23 @@
             provenance.appendChild(badge);
             card.querySelector('.spux-card__meta')?.after(provenance);
         }
-        if (meta.updated_at && !card.querySelector('.spux-item-freshness')) {
-            const date = new Date(meta.updated_at);
-            if (Number.isFinite(date.getTime()) && date.getTime() <= Date.now() + 300000) {
+        if (!card.querySelector('.spux-item-freshness')) {
+            // Explicit updates take precedence only when their date is
+            // credible. A publication fallback must say Published, not Updated.
+            const validDate = (value) => {
+                if (typeof value !== 'string' || value.trim() === '') return null;
+                const parsed = new Date(value);
+                return Number.isFinite(parsed.getTime()) && parsed.getTime() <= Date.now() + 300000 ? parsed : null;
+            };
+            const revised = validDate(meta.updated_at);
+            const published = revised ? null : validDate(meta.published_at);
+            const date = revised || published;
+            if (date) {
+                const stamp = revised ? meta.updated_at : meta.published_at;
+                const label = revised ? t('updatedLabel', 'Updated') : t('publishedLabel', 'Published');
                 const wrap = element('span', 'spux-item-freshness');
-                const time = element('time', '', `${t('updatedLabel', 'Updated')} ${date.toLocaleDateString()}`);
-                time.dateTime = meta.updated_at;
+                const time = element('time', '', `${label} ${date.toLocaleDateString()}`);
+                time.dateTime = stamp;
                 wrap.appendChild(time);
                 card.querySelector('.spux-card__meta')?.appendChild(wrap);
             }

@@ -123,6 +123,7 @@ final class Future_Public_Experience
             'eraSummary' => __('Timeline era summary', 'sabri-public-experience'),
             'sourceVerified' => __('Verified source projection', 'sabri-public-experience'),
             'updatedLabel' => __('Updated', 'sabri-public-experience'),
+            'publishedLabel' => __('Published', 'sabri-public-experience'),
             'actionsLabel' => __('Profile actions', 'sabri-public-experience'),
             'toolbarLabel' => __('Reading and accessibility preferences', 'sabri-public-experience'),
             'readingMode' => __('Reading mode', 'sabri-public-experience'),
@@ -403,7 +404,10 @@ final class Future_Public_Experience
                 'url' => $url,
                 'source_verified' => sanitize_key((string) ($item['provider_id'] ?? '')) !== '',
                 'correction_state' => in_array($state, ['corrected', 'retracted'], true) ? $state : 'none',
-                'updated_at' => self::iso_time((string) ($item['updated_at'] ?? $item['published_at'] ?? '')),
+                // Source date semantics are not interchangeable. A publication
+                // timestamp must never be silently relabelled as an update.
+                'updated_at' => self::iso_time((string) ($item['updated_at'] ?? '')),
+                'published_at' => self::iso_time((string) ($item['published_at'] ?? '')),
             ];
         }
         return $clean;
