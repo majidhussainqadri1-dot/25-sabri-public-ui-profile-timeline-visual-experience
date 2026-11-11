@@ -1,12 +1,12 @@
 {
   "review": "File25 V12.1 source-vs-acceptance traceability",
   "date": "2026-11-11",
-  "parent_sha": "dbab833313940cd618d140eaf239d97b85c233d6",
+  "parent_sha": "5eea773a2efd144e5869ee5edece9af1595f9c09",
   "governing": "Sabri Social Homeopathy Platform Master Plan V12.1 (10 Nov 2026)",
   "scope_count": 23,
   "counts": {
-    "source_corrected": 5,
-    "source_witness_runtime_pending": 9,
+    "source_corrected": 6,
+    "source_witness_runtime_pending": 8,
     "design_decision_pending": 1,
     "cross_owner_blocked": 5,
     "acceptance_pending": 3
@@ -120,11 +120,11 @@
       "id": "V12-026-FRESHNESS",
       "requirement": "V12-026",
       "priority": "P0",
-      "evidence_state": "source_witness_runtime_pending",
+      "evidence_state": "source_corrected",
       "owner": "Native-domain/File25",
-      "observation": "Profile overview renders optional owner-provided updated_at",
+      "observation": "Future public update dates rejected; source date always visible alongside any label",
       "path": "includes/class-future-public-experience.php",
-      "next_gate": "Other high-decision surfaces and real stale/uncertain source indication"
+      "next_gate": "Real browser/locales, native provenance, other decision-sensitive surfaces and stale source QA"
     },
     {
       "id": "F00-PROFILE-AUTH",

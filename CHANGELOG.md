@@ -5,6 +5,8 @@
 - Correct the actual HTML ProfileTimeline empty-state root cause: reject invalid search without false no-publications claims; separate provider outage, retrieval truncation, filtered zero, ordinary zero and later-page zero with accurate, same-site reset/retry actions.
 - Add a rendered-template PHP regression suite; record root-cause evidence and owner boundaries. Expand staging acceptance cases without manufacturing external QA evidence.
 - Expose the polite, visually hidden welcome announcement status region required by the independent **unmerged File20 PR #41** JavaScript; extend the existing PHP welcome contract regression.
+- Correct V12-026 future update and label-only freshness ambiguity across source and profile/timeline views, add a behavioral PHP regression plus checked JS source invariants, and record exact pending browser/native owner tests.
+- Add 23-scope V12.1 source/owner/staging traceability with explicit evidence-class counts; these are NOT 23 independent complete audits or accepted production tests.
 - Draft PR #44 source candidate only. Main, installed WordPress, DB/schema/migrations, actual keyboard/RTL/real screen reader and live parity remain unverified.
 
 ## Unreleased — 2026-11-11 — V12.1 File25 public states, Skip Intro and exact-source documentation
