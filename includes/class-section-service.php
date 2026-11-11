@@ -24,7 +24,7 @@ final class Section_Service
     private const MAX_CACHE_PROFILE_ENTRIES = 160;
     private const MAX_CACHE_PROFILE_STRING = 1000;
 
-    /** @var array<string,array<string,mixed>> */
+    /** @var array<string,array{source_status_digest:string,result:array<string,mixed>}> */
     private array $public_cache = [];
 
     public function __construct(private Section_Registry $registry)
@@ -98,14 +98,32 @@ final class Section_Service
             return $empty;
         }
 
+        // A registered provider's metadata does not attest its live
+        // availability, eligibility for this public profile, or recovery from
+        // an exception. Re-evaluate statuses BEFORE consulting the in-request
+        // projection cache; otherwise empty, stale or unauthorized cards can
+        // survive changes to those owner-controlled states.
+        $providers = $this->registry->for_section($section);
+        $source_states = [];
+        foreach ($providers as $provider_id => $provider) {
+            $source_states[(string) $provider_id] = $this->provider_status($provider, $profile, $section);
+        }
+        $source_status_digest = hash('sha256', (string) json_encode($source_states));
+        $source_status_error = in_array('error', $source_states, true);
+
         $profile_digest = self::profile_cache_digest($profile);
         $registry_fingerprint = $this->registry->metadata_fingerprint($section);
         $cache_key = $profile_digest !== null && $registry_fingerprint !== ''
             ? $user_id . ':' . $section . ':' . $registry_fingerprint . ':' . $profile_digest
             : null;
         if ($cache_key !== null && isset($this->public_cache[$cache_key])) {
-            /** @var array{contract_version:string,section:string,label:string,items:list<array<string,mixed>>,provider_error_count:int,truncated:bool,is_provider_section:bool} */
-            return $this->public_cache[$cache_key];
+            $cached = $this->public_cache[$cache_key];
+            if (! $source_status_error && $cached['source_status_digest'] === $source_status_digest) {
+                return $cached['result'];
+            }
+            // Evict old success on temporary failure or any eligibility
+            // change, so recovery cannot revive stale authorized content.
+            unset($this->public_cache[$cache_key]);
         }
 
         $items = [];
@@ -113,8 +131,8 @@ final class Section_Service
         $errors = 0;
         $truncated = false;
 
-        foreach ($this->registry->for_section($section) as $provider) {
-            $status = $this->provider_status($provider, $profile, $section);
+        foreach ($providers as $provider_id => $provider) {
+            $status = $source_states[(string) $provider_id] ?? 'error';
             if ($status === 'error') {
                 $errors++;
                 continue;
@@ -138,9 +156,7 @@ final class Section_Service
                 $errors++;
                 continue;
             }
-            if (count($raw) >= self::MAX_ITEMS_PER_PROVIDER) {
-                $truncated = true;
-            }
+            $provider_capped = count($raw) >= self::MAX_ITEMS_PER_PROVIDER;
 
             // One provider response is one transaction. A malformed candidate
             // invalidates the complete untrusted batch; valid duplicates remain
@@ -170,6 +186,12 @@ final class Section_Service
                 $errors++;
                 continue;
             }
+            // Only a fully validated public batch may claim that a source
+            // was capped. Rejected private/malformed rows cannot create a
+            // phantom source truncation warning.
+            if ($provider_capped) {
+                $truncated = true;
+            }
 
             foreach ($provider_cards as $key => $card) {
                 if (isset($seen[$key])) {
@@ -193,8 +215,13 @@ final class Section_Service
             'truncated' => $truncated,
             'is_provider_section' => true,
         ];
-        if ($cache_key !== null) {
-            $this->public_cache[$cache_key] = $result;
+        // A transient provider error must never poison the shared
+        // in-request projection cache. A later call must retry the owner.
+        if ($cache_key !== null && $errors === 0 && ! $source_status_error) {
+            $this->public_cache[$cache_key] = [
+                'source_status_digest' => $source_status_digest,
+                'result' => $result,
+            ];
         }
 
         return $result;
