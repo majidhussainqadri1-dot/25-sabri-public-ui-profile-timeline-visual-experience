@@ -127,6 +127,7 @@ final class Visual_Acceptance
         self::validate_group($errors, $evidence, 'input_modes', self::INPUT_MODES, $target_commit);
         self::validate_staging($errors, $evidence['staging_environment'] ?? null, $target_commit);
         self::validate_signoff($errors, $evidence['founder_signoff'] ?? null, $target_commit);
+        self::validate_evidence_chronology($errors, $evidence);
 
         return array_values(array_unique($errors));
     }
@@ -141,6 +142,58 @@ final class Visual_Acceptance
             'error_count' => count($errors),
             'errors' => $errors,
         ];
+    }
+
+    /**
+     * A Founder approval cannot predate evidence it purports to accept.
+     * This is a metadata chronology guard only. It cannot authenticate
+     * reviewers or read and hash the referenced screenshot files.
+     *
+     * @param list<string> $errors
+     * @param array<string,mixed> $evidence
+     */
+    private static function validate_evidence_chronology(array &$errors, array $evidence): void
+    {
+        $signoff = $evidence['founder_signoff'] ?? null;
+        $approved_at = is_array($signoff) ? ($signoff['recorded_at'] ?? null) : null;
+        if (! self::iso_time($approved_at)) {
+            return; // Other validators already reject missing/invalid sign-off.
+        }
+        $approved_timestamp = (new \DateTimeImmutable((string) $approved_at))->getTimestamp();
+        // Clock skew is bounded and never converts an invalid timestamp
+        // into a valid record.
+        $latest_allowed = $approved_timestamp + 300;
+        $staging = $evidence['staging_environment'] ?? null;
+        if (is_array($staging) && self::iso_time($staging['recorded_at'] ?? null)
+            && (new \DateTimeImmutable((string) $staging['recorded_at']))->getTimestamp() > $latest_allowed
+        ) {
+            $errors[] = 'Founder sign-off precedes staging evidence.';
+        }
+
+        $groups = [
+            'surfaces' => self::REQUIRED_SURFACES,
+            'viewports' => array_keys(self::VIEWPORTS),
+            'directions' => self::DIRECTIONS,
+            'color_modes' => self::COLOR_MODES,
+            'motion_modes' => self::MOTION_MODES,
+            'zoom_levels' => array_map('strval', self::ZOOM_LEVELS),
+            'input_modes' => self::INPUT_MODES,
+        ];
+        foreach ($groups as $group => $required) {
+            $records = $evidence[$group] ?? null;
+            if (! is_array($records)) {
+                continue; // Missing groups are rejected separately.
+            }
+            foreach ($required as $key) {
+                $record = $records[(string) $key] ?? null;
+                if (! is_array($record) || ! self::iso_time($record['recorded_at'] ?? null)) {
+                    continue; // Existing validators reject malformed records.
+                }
+                if ((new \DateTimeImmutable((string) $record['recorded_at']))->getTimestamp() > $latest_allowed) {
+                    $errors[] = 'Founder sign-off predates evidence record: ' . $group . '.' . $key;
+                }
+            }
+        }
     }
 
     /** @param list<string> $errors @param list<string> $required @param array<string,mixed> $evidence */
