@@ -305,7 +305,12 @@ final class Plan_Completion
                             <?php $definition = self::PREFERENCE_SCHEMA[$key]; ?>
                             <tr>
                                 <th scope="row"><label for="spux-<?php echo esc_attr($key); ?>"><?php echo esc_html(ucwords(str_replace('_', ' ', $key))); ?></label></th>
-                                <td><?php $this->render_preference_control($key, $definition, $preferences[$key]); ?></td>
+                                <td>
+                                    <?php $this->render_preference_control($key, $definition, $preferences[$key]); ?>
+                                    <?php if ($key === 'public_metrics') : ?>
+                                        <p class="description"><?php esc_html_e('Public counters remain unavailable until an approved native, privacy-screened metrics contract is installed. Saving this preference does not authorize or publish a count.', 'sabri-public-experience'); ?></p>
+                                    <?php endif; ?>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </table>

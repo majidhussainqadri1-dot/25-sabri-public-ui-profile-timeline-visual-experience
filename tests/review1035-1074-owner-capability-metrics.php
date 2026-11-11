@@ -61,6 +61,9 @@ foreach (['invalid', 10, 5, 0, null, [], '0', -1, 1000000001] as $candidate) {
 }
 $check($GLOBALS['f25_r1035_metrics_filter_calls'] === 0,
     'Generic UI metrics filter must not be called as a data-publishing authority.');
+$adminSource = (string) file_get_contents(dirname(__DIR__) . '/includes/class-plan-completion.php');
+$check(str_contains($adminSource, 'Saving this preference does not authorize or publish a count.'),
+    'Admin preference must not imply that unsigned native statistics become public.');
 $check(\Sabri\PublicExperience\Plan_Completion::public_metrics(['user_id' => 0]) === [],
     'Invalid owner identity must remain excluded.');
 
