@@ -184,6 +184,9 @@ final class Three_Plan_Corrections
         return '<section class="sabri-ui-welcome-panel" role="region" aria-labelledby="sabri-welcome-title"'
             . ' data-directive="CHAT-UX-001" data-frequency-owner="file-20" data-visual-owner="file-25">'
             . '<h2 id="sabri-welcome-title">' . self::escape_html($title) . '</h2>'
+            // File20 announces this existing title only after the host
+            // becomes visible; File25 supplies a nonfocusable status target.
+            . '<span class="sabri-ui-welcome-panel__announcement" role="status" aria-live="polite" aria-atomic="true" data-sabri-welcome-announcement></span>'
             . $description
             . '<div class="sabri-ui-welcome-panel__actions">'
             . '<a class="sabri-ui-button sabri-ui-button--primary" href="' . self::escape_url($continue_url) . '">'
@@ -218,6 +221,17 @@ final class Three_Plan_Corrections
     background: var(--sabri-surface, #fff);
     box-shadow: 0 1rem 2.5rem rgb(15 23 42 / 10%);
     color: var(--sabri-text, #111827);
+}
+.sabri-ui-welcome-panel__announcement {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
 }
 .sabri-ui-welcome-panel h2,
 .sabri-ui-welcome-panel p { margin: 0; }

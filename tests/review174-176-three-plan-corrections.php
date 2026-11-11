@@ -119,6 +119,19 @@ namespace Sabri\PublicExperience {
     $assert(str_contains($welcome, '>Skip</button>'), 'Skip label must render.');
     $assert(! str_contains($welcome, 'countdown') && ! str_contains($welcome, 'autoplay'), 'Welcome must be non-blocking.');
 
+    // File20 PR #41 explicitly reads this live target, but never transfers
+    // frequency, focus or storage authority to File25.
+    $assert(substr_count($welcome, 'data-sabri-welcome-announcement') === 1,
+        'File20 welcome announce target must exist exactly once.');
+    $assert(str_contains($welcome, 'role="status" aria-live="polite" aria-atomic="true"'),
+        'Welcome live status must use nonintrusive accessible semantics.');
+    $assert(strpos($welcome, 'data-sabri-welcome-announcement') > strpos($welcome, 'id="sabri-welcome-title"'),
+        'Announcement must follow the existing semantic heading.');
+    $welcomeCss = Three_Plan_Corrections::css();
+    $assert(str_contains($welcomeCss, '.sabri-ui-welcome-panel__announcement')
+        && str_contains($welcomeCss, 'clip-path: inset(50%)'),
+        'File25 must hide an announcement target visually without display:none.');
+
     $matrixRaw = file_get_contents($root . '/config/all-chats-directive-matrix.json');
     $matrix = is_string($matrixRaw) ? json_decode($matrixRaw, true) : [];
     $ids = array_column((array) ($matrix['directives'] ?? []), 'id');
