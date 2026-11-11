@@ -11,7 +11,7 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
 /** Machine-readable Definition-of-Done matrix and evidence validator. */
 final class Visual_Acceptance
 {
-    public const CONTRACT_VERSION = '1.4.0';
+    public const CONTRACT_VERSION = '1.5.0';
 
     private const VIEWPORTS = [
         'mobile-small' => ['width' => 320, 'height' => 568],
@@ -50,6 +50,9 @@ final class Visual_Acceptance
         'marketplace-section',
         'loading-state',
         'empty-state',
+        'filtered-empty-state',
+        'permission-denied-state',
+        'offline-state',
         'error-state',
         'success-state',
         'warning-state',

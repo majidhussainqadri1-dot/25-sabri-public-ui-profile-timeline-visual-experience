@@ -4,7 +4,7 @@
 
 - Add three semantically distinct safe public states: filtered-empty, permission-denied and offline; preserve owner-provided same-origin retry actions, visible text and decorative state icons. Components contract 1.3.0.
 - Provide a separate Skip Intro control, bound to the existing File20 dismissal selector without taking ownership of the 30-day cooldown; real File20 owner PR #41 integration is **not** yet accepted.
-- Expand behavioral PHP tests; correct the hard-coded 0.13.0 design-system fixture to derive version from the checked-out 0.15.0 source header. Reconcile stale architecture/contract document versions.
+- Require all three new V12.1 states in exact-SHA Visual Acceptance manifests (contract 1.5.0); add missing-evidence fail-closed regression. Expand behavioral PHP tests; correct the hard-coded 0.13.0 fixture to derive version from the checked-out 0.15.0 source header. Reconcile stale architecture/contract document versions.
 - Changes remain in Draft PR #44, stacked on Draft PR #43. CI, downloadable ZIP and a source-level audit never constitute live deployed parity, installed WordPress acceptance, migration completion, or Founder signoff.
 
 ## Unreleased — 2026-10-20 — Reviews 1755–1794: legacy redirect safety

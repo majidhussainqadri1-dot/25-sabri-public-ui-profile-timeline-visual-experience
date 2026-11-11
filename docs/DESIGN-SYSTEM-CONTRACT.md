@@ -21,7 +21,7 @@ Design-system contract version: `1.9.0`
 
 Optional-section contract version: `1.2.0`
 
-Visual-acceptance contract version: `1.4.0`
+Visual-acceptance contract version: `1.5.0` (V12.1 required visual states)
 
 Public integration functions:
 
