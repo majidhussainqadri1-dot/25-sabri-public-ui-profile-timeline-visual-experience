@@ -10,7 +10,7 @@ namespace {
         // Bind tests to the actual plugin header, not a stale fixture version.
         $plugin_source = file_get_contents(dirname(__DIR__) . '/sabri-public-experience.php');
         if (! is_string($plugin_source) || preg_match('/^\\s*\\* Version:\\s*([^\\s]+)/m', $plugin_source, $plugin_header) !== 1) {
-            throw new \\RuntimeException('File 25 plugin version cannot be established from the source header.');
+            throw new \RuntimeException('File 25 plugin version cannot be established from the source header.');
         }
         define('SABRI_PUBLIC_EXPERIENCE_VERSION', $plugin_header[1]);
     }
