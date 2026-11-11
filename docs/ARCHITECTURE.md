@@ -6,7 +6,7 @@
 
 ## Current source phase
 
-Candidate `0.14.0` corrects the authoritative read boundaries of the existing File 25 implementation. It remains a Draft PR source candidate and does not represent Hostinger staging, merge, production, deployment, or Founder acceptance.
+The current GitHub source plugin header is `0.15.0` (schema declaration `2`). Draft PR #44 adds V12.1 public visual states and Skip Intro above unmerged PR #43; this is source evidence only. It does not establish Hostinger staging, deployed package checksum, DB/schema or migration parity, production deployment, or Founder acceptance.
 
 ## Ownership
 

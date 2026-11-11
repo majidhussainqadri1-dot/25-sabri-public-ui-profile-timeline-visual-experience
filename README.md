@@ -5,6 +5,14 @@
 WordPress module for the **Sabri Social Homeopathy Platform**. This is the existing File 25; no duplicate File 26 is created.
 
 
+## V12.1 source corrections — 11 November 2026 (Draft PR #44)
+
+- **Scope:** New central Master Plan V12.1, File 25, File 13 and V12-012, based on exact unmerged PR #43 head. Add explicit filtered-empty, permission-denied and offline display states, privacy-safe translated copy, decorative icons plus visible text, and a distinct Skip Intro control which reuses File 20's frequency-owner dismissal hook.
+- **Root causes:** Former state renderer silently collapsed these three reasons into `empty`; Welcome presented Close but lacked an explicit Skip option. Both are repaired **in source** and guarded by governed PHP tests.
+- **Version/documentation correction:** Components 1.3.0, plugin source header 0.15.0, Design System contract 1.9.0, optional-section 1.2.0, visual acceptance 1.4.0. The design-system test now reads the source plugin header instead of hardcoding obsolete 0.13.0.
+- **Integration boundary:** File 20 Welcome-frequency PR #41 is unmerged and independent of current File 20 main and its PR #43. Actual owner-driven dismissal, 30-day persistence, RTL, keyboard, staging, and live re-test remain unverified.
+- **Evidence:** `docs/V12.1-FILE25-PUBLIC-STATES-AND-WELCOME-SOURCE-DELTA-2026-11-11.md`, source branch `fix/file25-v12-1-states-skip-20261111`. Do not treat CI or an artifact as production acceptance.
+
 ## Latest File25 source audit — Reviews 1755–1794 (20 October 2026)
 
 Forty new individually scoped File25/central-plan/owner-contract checks: **28 existing source witnesses, 12 deficient scopes in four root causes**. Fixed self-redirect loops for absolute-vs-relative and query-only destinations; encoded protected WordPress routes; unsafe or corrupted active redirect maps; and slash-only alias inconsistencies.
