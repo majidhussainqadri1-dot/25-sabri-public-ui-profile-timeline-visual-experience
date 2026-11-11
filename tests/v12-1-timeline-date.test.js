@@ -37,8 +37,27 @@ assert.equal(choose({published_at: 'not-a-date'}), null);
 assert.equal(choose({}), null);
 assert.equal(choose(null), null);
 
+// Execute the actual URL-collision fail-closed helper as well.
+const duplicateStart = source.indexOf('// V12-012-UNIQUE-METADATA-BEGIN');
+const duplicateEnd = source.indexOf('// V12-012-UNIQUE-METADATA-END', duplicateStart);
+assert(duplicateStart >= 0 && duplicateEnd > duplicateStart);
+const duplicateBodyStart = source.indexOf('\n', duplicateStart);
+const uniqueSource = source.slice(duplicateBodyStart + 1, duplicateEnd);
+const uniqueIndex = vm.runInNewContext(`${uniqueSource}\n indexUniqueTimelineMetadata;`, {Map, Set, Array}, {timeout: 1500});
+const canonical = (url) => typeof url === 'string' && url.startsWith('https://example.test/') ? url : '';
+const a = {url: 'https://example.test/same/', source_verified: false};
+const b = {url: 'https://example.test/same/', source_verified: true};
+const c = {url: 'https://example.test/unique/', source_verified: true};
+const map = uniqueIndex([a, b, c, {url:'https://external.test/'}, a], canonical);
+assert(!map.has(a.url), 'Conflicting native objects must never acquire a last-writer verified badge.');
+assert.equal(map.get(c.url), c, 'Unique canonical URL projection must be preserved.');
+assert.equal(map.size, 1, 'Repeated collision must remain suppressed, not recreated.');
+assert.equal(uniqueIndex([], canonical).size, 0);
+assert.equal(uniqueIndex(null, canonical).size, 0);
 assert(source.includes("t('publishedLabel', 'Published')"), 'Published must be localized.');
 assert(source.includes("t('updatedLabel', 'Updated')"), 'Updated must be localized.');
+assert(source.includes("datePresentation.date.toLocaleDateString(undefined, {timeZone: 'UTC'})"), 'Updated dates must share the canonical UTC calendar day of server-rendered publications.');
+assert(source.includes("t('sourceVerified', 'Source reports verified status')"), 'A source badge must not claim independent platform verification.');
 assert(source.includes("existingDate.getTime() === datePresentation.date.getTime()"),
     'The existing canonical publication date must be reused rather than displayed twice.');
 assert(source.includes("existing.textContent = `${label} ${existing.textContent.trim()}`;"),

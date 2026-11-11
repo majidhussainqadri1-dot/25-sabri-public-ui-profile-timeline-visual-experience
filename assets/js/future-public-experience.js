@@ -350,8 +350,26 @@
         return null;
     };
     // V12-026-DATE-CHOICE-END
+    // V12-012-UNIQUE-METADATA-BEGIN
+    const indexUniqueTimelineMetadata = (rows, canonicalize) => {
+        const known = new Map();
+        const ambiguous = new Set();
+        if (!Array.isArray(rows)) return known;
+        rows.forEach((row) => {
+            const url = row && typeof row === 'object' ? canonicalize(row.url) : '';
+            if (!url || ambiguous.has(url)) return;
+            if (known.has(url)) {
+                known.delete(url);
+                ambiguous.add(url);
+                return;
+            }
+            known.set(url, row);
+        });
+        return known;
+    };
+    // V12-012-UNIQUE-METADATA-END
     const timelineMeta = Array.isArray(payload.timeline) ? payload.timeline : [];
-    const metaByUrl = new Map(timelineMeta.map((row) => [canonicalHref(row.url), row]).filter(([url]) => url !== ''));
+    const metaByUrl = indexUniqueTimelineMetadata(timelineMeta, canonicalHref);
     const timelineCards = [...profileRoot.querySelectorAll('.spux-timeline-card')];
     timelineCards.forEach((card) => {
         card.dataset.spuxTimelineCard = '';
@@ -360,8 +378,8 @@
         if (!meta) return;
         if (meta.source_verified === true && !card.querySelector('[data-spux-source-verified]')) {
             const provenance = element('div', 'spux-provenance');
-            provenance.setAttribute('aria-label', t('sourceVerified', 'Verified source projection'));
-            const badge = element('span', 'spux-badge spux-badge--provenance', t('sourceVerified', 'Verified source projection'));
+            provenance.setAttribute('aria-label', t('sourceVerified', 'Source reports verified status'));
+            const badge = element('span', 'spux-badge spux-badge--provenance', t('sourceVerified', 'Source reports verified status'));
             badge.dataset.spuxSourceVerified = '';
             provenance.appendChild(badge);
             card.querySelector('.spux-card__meta')?.after(provenance);
@@ -381,7 +399,7 @@
                 existing.classList.add('spux-item-freshness');
             } else {
                 const wrap = element('span', 'spux-item-freshness');
-                const time = element('time', '', `${label} ${datePresentation.date.toLocaleDateString()}`);
+                const time = element('time', '', `${label} ${datePresentation.date.toLocaleDateString(undefined, {timeZone: 'UTC'})}`);
                 time.dateTime = datePresentation.stamp;
                 wrap.appendChild(time);
                 card.querySelector('.spux-card__meta')?.appendChild(wrap);

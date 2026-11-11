@@ -121,7 +121,7 @@ final class Future_Public_Experience
             'allYears' => __('All years', 'sabri-public-experience'),
             'timelineYears' => __('Timeline years', 'sabri-public-experience'),
             'eraSummary' => __('Timeline era summary', 'sabri-public-experience'),
-            'sourceVerified' => __('Verified source projection', 'sabri-public-experience'),
+            'sourceVerified' => __('Source reports verified status', 'sabri-public-experience'),
             'updatedLabel' => __('Updated', 'sabri-public-experience'),
             'publishedLabel' => __('Published', 'sabri-public-experience'),
             'actionsLabel' => __('Profile actions', 'sabri-public-experience'),
