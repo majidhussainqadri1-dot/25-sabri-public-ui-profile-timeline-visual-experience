@@ -373,6 +373,16 @@ final class Future_Public_Experience
         if ($updated === '') {
             return [];
         }
+        // V12-026: do not present clearly future-dated metadata as an update.
+        // A five-minute allowance covers bounded server clock skew.
+        try {
+            $timestamp = (new \DateTimeImmutable($updated))->getTimestamp();
+        } catch (\Throwable) {
+            return [];
+        }
+        if ($timestamp > time() + 300) {
+            return [];
+        }
         return ['updated_at' => $updated, 'label' => self::plain($data['label'] ?? '', 190)];
     }
 

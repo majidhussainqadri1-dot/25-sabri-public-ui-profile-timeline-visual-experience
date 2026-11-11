@@ -239,11 +239,16 @@
         const fresh = payload.freshness || {};
         if (fresh.updated_at) {
             const date = new Date(fresh.updated_at);
-            if (!Number.isNaN(date.getTime())) {
+            if (Number.isFinite(date.getTime()) && date.getTime() <= Date.now() + 300000) {
                 const p = element('p', 'spux-content-freshness');
-                const time = element('time', '', fresh.label || `${t('publicInformationUpdated', 'Public information updated')} ${date.toLocaleDateString()}`);
+                // The user-visible and spoken date must not be replaced by
+                // an owner note claiming live data without a source date.
+                const time = element('time', '', `${t('publicInformationUpdated', 'Public information updated')} ${date.toLocaleDateString()}`);
                 time.dateTime = fresh.updated_at;
                 p.appendChild(time);
+                if (typeof fresh.label === 'string' && fresh.label.trim() !== '') {
+                    p.appendChild(element('span', 'spux-content-freshness__label', ` · ${fresh.label.trim()}`));
+                }
                 main.appendChild(p);
             }
         }
@@ -342,7 +347,7 @@
         }
         if (meta.updated_at && !card.querySelector('.spux-item-freshness')) {
             const date = new Date(meta.updated_at);
-            if (!Number.isNaN(date.getTime())) {
+            if (Number.isFinite(date.getTime()) && date.getTime() <= Date.now() + 300000) {
                 const wrap = element('span', 'spux-item-freshness');
                 const time = element('time', '', `${t('updatedLabel', 'Updated')} ${date.toLocaleDateString()}`);
                 time.dateTime = meta.updated_at;
