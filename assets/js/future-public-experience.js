@@ -359,11 +359,20 @@
             if (date) {
                 const stamp = revised ? meta.updated_at : meta.published_at;
                 const label = revised ? t('updatedLabel', 'Updated') : t('publishedLabel', 'Published');
-                const wrap = element('span', 'spux-item-freshness');
-                const time = element('time', '', `${label} ${date.toLocaleDateString()}`);
-                time.dateTime = stamp;
-                wrap.appendChild(time);
-                card.querySelector('.spux-card__meta')?.appendChild(wrap);
+                // The server already renders publication dates. Label that
+                // existing time in place rather than duplicating the date.
+                const existingPublished = revised ? null : card.querySelector('.spux-card__meta time[datetime]');
+                const existingDate = existingPublished ? validDate(existingPublished.getAttribute('datetime')) : null;
+                if (existingDate && existingDate.getTime() === date.getTime()) {
+                    existingPublished.textContent = `${label} ${existingPublished.textContent.trim()}`;
+                    existingPublished.classList.add('spux-item-freshness');
+                } else {
+                    const wrap = element('span', 'spux-item-freshness');
+                    const time = element('time', '', `${label} ${date.toLocaleDateString()}`);
+                    time.dateTime = stamp;
+                    wrap.appendChild(time);
+                    card.querySelector('.spux-card__meta')?.appendChild(wrap);
+                }
             }
         }
     });
