@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — 2026-11-11 — PR16 owner-truth safety restored on PR46
+
+- Confirmed one File25 presentation trust-boundary defect across five unsupported public-claim surfaces. Reapply independent unmerged PR16's fail-closed governance only for Trust Capsule, translated profile copy, public relationships, citations and Profile-wide generic freshness.
+- Actual File03/09 native profile verified bit continues to display but generic visual hooks cannot invent issuer, verified-at, correction state or institution/source claims. No new native-owner tables or duplicate publishing authority.
+- Extend PHP hostile-filter regressions and adjust V12-026 freshness test to retain owner-approved native Timeline dates while suppressing unapproved Profile last-updated assertions.
+- PR #16 and PR #46 are still separate unmerged source candidates; do not merge or mark Live Resolved without independent reconciliation, owner contract review, staging and release acceptance.
+
 ## Unreleased — 2026-11-11 — V12.1 PR46 publication/provenance reconciliation
 
 - Separate and validate publication and genuine later modification dates without PR45's visitor-clock or stale-source regression; preserve server `safe_update_time()` and actual calendar day consistency.

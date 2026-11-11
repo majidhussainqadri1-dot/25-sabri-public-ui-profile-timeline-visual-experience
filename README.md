@@ -5,6 +5,12 @@
 WordPress module for the **Sabri Social Homeopathy Platform**. This is the existing File 25; no duplicate File 26 is created.
 
 
+## V12.1 independent PR16 native-claim safety reconciliation — 11 November 2026 (Draft PR #46)
+
+- **One owner-truth root cause in five UI families:** ordinary WordPress filters cannot invent translated profiles, institutional relationships, source citations, arbitrary profile last-updated claims, or extra Trust Capsule verification/issuer/correction details. Reconciled the fail-closed source remedy from independent unmerged PR #16, without copying its older source/date code or requiring new File25 owner tables.
+- **Owner availability:** approved File03/09 `verified` remains visible. Profile-wide translation, relationships, citations and freshness remain **inactive** until the authoritative native owner supplies a versioned, authorized public-safe projection. Native Timeline `published_at`/`updated_at` display remains enabled and validated.
+- **Behavioral regression:** `tests/v12-1-native-public-claim-gates.php` injects forged trust/translation/citation/relationship/freshness values and proves that none are emitted. `tests/v12-1-freshness-truth.php` now distinguishes blocked generic Profile freshness from valid native Timeline dates. Source-only, not Live acceptance. See `docs/V12.1-FILE25-NATIVE-CLAIM-BOUNDARY-2026-11-11.md`.
+
 ## V12.1 third-round source reconciliation — 11 November 2026 (Draft PR #46)
 
 - **Fresh PR45 reconciliation without safety regressions:** Published and Updated are distinct source dates. The current `safe_update_time()` server guard remains in force; neither future timestamp rejection nor the visitor-clock independence is lost. Existing server-rendered published dates are not duplicated. Additive Future Public Experience contract: `1.1.0`.
@@ -17,7 +23,7 @@ WordPress module for the **Sabri Social Homeopathy Platform**. This is the exist
 
 - **One confirmed Timeline status root cause, five source manifestations:** the File25 Timeline HTML partial treated invalid/disabled searches, source-provider failures, bounded retrieval and empty later pages as if no approved public contributions existed. It now preserves error, unavailable, filtered-empty and ordinary empty distinctions with a truthful, same-site next action and no private-data inference.
 - **One File20/25 source contract mismatch:** File20 unmerged PR #41 Welcome script explicitly requires `data-sabri-welcome-announcement`; the File25 renderer initially omitted it. Source now supplies one nonfocusable polite screen-reader status target after the title. File20 remains the 30-day state owner. Real dual-plugin staging acceptance remains blocked.
-- **V12-026 freshness truth:** profile and timeline source-update dates are validated using server time, not potentially incorrect client clocks; the actual date remains visible alongside any owner label. New `tests/v12-1-freshness-truth.php` covers past/future/clock-skew/invalid timestamps. No claim of actual browser or File03/21 provider acceptance.
+- **V12-026 freshness truth:** authenticated native Timeline source-update dates are validated using server time, not an incorrect visitor clock; valid publication/update dates remain separately visible. A *generic UI-filter Profile-wide freshness claim is now deliberately suppressed* until a versioned File03/21 owner projection is approved. New `tests/v12-1-freshness-truth.php` checks both boundaries; browser/File03/21 Staging acceptance remains pending.
 - **Visual Acceptance metadata truth:** future-dated screenshot, staging and Founder-signoff records now fail source validation (`tests/visual-acceptance.php`); actual evidence bytes and independent reviewer identity are *not* verified by the manifest validator. See `docs/V12.1-FILE25-ACCEPTANCE-TIMESTAMP-GUARD-2026-11-11.md`.
 - **Tests/traceability:** `tests/v12-1-timeline-state-truth.php`, `tests/review174-176-three-plan-corrections.php`, `tests/v12-1-freshness-truth.php`, and the 23-scope evidence-classified matrix `config/v12-1-file25-requirement-traceability-2026-11-11.json`. `STAGING-ACCEPTANCE.md` lists actual end-to-end journeys. No live or native-owner release is represented by these source corrections.
 
