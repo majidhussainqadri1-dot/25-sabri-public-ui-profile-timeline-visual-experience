@@ -5,6 +5,22 @@
 WordPress module for the **Sabri Social Homeopathy Platform**. This is the existing File 25; no duplicate File 26 is created.
 
 
+## V12.1 second-round integration audit — 11 November 2026 (Draft PR #44)
+
+- **One confirmed Timeline status root cause, five source manifestations:** the File25 Timeline HTML partial treated invalid/disabled searches, source-provider failures, bounded retrieval and empty later pages as if no approved public contributions existed. It now preserves error, unavailable, filtered-empty and ordinary empty distinctions with a truthful, same-site next action and no private-data inference.
+- **One File20/25 source contract mismatch:** File20 unmerged PR #41 Welcome script explicitly requires `data-sabri-welcome-announcement`; the File25 renderer initially omitted it. Source now supplies one nonfocusable polite screen-reader status target after the title. File20 remains the 30-day state owner. Real dual-plugin staging acceptance remains blocked.
+- **V12-026 freshness truth:** profile and timeline source-update dates are validated using server time, not potentially incorrect client clocks; the actual date remains visible alongside any owner label. New `tests/v12-1-freshness-truth.php` covers past/future/clock-skew/invalid timestamps. No claim of actual browser or File03/21 provider acceptance.
+- **Visual Acceptance metadata truth:** future-dated screenshot, staging and Founder-signoff records now fail source validation (`tests/visual-acceptance.php`); actual evidence bytes and independent reviewer identity are *not* verified by the manifest validator. See `docs/V12.1-FILE25-ACCEPTANCE-TIMESTAMP-GUARD-2026-11-11.md`.
+- **Tests/traceability:** `tests/v12-1-timeline-state-truth.php`, `tests/review174-176-three-plan-corrections.php`, `tests/v12-1-freshness-truth.php`, and the 23-scope evidence-classified matrix `config/v12-1-file25-requirement-traceability-2026-11-11.json`. `STAGING-ACCEPTANCE.md` lists actual end-to-end journeys. No live or native-owner release is represented by these source corrections.
+
+## V12.1 source corrections — 11 November 2026 (Draft PR #44)
+
+- **Scope:** New central Master Plan V12.1, File 25, File 13 and V12-012, based on exact unmerged PR #43 head. Add explicit filtered-empty, permission-denied and offline display states, privacy-safe translated copy, decorative icons plus visible text, and a distinct Skip Intro control which reuses File 20's frequency-owner dismissal hook.
+- **Root causes:** Former state renderer silently collapsed these three reasons into `empty`; Welcome presented Close but lacked an explicit Skip option; the Visual Acceptance manifest omitted required screenshot coverage for the new states. All three scopes are addressed **in source**, with corresponding governed PHP tests.
+- **Version/documentation correction:** Components 1.3.0, plugin source header 0.15.0, Design System contract 1.9.0, optional-section 1.2.0, visual acceptance 1.5.0. The design-system test now reads the source plugin header instead of hardcoding obsolete 0.13.0.
+- **Integration boundary:** File 20 Welcome-frequency PR #41 is unmerged and independent of current File 20 main and its PR #43. Actual owner-driven dismissal, 30-day persistence, RTL, keyboard, staging, and live re-test remain unverified.
+- **Evidence:** `docs/V12.1-FILE25-PUBLIC-STATES-AND-WELCOME-SOURCE-DELTA-2026-11-11.md`, source branch `fix/file25-v12-1-states-skip-20261111`. Do not treat CI or an artifact as production acceptance.
+
 ## Latest File25 source audit — Reviews 1755–1794 (20 October 2026)
 
 Forty new individually scoped File25/central-plan/owner-contract checks: **28 existing source witnesses, 12 deficient scopes in four root causes**. Fixed self-redirect loops for absolute-vs-relative and query-only destinations; encoded protected WordPress routes; unsafe or corrupted active redirect maps; and slash-only alias inconsistencies.

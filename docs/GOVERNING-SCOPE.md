@@ -13,7 +13,7 @@ This is the existing File 25. No File 26 is created.
 - Sabri Social Homeopathy Platform Definitive Master Plan 2026 `v3.0`.
 - File 20 Harmonized Master Plan 2026 `v4.1`.
 - File 00 runtime `1.2.4`, public assertion contract `1.1.2`.
-- File 25 corrective source candidate `0.14.0`, schema `2`.
+- File 25 GitHub source plugin header `0.15.0`, schema declaration `2` (this is source truth only; deployed code/DB remain unverified).
 
 ## Canonical ownership
 

@@ -33,6 +33,9 @@ $secondary_active = $current_provider !== ''
     || $current_language !== ''
     || $current_topic !== ''
     || $current_sort !== 'latest';
+$has_refinement = $search_query !== '' || $current_type !== '' || $secondary_active;
+$clear_refinements_url = remove_query_arg(['profile_q', 'type', 'provider', 'year', 'language', 'topic', 'sort', 'paged']);
+$retry_timeline_url = remove_query_arg('paged');
 $filters = [];
 foreach ((array) ($context['timeline_filters'] ?? []) as $type => $label) {
     if (! is_scalar($type) || ! is_scalar($label)) {
@@ -74,9 +77,17 @@ if (! isset($filters[''])) {
 <?php endif; ?>
 
 <?php if ($search_error !== '') : ?>
-    <div class="spux-notice spux-notice--warning" role="alert">
-        <p><?php esc_html_e('The profile search request was invalid or search is disabled. No unsafe query was executed.', 'sabri-public-experience'); ?></p>
-    </div>
+    <?php
+    // The renderer intentionally skipped native retrieval on invalid filters.
+    // Never claim the author has no publications or broaden the query.
+    echo \Sabri\PublicExperience\Components::render_state([
+        'type' => 'error',
+        'title' => __('Timeline request not processed', 'sabri-public-experience'),
+        'message' => __('This search or filter request could not be processed. Clear the filters and try again.', 'sabri-public-experience'),
+        'action_url' => $clear_refinements_url,
+        'action_label' => __('Clear timeline filters', 'sabri-public-experience'),
+    ]); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- centralized escaped visual component.
+    ?>
 <?php endif; ?>
 
 <?php if (count($filters) > 1) : ?>
@@ -143,29 +154,58 @@ if (! isset($filters[''])) {
     </fieldset>
 </form>
 
-<?php if ($partial) : ?>
+<?php if ($partial && $items !== []) : ?>
     <div class="spux-notice spux-notice--warning" role="status">
         <p><?php esc_html_e('Some public contributions could not be loaded. Available verified items are shown below.', 'sabri-public-experience'); ?></p>
     </div>
 <?php endif; ?>
 
-<?php if ($truncated) : ?>
+<?php if ($truncated && $items !== []) : ?>
     <div class="spux-notice spux-notice--warning" role="status">
         <p><?php esc_html_e('This foundation view reached its safe retrieval limit. A production timeline index is required for deeper history.', 'sabri-public-experience'); ?></p>
     </div>
 <?php endif; ?>
 
-<?php if ($items === []) : ?>
-    <div class="spux-state spux-state--empty" role="status">
-        <?php if ($search_query !== '' || $current_type !== '' || $secondary_active) : ?>
-            <h3><?php esc_html_e('No matching public contributions', 'sabri-public-experience'); ?></h3>
-            <p><?php esc_html_e('Try different filters or clear the current timeline refinement.', 'sabri-public-experience'); ?></p>
-        <?php else : ?>
-            <h3><?php esc_html_e('No public publications yet', 'sabri-public-experience'); ?></h3>
-            <p><?php esc_html_e('Approved contributions will appear here when their native providers publish them.', 'sabri-public-experience'); ?></p>
-        <?php endif; ?>
-    </div>
-<?php else : ?>
+<?php if ($items === [] && $search_error === '') : ?>
+    <?php
+    // Master Plan V12-012: a provider failure, filtered zero and an
+    // unfiltered zero have different meanings and must not be conflated.
+    if ($partial || $truncated) {
+        $empty_state = [
+            'type' => 'unavailable',
+            'title' => __('Timeline availability could not be confirmed', 'sabri-public-experience'),
+            'message' => __('A content provider was unavailable or the safe retrieval limit was reached. This does not establish that no public contributions exist.', 'sabri-public-experience'),
+            'action_url' => $retry_timeline_url,
+            'action_label' => $page > 1
+                ? __('Return to first page', 'sabri-public-experience')
+                : __('Try the timeline again', 'sabri-public-experience'),
+        ];
+    } elseif ($has_refinement || $page > 1) {
+        $empty_state = [
+            'type' => 'filtered-empty',
+            'title' => $page > 1
+                ? __('No approved contributions on this page', 'sabri-public-experience')
+                : __('No matching public contributions', 'sabri-public-experience'),
+            'message' => $page > 1
+                ? __('Try the first page while keeping the current filters.', 'sabri-public-experience')
+                : __('Adjust or clear the current timeline filters.', 'sabri-public-experience'),
+            'action_url' => $page > 1 ? $retry_timeline_url : $clear_refinements_url,
+            'action_label' => $page > 1
+                ? __('Return to first page', 'sabri-public-experience')
+                : __('Clear timeline filters', 'sabri-public-experience'),
+        ];
+    } else {
+        $empty_state = [
+            'type' => 'empty',
+            'title' => __('No approved public contributions available here', 'sabri-public-experience'),
+            'message' => __('Approved public contributions will appear here when available.', 'sabri-public-experience'),
+            'action_url' => home_url('/'),
+            'action_label' => __('Return Home', 'sabri-public-experience'),
+        ];
+    }
+    echo \Sabri\PublicExperience\Components::render_state($empty_state); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped centralized component.
+    ?>
+<?php elseif ($items !== []) : ?>
     <div class="spux-timeline">
         <?php foreach ($items as $item) : ?>
             <?php

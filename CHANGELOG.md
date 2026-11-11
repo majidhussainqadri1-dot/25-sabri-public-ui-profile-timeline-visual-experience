@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased — 2026-11-11 — V12.1 second-round status-truth and File20 Welcome compatibility
+
+- Correct the actual HTML ProfileTimeline empty-state root cause: reject invalid search without false no-publications claims; separate provider outage, retrieval truncation, filtered zero, ordinary zero and later-page zero with accurate, same-site reset/retry actions.
+- Add a rendered-template PHP regression suite; record root-cause evidence and owner boundaries. Expand staging acceptance cases without manufacturing external QA evidence.
+- Expose the polite, visually hidden welcome announcement status region required by the independent **unmerged File20 PR #41** JavaScript; extend the existing PHP welcome contract regression.
+- Correct V12-026 future update and label-only freshness ambiguity across source and profile/timeline views, add a behavioral PHP regression plus checked JS source invariants, and record exact pending browser/native owner tests.
+- Add 23-scope V12.1 source/owner/staging traceability with explicit evidence-class counts; these are NOT 23 independent complete audits or accepted production tests.
+- Tighten visual-evidence ISO metadata validation: future screenshot, staging and Founder-signoff timestamps cannot pass; preserve the boundary that File24, not a metadata manifest, must prove actual artifacts and real acceptance.
+- Draft PR #44 source candidate only. Main, installed WordPress, DB/schema/migrations, actual keyboard/RTL/real screen reader and live parity remain unverified.
+
+## Unreleased — 2026-11-11 — V12.1 File25 public states, Skip Intro and exact-source documentation
+
+- Add three semantically distinct safe public states: filtered-empty, permission-denied and offline; preserve owner-provided same-origin retry actions, visible text and decorative state icons. Components contract 1.3.0.
+- Provide a separate Skip Intro control, bound to the existing File20 dismissal selector without taking ownership of the 30-day cooldown; real File20 owner PR #41 integration is **not** yet accepted.
+- Require all three new V12.1 states in exact-SHA Visual Acceptance manifests (contract 1.5.0); add missing-evidence fail-closed regression. Expand behavioral PHP tests; correct the hard-coded 0.13.0 fixture to derive version from the checked-out 0.15.0 source header. Reconcile stale architecture/contract document versions.
+- Changes remain in Draft PR #44, stacked on Draft PR #43. CI, downloadable ZIP and a source-level audit never constitute live deployed parity, installed WordPress acceptance, migration completion, or Founder signoff.
+
 ## Unreleased — 2026-10-20 — Reviews 1755–1794: legacy redirect safety
 
 - Forty targeted File25/central/owner source inspections: 28 existing guards and twelve newly corrected scopes across four root causes.

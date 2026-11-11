@@ -10,6 +10,14 @@ The staging run must verify the current File 00 membership/identity contract, Fi
 
 It must also verify Founder/Doctor/Member/minor/private/suspended states; anonymous public reading; action-time authorization; no private or clinical leakage; Safe Mode; migration/rollback; browser/device widths; Urdu/Arabic RTL and English LTR; keyboard/screen reader/zoom/reduced motion; performance/degraded-network behavior; backup/restore; and deterministic artifact checksums.
 
+## V12.1 File25 source candidate acceptance cases (not yet executed)
+
+- **Timeline status-truth:** Test invalid search, disabled search, malformed filters, ordinary empty, filtered empty, later-page empty, all-native-provider outage, partial outage with approved results, 500-item bounded truncation and retry/reset links. No case may infer that a hidden/private contribution exists. Verify both HTML and REST and ensure no unauthorized native query is broadened.
+- **Welcome cross-owner contract:** Test exact File20 WelcomeFrequency owner implementation together with File25 renderer under guest/member, keyboard/Escape/Skip/Close, one polite heading announcement, reduced motion, 30-day guest cookie/member persistence, storage disabled, Safe Mode, request failures and focus restoration. File20's required announcement target and exact registered native callback must be present. Confirm neither File20 nor File25 creates a second shell or frequency record.
+- **Honest freshness (V12-026):** Verify stale owner dates show their true source date, a supplier note never replaces the displayed date, future timestamps do not masquerade as completed updates, and screen readers speak date/uncertainty. Test real browser/locales and clock-skew behavior; do not extrapolate from source tests.
+- **Evidence time integrity:** A source-only Visual Acceptance manifest must reject future-dated screenshot, Staging and Founder-signoff records. Independent assurance must separately open/hash real evidence bytes and verify who reviewed them; metadata validator acceptance alone is insufficient.
+- **Visual evidence:** Require actual screenshots and keyboard/screen-reader checks for filtered-empty, permission-denied and offline across representative 320px–1920px, Urdu RTL / English LTR, 200%/400% zoom and forced-colors/reduced-motion states. Evidence references must be linked to the exact installed artifact SHA; a manifest validator alone is not screenshot verification.
+
 ## Current truth
 
 All external acceptance flags remain **pending**. This document is a checklist/contract, not evidence that Hostinger staging, production, live deployment or operations have passed.

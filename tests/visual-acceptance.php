@@ -20,7 +20,7 @@ $check = static function (bool $condition, string $message) use (&$failures): vo
 $contract = Visual_Acceptance::contract();
 $check(($contract['owner'] ?? '') === 'file-25', 'File 25 must own visual acceptance.');
 $check(($contract['shell_owner'] ?? '') === 'file-20', 'File 20 must remain the shell owner.');
-$check(($contract['contract_version'] ?? '') === '1.4.0', 'Visual acceptance contract version must be current.');
+$check(($contract['contract_version'] ?? '') === '1.5.0', 'Visual acceptance contract version must include V12.1 state evidence.');
 $check(($contract['green_ci_is_acceptance'] ?? true) === false, 'Green CI must not be treated as visual acceptance.');
 $check(($contract['source_contract_is_acceptance'] ?? true) === false, 'Source contracts must not be treated as visual acceptance.');
 $check(($contract['target_commit_sha_required'] ?? false) === true, 'All evidence must be bound to one target commit.');
@@ -37,6 +37,9 @@ $check(in_array('profile-hero-actions', (array) ($contract['required_surfaces'] 
 $check(in_array('qr-share-state', (array) ($contract['required_surfaces'] ?? []), true), 'QR/share state evidence is required.');
 $check(in_array('media-section', (array) ($contract['required_surfaces'] ?? []), true), 'Media-section evidence is required.');
 $check(in_array('marketplace-section', (array) ($contract['required_surfaces'] ?? []), true), 'Marketplace-section evidence is required.');
+foreach (['filtered-empty-state', 'permission-denied-state', 'offline-state'] as $requiredV12State) {
+    $check(in_array($requiredV12State, (array) ($contract['required_surfaces'] ?? []), true), 'V12-012 visual evidence is mandatory: ' . $requiredV12State);
+}
 $check(in_array('rtl', (array) ($contract['directions'] ?? []), true), 'RTL evidence is required.');
 $check(in_array('forced-colors', (array) ($contract['color_modes'] ?? []), true), 'Forced-colors evidence is required.');
 $check(in_array(400, (array) ($contract['zoom_levels'] ?? []), true), 'Four-hundred-percent zoom evidence is required.');
@@ -109,6 +112,9 @@ foreach ((array) $contract['zoom_levels'] as $zoom) {
 }
 
 $check(Visual_Acceptance::validate_evidence($complete) === [], 'A complete commit-bound evidence manifest must validate.');
+$missingV12 = $complete;
+unset($missingV12['surfaces']['permission-denied-state']);
+$check(Visual_Acceptance::validate_evidence($missingV12) !== [], 'A staging manifest missing permission-denied evidence must not be accepted.');
 $summary = Visual_Acceptance::summarize($complete);
 $check(($summary['accepted'] ?? false) === true && ($summary['error_count'] ?? 1) === 0, 'Complete evidence summary must be accepted.');
 
@@ -119,6 +125,22 @@ $forged['surfaces']['marketplace-section']['recorded_at'] = '2026-02-30T25:61:61
 $forged['staging_environment']['site_url'] = 'https://staging.example.test/?preview=1';
 $forged_errors = Visual_Acceptance::validate_evidence($forged);
 $check($forged_errors !== [], 'Placeholders, commit mismatch, normalized dates, and noncanonical staging URLs must be rejected.');
+
+// Source-level proof that an impossible future record cannot pass the
+// metadata acceptance gate. This is not screenshot artifact-byte validation.
+$futureTime = gmdate('Y-m-d\\TH:i:s\\Z', time() + 86400);
+$futureArtifact = $complete;
+$futureArtifact['surfaces']['founder-overview']['recorded_at'] = $futureTime;
+$check(Visual_Acceptance::validate_evidence($futureArtifact) !== [],
+    'Future-dated screenshot metadata cannot count as a completed test.');
+$futureStaging = $complete;
+$futureStaging['staging_environment']['recorded_at'] = $futureTime;
+$check(Visual_Acceptance::validate_evidence($futureStaging) !== [],
+    'Future staging evidence cannot be accepted as performed.');
+$futureSignoff = $complete;
+$futureSignoff['founder_signoff']['recorded_at'] = $futureTime;
+$check(Visual_Acceptance::validate_evidence($futureSignoff) !== [],
+    'Future Founder signoff cannot masquerade as an existing approval.');
 
 $mixed_commit = $complete;
 $mixed_commit['surfaces']['founder-overview']['commit_sha'] = str_repeat('e', 40);

@@ -171,8 +171,9 @@ final class Three_Plan_Corrections
         $message = self::text($args['message'] ?? '', 600);
         $continue_label = self::text($args['continue_label'] ?? 'Continue', 80);
         $close_label = self::text($args['close_label'] ?? 'Close', 80);
+        $skip_label = self::text($args['skip_label'] ?? 'Skip intro', 80);
         $continue_url = Public_URL::sanitize_same_site($args['continue_url'] ?? home_url('/'));
-        if ($title === '' || $continue_label === '' || $close_label === '' || $continue_url === '') {
+        if ($title === '' || $continue_label === '' || $close_label === '' || $skip_label === '' || $continue_url === '') {
             return '';
         }
 
@@ -183,12 +184,18 @@ final class Three_Plan_Corrections
         return '<section class="sabri-ui-welcome-panel" role="region" aria-labelledby="sabri-welcome-title"'
             . ' data-directive="CHAT-UX-001" data-frequency-owner="file-20" data-visual-owner="file-25">'
             . '<h2 id="sabri-welcome-title">' . self::escape_html($title) . '</h2>'
+            // File20 announces this existing title only after the host
+            // becomes visible; File25 supplies a nonfocusable status target.
+            . '<span class="sabri-ui-welcome-panel__announcement" role="status" aria-live="polite" aria-atomic="true" data-sabri-welcome-announcement></span>'
             . $description
             . '<div class="sabri-ui-welcome-panel__actions">'
             . '<a class="sabri-ui-button sabri-ui-button--primary" href="' . self::escape_url($continue_url) . '">'
             . self::escape_html($continue_label) . '</a>'
             . '<button class="sabri-ui-button sabri-ui-button--secondary" type="button" data-sabri-welcome-dismiss>'
             . self::escape_html($close_label) . '</button>'
+            // File 20 retains the same dismissal/frequency owner for Skip.
+            . '<button class="sabri-ui-button sabri-ui-button--secondary" type="button" data-sabri-welcome-skip data-sabri-welcome-dismiss>'
+            . self::escape_html($skip_label) . '</button>'
             . '</div></section>';
     }
 
@@ -214,6 +221,17 @@ final class Three_Plan_Corrections
     background: var(--sabri-surface, #fff);
     box-shadow: 0 1rem 2.5rem rgb(15 23 42 / 10%);
     color: var(--sabri-text, #111827);
+}
+.sabri-ui-welcome-panel__announcement {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
 }
 .sabri-ui-welcome-panel h2,
 .sabri-ui-welcome-panel p { margin: 0; }

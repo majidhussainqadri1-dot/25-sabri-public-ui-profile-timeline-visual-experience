@@ -218,11 +218,11 @@ body.sabri-visual-system.sabri-shell-theme-dark {
     border-inline-start-color: var(--sabri-visual-primary);
 }
 
-:where(.sabri-ui-state--empty, .sabri-ui-state--unavailable) {
+:where(.sabri-ui-state--empty, .sabri-ui-state--filtered-empty, .sabri-ui-state--offline, .sabri-ui-state--unavailable) {
     border-inline-start-color: var(--sabri-visual-muted);
 }
 
-:where(.sabri-ui-state--warning, .sabri-ui-notice--warning) {
+:where(.sabri-ui-state--warning, .sabri-ui-state--permission-denied, .sabri-ui-notice--warning) {
     border-inline-start-color: var(--sabri-visual-warning);
 }
 
@@ -232,6 +232,20 @@ body.sabri-visual-system.sabri-shell-theme-dark {
 
 :where(.sabri-ui-state--success, .sabri-ui-notice--success) {
     border-inline-start-color: var(--sabri-visual-success);
+}
+
+:where(.sabri-ui-state__icon) {
+    align-items: center;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    color: var(--sabri-visual-primary-strong);
+    display: inline-flex;
+    font-size: 1.125rem;
+    font-weight: 750;
+    justify-content: center;
+    line-height: 1;
+    min-block-size: 2rem;
+    min-inline-size: 2rem;
 }
 
 :where(.sabri-ui-state__title) {

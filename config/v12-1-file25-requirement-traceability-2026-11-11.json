@@ -1,0 +1,250 @@
+{
+  "review": "File25 V12.1 source-vs-acceptance traceability",
+  "date": "2026-11-11",
+  "parent_sha": "5eea773a2efd144e5869ee5edece9af1595f9c09",
+  "governing": "Sabri Social Homeopathy Platform Master Plan V12.1 (10 Nov 2026)",
+  "scope_count": 23,
+  "counts": {
+    "source_corrected": 6,
+    "source_witness_runtime_pending": 8,
+    "design_decision_pending": 1,
+    "cross_owner_blocked": 5,
+    "acceptance_pending": 3
+  },
+  "source_only": true,
+  "staging_accepted": false,
+  "live_verified": false,
+  "notes": "Rows are different requirement scopes, not independent complete audits, root-cause defects, installed WordPress runs or live tests.",
+  "rows": [
+    {
+      "id": "V12-012-A",
+      "requirement": "V12-012",
+      "priority": "P0",
+      "evidence_state": "source_corrected",
+      "owner": "File25",
+      "observation": "Distinct empty/filtered-empty/permission-denied/offline/other visual states",
+      "path": "includes/class-components.php",
+      "next_gate": "Real domain rendering beyond ProfileTimeline and accessibility QA"
+    },
+    {
+      "id": "V12-012-B",
+      "requirement": "V12-012",
+      "priority": "P0",
+      "evidence_state": "source_corrected",
+      "owner": "File25",
+      "observation": "HTML Timeline error/partial/truncation/filter/page status truth",
+      "path": "templates/partials/timeline.php",
+      "next_gate": "Real File21 provider outages and actual role-based browser testing"
+    },
+    {
+      "id": "V12-012-C",
+      "requirement": "V12-012",
+      "priority": "P0",
+      "evidence_state": "source_corrected",
+      "owner": "File25",
+      "observation": "Visual acceptance requires the new state screenshot surfaces",
+      "path": "includes/class-visual-acceptance.php",
+      "next_gate": "Genuine exact-SHA screenshot/assistive technology evidence"
+    },
+    {
+      "id": "F13-WELCOME-SKIP",
+      "requirement": "File13",
+      "priority": "P0",
+      "evidence_state": "source_corrected",
+      "owner": "File25-visual/File20-frequency",
+      "observation": "Explicit Skip control reuses File20 dismiss selector",
+      "path": "includes/class-three-plan-corrections.php",
+      "next_gate": "Real File20 installed JavaScript and 30-day persistence verification"
+    },
+    {
+      "id": "F13-WELCOME-ANNOUNCE",
+      "requirement": "File13",
+      "priority": "P0",
+      "evidence_state": "source_corrected",
+      "owner": "File25-visual/File20-frequency",
+      "observation": "One nonfocusable polite heading announcement target",
+      "path": "tests/review174-176-three-plan-corrections.php",
+      "next_gate": "Real screen-reader and File20 PR41 browser tests"
+    },
+    {
+      "id": "RCD-001-GREEN",
+      "requirement": "RCD-001",
+      "priority": "P0",
+      "evidence_state": "source_witness_runtime_pending",
+      "owner": "File25",
+      "observation": "Canonical green primary token present",
+      "path": "assets/css/design-system.css",
+      "next_gate": "Owner-approved actual color/theme contrast across modes"
+    },
+    {
+      "id": "RCD-001-ICONS",
+      "requirement": "RCD-001",
+      "priority": "P0",
+      "evidence_state": "source_witness_runtime_pending",
+      "owner": "File25",
+      "observation": "New status icons accompany visible text",
+      "path": "includes/class-components.php",
+      "next_gate": "All important pages/actions, forced colors and assistive QA"
+    },
+    {
+      "id": "RCD-004-I18N",
+      "requirement": "RCD-004",
+      "priority": "P0",
+      "evidence_state": "source_witness_runtime_pending",
+      "owner": "File25/CF06",
+      "observation": "WordPress translation hooks for state strings",
+      "path": "includes/class-components.php",
+      "next_gate": "Real complete Urdu/Arabic/English catalogs and bidi context testing"
+    },
+    {
+      "id": "RCD-005-A11Y",
+      "requirement": "RCD-005",
+      "priority": "P0",
+      "evidence_state": "source_witness_runtime_pending",
+      "owner": "File25/File20",
+      "observation": "RTL/LTR, focus, reduced-motion and multi-viewport acceptance contracts",
+      "path": "includes/class-visual-acceptance.php",
+      "next_gate": "320–1920 px, 200–400% zoom, keyboard and screen-reader evidence"
+    },
+    {
+      "id": "V12-013-TOKENS",
+      "requirement": "V12-013",
+      "priority": "P1",
+      "evidence_state": "design_decision_pending",
+      "owner": "File25/File24",
+      "observation": "Primary green fixed; other numeric colors are V12.1 proposals",
+      "path": "includes/class-design-system.php",
+      "next_gate": "Founder-approved numeric token delta and contrast, rollback measurements"
+    },
+    {
+      "id": "V12-026-FRESHNESS",
+      "requirement": "V12-026",
+      "priority": "P0",
+      "evidence_state": "source_corrected",
+      "owner": "Native-domain/File25",
+      "observation": "Future public update dates rejected; source date always visible alongside any label",
+      "path": "includes/class-future-public-experience.php",
+      "next_gate": "Real browser/locales, native provenance, other decision-sensitive surfaces and stale source QA"
+    },
+    {
+      "id": "F00-PROFILE-AUTH",
+      "requirement": "File00",
+      "priority": "P0",
+      "evidence_state": "source_witness_runtime_pending",
+      "owner": "File00/File25-read",
+      "observation": "Profile authorization consumed through native contracts",
+      "path": "includes/class-profile-renderer.php",
+      "next_gate": "Installed exact native assertion versions and revoked/minor roles"
+    },
+    {
+      "id": "F03-PUBLIC-CONTACT",
+      "requirement": "File03",
+      "priority": "P0",
+      "evidence_state": "source_witness_runtime_pending",
+      "owner": "File03/File25-read",
+      "observation": "Public profile consumes owner-approved contacts only",
+      "path": "includes/class-profile-repository.php",
+      "next_gate": "Real owner consent and revocation across browser/REST/SEO"
+    },
+    {
+      "id": "F08-BOOKING",
+      "requirement": "File08",
+      "priority": "P0",
+      "evidence_state": "cross_owner_blocked",
+      "owner": "File08",
+      "observation": "No accepted target-bound appointment URL exposed to File25",
+      "path": "includes/class-plan-completion.php",
+      "next_gate": "File08 approved booking action contract and installed integration"
+    },
+    {
+      "id": "F17-FOLLOW",
+      "requirement": "File17",
+      "priority": "P0",
+      "evidence_state": "cross_owner_blocked",
+      "owner": "File17",
+      "observation": "No accepted target-bound Follow URL exposed to File25",
+      "path": "includes/class-plan-completion.php",
+      "next_gate": "File17 native authorized Follow/Unfollow action contract"
+    },
+    {
+      "id": "F20-WELCOME-OWNER",
+      "requirement": "File20",
+      "priority": "P0",
+      "evidence_state": "cross_owner_blocked",
+      "owner": "File20",
+      "observation": "File20 WelcomeFrequency code is an unmerged independent PR #41",
+      "path": "docs/V12.1-FILE25-PUBLIC-STATES-AND-WELCOME-SOURCE-DELTA-2026-11-11.md",
+      "next_gate": "File20 PR41 consolidation plus exact installed callback/JS verification"
+    },
+    {
+      "id": "F21-TIMELINE-PROVIDERS",
+      "requirement": "File21",
+      "priority": "P0",
+      "evidence_state": "cross_owner_blocked",
+      "owner": "File21-and-other-native-owners",
+      "observation": "Canonical posts provider exists; other native author projections not fully accepted",
+      "path": "includes/class-timeline-service.php",
+      "next_gate": "Real owner-provider visibility, pagination and outage integration"
+    },
+    {
+      "id": "F24-SECURITY-EVIDENCE",
+      "requirement": "File24",
+      "priority": "P0",
+      "evidence_state": "cross_owner_blocked",
+      "owner": "File24",
+      "observation": "Security and visual evidence contracts declared",
+      "path": "includes/class-file-24-integration.php",
+      "next_gate": "Exact owner artifact QA, security privacy browser evidence and MySQL concurrency"
+    },
+    {
+      "id": "F26-SEARCH-BOUNDARY",
+      "requirement": "File26",
+      "priority": "P0",
+      "evidence_state": "source_witness_runtime_pending",
+      "owner": "File26",
+      "observation": "Global search ownership remains outside File25",
+      "path": "docs/GOVERNING-SCOPE.md",
+      "next_gate": "File26 global search/discovery installation and route acceptance"
+    },
+    {
+      "id": "F25-CI-REPRO",
+      "requirement": "File25 release",
+      "priority": "P0",
+      "evidence_state": "source_witness_runtime_pending",
+      "owner": "File25",
+      "observation": "PHP/JS source suite and deterministic package workflow exists",
+      "path": ".github/workflows/ci.yml",
+      "next_gate": "Source green on final SHA; release ZIP install and exact deployed parity separate"
+    },
+    {
+      "id": "F25-STAGING",
+      "requirement": "File25 QA",
+      "priority": "P0",
+      "evidence_state": "acceptance_pending",
+      "owner": "File25/File20/File24",
+      "observation": "Staging criteria written but not executed",
+      "path": "STAGING-ACCEPTANCE.md",
+      "next_gate": "Real WordPress/Hostinger roles, mobile, restore, rollback and Founder acceptance"
+    },
+    {
+      "id": "F25-MIGRATION",
+      "requirement": "File25 migration",
+      "priority": "P0",
+      "evidence_state": "acceptance_pending",
+      "owner": "File25/Hostinger",
+      "observation": "Migration runbook and guards exist",
+      "path": "MIGRATION.md",
+      "next_gate": "Deployed wp_options/schema/migration rows and parity evidence"
+    },
+    {
+      "id": "F25-LIVE-PARITY",
+      "requirement": "Live-first",
+      "priority": "P0",
+      "evidence_state": "acceptance_pending",
+      "owner": "Operations",
+      "observation": "No connected WordPress site or verified installed source",
+      "path": "STAGING-ACCEPTANCE.md",
+      "next_gate": "Active plugin SHA/checksum, DB version, runtime logs, live re-test"
+    }
+  ]
+}

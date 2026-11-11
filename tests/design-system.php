@@ -7,7 +7,12 @@ namespace {
         define('ABSPATH', __DIR__ . '/fixtures/');
     }
     if (! defined('SABRI_PUBLIC_EXPERIENCE_VERSION')) {
-        define('SABRI_PUBLIC_EXPERIENCE_VERSION', '0.13.0');
+        // Bind tests to the actual plugin header, not a stale fixture version.
+        $plugin_source = file_get_contents(dirname(__DIR__) . '/sabri-public-experience.php');
+        if (! is_string($plugin_source) || preg_match('/^\\s*\\* Version:\\s*([^\\s]+)/m', $plugin_source, $plugin_header) !== 1) {
+            throw new \RuntimeException('File 25 plugin version cannot be established from the source header.');
+        }
+        define('SABRI_PUBLIC_EXPERIENCE_VERSION', $plugin_header[1]);
     }
     if (! function_exists('home_url')) {
         function home_url(string $path = ''): string
@@ -54,7 +59,7 @@ namespace {
     $check(($contract['file'] ?? null) === 25, 'Design system contract must remain owned by File 25.');
     $check(($contract['canonical_name'] ?? '') === 'Sabri Unified Global Visual Experience and Design System', 'Canonical File 25 name must remain exact.');
     $check(($contract['contract_version'] ?? '') === '1.9.0', 'Design-system contract version must include the newest governing-plan reconciliation.');
-    $check(($contract['runtime_version'] ?? '') === '0.13.0', 'Design-system runtime version must match File 25 0.13.0.');
+    $check(($contract['runtime_version'] ?? '') === SABRI_PUBLIC_EXPERIENCE_VERSION, 'Design-system runtime version must match the exact File 25 plugin header.');
     $check(($contract['creates_file_26'] ?? true) === false, 'Design system must reject a duplicate File 26.');
     $check(($contract['global_shell_owner'] ?? '') === 'file-20', 'File 20 must remain the global shell owner.');
     $check(($contract['visual_system_owner'] ?? '') === 'file-25', 'File 25 must remain the visual-system owner.');
@@ -160,6 +165,22 @@ namespace {
     $check(! str_contains($state, '<script'), 'State renderer must strip executable markup.');
     $check(! str_contains($state, 'javascript:'), 'State renderer must reject unsafe URLs.');
     $check(str_contains($state, 'role="alert"'), 'Error state must use alert semantics.');
+
+    // V12.1 V12-012: distinguish filtered-empty, denied and offline from empty.
+    $stateTypes = (array) (Components::contract()['states'] ?? []);
+    $check(Components::CONTRACT_VERSION === '1.3.0', 'V12-012 component-state contract must be versioned.');
+    foreach (['filtered-empty', 'permission-denied', 'offline'] as $type) {
+        $check(in_array($type, $stateTypes, true), 'V12-012 state unavailable: ' . $type);
+        $markup = Components::render_state(['type' => $type, 'action_label' => 'Try again', 'action_url' => '/retry/']);
+        $check(str_contains($markup, 'data-sabri-visual-state="' . $type . '"'), 'Lost state identity: ' . $type);
+        $check(str_contains($markup, 'sabri-ui-state__icon') && str_contains($markup, 'aria-hidden="true"'), 'Accessible state must have decorative icon: ' . $type);
+        $check(str_contains($markup, 'retry/'), 'Safe owner-supplied action must be available: ' . $type);
+    }
+    $denied = Components::render_state(['type' => 'permission-denied']);
+    $check(str_contains($denied, 'role="alert"'), 'Denied state must announce the denial.');
+    $check(! str_contains($denied, 'hidden record') && ! str_contains($denied, 'exists'), 'Denied state may not reveal the existence of private records.');
+    $offline = Components::render_state(['type' => 'offline', 'action_label' => 'Retry', 'action_url' => 'javascript:alert(1)']);
+    $check(! str_contains($offline, 'javascript:'), 'Offline retry must reject unsafe URLs.');
 
     if ($failures !== []) {
         fwrite(STDERR, "FAILED\n- " . implode("\n- ", $failures) . "\n");

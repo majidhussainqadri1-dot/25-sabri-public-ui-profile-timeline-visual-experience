@@ -17,11 +17,11 @@ File 25 must not render a second shell, create a second publication backend, or 
 
 ## Runtime contract
 
-Design-system contract version: `1.4.0`
+Design-system contract version: `1.9.0`
 
-Optional-section contract version: `1.1.0`
+Optional-section contract version: `1.2.0`
 
-Visual-acceptance contract version: `1.2.0`
+Visual-acceptance contract version: `1.5.0` (V12.1 required visual states)
 
 Public integration functions:
 
@@ -47,6 +47,8 @@ sabri_public_experience/design_system_contract
 Canonical stylesheet handle: `sabri-visual-design-system`.
 
 Reusable component prefix: `sabri-ui-`.
+
+Reusable Components contract version: `1.3.0` (additive V12.1 public-state variants).
 
 ## Semantic tokens
 
