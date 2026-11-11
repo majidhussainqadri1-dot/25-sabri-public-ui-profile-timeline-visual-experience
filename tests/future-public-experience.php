@@ -93,9 +93,9 @@ $timelineFixtures = ['items' => [
 ]];
 $dateRows = $timelineMetaMethod->invoke(null, $timelineFixtures);
 $check(count($dateRows) === 3, 'Public timeline metadata should preserve three valid canonical URLs.');
-$check(($dateRows[0]['published_at'] ?? '') === '2026-10-01T10:00:00Z' && ($dateRows[0]['updated_at'] ?? null) === '', 'Publication-only timestamp must not be projected as updated_at.');
-$check(($dateRows[1]['published_at'] ?? '') === '2026-09-01T10:00:00Z' && ($dateRows[1]['updated_at'] ?? '') === '2026-10-03T11:30:00Z', 'Distinct genuine publication and update timestamps must survive projection.');
-$check(($dateRows[2]['updated_at'] ?? null) === '' && ($dateRows[2]['published_at'] ?? '') === '2026-10-05T10:00:00Z', 'Invalid update timestamp must not erase trustworthy publication time.');
+$check(($dateRows[0]['published_at'] ?? '') === '2026-10-01T10:00:00+00:00' && ($dateRows[0]['updated_at'] ?? null) === '', 'Publication-only timestamp must not be projected as updated_at.');
+$check(($dateRows[1]['published_at'] ?? '') === '2026-09-01T10:00:00+00:00' && ($dateRows[1]['updated_at'] ?? '') === '2026-10-03T11:30:00+00:00', 'Distinct genuine publication and update timestamps must survive projection.');
+$check(($dateRows[2]['updated_at'] ?? null) === '' && ($dateRows[2]['published_at'] ?? '') === '2026-10-05T10:00:00+00:00', 'Invalid update timestamp must not erase trustworthy publication time.');
 $check(str_contains($js, "t('publishedLabel', 'Published')"), 'The timeline JS must label a publication date as Published.');
 $check(str_contains($js, 'const revised = validDate(meta.updated_at)'), 'JS must select a credible update date separately from published date.');
 $check(str_contains((string) file_get_contents(dirname(__DIR__) . '/includes/class-future-public-experience.php'), "'publishedLabel' => __('Published'"), 'Published must be an internationalizable UI label.');
