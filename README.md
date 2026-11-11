@@ -5,6 +5,12 @@
 WordPress module for the **Sabri Social Homeopathy Platform**. This is the existing File 25; no duplicate File 26 is created.
 
 
+## V12.1 second-round integration audit — 11 November 2026 (Draft PR #44)
+
+- **One confirmed Timeline status root cause, five source manifestations:** the File25 Timeline HTML partial treated invalid/disabled searches, source-provider failures, bounded retrieval and empty later pages as if no approved public contributions existed. It now preserves error, unavailable, filtered-empty and ordinary empty distinctions with a truthful, same-site next action and no private-data inference.
+- **One File20/25 source contract mismatch:** File20 unmerged PR #41 Welcome script explicitly requires `data-sabri-welcome-announcement`; the File25 renderer initially omitted it. Source now supplies one nonfocusable polite screen-reader status target after the title. File20 remains the 30-day state owner. Real dual-plugin staging acceptance remains blocked.
+- **Tests/traceability:** `tests/v12-1-timeline-state-truth.php`, `tests/review174-176-three-plan-corrections.php`, and corresponding V12.1 technical reports in `docs/`. `STAGING-ACCEPTANCE.md` now lists actual end-to-end journeys. No live or native-owner release is represented by these source corrections.
+
 ## V12.1 source corrections — 11 November 2026 (Draft PR #44)
 
 - **Scope:** New central Master Plan V12.1, File 25, File 13 and V12-012, based on exact unmerged PR #43 head. Add explicit filtered-empty, permission-denied and offline display states, privacy-safe translated copy, decorative icons plus visible text, and a distinct Skip Intro control which reuses File 20's frequency-owner dismissal hook.

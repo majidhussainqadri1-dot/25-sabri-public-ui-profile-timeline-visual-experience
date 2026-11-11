@@ -110,7 +110,7 @@ $invalid = $render([
 $assert(str_contains($invalid, 'data-sabri-visual-state="error"'), 'Invalid requests must show an error, not generic empty.');
 $assert(! str_contains($invalid, 'data-sabri-visual-state="empty"'), 'Invalid requests must not imply no publications.');
 $assert(! str_contains($invalid, 'data-sabri-visual-state="filtered-empty"'), 'Invalid requests did not execute a filtered retrieval.');
-$assert(str_contains($invalid, 'No unrestricted timeline was substituted.'), 'Invalid filters must disclose fail-closed behavior.');
+$assert(str_contains($invalid, 'Clear the filters and try again.'), 'Invalid filters must give a plain-language next step.');
 
 $partial = $render([
     'timeline' => ['provider_errors' => ['file-21']],
@@ -132,6 +132,14 @@ $page = $render([
 $assert(str_contains($page, 'data-sabri-visual-state="filtered-empty"'), 'Empty later page must not claim author has no public content.');
 $assert(str_contains($page, 'Return to first page'), 'Empty later page must offer a usable previous destination.');
 $assert(! str_contains($page, 'paged=4"'), 'Return-to-first-page URL must clear page number.');
+
+$partialPage = $render([
+    'url' => 'https://example.test/doctors/approved/timeline/?paged=4',
+    'timeline' => ['page' => 4, 'provider_errors' => ['file-21']],
+]);
+$assert(str_contains($partialPage, 'data-sabri-visual-state="unavailable"'), 'A later-page outage stays unavailable.');
+$assert(str_contains($partialPage, 'Return to first page'), 'Outage recovery label must match the actual reset-page destination.');
+$assert(! str_contains($partialPage, 'Try the timeline again'), 'Do not describe a page reset as retrying the same page.');
 
 if ($failures !== []) {
     fwrite(STDERR, "FAILED File25 V12.1 timeline-state truth\n- " . implode("\n- ", $failures) . "\n");

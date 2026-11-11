@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — 2026-11-11 — V12.1 second-round status-truth and File20 Welcome compatibility
+
+- Correct the actual HTML ProfileTimeline empty-state root cause: reject invalid search without false no-publications claims; separate provider outage, retrieval truncation, filtered zero, ordinary zero and later-page zero with accurate, same-site reset/retry actions.
+- Add a rendered-template PHP regression suite; record root-cause evidence and owner boundaries. Expand staging acceptance cases without manufacturing external QA evidence.
+- Expose the polite, visually hidden welcome announcement status region required by the independent **unmerged File20 PR #41** JavaScript; extend the existing PHP welcome contract regression.
+- Draft PR #44 source candidate only. Main, installed WordPress, DB/schema/migrations, actual keyboard/RTL/real screen reader and live parity remain unverified.
+
 ## Unreleased — 2026-11-11 — V12.1 File25 public states, Skip Intro and exact-source documentation
 
 - Add three semantically distinct safe public states: filtered-empty, permission-denied and offline; preserve owner-provided same-origin retry actions, visible text and decorative state icons. Components contract 1.3.0.

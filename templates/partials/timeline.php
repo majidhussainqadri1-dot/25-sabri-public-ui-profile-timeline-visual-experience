@@ -83,7 +83,7 @@ if (! isset($filters[''])) {
     echo \Sabri\PublicExperience\Components::render_state([
         'type' => 'error',
         'title' => __('Timeline request not processed', 'sabri-public-experience'),
-        'message' => __('Search or filter values were invalid or unavailable. No unrestricted timeline was substituted.', 'sabri-public-experience'),
+        'message' => __('This search or filter request could not be processed. Clear the filters and try again.', 'sabri-public-experience'),
         'action_url' => $clear_refinements_url,
         'action_label' => __('Clear timeline filters', 'sabri-public-experience'),
     ]); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- centralized escaped visual component.
@@ -176,7 +176,9 @@ if (! isset($filters[''])) {
             'title' => __('Timeline availability could not be confirmed', 'sabri-public-experience'),
             'message' => __('A content provider was unavailable or the safe retrieval limit was reached. This does not establish that no public contributions exist.', 'sabri-public-experience'),
             'action_url' => $retry_timeline_url,
-            'action_label' => __('Try the timeline again', 'sabri-public-experience'),
+            'action_label' => $page > 1
+                ? __('Return to first page', 'sabri-public-experience')
+                : __('Try the timeline again', 'sabri-public-experience'),
         ];
     } elseif ($has_refinement || $page > 1) {
         $empty_state = [
@@ -184,7 +186,9 @@ if (! isset($filters[''])) {
             'title' => $page > 1
                 ? __('No approved contributions on this page', 'sabri-public-experience')
                 : __('No matching public contributions', 'sabri-public-experience'),
-            'message' => __('Try an earlier page or clear the current timeline refinements.', 'sabri-public-experience'),
+            'message' => $page > 1
+                ? __('Try the first page while keeping the current filters.', 'sabri-public-experience')
+                : __('Adjust or clear the current timeline filters.', 'sabri-public-experience'),
             'action_url' => $page > 1 ? $retry_timeline_url : $clear_refinements_url,
             'action_label' => $page > 1
                 ? __('Return to first page', 'sabri-public-experience')
