@@ -105,6 +105,7 @@ $check(($dateRows[1]['published_at'] ?? '') === '2026-09-01T10:00:00+00:00' && (
 $check(($dateRows[2]['updated_at'] ?? null) === '' && ($dateRows[2]['published_at'] ?? '') === '2026-10-05T10:00:00+00:00', 'Invalid update timestamp must not erase trustworthy publication time.');
 $check(str_contains($js, "t('publishedLabel', 'Published')"), 'The timeline JS must label a publication date as Published.');
 $check(str_contains($js, 'const revised = validDate(meta.updated_at)'), 'JS must select a credible update date separately from published date.');
+$check(str_contains($js, 'existingPublished.textContent') && str_contains($js, 'existingDate.getTime() === date.getTime()'), 'Publication dates must label the server-rendered time rather than duplicate it.');
 $check(str_contains((string) file_get_contents(dirname(__DIR__) . '/includes/class-future-public-experience.php'), "'publishedLabel' => __('Published'"), 'Published must be an internationalizable UI label.');
 
 if ($failures !== []) {
