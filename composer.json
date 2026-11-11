@@ -81,7 +81,8 @@
     "tests/review1795-1834-40-check-ledger.php",
     "tests/v12-1-timeline-state-truth.php",
     "tests/v12-1-freshness-truth.php",
-    "tests/v12-1-date-provenance.php"
+    "tests/v12-1-date-provenance.php",
+    "tests/v12-1-native-public-claim-gates.php"
     ]
   }
 }
