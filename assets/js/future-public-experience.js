@@ -239,7 +239,7 @@
         const fresh = payload.freshness || {};
         if (fresh.updated_at) {
             const date = new Date(fresh.updated_at);
-            if (Number.isFinite(date.getTime()) && date.getTime() <= Date.now() + 300000) {
+            if (Number.isFinite(date.getTime())) {
                 const p = element('p', 'spux-content-freshness');
                 // The user-visible and spoken date must not be replaced by
                 // an owner note claiming live data without a source date.
@@ -347,7 +347,7 @@
         }
         if (meta.updated_at && !card.querySelector('.spux-item-freshness')) {
             const date = new Date(meta.updated_at);
-            if (Number.isFinite(date.getTime()) && date.getTime() <= Date.now() + 300000) {
+            if (Number.isFinite(date.getTime())) {
                 const wrap = element('span', 'spux-item-freshness');
                 const time = element('time', '', `${t('updatedLabel', 'Updated')} ${date.toLocaleDateString()}`);
                 time.dateTime = meta.updated_at;

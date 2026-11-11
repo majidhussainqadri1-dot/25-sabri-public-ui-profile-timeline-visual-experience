@@ -369,18 +369,8 @@ final class Future_Public_Experience
         if (! is_array($data)) {
             return [];
         }
-        $updated = self::iso_time((string) ($data['updated_at'] ?? ''));
+        $updated = self::safe_update_time((string) ($data['updated_at'] ?? ''));
         if ($updated === '') {
-            return [];
-        }
-        // V12-026: do not present clearly future-dated metadata as an update.
-        // A five-minute allowance covers bounded server clock skew.
-        try {
-            $timestamp = (new \DateTimeImmutable($updated))->getTimestamp();
-        } catch (\Throwable) {
-            return [];
-        }
-        if ($timestamp > time() + 300) {
             return [];
         }
         return ['updated_at' => $updated, 'label' => self::plain($data['label'] ?? '', 190)];
@@ -403,7 +393,7 @@ final class Future_Public_Experience
                 'url' => $url,
                 'source_verified' => sanitize_key((string) ($item['provider_id'] ?? '')) !== '',
                 'correction_state' => in_array($state, ['corrected', 'retracted'], true) ? $state : 'none',
-                'updated_at' => self::iso_time((string) ($item['updated_at'] ?? $item['published_at'] ?? '')),
+                'updated_at' => self::safe_update_time((string) ($item['updated_at'] ?? $item['published_at'] ?? '')),
             ];
         }
         return $clean;
@@ -564,6 +554,24 @@ final class Future_Public_Experience
         }
         $limit = max(1, min(12000, $limit));
         return function_exists('mb_substr') ? mb_substr($text, 0, $limit) : substr($text, 0, $limit);
+    }
+
+    /**
+     * Validate an owner-provided content update using server time, not a
+     * visitor's potentially incorrect browser clock (Master Plan V12-026).
+     */
+    private static function safe_update_time(string $value): string
+    {
+        $updated = self::iso_time($value);
+        if ($updated === '') {
+            return '';
+        }
+        try {
+            $timestamp = (new \DateTimeImmutable($updated))->getTimestamp();
+        } catch (\Throwable) {
+            return '';
+        }
+        return $timestamp <= time() + 300 ? $updated : '';
     }
 
     private static function iso_time(string $value): string
