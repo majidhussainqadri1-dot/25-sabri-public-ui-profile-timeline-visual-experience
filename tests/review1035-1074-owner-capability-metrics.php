@@ -5,6 +5,7 @@ if (! defined('ABSPATH')) { define('ABSPATH', __DIR__ . '/fixtures/'); }
 $GLOBALS['f25_r1035_admin'] = false;
 $GLOBALS['f25_r1035_threshold'] = 'invalid';
 $GLOBALS['f25_r1035_metric_allowed'] = true;
+$GLOBALS['f25_r1035_metrics_filter_calls'] = 0;
 function is_user_logged_in(): bool { return true; }
 function current_user_can(string $capability): bool {
     return $capability === 'read'
@@ -19,6 +20,7 @@ function apply_filters(string $hook, mixed $value, mixed ...$params): mixed {
         return 'read'; // Malicious/weaker extension must never grant an admin action.
     }
     if ($hook === 'sabri_public_experience/public_metrics') {
+        ++$GLOBALS['f25_r1035_metrics_filter_calls'];
         return ['publications'=>7, 'followers'=>4, 'secret_internal'=>100];
     }
     if ($hook === 'sabri_public_experience/public_metric_minimum') {
@@ -46,25 +48,22 @@ $check($permission->invoke(null,'preferences') === true,
 $GLOBALS['f25_r1035_admin'] = false;
 
 $metric = [ 'user_id' => 42 ];
-$metrics=\Sabri\PublicExperience\Plan_Completion::public_metrics($metric);
-$check($metrics === [], 'Malformed public metric threshold must not expose any counts.');
-$GLOBALS['f25_r1035_threshold']=10;
-$check(\Sabri\PublicExperience\Plan_Completion::public_metrics($metric)===[],
-    'Below-threshold counts must stay hidden.');
-$GLOBALS['f25_r1035_threshold']=5;
-$metrics=\Sabri\PublicExperience\Plan_Completion::public_metrics($metric);
-$check(($metrics['publications']??null)===7 && !isset($metrics['followers'])
-    && !isset($metrics['secret_internal']),
-    'Valid aggregate thresholds must admit only approved numeric metrics above minimum.');
-$GLOBALS['f25_r1035_metric_allowed']=false;
-$check(\Sabri\PublicExperience\Plan_Completion::public_metrics($metric)===[],
-    'Explicit metrics approval revocation must suppress all public counters.');
-$GLOBALS['f25_r1035_metric_allowed']=true;
-foreach ([null, [], '0', -1, 1000000001] as $invalid) {
-    $GLOBALS['f25_r1035_threshold']=$invalid;
-    $check(\Sabri\PublicExperience\Plan_Completion::public_metrics($metric)===[],
-        'Malformed/overflow metric threshold must fail closed: '.get_debug_type($invalid));
+// File 25 has no owner-authorized public-safe metrics projection. Even a
+// valid-looking number or a benign threshold from a presentation hook must
+// not create a count claimed by File03/21/other native owners.
+foreach (['invalid', 10, 5, 0, null, [], '0', -1, 1000000001] as $candidate) {
+    $GLOBALS['f25_r1035_threshold'] = $candidate;
+    foreach ([true, false] as $allowed) {
+        $GLOBALS['f25_r1035_metric_allowed'] = $allowed;
+        $check(\Sabri\PublicExperience\Plan_Completion::public_metrics($metric) === [],
+            'Unapproved metrics must remain absent regardless of filter thresholds and opt-in.');
+    }
 }
+$check($GLOBALS['f25_r1035_metrics_filter_calls'] === 0,
+    'Generic UI metrics filter must not be called as a data-publishing authority.');
+$check(\Sabri\PublicExperience\Plan_Completion::public_metrics(['user_id' => 0]) === [],
+    'Invalid owner identity must remain excluded.');
+
 if($errors!==[]){
     fwrite(STDERR,"FAILED R1035–1074 File25 admin and public metric privacy\n- ".implode("\n- ",$errors)."\n");
     exit(1);

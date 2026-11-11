@@ -83,7 +83,8 @@
     "tests/v12-1-freshness-truth.php",
     "tests/v12-1-date-provenance.php",
     "tests/v12-1-native-public-claim-gates.php",
-    "tests/v12-1-timeline-instant-precision.php"
+    "tests/v12-1-timeline-instant-precision.php",
+    "tests/v12-1-native-owner-index-metrics.php"
     ]
   }
 }

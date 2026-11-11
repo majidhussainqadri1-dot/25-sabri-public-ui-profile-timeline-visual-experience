@@ -281,14 +281,11 @@ final class Profile_Renderer
         $profile = (array) ($GLOBALS['sabri_public_experience_profile'] ?? []);
         $profile_class = sanitize_key((string) ($profile['class'] ?? ''));
         $professional = in_array($profile_class, ['founder', 'doctor'], true);
-        $member_indexing = $profile !== [] && apply_filters(
-            'sabri_public_experience/index_nonprofessional_profile',
-            false,
-            $profile
-        ) === true;
-
+        // File 03 is the public identity/consent authority. No approved,
+        // versioned public member indexability projection exists. A generic
+        // UI filter cannot grant public search-engine discoverability.
         if (is_404() || $filtered || Plan_Completion::preferences()['public_visibility'] !== true
-            || (! $professional && ! $member_indexing)
+            || ! $professional
         ) {
             $robots['noindex'] = true;
             $robots['noarchive'] = true;
