@@ -141,11 +141,8 @@ final class Timeline_Service
                 $provider_items = $provider->get_public_author_items($author_id, $provider_query);
                 // Reaching the requested look-ahead (e.g. 21 for page 1)
                 // is normal pagination, not a 500-item safety truncation.
-                if ($candidate_limit === self::MAX_CANDIDATES_PER_PROVIDER
-                    && count($provider_items) >= self::MAX_CANDIDATES_PER_PROVIDER
-                ) {
-                    $provider_limit_reached = true;
-                }
+                $provider_at_limit = $candidate_limit === self::MAX_CANDIDATES_PER_PROVIDER
+                    && count($provider_items) >= self::MAX_CANDIDATES_PER_PROVIDER;
                 if (count($provider_items) > $candidate_limit) {
                     $provider_items = array_slice($provider_items, 0, $candidate_limit);
                 }
@@ -207,6 +204,12 @@ final class Timeline_Service
                 }
                 foreach ($provider_canonical_items as $canonical_key => $key) {
                     $canonical_items[$canonical_key] = $key;
+                }
+                // A bounded source is not public evidence if its batch fails
+                // validation. Set truncation only after this entire native
+                // provider transaction successfully commits.
+                if ($provider_at_limit) {
+                    $provider_limit_reached = true;
                 }
             } catch (\Throwable $exception) {
                 $errors[] = (string) $provider_id;

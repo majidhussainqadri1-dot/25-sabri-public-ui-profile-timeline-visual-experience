@@ -1,0 +1,106 @@
+{
+  "schema": "file25.v12.1.post-audit-correction.v1",
+  "created_at": "2026-11-11",
+  "audit_parent_pr": 48,
+  "audit_parent_sha": "ca2b1b05dd00821a743629aa66be05dfff0fba3d",
+  "reviewed_correction_parent_sha": "8e5bd08f14bfb81f50c6751ff2bee8e76af17637",
+  "repository_main_sha": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+  "source_only": true,
+  "git_main_merged": false,
+  "staging_verified": false,
+  "live_verified": false,
+  "source_root_cause_count": 6,
+  "source_corrected_count": 6,
+  "live_verified_fix_count": 0,
+  "fixes": [
+    {
+      "id": "F25-PR49-01",
+      "domain": "File03 member SEO",
+      "source": "includes/class-profile-renderer.php",
+      "tests": [
+        "tests/review795-834-seo-scope-privacy.php",
+        "tests/v12-1-native-owner-index-metrics.php"
+      ],
+      "authority": "File03",
+      "status": "source_corrected_unmerged"
+    },
+    {
+      "id": "F25-PR49-02",
+      "domain": "Public metrics owner claim",
+      "source": "includes/class-plan-completion.php",
+      "tests": [
+        "tests/review1035-1074-owner-capability-metrics.php",
+        "tests/v12-1-native-owner-index-metrics.php"
+      ],
+      "authority": "Native metrics owner/File21",
+      "status": "source_corrected_unmerged"
+    },
+    {
+      "id": "F25-PR49-03",
+      "domain": "Provider section cache and cap",
+      "source": "includes/class-section-service.php",
+      "tests": [
+        "tests/review1039-section-provider-atomicity-recovery.php"
+      ],
+      "authority": "File06/10/11/12/18/21 providers",
+      "status": "source_corrected_unmerged"
+    },
+    {
+      "id": "F25-PR49-04",
+      "domain": "Timeline provider 500 cap",
+      "source": "includes/class-timeline-service.php",
+      "tests": [
+        "tests/v12-1-timeline-provider-truncation.php"
+      ],
+      "authority": "File21/provider registry",
+      "status": "source_corrected_unmerged"
+    },
+    {
+      "id": "F25-PR49-05",
+      "domain": "File09 withheld professional snapshot",
+      "source": "includes/class-native-integration.php",
+      "tests": [
+        "tests/review1016-file03-professional-projection-privacy.php"
+      ],
+      "authority": "File03 public / File09 verification",
+      "status": "source_corrected_unmerged"
+    },
+    {
+      "id": "F25-PR49-06",
+      "domain": "REST date-only 304",
+      "source": "includes/class-rest-controller.php",
+      "tests": [
+        "tests/review37-rest-etag-revalidation.php",
+        "tests/review515-594-fifth-eighty-current-truth.php"
+      ],
+      "authority": "public native representation",
+      "status": "source_corrected_unmerged"
+    }
+  ],
+  "coverage_only": [
+    {
+      "source_pr": 38,
+      "scope": "SQL CAS initial write rejection",
+      "test": "tests/review1675-1714-atomic-index-concurrency.php",
+      "fixture": "tests/fixtures/fake-atomic-index-wpdb.php",
+      "native_mysql_stress_tested": false
+    }
+  ],
+  "unresolved": [
+    "PR #16 historical File03 name fallback behavior is not identical to new stricter fail-closed owner policy.",
+    "File21 metric-ranked sorting and source-state advanced filters require accepted current owner contracts.",
+    "PR36 redirect unique evidence, PR19 optional logo/motion and PR45 date docs need separate selective review.",
+    "No installed WordPress package, DB version, migration state, runtime logs, File20/21/24 parity or actual screenshot hashes.",
+    "No real browser Urdu RTL/keyboard/screen-reader or MySQL concurrency/staging/live acceptance.",
+    "No independent Code Owner reviewer or Founder release approval."
+  ],
+  "release_gates": {
+    "independent_review": "pending",
+    "approved_branch_consolidation": "pending",
+    "staging_exact_artifact": "pending",
+    "file24_evidence_bytes": "pending",
+    "owner_contracts": "pending",
+    "founder_signoff": "pending",
+    "live_retest": "pending"
+  }
+}

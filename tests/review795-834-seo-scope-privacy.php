@@ -14,6 +14,7 @@ $GLOBALS['f25_seo_preferences'] = [];
 $GLOBALS['f25_seo_query'] = [];
 $GLOBALS['f25_seo_is404'] = false;
 $GLOBALS['f25_seo_member_optin'] = false;
+$GLOBALS['f25_seo_member_filter_calls'] = 0;
 
 if (! function_exists('sanitize_key')) {
     function sanitize_key(string $value): string {
@@ -36,8 +37,11 @@ if (! function_exists('is_404')) {
 }
 if (! function_exists('apply_filters')) {
     function apply_filters(string $name, mixed $value, mixed ...$args): mixed {
-        return $name === 'sabri_public_experience/index_nonprofessional_profile'
-            ? $GLOBALS['f25_seo_member_optin'] : $value;
+        if ($name === 'sabri_public_experience/index_nonprofessional_profile') {
+            ++$GLOBALS['f25_seo_member_filter_calls'];
+            return $GLOBALS['f25_seo_member_optin'];
+        }
+        return $value;
     }
 }
 
@@ -117,8 +121,15 @@ $expect(($noPermission['noindex'] ?? false) === true,
     'Nonprofessional indexing opt-in requires strict boolean true.');
 $GLOBALS['f25_seo_member_optin'] = true;
 $permission = $renderer->robots([]);
-$expect(! isset($permission['noindex']),
-    'An explicitly granted public member indexing opt-in remains supported.');
+$expect(($permission['noindex'] ?? false) === true && ($permission['noarchive'] ?? false) === true,
+    'A generic UI filter cannot grant member indexing without native File03 public consent.');
+$expect($GLOBALS['f25_seo_member_filter_calls'] === 0,
+    'Forbidden member-indexing presentation filter must not be consulted.');
+$GLOBALS['sabri_public_experience_profile']['class'] = 'doctor';
+$doctor = $renderer->robots([]);
+$expect(! isset($doctor['noindex']),
+    'Ordinary approved professional profile remains indexable under public visibility.');
+$GLOBALS['sabri_public_experience_profile']['class'] = 'member';
 
 // Do not downgrade a previous nofollow signal when a Timeline filter triggers
 // noindex; a 404, however, must establish nofollow.

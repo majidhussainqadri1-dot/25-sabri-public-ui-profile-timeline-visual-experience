@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased — 2026-11-11 — PR49 native public authority, provider cache and ETag safety
+
+- Fail closed on nonprofessional WordPress SEO indexing without canonical File03 public consent; keep eligible ordinary Doctor/Founder unfiltered pages indexable.
+- Disable unverified UI-filter-derived public profile counters until an accepted owner projection; disclose the gate in admin preferences rather than implying a checkbox publishes counts.
+- Invalidate Section Provider in-request cache on source availability/eligibility transitions and any error; do not advertise invalid capped batches as truncated, and retain healthy provider recovery and safe same-state caching.
+- Delay Timeline 500-item truncation until the entire native provider batch validates and commits; preserve independent healthy provider items on partial outages.
+- Never use File09's private approved decision/snapshot as fallback content for File03-withheld professional details.
+- Disable nested-date-only REST 304 while retaining an informational Last-Modified header and full canonical ETag revalidation; update obsolete fifth-cycle marker test, not the unsafe route.
+- Add behavioral PHP regressions and rebase the independent PR38 initial SQL CAS write-refusal scenario onto the current fake-wpdb fixture. All changes remain an unmerged Draft source branch; no Staging/Live assurance.
+
 ## Unreleased — 2026-11-11 — V12.1 PR47 sign-off chronology and precision hardening
 
 - Fail closed when Founder visual acceptance predates the required screenshot/staging evidence, permitting no more than a bounded 300-second clock skew. Direct PHP regression covers later screenshots, later staging and tolerated skew.

@@ -72,10 +72,40 @@ namespace {
     $date304 = $method->invoke($controller, [
         'profile' => ['updated_at' => '2026-08-10T12:30:00Z'],
     ], 200, new WP_REST_Request(['if-modified-since' => $lastModified]));
-    if ($date304->status !== 304 || $date304->data !== null) {
-        fwrite(STDERR, "Review 517 failed: If-Modified-Since did not produce 304.\n");
+    // Last-Modified is advisory until a canonical owner can attest that it
+    // covers the entire versioned public projection. A nested item's date
+    // alone is insufficient authority to omit a changed representation.
+    if ($date304->status !== 200 || $date304->data === null) {
+        fwrite(STDERR, "Review 517 failed: unverified date-only condition must not suppress a full response.\n");
         exit(1);
     }
+    $oldBio = $method->invoke($controller, [
+        'profile' => ['updated_at' => '2026-08-10T12:30:00Z', 'bio' => 'Old public biography'],
+        'items' => [['title' => 'Public item']],
+    ], 200, new WP_REST_Request());
+    $changedBio = $method->invoke($controller, [
+        'profile' => ['updated_at' => '2026-08-10T12:30:00Z', 'bio' => 'New owner-approved public biography'],
+        'items' => [['title' => 'Public item']],
+    ], 200, new WP_REST_Request(['if-modified-since' => $lastModified]));
+    if ($changedBio->status !== 200
+        || ($changedBio->data['profile']['bio'] ?? '') !== 'New owner-approved public biography'
+        || ($changedBio->headers['ETag'] ?? '') === ($oldBio->headers['ETag'] ?? '')
+    ) {
+        fwrite(STDERR, "Review 517 regression: changed public payload at same nested date was incorrectly 304.\n");
+        exit(1);
+    }
+    $changedAfterEtag = $method->invoke($controller, [
+        'profile' => ['updated_at' => '2026-08-10T12:30:00Z', 'bio' => 'New owner-approved public biography'],
+        'items' => [['title' => 'Public item']],
+    ], 200, new WP_REST_Request([
+        'if-none-match' => (string) ($oldBio->headers['ETag'] ?? ''),
+        'if-modified-since' => $lastModified,
+    ]));
+    if ($changedAfterEtag->status !== 200) {
+        fwrite(STDERR, "Review 517 regression: stale ETag plus stale date must return changed payload.\n");
+        exit(1);
+    }
+
     $precedence = $method->invoke($controller, [
         'profile' => ['updated_at' => '2026-08-10T12:30:00Z'],
     ], 200, new WP_REST_Request(['if-none-match' => '"miss"', 'if-modified-since' => $lastModified]));

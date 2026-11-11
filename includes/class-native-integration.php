@@ -743,9 +743,11 @@ final class Native_Integration
     {
         $projection = $this->public_profile_projection($user_id, 0);
         $source = is_array($projection['professional'] ?? null) ? $projection['professional'] : [];
-        if ($source === []) {
-            $source = (array) ($this->doctor_approved_snapshot($user_id)['profile'] ?? []);
-        }
+        // File 09's approved private decision/snapshot may establish
+        // eligibility; it does NOT grant public disclosure of qualifications,
+        // issuer names, licenses or specialty. Only File 03's current public
+        // professional DTO may publish these details. Never fall back to
+        // doctor_approved_snapshot() when File03 deliberately withholds them.
         if ($source === []) {
             return [];
         }

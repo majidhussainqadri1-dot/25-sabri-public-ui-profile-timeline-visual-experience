@@ -305,7 +305,12 @@ final class Plan_Completion
                             <?php $definition = self::PREFERENCE_SCHEMA[$key]; ?>
                             <tr>
                                 <th scope="row"><label for="spux-<?php echo esc_attr($key); ?>"><?php echo esc_html(ucwords(str_replace('_', ' ', $key))); ?></label></th>
-                                <td><?php $this->render_preference_control($key, $definition, $preferences[$key]); ?></td>
+                                <td>
+                                    <?php $this->render_preference_control($key, $definition, $preferences[$key]); ?>
+                                    <?php if ($key === 'public_metrics') : ?>
+                                        <p class="description"><?php esc_html_e('Public counters remain unavailable until an approved native, privacy-screened metrics contract is installed. Saving this preference does not authorize or publish a count.', 'sabri-public-experience'); ?></p>
+                                    <?php endif; ?>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </table>
@@ -823,42 +828,14 @@ final class Plan_Completion
     /** @param array<string,mixed> $profile @return array<string,int> */
     public static function public_metrics(array $profile): array
     {
-        if (self::preferences()['public_metrics'] !== true) {
-            return [];
-        }
-        $user_id = self::exact_integer($profile['user_id'] ?? null) ?? 0;
-        if ($user_id < 1) {
-            return [];
-        }
-        $metrics = apply_filters('sabri_public_experience/public_metrics', [], $user_id, $profile);
-        if (! is_array($metrics)) {
-            return [];
-        }
-        $allowed = ['publications', 'videos', 'research', 'followers', 'views', 'saves', 'reviews'];
-        $clean = [];
-        foreach ($allowed as $key) {
-            if (! array_key_exists($key, $metrics) || ! is_int($metrics[$key])) {
-                continue;
-            }
-            $value = $metrics[$key];
-            if ($value < 0 || $value > self::MAX_METRIC_VALUE) {
-                continue;
-            }
-            $threshold = apply_filters('sabri_public_experience/public_metric_minimum', 0, $key, $user_id, $profile);
-            if (! is_int($threshold) || $threshold < 0 || $threshold > self::MAX_METRIC_VALUE) {
-                // Invalid privacy thresholds must suppress the count, never
-                // silently lower the aggregation threshold to zero.
-                continue;
-            }
-            if ($value < $threshold) {
-                continue;
-            }
-            if (apply_filters('sabri_public_experience/public_metric_allowed', true, $key, $user_id, $profile) !== true) {
-                continue;
-            }
-            $clean[$key] = $value;
-        }
-        return $clean;
+        // Counts need an authoritative, versioned, owner-projected public
+        // aggregate with consent, deduplication and privacy thresholds.
+        // File 25 currently has no accepted native metrics DTO. The former
+        // presentation filter could mint plausible but unverified numbers,
+        // which prepare_response() placed directly in public HTML.
+        // An administrator preference is not evidence of source authority.
+        unset($profile);
+        return [];
     }
 
     /** @param array<string,mixed> $profile @return array<string,mixed> */
