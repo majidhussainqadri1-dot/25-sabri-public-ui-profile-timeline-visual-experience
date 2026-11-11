@@ -29,22 +29,19 @@ $check = static function (bool $ok, string $name) use (&$errors): void {
 };
 
 $past = gmdate('Y-m-d\TH:i:s\Z', time() - 86400);
-$GLOBALS['v12_freshness_payload'] = ['updated_at' => $past, 'label' => 'Content source'];
-$accepted = $method->invoke(null, ['class' => 'founder']);
-$check(is_array($accepted) && ! empty($accepted['updated_at']), 'Past owner date must remain available.');
-$check(($accepted['label'] ?? '') === 'Content source', 'Owner note should remain an auxiliary label.');
-
-$GLOBALS['v12_freshness_payload'] = ['updated_at' => gmdate('Y-m-d\TH:i:s\Z', time() + 86400), 'label' => 'Live now'];
-$check($method->invoke(null, []) === [], 'Far-future update must never appear as already refreshed.');
-
-$GLOBALS['v12_freshness_payload'] = ['updated_at' => gmdate('Y-m-d\TH:i:s\Z', time() + 120), 'label' => 'Clock skew'];
-$check(($method->invoke(null, [])['updated_at'] ?? '') !== '', 'Allow small server clock skew.');
-
-$GLOBALS['v12_freshness_payload'] = ['updated_at' => '2026-02-30T12:00:00Z'];
-$check($method->invoke(null, []) === [], 'Reject invalid calendar date.');
-
-$GLOBALS['v12_freshness_payload'] = null;
-$check($method->invoke(null, []) === [], 'Reject malformed owner payload.');
+// A UI presentation filter cannot establish a canonical File03/21 public
+// profile freshness source. The owner has not approved a typed projection.
+foreach ([
+    ['updated_at' => $past, 'label' => 'Content source'],
+    ['updated_at' => gmdate('Y-m-d\TH:i:s\Z', time() + 86400), 'label' => 'Live now'],
+    ['updated_at' => gmdate('Y-m-d\TH:i:s\Z', time() + 120), 'label' => 'Clock skew'],
+    ['updated_at' => '2026-02-30T12:00:00Z', 'label' => 'Impossible'],
+    null,
+] as $candidate) {
+    $GLOBALS['v12_freshness_payload'] = $candidate;
+    $check($method->invoke(null, ['class' => 'founder']) === [],
+        'Generic UI filter must not make a public Profile last-updated claim.');
+}
 
 $metaMethod = new ReflectionMethod(\Sabri\PublicExperience\Future_Public_Experience::class, 'timeline_meta');
 $metaMethod->setAccessible(true);

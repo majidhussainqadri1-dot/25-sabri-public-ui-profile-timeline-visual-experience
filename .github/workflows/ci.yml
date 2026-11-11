@@ -61,6 +61,8 @@ jobs:
         run: |
           node --check assets/js/public.js
           node --check assets/js/future-public-experience.js
+          node --check tests/v12-1-timeline-date.test.js
+          node tests/v12-1-timeline-date.test.js
 
   staging-package:
     name: Deterministic staging candidate

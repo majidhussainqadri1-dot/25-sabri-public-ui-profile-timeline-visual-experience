@@ -33,7 +33,7 @@ $check = static function (bool $condition, string $message) use (&$failures): vo
 
 $contract = Future_Public_Experience::contract();
 $features = (array) ($contract['future_enhancements'] ?? []);
-$check(($contract['contract_version'] ?? '') === '1.0.0', 'Future public experience contract version must be current.');
+$check(($contract['contract_version'] ?? '') === '1.1.0', 'Future public experience additive date/provenance contract version must be current.');
 $check(($contract['owner'] ?? '') === 'file-25', 'File 25 must own the future public presentation layer.');
 $check(($contract['shell_owner'] ?? '') === 'file-20', 'File 20 must remain shell owner.');
 $check(($contract['security_governance_owner'] ?? '') === 'file-24', 'File 24 must remain security governance owner.');
