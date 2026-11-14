@@ -43,8 +43,8 @@
     {
       "id": "W06",
       "title": "six visual scenes",
-      "state": "blocked",
-      "reason": "native owners, real screenshot bytes and File24 reviewer pending"
+      "state": "source_gate_only",
+      "reason": "Six owner-bounded visual scenes mandatory in contract 1.6.0; real screenshots / File24 acceptance blocked"
     },
     {
       "id": "W07",
@@ -89,5 +89,7 @@
   "migration_state": null,
   "live_verification_status": "UNVERIFIED",
   "live_resolved_defects": 0,
-  "notes": "0 verified means no proof, not absence of defects. No progress percentage certified."
+  "notes": "0 verified means no proof, not absence of defects. No progress percentage certified. Six-scene contract declarations are NOT evidence screenshots.",
+  "source_traceability_register": "config/v12-3-file25-requirement-traceability.json",
+  "traceability_scope": 14
 }

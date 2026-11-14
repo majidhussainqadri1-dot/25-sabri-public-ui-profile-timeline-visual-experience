@@ -1,0 +1,234 @@
+{
+  "schema": "file25.v12.3.requirement-to-evidence.v1",
+  "date": "2026-11-14",
+  "repository": "majidhussainqadri1-dot/25-sabri-public-ui-profile-timeline-visual-experience",
+  "governing_source": "Sabri-Website-Master-Plan-V12.3.docx",
+  "source_parent_sha": "33f13bf148cea6d564b7deb0a0cf63c54e4e9bd3",
+  "source_only": true,
+  "full_site_acceptance": false,
+  "installed_deployed_code_verified": false,
+  "relevant_identifiers_count": 14,
+  "allowable_statuses": [
+    "source_tested",
+    "source_partial",
+    "evidence_pending",
+    "owner_blocked",
+    "stage_blocked"
+  ],
+  "statements_of_scope": "Focused cross-reference, not all 2066 central requirement records nor an exhaustive independent W00-W12 acceptance audit",
+  "records": [
+    {
+      "id": "F25-CEN-01",
+      "owner": [
+        "File25",
+        "File24"
+      ],
+      "status": "source_tested",
+      "sources": [
+        "assets/css/design-system.css",
+        "includes/class-design-system.php",
+        "tests/v12-3-design-tokens.php"
+      ],
+      "acceptance": "V12.3 §2.2 light/dark/hover/decorative and functional border parity; browser contrast pending",
+      "remaining": "actual computed styles, File24 independent approval"
+    },
+    {
+      "id": "F25-CEN-02",
+      "owner": [
+        "File25",
+        "File20",
+        "File21",
+        "File24"
+      ],
+      "status": "source_partial",
+      "sources": [
+        "includes/class-visual-acceptance.php",
+        "tests/visual-acceptance.php",
+        "assets/css/design-system.css"
+      ],
+      "acceptance": "Public profile/timeline visual primitives + all six mandatory scenes",
+      "remaining": "actual live-shaped data, real scenes, WordPress permission and screenshots"
+    },
+    {
+      "id": "V12-012",
+      "owner": [
+        "File25",
+        "domain owners"
+      ],
+      "status": "source_partial",
+      "sources": [
+        "includes/class-visual-acceptance.php",
+        "tests/visual-acceptance.php"
+      ],
+      "acceptance": "Distinct empty/filtered empty/denied/offline/error/load for real public data",
+      "remaining": "Real domain, role and screen reader rendering; no hidden record disclosures"
+    },
+    {
+      "id": "V12-013",
+      "owner": [
+        "File25",
+        "File24"
+      ],
+      "status": "source_tested",
+      "sources": [
+        "config/v12-3-design-token-contract.json",
+        "tests/v12-3-design-tokens.php"
+      ],
+      "acceptance": "Numerical tokens and contrast calculation independently reviewed",
+      "remaining": "Browser measured color and Founder token approval"
+    },
+    {
+      "id": "M01",
+      "owner": [
+        "File20",
+        "File25",
+        "File24"
+      ],
+      "status": "evidence_pending",
+      "sources": [
+        "config/staging-test-plan.json",
+        "includes/class-visual-acceptance.php"
+      ],
+      "acceptance": "320/390/768/1024/1440 route, keyboard, bidi and baseline fallback",
+      "remaining": "Installed device/browser five-width test"
+    },
+    {
+      "id": "M02",
+      "owner": [
+        "File25",
+        "File24",
+        "domain owners"
+      ],
+      "status": "evidence_pending",
+      "sources": [
+        "includes/class-visual-acceptance.php",
+        "tests/visual-acceptance.php"
+      ],
+      "acceptance": "Applicable WCAG 2.2 AA complete tasks",
+      "remaining": "Independent manual screen reader, keyboard, zoom, forced-colors"
+    },
+    {
+      "id": "M03",
+      "owner": [
+        "File24",
+        "File25",
+        "CF05"
+      ],
+      "status": "evidence_pending",
+      "sources": [
+        "config/staging-test-plan.json"
+      ],
+      "acceptance": "Route budgets and field p75 LCP/INP/CLS on mobile and desktop",
+      "remaining": "Actual lab and qualified field data"
+    },
+    {
+      "id": "QA-15",
+      "owner": [
+        "File20",
+        "File25",
+        "File24"
+      ],
+      "status": "evidence_pending",
+      "sources": [
+        "includes/class-visual-acceptance.php"
+      ],
+      "acceptance": "Low data and no-JS enhanced navigation, full keyboard, 5 viewports",
+      "remaining": "Real devices and browser fallback"
+    },
+    {
+      "id": "QA-16",
+      "owner": [
+        "File25",
+        "File24"
+      ],
+      "status": "evidence_pending",
+      "sources": [
+        "includes/class-visual-acceptance.php"
+      ],
+      "acceptance": "WCAG 2.2 AA, 200% text, 400% zoom, 320px reflow, forced colors",
+      "remaining": "Independent installed screen reader and browser evidence"
+    },
+    {
+      "id": "QA-17",
+      "owner": [
+        "File24",
+        "File25",
+        "CF05"
+      ],
+      "status": "evidence_pending",
+      "sources": [
+        "config/staging-test-plan.json"
+      ],
+      "acceptance": "Cold/warm lab plus separately sufficient field p75",
+      "remaining": "Instrumented field evidence and performance budgets"
+    },
+    {
+      "id": "AJ-39",
+      "owner": [
+        "File25",
+        "File20",
+        "File03",
+        "File05",
+        "File08",
+        "File12",
+        "File19",
+        "File21",
+        "File22",
+        "File24",
+        "File26"
+      ],
+      "status": "source_partial",
+      "sources": [
+        "includes/class-visual-acceptance.php",
+        "tests/visual-acceptance.php",
+        "docs/V12.3-FILE25-W06-SIX-SCENE-VISUAL-GATES-2026-11-14.md"
+      ],
+      "acceptance": "Six scene artifact receipts across device, role, locale, theme and failure states",
+      "remaining": "Actual byte-authenticated screenshots, role/domain owners, File24 approval"
+    },
+    {
+      "id": "UX-01",
+      "owner": [
+        "File20",
+        "File21",
+        "File25"
+      ],
+      "status": "owner_blocked",
+      "sources": [
+        "includes/class-visual-acceptance.php"
+      ],
+      "acceptance": "First-view clarity, no mandatory welcome, continuity/Back",
+      "remaining": "Real File20 shell and File21 content integration"
+    },
+    {
+      "id": "UX-12",
+      "owner": [
+        "File25",
+        "File20",
+        "File10",
+        "File11"
+      ],
+      "status": "owner_blocked",
+      "sources": [
+        "includes/class-visual-acceptance.php"
+      ],
+      "acceptance": "Media/captions/reduced motion/accessible controls",
+      "remaining": "File10/11 native player/staging and assistive tests"
+    },
+    {
+      "id": "CEN-REL-001",
+      "owner": [
+        "File24",
+        "Founder",
+        "File01"
+      ],
+      "status": "stage_blocked",
+      "sources": [
+        "config/staging-test-plan.json",
+        "config/staging-dependencies.json"
+      ],
+      "acceptance": "Exact deployed parity/backup/restore and zero known in-scope defects",
+      "remaining": "Hostinger staging, deployed runtime, database, signoff and live re-test"
+    }
+  ]
+}
