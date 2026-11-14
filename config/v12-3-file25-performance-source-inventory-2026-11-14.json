@@ -3,7 +3,7 @@
   "date": "2026-11-14",
   "governing_source": "Sabri-Website-Master-Plan-V12.3.docx §2.7 and File25 execution plan W10",
   "source_only": true,
-  "asset_binary_source_commit": "a4034bf429bc0f697d7841a295c10586d7c7fedc",
+  "asset_binary_source_commit": null,
   "initial_budgets_not_release_acceptance": true,
   "installed_staging_measured": false,
   "actual_route_transfer_measured": false,
@@ -21,8 +21,8 @@
   "file25_css_js_raw_budget_bytes": 131072,
   "source_asset_totals": {
     "file_count": 8,
-    "raw_bytes": 82618,
-    "independent_local_gzip_bytes": 19751
+    "raw_bytes": 83330,
+    "independent_local_gzip_bytes": 19900
   },
   "source_assets": [
     {
@@ -45,9 +45,9 @@
     },
     {
       "path": "assets/css/future-public-experience.css",
-      "raw_bytes": 8415,
-      "local_gzip_bytes": 2045,
-      "sha256": "8b38d16b4467f52cb124d884483ab79ff01102eda75d4a94363f560bb492d836"
+      "raw_bytes": 9127,
+      "local_gzip_bytes": 2194,
+      "sha256": "f2bbe279013b47006e6422888240fc03532eeb0d2255b032bc26d4cd3eff58be"
     },
     {
       "path": "assets/css/profile-sections.css",
@@ -118,6 +118,7 @@
       "field_status": "not_measured"
     }
   ],
-  "next_exact_asset_commit_pending_update": false,
-  "source_visual_control_review": "W03 interactive control border correction: 3:1 required, local Chromium light/dark green"
+  "next_exact_asset_commit_pending_update": true,
+  "source_visual_control_review": "W03 interactive control border correction: 3:1 required, local Chromium light/dark green",
+  "W09_keyboard_focus_source_fixture": "4 preference and 4 disclosure focus targets: Chromium 1px auto -> 3px solid, disclosure 25.59px -> 44.78px (local source fixture)"
 }

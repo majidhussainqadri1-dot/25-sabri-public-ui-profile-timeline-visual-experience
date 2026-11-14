@@ -42,6 +42,15 @@
     cursor: pointer;
 }
 
+/* V12.3 keyboard operability: visible 3px focus on all public preference actions. */
+.spux-pref-toggle:focus-visible,
+.spux-pref-reset:focus-visible,
+.spux-translation-panel__switcher button:focus-visible,
+.spux-time-navigator__item:focus-visible {
+    outline: 3px solid var(--sabri-visual-focus, #087A4E);
+    outline-offset: 3px;
+}
+
 .spux-pref-toggle[aria-pressed="true"],
 .spux-translation-panel__switcher button[aria-pressed="true"],
 .spux-time-navigator__item.is-active,
@@ -161,8 +170,20 @@
 .spux-privacy-preview summary,
 .spux-quality-score summary,
 .spux-era-summary summary {
+    box-sizing: border-box;
     cursor: pointer;
     font-weight: 700;
+    min-block-size: 2.75rem;
+    padding-block: 0.6rem;
+    padding-inline: 0.25rem;
+}
+
+.spux-citation-drawer summary:focus-visible,
+.spux-privacy-preview summary:focus-visible,
+.spux-quality-score summary:focus-visible,
+.spux-era-summary summary:focus-visible {
+    outline: 3px solid var(--sabri-visual-focus, #087A4E);
+    outline-offset: 3px;
 }
 
 .spux-quality-score {

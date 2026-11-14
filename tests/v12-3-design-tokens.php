@@ -90,5 +90,16 @@ if(($typography['reading_px']??null)!==18 || ($typography['reading_line_px']??nu
    || ($typography['requires_real_rendered_font_glyph_qa']??false)!==true){
  throw new RuntimeException('Unverified or incomplete V12.3 typography contract');
 }
+// W09 source-proven keyboard focus and short summary targets on the public panels.
+$futureFocus = (string) file_get_contents($root . '/assets/css/future-public-experience.css');
+if(!str_contains($futureFocus,'.spux-pref-toggle:focus-visible,')
+ || !str_contains($futureFocus,'.spux-time-navigator__item:focus-visible')
+ || !str_contains($futureFocus,'.spux-citation-drawer summary:focus-visible,')
+ || !str_contains($futureFocus,'.spux-era-summary summary:focus-visible')
+ || !preg_match('/\.spux-era-summary summary\s*\{[^}]*min-block-size:\s*2\.75rem;[^}]*padding-block:\s*0\.6rem;/s',$futureFocus)
+ || !preg_match('/\.spux-era-summary summary:focus-visible\s*\{[^}]*outline:\s*3px solid var\(--sabri-visual-focus/s',$futureFocus)){
+ throw new RuntimeException('V12.3 preference or disclosure interactive controls lack 3px visible focus or 44px summary target');
+}
+
 if(($spec['staging_accepted']??true)!==false||($spec['live_verified']??true)!==false){throw new RuntimeException('Source-only release state misrepresented');}
 echo "V12.3 authored CSS/PHP + 24 contrast assertions passed (NOT staging/live)\n";

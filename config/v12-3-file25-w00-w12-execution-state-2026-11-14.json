@@ -61,8 +61,8 @@
     {
       "id": "W09",
       "title": "WCAG 2.2 AA and human UX",
-      "state": "synthetic_browser_partial",
-      "reason": "Actual Chromium computed contrast/keyboard spot-check 45/45, but no assistive/human/WCAG installed acceptance"
+      "state": "extended_source_keyboard_probes_pending_installed",
+      "reason": "8 additional preference/disclosure controls real Chromium source fixture corrected to 3px focus and >=44px summary; 45 responsive source fixtures; independent WCAG/assistive testing still pending"
     },
     {
       "id": "W10",
