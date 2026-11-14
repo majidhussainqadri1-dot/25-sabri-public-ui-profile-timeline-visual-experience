@@ -23,6 +23,30 @@ if(($s['tokens']['background']??'')!=='#F4F7F5'){throw new RuntimeException('Fil
 if(!str_contains($css,'border: 1px solid var(--sabri-visual-control-border)')||!str_contains($public,'border-color: var(--spux-control-border)')){throw new RuntimeException('Essential control borders not migrated');}
 function f25lum(string $h):float{$h=ltrim($h,'#');$x=[];foreach([0,2,4] as $i){$v=hexdec(substr($h,$i,2))/255;$x[]=($v<=.04045)?$v/12.92:(($v+.055)/1.055)**2.4;}return .2126*$x[0]+.7152*$x[1]+.0722*$x[2];}
 function f25cr(string $a,string $b):float{$x=f25lum($a);$y=f25lum($b);return (max($x,$y)+.05)/(min($x,$y)+.05);}
-foreach(['light'=>[['text','page',4.5],['muted','surface',4.5],['primary','surface',4.5],['control-border','page',3]],'dark'=>[['text','page',4.5],['muted','surface',4.5],['primary','page',4.5],['control-border','page',3]]] as $mode=>$pairs){foreach($pairs as [$x,$y,$min]){if(f25cr($spec[$mode][$x],$spec[$mode][$y])<$min){throw new RuntimeException("Contrast failure $mode $x $y");}}}
+$contrast_pairs = [
+ 'light' => [
+  ['text','page',4.5], ['text','surface',4.5], ['muted','surface',4.5],
+  ['primary','surface',4.5], ['hover','surface',4.5],
+  ['primary-strong','primary-soft',4.5], ['control-border','surface',3.0],
+  ['control-border','page',3.0], ['success','primary-soft',4.5],
+  ['warning','surface',4.5], ['danger','surface',4.5], ['information','surface',4.5],
+ ],
+ 'dark' => [
+  ['text','page',4.5], ['text','surface',4.5], ['muted','surface',4.5],
+  ['primary','page',4.5], ['hover','page',4.5],
+  ['primary-strong','primary-soft',4.5], ['control-border','surface',3.0],
+  ['control-border','page',3.0], ['success','page',4.5],
+  ['warning','page',4.5], ['danger','page',4.5], ['information','page',4.5],
+ ]
+];
+$contrast_count = 0;
+foreach($contrast_pairs as $mode=>$pairs){
+ foreach($pairs as [$foreground,$background,$min]){
+  $actual=f25cr($spec[$mode][$foreground],$spec[$mode][$background]);
+  if($actual<$min){throw new RuntimeException("Contrast failure $mode $foreground/$background ratio=$actual minimum=$min");}
+  $contrast_count++;
+ }
+}
+if($contrast_count!==24){throw new RuntimeException('Incomplete 24-pair contrast suite');}
 if(($spec['staging_accepted']??true)!==false||($spec['live_verified']??true)!==false){throw new RuntimeException('Source-only release state misrepresented');}
-echo "V12.3 source tokens: light/dark/CSS/PHP/contrast tests passed (NOT staging/live)\n";
+echo "V12.3 authored CSS/PHP + 24 contrast assertions passed (NOT staging/live)\n";
