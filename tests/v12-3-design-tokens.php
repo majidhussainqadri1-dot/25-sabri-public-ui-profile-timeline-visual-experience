@@ -50,6 +50,9 @@ foreach($contrast_pairs as $mode=>$pairs){
  }
 }
 if($contrast_count!==24){throw new RuntimeException('Incomplete 24-pair contrast suite');}
+if(!preg_match('/:where\(\.sabri-ui-reading-width\)\s*\{\s*box-sizing:\s*border-box;\s*inline-size:\s*min\(100%,/s',$css)){
+ throw new RuntimeException('Reading-width content-box padding causes source-level horizontal overflow on narrow RTL viewport');
+}
 foreach(['sabri-ui-page-title','sabri-ui-section-title','sabri-ui-body-text','sabri-ui-reading-width.sabri-ui-urdu-nastaliq'] as $selector) {
  if(!str_contains($css,$selector)){throw new RuntimeException('Missing V12.3 type scale CSS selector: '.$selector);}
 }

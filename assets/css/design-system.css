@@ -132,6 +132,7 @@ body.sabri-visual-system.sabri-shell-theme-dark {
 }
 
 :where(.sabri-ui-reading-width) {
+    box-sizing: border-box;
     inline-size: min(100%, var(--sabri-visual-content-reading));
     font-size: 1.125rem; /* V12.3 §2.2: 18 CSS px */
     line-height: 1.8889; /* 34 CSS px at the baseline size */
