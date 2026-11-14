@@ -21,6 +21,8 @@ foreach(['color-text'=>'#15251E','color-page'=>'#F4F7F5','color-border'=>'#D6E1D
 $s=Sabri\PublicExperience\Design_System::filter_shell_visual_contract([]);
 if(($s['tokens']['background']??'')!=='#F4F7F5'){throw new RuntimeException('File20 visual consumer mismatch');}
 if(!str_contains($css,'border: 1px solid var(--sabri-visual-control-border)')||!str_contains($public,'border-color: var(--spux-control-border)')){throw new RuntimeException('Essential control borders not migrated');}
+if(!preg_match('/\\.spux-profile-qr > summary\\s*\\{[^}]*min-block-size:\\s*2\\.75rem;/s',$public) || !str_contains($public,'.spux-profile-qr > summary:focus-visible')){throw new RuntimeException('Public QR summary lacks V12.3 keyboard focus or 44px touch target');}
+
 function f25lum(string $h):float{$h=ltrim($h,'#');$x=[];foreach([0,2,4] as $i){$v=hexdec(substr($h,$i,2))/255;$x[]=($v<=.04045)?$v/12.92:(($v+.055)/1.055)**2.4;}return .2126*$x[0]+.7152*$x[1]+.0722*$x[2];}
 function f25cr(string $a,string $b):float{$x=f25lum($a);$y=f25lum($b);return (max($x,$y)+.05)/(min($x,$y)+.05);}
 $contrast_pairs = [

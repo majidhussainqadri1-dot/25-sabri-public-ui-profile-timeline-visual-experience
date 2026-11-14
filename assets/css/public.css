@@ -448,7 +448,19 @@
 }
 
 .spux-profile-qr > summary {
+    align-items: center;
+    cursor: pointer;
+    display: inline-flex;
     list-style: none;
+    min-block-size: 2.75rem;
+    min-inline-size: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--spux-radius-sm);
+}
+
+.spux-profile-qr > summary:focus-visible {
+    outline: 3px solid var(--spux-focus);
+    outline-offset: 3px;
 }
 
 .spux-profile-qr > summary::-webkit-details-marker {
