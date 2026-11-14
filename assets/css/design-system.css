@@ -50,6 +50,8 @@
 body.sabri-visual-system {
     --spux-primary: var(--sabri-visual-primary);
     --spux-primary-strong: var(--sabri-visual-primary-strong);
+    --spux-primary-soft: var(--sabri-visual-primary-soft);
+    --spux-on-primary: var(--sabri-visual-on-primary);
     --spux-text: var(--sabri-visual-text);
     --spux-muted: var(--sabri-visual-muted);
     --spux-surface: var(--sabri-visual-surface);

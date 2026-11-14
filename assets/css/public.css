@@ -203,9 +203,8 @@
 }
 
 .spux-tabs__item.is-active {
-    background: var(--spux-primary-soft);
-    background: color-mix(in srgb, var(--spux-primary) 18%, var(--spux-surface));
-    color: var(--spux-primary-strong);
+    background: var(--sabri-visual-selected, var(--spux-primary-soft));
+    color: var(--sabri-visual-selected-text, var(--spux-primary-strong));
 }
 
 .spux-layout,
