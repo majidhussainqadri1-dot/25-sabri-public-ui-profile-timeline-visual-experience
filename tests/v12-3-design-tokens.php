@@ -48,5 +48,14 @@ foreach($contrast_pairs as $mode=>$pairs){
  }
 }
 if($contrast_count!==24){throw new RuntimeException('Incomplete 24-pair contrast suite');}
+foreach(['sabri-ui-page-title','sabri-ui-section-title','sabri-ui-body-text','sabri-ui-reading-width.sabri-ui-urdu-nastaliq'] as $selector) {
+ if(!str_contains($css,$selector)){throw new RuntimeException('Missing V12.3 type scale CSS selector: '.$selector);}
+}
+$typography = $spec['typography'] ?? [];
+if(($typography['reading_px']??null)!==18 || ($typography['reading_line_px']??null)!==34
+   || ($typography['remote_font_required']??true)!==false
+   || ($typography['requires_real_rendered_font_glyph_qa']??false)!==true){
+ throw new RuntimeException('Unverified or incomplete V12.3 typography contract');
+}
 if(($spec['staging_accepted']??true)!==false||($spec['live_verified']??true)!==false){throw new RuntimeException('Source-only release state misrepresented');}
 echo "V12.3 authored CSS/PHP + 24 contrast assertions passed (NOT staging/live)\n";

@@ -133,12 +133,39 @@ body.sabri-visual-system.sabri-shell-theme-dark {
 
 :where(.sabri-ui-reading-width) {
     inline-size: min(100%, var(--sabri-visual-content-reading));
+    font-size: 1.125rem; /* V12.3 §2.2: 18 CSS px */
+    line-height: 1.8889; /* 34 CSS px at the baseline size */
+}
+:where(.sabri-ui-page-title) {
+    font-size: clamp(1.75rem, 2.25vw, 2.25rem); /* 28 to 36 CSS px */
+    line-height: 1.28;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+:where(.sabri-ui-section-title) {
+    font-size: clamp(1.25rem, 1.75vw, 1.5rem); /* 20 to 24 CSS px */
+    line-height: 1.45;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+:where(.sabri-ui-body-text) {
+    font-size: 1rem; /* 16 CSS px */
+    line-height: 1.625; /* 26 CSS px */
+    overflow-wrap: anywhere;
 }
 :where(.sabri-ui-reading-width):lang(ur),
-:where(.sabri-ui-reading-width):lang(ar) {font-family:var(--sabri-visual-font-reading-arabic);line-height:1.9;}
-:where(.sabri-ui-urdu-nastaliq):lang(ur) {font-family:var(--sabri-visual-font-reading-urdu-optional);line-height:2.1;}
+:where(.sabri-ui-reading-width):lang(ar) {
+    font-family: var(--sabri-visual-font-reading-arabic);
+}
+:where(.sabri-ui-reading-width.sabri-ui-urdu-nastaliq):lang(ur) {
+    font-size: 1.25rem; /* 20 CSS px */
+    line-height: 2.1; /* 42 CSS px */
+    font-family: var(--sabri-visual-font-reading-urdu-optional);
+}
 :where(.sabri-ui-container):lang(ur),
-:where(.sabri-ui-container):lang(ar) {font-family:var(--sabri-visual-font-ui-arabic);}
+:where(.sabri-ui-container):lang(ar) {
+    font-family: var(--sabri-visual-font-ui-arabic);
+}
 
 :where(.sabri-ui-stack) {
     display: grid;

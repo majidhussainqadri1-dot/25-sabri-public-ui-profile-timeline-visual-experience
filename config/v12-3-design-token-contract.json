@@ -41,5 +41,27 @@
   },
   "staging_accepted": false,
   "live_verified": false,
-  "requires_file24_evidence": true
+  "requires_file24_evidence": true,
+  "typography": {
+    "plan": "V12.3 §2.2",
+    "page_title_px": [
+      28,
+      36
+    ],
+    "section_title_px": [
+      20,
+      24
+    ],
+    "body_px": 16,
+    "body_line_px": 26,
+    "reading_px": 18,
+    "reading_line_px": 34,
+    "nastaliq_optional_px": 20,
+    "nastaliq_line_px": 42,
+    "ui_arabic": "Noto Sans Arabic",
+    "reading_arabic": "Noto Naskh Arabic",
+    "reading_urdu_optional": "Noto Nastaliq Urdu",
+    "remote_font_required": false,
+    "requires_real_rendered_font_glyph_qa": true
+  }
 }
