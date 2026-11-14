@@ -25,8 +25,8 @@
     {
       "id": "W03",
       "title": "typography/components/accessibility",
-      "state": "source_controls_and_focus_tested_staging_pending",
-      "reason": "6 control families functional border + 4 preference/4 summary focus 3px; 44px targets on synthetic source, real WP QA pending"
+      "state": "source_mobile_keyboard_tested_staging_pending",
+      "reason": "Mobile Action Sheet Tab/Shift+Tab/Escape/outside click/resize source Chromium 14/14; actual installed staging and File24 still unknown"
     },
     {
       "id": "W04",
@@ -61,8 +61,8 @@
     {
       "id": "W09",
       "title": "WCAG 2.2 AA and human UX",
-      "state": "synthetic_keyboard_and_zoom_partial",
-      "reason": "Keyboard: 4 actions and 4 summary 3px visible focus, summary 44.8px in Light/Dark; real AT, forced-colors, WCAG 2.2 AA pending"
+      "state": "source_keyboard_browser_partial",
+      "reason": "New mobile action sheet Chromium synthetic 14/14 plus earlier 45/45 responsive; real AT and WCAG acceptance unavailable"
     },
     {
       "id": "W10",
@@ -89,7 +89,7 @@
   "migration_state": null,
   "live_verification_status": "UNVERIFIED",
   "live_resolved_defects": 0,
-  "notes": "0 verified means no proof, not absence of defects. No progress percentage certified. Six-scene contract declarations are NOT evidence screenshots. W08 new source freeze is NOT installed compatibility or permission validation. Source asset inventory is not measured route transfer or field Core Web Vitals. W03 control border synthetic Chromium test measured 4.05:1 light and 5.85:1 dark against surfaces, not independent File24 WCAG acceptance. Latest W09 synthetic 15-case zoom/reflow probe no overflow; not real WordPress zoom acceptance. Release staging host and metadata guards fail-closed source.",
+  "notes": "0 verified means no proof, not absence of defects. No progress percentage certified. Six-scene contract declarations are NOT evidence screenshots. W08 new source freeze is NOT installed compatibility or permission validation. Source asset inventory is not measured route transfer or field Core Web Vitals. W03 control border synthetic Chromium test measured 4.05:1 light and 5.85:1 dark against surfaces, not independent File24 WCAG acceptance. Latest W09 synthetic 15-case zoom/reflow probe no overflow; not real WordPress zoom acceptance. Release staging host and metadata guards fail-closed source. W03 genuine source-level mobile action sheet focus escape corrected, exact-source CI and native staging remain separate.",
   "source_traceability_register": "config/v12-3-file25-requirement-traceability.json",
   "traceability_scope": 14,
   "source_owner_freeze_register": "config/v12-3-file25-owner-source-freeze-2026-11-14.json",
