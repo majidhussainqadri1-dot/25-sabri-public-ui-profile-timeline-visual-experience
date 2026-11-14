@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased — 2026-11-14 — V12.3 source parity and six-scene acceptance (Draft PR #50)
+
+- V12.3 W00 baseline records GitHub source reality apart from disconnected Jetpack/WPVibe and unknown exact deployed plugin, DB/schema, migration and logs.
+- V12.3 W01 revisits 33 originally open PRs (26 ancestral, 3 divergent, 4 independent historical); safe, non-duplicative selection only.
+- V12.3 W02 adds light/dark semantic hover/focus/selected, functional-border values and PHP/CSS/File20 visual consumer parity, with 24 authored contrast regression pairs.
+- V12.3 W03 adds title/body/reading/optional Nastaliq typography scale and safe fallback stacks; no remote font download.
+- V12.3 W06 bumps Visual Acceptance contract to \`1.6.0\`; six owner-bound AJ-39 visual scene receipts are now compulsory for evidence shape checking, but no genuine screenshot bytes or identities have been authenticated.
+- Adds 14-ID source-to-acceptance traceability, source-only tests and explicit real-world blockers.
+- No GitHub main merge, production change, Staging installation or Live parity proof. Never infer Live Resolved from successful CI.
+
 ## Unreleased — 2026-11-11 — PR49 native public authority, provider cache and ETag safety
 
 - Fail closed on nonprofessional WordPress SEO indexing without canonical File03 public consent; keep eligible ordinary Doctor/Founder unfiltered pages indexable.
