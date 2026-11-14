@@ -111,21 +111,27 @@
 
 .spux-filter-bar__item {
     background: var(--spux-surface);
-    border: 1px solid var(--spux-border);
+    border: 1px solid var(--spux-control-border);
     border-radius: 999px;
     color: var(--spux-text);
     flex: 0 0 auto;
     font-weight: 750;
     min-height: 2.75rem;
+    min-width: 2.75rem;
     padding: 0.65rem 1rem;
     text-decoration: none;
 }
 
-.spux-filter-bar__item:hover,
-.spux-filter-bar__item.is-active {
-    background: var(--spux-primary-soft);
+.spux-filter-bar__item:hover {
+    background: var(--sabri-visual-hover, #065F3D);
     border-color: var(--spux-primary);
-    color: var(--spux-primary-strong);
+    color: var(--sabri-visual-on-hover, #FFFFFF);
+}
+
+.spux-filter-bar__item.is-active {
+    background: var(--sabri-visual-selected, var(--spux-primary-soft));
+    border-color: var(--spux-primary);
+    color: var(--sabri-visual-selected-text, var(--spux-primary-strong));
 }
 
 .spux-filter-bar__item:focus-visible {

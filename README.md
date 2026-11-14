@@ -4,6 +4,48 @@
 
 WordPress module for the **Sabri Social Homeopathy Platform**. This is the existing File 25; no duplicate File 26 is created.
 
+## Current V12.3 execution candidate — Draft PR #50, 14 November 2026
+
+**Governing plan:** \`Sabri-Website-Master-Plan-V12.3.docx\`; this candidate is source-only and is based on **unmerged** PR #49. GitHub main, Staging, installed WordPress and Live are separate truth domains.
+
+- **W00:** Exact source and connector status freeze; deployed plugin/version/checksum, DB/schema/options/migration/runtime logs still **unverified**.
+- **W01:** 33 original open PRs deduplicated into 26 ancestral, 3 parallel divergent and 4 independent historical. Do not individually merge ancestry or blindly carry over divergent historic trees.
+- **W02:** V12.3 §2.2 light/dark/hover/focus/functional-border semantic design tokens synchronized across CSS, PHP and File20 visual-consumer projection. New governed regression checks 24 authored contrast pairs; this is not real computed WCAG evidence.
+- **W03:** V12.3 typography scale for titles, sections, body, long reading and optional Nastaliq uses local fallback font families. Actual rendered Urdu/Arabic glyph, zoom and screen-reader QA remain pending.
+- **W06:** Visual Acceptance contract \`1.6.0\` now requires all six V12.3 §2.6 scenes (Home, Search, Settings, Doctor/Booking, Book/Lesson, Publishing). These are **evidence obligations**, not implemented native routes or collected screenshots. Each scene retains its owning domain; File24 independent review remains mandatory.
+- **14-ID evidence register:** \`config/v12-3-file25-requirement-traceability.json\` maps named V12.3 requirements to source, owner, tests, and missing actual evidence; not a 2066-requirement full audit.
+- **Source baseline:** PR #49's six privacy/provider/SEO/ETag corrections stay in the stacked candidate. No separate production incident is declared resolved.
+- **Live blocker:** WordPress.com Jetpack connection reported \`site_disconnected\`; no registered WPVibe site and WPVibe connection attempt HTTP 530 (root cause **not** identified). No authenticated deployed source or DB inspection was possible.
+- **Release governance:** default \`main\` is currently not protected; approved code review, branch protection, checksum and staging parity, rollback, Founder sign-off and Live re-test remain gates. Source CI and a downloadable artifact are *not* production approval.
+
+**Exact deployed code ابھی unverified ہے؛ repository-based diagnosis provisional ہے۔**
+
+### Durable V12.3 execution documents
+
+\`\`\`text
+config/v12-3-design-token-contract.json
+config/v12-3-file25-33-pr-audit-2026-11-14.json
+config/v12-3-file25-requirement-traceability.json
+config/v12-3-file25-w00-w12-execution-state-2026-11-14.json
+docs/V12.3-FILE25-W00-W02-2026-11-14.md
+docs/V12.3-FILE25-W01-33-PR-GOVERNANCE-2026-11-14.md
+docs/V12.3-FILE25-W06-SIX-SCENE-VISUAL-GATES-2026-11-14.md
+docs/V12.3-FILE25-REQUIREMENT-TRACEABILITY-2026-11-14.md
+tests/v12-3-design-tokens.php
+tests/v12-3-requirement-traceability.php
+\`\`\`
+
+**Current stage:** Source tests and packaging are useful evidence only. W04/W05 real native owner integration and W07–W12 real browser/Hostinger Staging/Live acceptance remain unverified.
+
+
+
+
+## V12.3 continued source execution — 14 November 2026 (Draft PR #50)
+
+- Additional source-only corrections: strict canonical staging host; prevent metadata-only acceptance; Dark profile aliases/Selected token parity; control border contrast and 44px target; 3px keyboard focus and native disclosure target sizing.
+- Independent native repository source freeze for File03/08/09/17/20/21/24/26 shows 4 stale historical references; does not establish deployed compatibility.
+- File25 source asset register covers 8 CSS/JS files and provisional six route budgets. Real Core Web Vitals, staging and File24 acceptance remain blocked.
+- Technical source evidence: `docs/V12.3-FILE25-CONTINUED-EXECUTION-HANDOFF-2026-11-14.md`. Source-only, main and Live untouched.
 
 ## V12.1 PR49 — native-owner Privacy / Provider / REST integration correction (Draft, 11 Nov 2026)
 

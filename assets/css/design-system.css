@@ -5,16 +5,30 @@
     --sabri-visual-primary-strong: #065C3B;
     --sabri-visual-primary-soft: #E7F5EE;
     --sabri-visual-on-primary: #FFFFFF;
-    --sabri-visual-text: #171717;
-    --sabri-visual-muted: #5f6368;
-    --sabri-visual-surface: #ffffff;
-    --sabri-visual-page: #f7f5f1;
-    --sabri-visual-border: #dfe2e6;
-    --sabri-visual-focus: #0b57d0;
-    --sabri-visual-success: #137333;
-    --sabri-visual-warning: #8a4b08;
-    --sabri-visual-danger: #b42318;
-    --sabri-visual-on-danger: #ffffff;
+    --sabri-visual-text: #15251E;
+    --sabri-visual-muted: #4A6155;
+    --sabri-visual-surface: #FFFFFF;
+    --sabri-visual-page: #F4F7F5;
+    --sabri-visual-border: #D6E1DA;
+    --sabri-visual-focus: #087A4E;
+    --sabri-visual-success: #065C3B;
+    --sabri-visual-warning: #664808;
+    --sabri-visual-danger: #9B3B36;
+    --sabri-visual-on-danger: #FFFFFF;
+    --sabri-visual-control-border: #6B8476;
+    --sabri-visual-hover: #065F3D;
+    --sabri-visual-on-hover: #FFFFFF;
+    --sabri-visual-selected: #E7F5EE;
+    --sabri-visual-selected-text: #065C3B;
+    --sabri-visual-success-surface: #E7F5EE;
+    --sabri-visual-warning-surface: #FFF5D9;
+    --sabri-visual-danger-surface: #FFF1EF;
+    --sabri-visual-information: #214B78;
+    --sabri-visual-information-surface: #EAF3FC;
+    --sabri-visual-font-ui-arabic: "Noto Sans Arabic", "Noto Sans", sans-serif;
+    --sabri-visual-font-ui-english: "Noto Sans", sans-serif;
+    --sabri-visual-font-reading-arabic: "Noto Naskh Arabic", serif;
+    --sabri-visual-font-reading-urdu-optional: "Noto Nastaliq Urdu", "Noto Naskh Arabic", serif;
     --sabri-visual-radius-control: 0.75rem;
     --sabri-visual-radius-card: 1rem;
     --sabri-visual-layout-gap: 1.5rem;
@@ -36,11 +50,14 @@
 body.sabri-visual-system {
     --spux-primary: var(--sabri-visual-primary);
     --spux-primary-strong: var(--sabri-visual-primary-strong);
+    --spux-primary-soft: var(--sabri-visual-primary-soft);
+    --spux-on-primary: var(--sabri-visual-on-primary);
     --spux-text: var(--sabri-visual-text);
     --spux-muted: var(--sabri-visual-muted);
     --spux-surface: var(--sabri-visual-surface);
     --spux-page: var(--sabri-visual-page);
     --spux-border: var(--sabri-visual-border);
+    --spux-control-border: var(--sabri-visual-control-border);
     --spux-focus: var(--sabri-visual-focus);
     --spux-danger: var(--sabri-visual-danger);
     --spux-warning: var(--sabri-visual-warning);
@@ -54,34 +71,60 @@ body.sabri-visual-system {
 /* File 25 also owns dark visual values; these are contextual display overrides,
  * while the canonical F25-CEN-01 green triplet remains frozen at :root. */
 body.sabri-visual-system.sabri-shell-theme-dark {
-    --sabri-visual-primary-strong: #E7F5EE;
-    --sabri-visual-text: #f3f4f6;
-    --sabri-visual-muted: #b7bec7;
-    --sabri-visual-surface: #181b1f;
-    --sabri-visual-page: #111315;
-    --sabri-visual-border: #30363d;
-    --sabri-visual-focus: #8ab4f8;
-    --sabri-visual-success: #81c995;
-    --sabri-visual-warning: #fdd663;
-    --sabri-visual-danger: #f28b82;
-    --sabri-visual-on-danger: #171717;
+    --sabri-visual-primary-strong: #70DCAB;
+    --sabri-visual-text: #E7F5EE;
+    --sabri-visual-muted: #B3C8BA;
+    --sabri-visual-surface: #1A2922;
+    --sabri-visual-page: #111B16;
+    --sabri-visual-border: #34493D;
+    --sabri-visual-focus: #70DCAB;
+    --sabri-visual-success: #B7EAD0;
+    --sabri-visual-warning: #F1D48A;
+    --sabri-visual-danger: #FFB5AC;
+    --sabri-visual-on-danger: #3D211F;
+    --sabri-visual-primary: #70DCAB;
+    --sabri-visual-primary-soft: #17392B;
+    --sabri-visual-on-primary: #111B16;
+    --sabri-visual-control-border: #90A699;
+    --sabri-visual-hover: #91EBC0;
+    --sabri-visual-on-hover: #111B16;
+    --sabri-visual-selected: #17392B;
+    --sabri-visual-selected-text: #70DCAB;
+    --sabri-visual-success-surface: #163527;
+    --sabri-visual-warning-surface: #392F17;
+    --sabri-visual-danger-surface: #3D211F;
+    --sabri-visual-information: #AFD8FF;
+    --sabri-visual-information-surface: #142536;
 }
 
 @media (prefers-color-scheme: dark) {
     body.sabri-visual-system.sabri-shell-theme-system,
     body.sabri-visual-system.sabri-visual-shell-degraded {
         color-scheme: dark;
-        --sabri-visual-primary-strong: #E7F5EE;
-        --sabri-visual-text: #f3f4f6;
-        --sabri-visual-muted: #b7bec7;
-        --sabri-visual-surface: #181b1f;
-        --sabri-visual-page: #111315;
-        --sabri-visual-border: #30363d;
-        --sabri-visual-focus: #8ab4f8;
-        --sabri-visual-success: #81c995;
-        --sabri-visual-warning: #fdd663;
-        --sabri-visual-danger: #f28b82;
-        --sabri-visual-on-danger: #171717;
+        --sabri-visual-primary-strong: #70DCAB;
+        --sabri-visual-text: #E7F5EE;
+        --sabri-visual-muted: #B3C8BA;
+        --sabri-visual-surface: #1A2922;
+        --sabri-visual-page: #111B16;
+        --sabri-visual-border: #34493D;
+        --sabri-visual-focus: #70DCAB;
+        --sabri-visual-success: #B7EAD0;
+        --sabri-visual-warning: #F1D48A;
+        --sabri-visual-danger: #FFB5AC;
+        --sabri-visual-on-danger: #3D211F;
+        --sabri-visual-primary: #70DCAB;
+        --sabri-visual-primary-soft: #17392B;
+        --sabri-visual-on-primary: #111B16;
+        --sabri-visual-control-border: #90A699;
+        --sabri-visual-hover: #91EBC0;
+        --sabri-visual-on-hover: #111B16;
+        --sabri-visual-selected: #17392B;
+        --sabri-visual-selected-text: #70DCAB;
+        --sabri-visual-success-surface: #163527;
+        --sabri-visual-warning-surface: #392F17;
+        --sabri-visual-danger-surface: #3D211F;
+        --sabri-visual-information: #AFD8FF;
+        --sabri-visual-information-surface: #142536;
     }
 }
 
@@ -91,7 +134,40 @@ body.sabri-visual-system.sabri-shell-theme-dark {
 }
 
 :where(.sabri-ui-reading-width) {
+    box-sizing: border-box;
     inline-size: min(100%, var(--sabri-visual-content-reading));
+    font-size: 1.125rem; /* V12.3 §2.2: 18 CSS px */
+    line-height: 1.8889; /* 34 CSS px at the baseline size */
+}
+:where(.sabri-ui-page-title) {
+    font-size: clamp(1.75rem, 2.25vw, 2.25rem); /* 28 to 36 CSS px */
+    line-height: 1.28;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+:where(.sabri-ui-section-title) {
+    font-size: clamp(1.25rem, 1.75vw, 1.5rem); /* 20 to 24 CSS px */
+    line-height: 1.45;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+:where(.sabri-ui-body-text) {
+    font-size: 1rem; /* 16 CSS px */
+    line-height: 1.625; /* 26 CSS px */
+    overflow-wrap: anywhere;
+}
+:where(.sabri-ui-reading-width):lang(ur),
+:where(.sabri-ui-reading-width):lang(ar) {
+    font-family: var(--sabri-visual-font-reading-arabic);
+}
+:where(.sabri-ui-reading-width.sabri-ui-urdu-nastaliq):lang(ur) {
+    font-size: 1.25rem; /* 20 CSS px */
+    line-height: 2.1; /* 42 CSS px */
+    font-family: var(--sabri-visual-font-reading-urdu-optional);
+}
+:where(.sabri-ui-container):lang(ur),
+:where(.sabri-ui-container):lang(ar) {
+    font-family: var(--sabri-visual-font-ui-arabic);
 }
 
 :where(.sabri-ui-stack) {
@@ -143,7 +219,7 @@ body.sabri-visual-system.sabri-shell-theme-dark {
 
 :where(.sabri-ui-button--secondary) {
     background: var(--sabri-visual-surface);
-    border-color: var(--sabri-visual-border);
+    border-color: var(--sabri-visual-control-border);
     color: var(--sabri-visual-text);
 }
 
@@ -153,6 +229,17 @@ body.sabri-visual-system.sabri-shell-theme-dark {
 }
 
 :where(.sabri-ui-button:hover) {
+    background: var(--sabri-visual-hover);
+    color: var(--sabri-visual-on-hover);
+}
+:where(.sabri-ui-button--secondary:hover) {
+    background: var(--sabri-visual-surface);
+    color: var(--sabri-visual-text);
+    filter: brightness(0.96);
+}
+:where(.sabri-ui-button--danger:hover) {
+    background: var(--sabri-visual-danger);
+    color: var(--sabri-visual-on-danger);
     filter: brightness(0.96);
 }
 
@@ -193,7 +280,11 @@ body.sabri-visual-system.sabri-shell-theme-dark {
     color: var(--sabri-visual-danger);
 }
 
-:where(.sabri-ui-badge--info, .sabri-ui-badge--primary) {
+:where(.sabri-ui-badge--info) {
+    border-color: var(--sabri-visual-information);
+    color: var(--sabri-visual-information);
+}
+:where(.sabri-ui-badge--primary) {
     border-color: var(--sabri-visual-primary);
     color: var(--sabri-visual-primary-strong);
 }
@@ -388,7 +479,7 @@ body.sabri-visual-system.sabri-shell-theme-dark {
 
 :where(.sabri-ui-input, .sabri-ui-select, .sabri-ui-textarea) {
     background: var(--sabri-visual-surface);
-    border: 1px solid var(--sabri-visual-border);
+    border: 1px solid var(--sabri-visual-control-border);
     border-radius: var(--sabri-visual-radius-control);
     color: var(--sabri-visual-text);
     font: inherit;

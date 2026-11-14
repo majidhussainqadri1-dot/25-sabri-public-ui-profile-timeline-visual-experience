@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased — 2026-11-14 — V12.3 extended W03/W08/W09/W10/W11 source corrections (Draft PR #50)
+
+- Fail-closed canonical staging metadata and distinguish File25 metadata validity from File24 independent release approval.
+- Repair inherited Dark profile button aliases and Selected state, interactive functional borders and minimum touch target sizes.
+- Add 3px visible keyboard focus for 4 preference actions + 4 native disclosure summaries; preserve native summary semantics.
+- Freeze current eight native owner GitHub source HEADs, four stale historical references, six provisional route budgets and exact-hash eight source CSS/JS assets.
+- Keep Source CI, Chromium synthetic fixtures, Staging and Live as separate realities; source improvements are not proof of deployed resolution.
+
+## Unreleased — 2026-11-14 — V12.3 source parity and six-scene acceptance (Draft PR #50)
+
+- V12.3 W00 baseline records GitHub source reality apart from disconnected Jetpack/WPVibe and unknown exact deployed plugin, DB/schema, migration and logs.
+- V12.3 W01 revisits 33 originally open PRs (26 ancestral, 3 divergent, 4 independent historical); safe, non-duplicative selection only.
+- V12.3 W02 adds light/dark semantic hover/focus/selected, functional-border values and PHP/CSS/File20 visual consumer parity, with 24 authored contrast regression pairs.
+- V12.3 W03 adds title/body/reading/optional Nastaliq typography scale and safe fallback stacks; no remote font download.
+- V12.3 W06 bumps Visual Acceptance contract to \`1.6.0\`; six owner-bound AJ-39 visual scene receipts are now compulsory for evidence shape checking, but no genuine screenshot bytes or identities have been authenticated.
+- Adds 14-ID source-to-acceptance traceability, source-only tests and explicit real-world blockers.
+- No GitHub main merge, production change, Staging installation or Live parity proof. Never infer Live Resolved from successful CI.
+
 ## Unreleased — 2026-11-11 — PR49 native public authority, provider cache and ETag safety
 
 - Fail closed on nonprofessional WordPress SEO indexing without canonical File03 public consent; keep eligible ordinary Doctor/Founder unfiltered pages indexable.

@@ -1,0 +1,126 @@
+{
+  "schema": "file25.v12.3.performance_source_inventory.v1",
+  "date": "2026-11-14",
+  "governing_source": "Sabri-Website-Master-Plan-V12.3.docx §2.7 and File25 execution plan W10",
+  "source_only": true,
+  "asset_binary_source_commit": "5b1781fd9feb4c47efb035e71ab8bfbb3aaaa0dd",
+  "initial_budgets_not_release_acceptance": true,
+  "installed_staging_measured": false,
+  "actual_route_transfer_measured": false,
+  "field_p75_verified": false,
+  "cdn_or_server_compression_verified": false,
+  "lab_lcp_ms": null,
+  "field_lcp_p75_ms": null,
+  "field_inp_p75_ms": null,
+  "field_cls_p75": null,
+  "required_field_thresholds": {
+    "lcp_ms": 2500,
+    "inp_ms": 200,
+    "cls": 0.1
+  },
+  "file25_css_js_raw_budget_bytes": 131072,
+  "source_asset_totals": {
+    "file_count": 8,
+    "raw_bytes": 85995,
+    "independent_local_gzip_bytes": 20529
+  },
+  "source_assets": [
+    {
+      "path": "assets/css/companion-token-bridge.css",
+      "raw_bytes": 1772,
+      "local_gzip_bytes": 459,
+      "sha256": "747ea326e5c146b1821340b82de760df3cf6e6d3f436c8cc1f7fe4fb664e7dd3"
+    },
+    {
+      "path": "assets/css/design-system-components.css",
+      "raw_bytes": 1297,
+      "local_gzip_bytes": 536,
+      "sha256": "c441b77b824d7fa9a6cd540ca53385db3949284799b850ac29d3837c59473d11"
+    },
+    {
+      "path": "assets/css/design-system.css",
+      "raw_bytes": 18998,
+      "local_gzip_bytes": 3679,
+      "sha256": "36ea15f22f04d69f7dbbad1636e2d4c889494324616ce9c486b46d603f8acfd0"
+    },
+    {
+      "path": "assets/css/future-public-experience.css",
+      "raw_bytes": 9127,
+      "local_gzip_bytes": 2194,
+      "sha256": "f2bbe279013b47006e6422888240fc03532eeb0d2255b032bc26d4cd3eff58be"
+    },
+    {
+      "path": "assets/css/profile-sections.css",
+      "raw_bytes": 4340,
+      "local_gzip_bytes": 1183,
+      "sha256": "9678739f108c786539b5ebde6b7deb10af42346cb150e21718ad43045d90b47b"
+    },
+    {
+      "path": "assets/css/public.css",
+      "raw_bytes": 12566,
+      "local_gzip_bytes": 2766,
+      "sha256": "9206a61b06ecffa09fc4976c572de916c2de465d947753470c157f479882d446"
+    },
+    {
+      "path": "assets/js/future-public-experience.js",
+      "raw_bytes": 33607,
+      "local_gzip_bytes": 8250,
+      "sha256": "59eb03c00dddd406f0d0a28dd79dacfef0c2f2269f97f66944fbf20100d98cc5"
+    },
+    {
+      "path": "assets/js/public.js",
+      "raw_bytes": 4288,
+      "local_gzip_bytes": 1462,
+      "sha256": "5e6c321b41557cc0baf24e9940bc3adf3d9370b1e47ef6e99c7a3f86402c806f"
+    }
+  ],
+  "route_budgets": [
+    {
+      "name": "Home",
+      "html_css_js_kib": 200,
+      "font_image_kib": 280,
+      "lab_status": "not_measured",
+      "field_status": "not_measured"
+    },
+    {
+      "name": "Search",
+      "html_css_js_kib": 225,
+      "font_image_kib": 210,
+      "lab_status": "not_measured",
+      "field_status": "not_measured"
+    },
+    {
+      "name": "Lesson/Book",
+      "html_css_js_kib": 275,
+      "font_image_kib": 230,
+      "lab_status": "not_measured",
+      "field_status": "not_measured"
+    },
+    {
+      "name": "Doctor/Appointment",
+      "html_css_js_kib": 250,
+      "font_image_kib": 250,
+      "lab_status": "not_measured",
+      "field_status": "not_measured"
+    },
+    {
+      "name": "Settings",
+      "html_css_js_kib": 225,
+      "font_image_kib": 160,
+      "lab_status": "not_measured",
+      "field_status": "not_measured"
+    },
+    {
+      "name": "Composer/Preview",
+      "html_css_js_kib": 300,
+      "font_image_kib": 200,
+      "lab_status": "not_measured",
+      "field_status": "not_measured"
+    }
+  ],
+  "next_exact_asset_commit_pending_update": false,
+  "source_visual_control_review": "W03 interactive control border correction: 3:1 required, local Chromium light/dark green",
+  "W09_keyboard_focus_source_fixture": "4 preference and 4 disclosure focus targets: Chromium 1px auto -> 3px solid, disclosure 25.59px -> 44.78px (local source fixture)",
+  "mobile_sheet_source_browser_evidence": "Chromium 14/14 synthetic profile in ur/RTL and en/LTR; source-level only",
+  "provenance_note": "SHA-256 and byte count from exact GitHub JS blob 4cd2f18b825ac9911bad0b8502b231875b5f7cb6; corrected after exact CI exposed local-draft mismatch."
+}

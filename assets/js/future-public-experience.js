@@ -184,12 +184,15 @@
     }
 
     const actions = profileRoot.querySelector('.spux-hero .spux-actions');
+    let actionSheetToggle = null;
     if (actions) {
         if (!actions.id) actions.id = 'spux-profile-actions';
         const toggle = element('button', 'spux-button spux-button--secondary spux-action-sheet-toggle', t('actionsLabel', 'Profile actions'));
         toggle.type = 'button';
         toggle.dataset.spuxActionSheetToggle = '';
         toggle.setAttribute('aria-controls', actions.id);
+        toggle.setAttribute('aria-haspopup', 'dialog');
+        actionSheetToggle = toggle;
         toggle.setAttribute('aria-expanded', 'false');
         actions.parentNode?.insertBefore(toggle, actions);
 
@@ -463,9 +466,37 @@
 
     applyPrefs(initialPrefs);
 
+    // V12.3-W03-MOBILE-SHEET-BEGIN: File25-local keyboard-operable action sheet.
+    const actionSheetFocusables = () => !actions ? [] : [
+        ...actions.querySelectorAll('a[href], button:not([disabled]), summary, input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'),
+    ].filter((node) => node.getClientRects().length > 0 && !node.closest('[inert]'));
+    // V12.3-W03-MOBILE-FOCUS-BOUNDARY-BEGIN
+    const actionSheetBoundaryTarget = (list, active, backwards) => {
+        if (!Array.isArray(list) || list.length === 0) return null;
+        if (!list.includes(active)) return backwards ? list[list.length - 1] : list[0];
+        if (backwards && active === list[0]) return list[list.length - 1];
+        if (!backwards && active === list[list.length - 1]) return list[0];
+        return null;
+    };
+    // V12.3-W03-MOBILE-FOCUS-BOUNDARY-END
+    const closeActionSheet = (restoreFocus = true) => {
+        if (!actions || !actionSheetToggle) return;
+        actions.classList.remove('is-open');
+        actions.removeAttribute('role');
+        actions.removeAttribute('aria-modal');
+        actions.removeAttribute('aria-label');
+        actionSheetToggle.setAttribute('aria-expanded', 'false');
+        if (restoreFocus && actionSheetToggle.getClientRects().length) actionSheetToggle.focus();
+    };
+    // V12.3-W03-MOBILE-SHEET-END
+
     document.addEventListener('click', (event) => {
         const target = event.target instanceof Element ? event.target : null;
-        if (!target || !profileRoot.contains(target)) return;
+        if (!target) return;
+        if (actions?.classList.contains('is-open') && !actions.contains(target) && !actionSheetToggle?.contains(target)) {
+            closeActionSheet(false);
+        }
+        if (!profileRoot.contains(target)) return;
         const pref = target.closest('[data-spux-pref]');
         if (pref) {
             const key = pref.dataset.spuxPref || '';
@@ -486,10 +517,21 @@
         const toggle = target.closest('[data-spux-action-sheet-toggle]');
         if (toggle && actions) {
             const open = !actions.classList.contains('is-open');
-            actions.classList.toggle('is-open', open);
-            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-            if (open) setTimeout(() => actions.querySelector('a[href],button:not([disabled]),summary')?.focus(), 0);
-            else toggle.focus();
+            if (!open) {
+                closeActionSheet(true);
+                return;
+            }
+            actions.classList.add('is-open');
+            actions.setAttribute('role', 'dialog');
+            actions.setAttribute('aria-modal', 'true');
+            actions.setAttribute('aria-label', t('actionsLabel', 'Profile actions'));
+            toggle.setAttribute('aria-expanded', 'true');
+            setTimeout(() => {
+                if (!actions.classList.contains('is-open')) return;
+                const first = actionSheetFocusables()[0];
+                if (first) first.focus();
+                else closeActionSheet(true);
+            }, 0);
             return;
         }
         const copy = target.closest('[data-spux-copy-url]');
@@ -523,14 +565,31 @@
     });
 
     document.addEventListener('keydown', (event) => {
-        if (event.key !== 'Escape' || !actions?.classList.contains('is-open')) return;
-        actions.classList.remove('is-open');
-        const toggle = profileRoot.querySelector('[data-spux-action-sheet-toggle]');
-        if (toggle) {
-            toggle.setAttribute('aria-expanded', 'false');
-            toggle.focus();
+        if (!actions?.classList.contains('is-open')) return;
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            closeActionSheet(true);
+            return;
+        }
+        if (event.key !== 'Tab') return;
+        const focusable = actionSheetFocusables();
+        if (!focusable.length) {
+            event.preventDefault();
+            closeActionSheet(true);
+            return;
+        }
+        const next = actionSheetBoundaryTarget(focusable, document.activeElement, event.shiftKey);
+        if (next) {
+            event.preventDefault();
+            next.focus();
         }
     });
+    // A mobile-only dialog must lose modal semantics on wide-screen resize.
+    if (actions && actionSheetToggle) {
+        addEventListener('resize', () => {
+            if (window.innerWidth > 720 && actions.classList.contains('is-open')) closeActionSheet(false);
+        });
+    }
 
     const translationRoot = profileRoot.querySelector('[data-spux-translations]');
     if (translationRoot) {

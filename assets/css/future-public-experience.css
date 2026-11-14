@@ -32,13 +32,23 @@
 .spux-translation-panel__switcher button,
 .spux-time-navigator__item {
     min-block-size: 2.75rem;
+    min-inline-size: 2.75rem;
     padding: .55rem .8rem;
-    border: 1px solid var(--sabri-visual-border, #d9e4de);
+    border: 1px solid var(--sabri-visual-control-border, #6B8476);
     border-radius: 999px;
     background: var(--sabri-visual-surface, #fff);
     color: var(--sabri-visual-text, #14251c);
     text-decoration: none;
     cursor: pointer;
+}
+
+/* V12.3 keyboard operability: visible 3px focus on all public preference actions. */
+.spux-pref-toggle:focus-visible,
+.spux-pref-reset:focus-visible,
+.spux-translation-panel__switcher button:focus-visible,
+.spux-time-navigator__item:focus-visible {
+    outline: 3px solid var(--sabri-visual-focus, #087A4E);
+    outline-offset: 3px;
 }
 
 .spux-pref-toggle[aria-pressed="true"],
@@ -160,8 +170,20 @@
 .spux-privacy-preview summary,
 .spux-quality-score summary,
 .spux-era-summary summary {
+    box-sizing: border-box;
     cursor: pointer;
     font-weight: 700;
+    min-block-size: 2.75rem;
+    padding-block: 0.6rem;
+    padding-inline: 0.25rem;
+}
+
+.spux-citation-drawer summary:focus-visible,
+.spux-privacy-preview summary:focus-visible,
+.spux-quality-score summary:focus-visible,
+.spux-era-summary summary:focus-visible {
+    outline: 3px solid var(--sabri-visual-focus, #087A4E);
+    outline-offset: 3px;
 }
 
 .spux-quality-score {
