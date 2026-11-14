@@ -23,6 +23,7 @@
       "tests/v12-3-design-tokens.php",
       "tests/v12-3-requirement-traceability.php",
       "tests/v12-3-owner-source-freeze.php",
+      "tests/v12-3-performance-source-inventory.php",
       "tests/release-engineering.php",
       "tests/review94-133-forty-round-adversarial.php",
       "tests/review134-173-current-directives.php",

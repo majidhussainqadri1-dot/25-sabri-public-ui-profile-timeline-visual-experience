@@ -67,8 +67,8 @@
     {
       "id": "W10",
       "title": "Core Web Vitals field QA",
-      "state": "blocked",
-      "reason": "p75 mobile/desktop field evidence pending"
+      "state": "source_assets_measured_route_field_blocked",
+      "reason": "8 exact-hash File25 CSS/JS source assets total 82,338 raw bytes; initial route budgets frozen; actual staging route and p75 field evidence unavailable"
     },
     {
       "id": "W11",
@@ -89,9 +89,10 @@
   "migration_state": null,
   "live_verification_status": "UNVERIFIED",
   "live_resolved_defects": 0,
-  "notes": "0 verified means no proof, not absence of defects. No progress percentage certified. Six-scene contract declarations are NOT evidence screenshots. W08 new source freeze is NOT installed compatibility or permission validation.",
+  "notes": "0 verified means no proof, not absence of defects. No progress percentage certified. Six-scene contract declarations are NOT evidence screenshots. W08 new source freeze is NOT installed compatibility or permission validation. Source asset inventory is not measured route transfer or field Core Web Vitals.",
   "source_traceability_register": "config/v12-3-file25-requirement-traceability.json",
   "traceability_scope": 14,
   "source_owner_freeze_register": "config/v12-3-file25-owner-source-freeze-2026-11-14.json",
-  "last_audited_source_sha": "3f1a433d04756e19fc4bc445ef5f2216a19488f6"
+  "last_audited_source_sha": "3f1a433d04756e19fc4bc445ef5f2216a19488f6",
+  "source_performance_inventory": "config/v12-3-file25-performance-source-inventory-2026-11-14.json"
 }
