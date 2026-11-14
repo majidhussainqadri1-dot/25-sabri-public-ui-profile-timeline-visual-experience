@@ -8,7 +8,7 @@ $public = file_get_contents($root . '/assets/css/public.css');
 $spec = json_decode((string)file_get_contents($root.'/config/v12-3-design-token-contract.json'),true,512,JSON_THROW_ON_ERROR);
 if(!is_string($css)||!is_string($public)){throw new RuntimeException('Missing CSS');}
 function f25map(string $s):array {preg_match_all('/(--sabri-visual-[\w-]+)\s*:\s*([^;]+);/', $s,$m,PREG_SET_ORDER);$o=[];foreach($m as $x){$o[substr($x[1],15)]=trim($x[2]);}return $o;}
-preg_match('/^:root\s*\{([^}]+)\}/s',$css,$r);
+preg_match('/^:root\s*\{([^}]+)\}/ms',$css,$r);
 preg_match('/body\.sabri-visual-system\.sabri-shell-theme-dark\s*\{([^}]+)\}/s',$css,$d);
 preg_match('/body\.sabri-visual-system\.sabri-visual-shell-degraded\s*\{([^}]+)\}/s',$css,$sys);
 if(empty($r[1])||empty($d[1])||empty($sys[1])){throw new RuntimeException('Missing light/dark scope');}
