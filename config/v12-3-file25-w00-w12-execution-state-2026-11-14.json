@@ -1,0 +1,93 @@
+{
+  "schema": "file25.v12.3.W00-W12.execution-state.v1",
+  "date": "2026-11-14",
+  "scope": "file25",
+  "source_head_at_start": "95854b4633ff4d63fd7fc242bab42c6f647c3d56",
+  "gates": [
+    {
+      "id": "W00",
+      "title": "live/stage/repository freeze",
+      "state": "partial",
+      "reason": "source_frozen; live and DB unknown"
+    },
+    {
+      "id": "W01",
+      "title": "33 PR dedup and approved unique source",
+      "state": "partial",
+      "reason": "33 classified; divergent behaviors and independent review not accepted"
+    },
+    {
+      "id": "W02",
+      "title": "V12.3 light/dark tokens",
+      "state": "source_candidate",
+      "reason": "authored source patch; CI, computed style and File24 pending"
+    },
+    {
+      "id": "W03",
+      "title": "typography/components/accessibility",
+      "state": "partial",
+      "reason": "font stacks added; full catalogue/browser QA outstanding"
+    },
+    {
+      "id": "W04",
+      "title": "public profile privacy",
+      "state": "source_candidate",
+      "reason": "PR49 six fixes; actual owner contracts and live role tests pending"
+    },
+    {
+      "id": "W05",
+      "title": "timeline source truth",
+      "state": "source_candidate",
+      "reason": "PR49 source; File21 provider/real data test pending"
+    },
+    {
+      "id": "W06",
+      "title": "six visual scenes",
+      "state": "blocked",
+      "reason": "native owners, real screenshot bytes and File24 reviewer pending"
+    },
+    {
+      "id": "W07",
+      "title": "responsive RTL and settings",
+      "state": "blocked",
+      "reason": "real device/viewport/RTL tests pending"
+    },
+    {
+      "id": "W08",
+      "title": "native integration privacy",
+      "state": "blocked",
+      "reason": "File03/08/09/17/20/21/24/26 installed contract parity pending"
+    },
+    {
+      "id": "W09",
+      "title": "WCAG 2.2 AA and human UX",
+      "state": "blocked",
+      "reason": "browser/screen readers/human testing pending"
+    },
+    {
+      "id": "W10",
+      "title": "Core Web Vitals field QA",
+      "state": "blocked",
+      "reason": "p75 mobile/desktop field evidence pending"
+    },
+    {
+      "id": "W11",
+      "title": "staging package backup rollback approval",
+      "state": "blocked",
+      "reason": "staging access and founder signoff pending"
+    },
+    {
+      "id": "W12",
+      "title": "live deploy parity and retest",
+      "state": "blocked",
+      "reason": "deploy blocked until W11"
+    }
+  ],
+  "repository_head": "347a4ff4d4c233c5ea6cd82c7786ee5398ea9d1e",
+  "deployed_version": null,
+  "db_version": null,
+  "migration_state": null,
+  "live_verification_status": "UNVERIFIED",
+  "live_resolved_defects": 0,
+  "notes": "0 verified means no proof, not absence of defects. No progress percentage certified."
+}
