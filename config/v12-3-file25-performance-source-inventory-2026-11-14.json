@@ -3,7 +3,7 @@
   "date": "2026-11-14",
   "governing_source": "Sabri-Website-Master-Plan-V12.3.docx §2.7 and File25 execution plan W10",
   "source_only": true,
-  "asset_binary_source_commit": "3f1a433d04756e19fc4bc445ef5f2216a19488f6",
+  "asset_binary_source_commit": null,
   "initial_budgets_not_release_acceptance": true,
   "installed_staging_measured": false,
   "actual_route_transfer_measured": false,
@@ -21,8 +21,8 @@
   "file25_css_js_raw_budget_bytes": 131072,
   "source_asset_totals": {
     "file_count": 8,
-    "raw_bytes": 82338,
-    "independent_local_gzip_bytes": 19681
+    "raw_bytes": 82618,
+    "independent_local_gzip_bytes": 19751
   },
   "source_assets": [
     {
@@ -45,15 +45,15 @@
     },
     {
       "path": "assets/css/future-public-experience.css",
-      "raw_bytes": 8377,
-      "local_gzip_bytes": 2033,
-      "sha256": "fda80574625575b644a34afd7854bdd7e266ccf8d898dc39fdd20d5103db64c3"
+      "raw_bytes": 8415,
+      "local_gzip_bytes": 2045,
+      "sha256": "8b38d16b4467f52cb124d884483ab79ff01102eda75d4a94363f560bb492d836"
     },
     {
       "path": "assets/css/profile-sections.css",
-      "raw_bytes": 4098,
-      "local_gzip_bytes": 1125,
-      "sha256": "15ea9123ff1e2a8704c4b0ccaffffaf64503e899a887e0d1c1cb3bcb21d561e7"
+      "raw_bytes": 4340,
+      "local_gzip_bytes": 1183,
+      "sha256": "9678739f108c786539b5ebde6b7deb10af42346cb150e21718ad43045d90b47b"
     },
     {
       "path": "assets/css/public.css",
@@ -117,5 +117,7 @@
       "lab_status": "not_measured",
       "field_status": "not_measured"
     }
-  ]
+  ],
+  "next_exact_asset_commit_pending_update": true,
+  "source_visual_control_review": "W03 interactive control border correction: 3:1 required, local Chromium light/dark green"
 }

@@ -32,8 +32,9 @@
 .spux-translation-panel__switcher button,
 .spux-time-navigator__item {
     min-block-size: 2.75rem;
+    min-inline-size: 2.75rem;
     padding: .55rem .8rem;
-    border: 1px solid var(--sabri-visual-border, #d9e4de);
+    border: 1px solid var(--sabri-visual-control-border, #6B8476);
     border-radius: 999px;
     background: var(--sabri-visual-surface, #fff);
     color: var(--sabri-visual-text, #14251c);
