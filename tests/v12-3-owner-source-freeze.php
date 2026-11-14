@@ -19,7 +19,7 @@ foreach(($r['rows']??[]) as $row){
   if(($row[$flag]??true)!==false){throw new RuntimeException('Premature owner acceptance: '.$id);}
  }
  foreach(['installed_plugin_version','installed_schema_version'] as $field){
-  if(($row[$field]??'not null')!==null){throw new RuntimeException('Invented installed version: '.$id);}
+  if(!array_key_exists($field,$row) || $row[$field]!==null){throw new RuntimeException('Invented installed version: '.$id);}
  }
  if(($row['source_drift_from_record']??'')==='ahead'){
   $changed++;
