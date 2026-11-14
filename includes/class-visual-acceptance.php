@@ -11,7 +11,8 @@ if (! defined('ABSPATH') && PHP_SAPI !== 'cli') {
 /** Machine-readable Definition-of-Done matrix and evidence validator. */
 final class Visual_Acceptance
 {
-    public const CONTRACT_VERSION = '1.6.0';
+    public const CONTRACT_VERSION = '1.7.0';
+    public const CANONICAL_STAGING_HOST = 'sabrisocialstaging.sabrihomeopathy.com';
 
     private const VIEWPORTS = [
         'mobile-small' => ['width' => 320, 'height' => 568],
@@ -89,6 +90,9 @@ final class Visual_Acceptance
             'contract_version' => self::CONTRACT_VERSION,
             'owner' => 'file-25',
             'shell_owner' => 'file-20',
+            'canonical_staging_host' => self::CANONICAL_STAGING_HOST,
+            'evidence_summary_scope' => 'metadata-only',
+            'release_acceptance_owner' => 'file-24',
             'viewports' => self::VIEWPORTS,
             'directions' => self::DIRECTIONS,
             'color_modes' => self::COLOR_MODES,
@@ -155,15 +159,27 @@ final class Visual_Acceptance
         return array_values(array_unique($errors));
     }
 
-    /** @param array<string,mixed> $evidence @return array{accepted:bool,error_count:int,errors:list<string>} */
+    /**
+     * Only metadata is checked here: syntactically plausible SHA-256 values
+     * do not prove screenshot bytes or authenticate a reviewer. File24 must
+     * independently verify artifacts and release acceptance.
+     *
+     * @param array<string,mixed> $evidence
+     * @return array{accepted:bool,metadata_valid:bool,error_count:int,errors:list<string>,release_blockers:list<string>}
+     */
     public static function summarize(array $evidence): array
     {
         $errors = self::validate_evidence($evidence);
 
         return [
-            'accepted' => $errors === [],
+            'accepted' => false,
+            'metadata_valid' => $errors === [],
             'error_count' => count($errors),
             'errors' => $errors,
+            'release_blockers' => [
+                'Independent File24 artifact-byte and reviewer verification is required.',
+                'Exact installed Staging/DB/owner-contract parity is required.',
+            ],
         ];
     }
 
@@ -278,6 +294,14 @@ final class Visual_Acceptance
         }
         if (! self::https_url($record['site_url'] ?? null)) {
             $errors[] = 'Invalid staging site URL.';
+        } else {
+            $parts = parse_url(trim((string) $record['site_url']));
+            $host = is_array($parts) ? strtolower((string) ($parts['host'] ?? '')) : '';
+            $path = is_array($parts) ? (string) ($parts['path'] ?? '/') : '';
+            $port = is_array($parts) ? ($parts['port'] ?? 443) : null;
+            if ($host !== self::CANONICAL_STAGING_HOST || ! in_array($path, ['', '/'], true) || $port !== 443) {
+                $errors[] = 'Staging evidence must identify the canonical Hostinger staging root, never Live or an arbitrary host.';
+            }
         }
         $record_commit = self::commit_sha($record['commit_sha'] ?? null);
         if ($record_commit === '' || $target_commit === '' || ! hash_equals($target_commit, $record_commit)) {

@@ -7,6 +7,7 @@ if (! defined('ABSPATH')) {
 }
 
 require_once dirname(__DIR__) . '/includes/class-visual-acceptance.php';
+require_once dirname(__DIR__) . '/includes/class-staging-probe.php';
 
 use Sabri\PublicExperience\Visual_Acceptance;
 
@@ -20,7 +21,9 @@ $check = static function (bool $condition, string $message) use (&$failures): vo
 $contract = Visual_Acceptance::contract();
 $check(($contract['owner'] ?? '') === 'file-25', 'File 25 must own visual acceptance.');
 $check(($contract['shell_owner'] ?? '') === 'file-20', 'File 20 must remain the shell owner.');
-$check(($contract['contract_version'] ?? '') === '1.6.0', 'Visual acceptance contract must include V12.3 six-scene evidence obligations.');
+$check(($contract['contract_version'] ?? '') === '1.7.0', 'File25 must separate metadata from File24 release acceptance.');
+$check(($contract['canonical_staging_host'] ?? '') === \Sabri\PublicExperience\Staging_Probe::CANONICAL_STAGING_HOST, 'Visual acceptance staging host must match Staging Probe.');
+$check(($contract['evidence_summary_scope'] ?? '') === 'metadata-only' && ($contract['release_acceptance_owner'] ?? '') === 'file-24', 'Only File24 may verify release artifacts.');
 $check(($contract['green_ci_is_acceptance'] ?? true) === false, 'Green CI must not be treated as visual acceptance.');
 $check(($contract['source_contract_is_acceptance'] ?? true) === false, 'Source contracts must not be treated as visual acceptance.');
 $check(($contract['target_commit_sha_required'] ?? false) === true, 'All evidence must be bound to one target commit.');
@@ -93,7 +96,7 @@ $complete = [
     'input_modes' => [],
     'staging_environment' => [
         'environment' => 'staging',
-        'site_url' => 'https://staging.example.test/',
+        'site_url' => 'https://sabrisocialstaging.sabrihomeopathy.com/',
         'commit_sha' => $target,
         'wordpress_version' => '7.0.1',
         'php_version' => '8.3.30',
@@ -133,7 +136,23 @@ $missingV12 = $complete;
 unset($missingV12['surfaces']['permission-denied-state']);
 $check(Visual_Acceptance::validate_evidence($missingV12) !== [], 'A staging manifest missing permission-denied evidence must not be accepted.');
 $summary = Visual_Acceptance::summarize($complete);
-$check(($summary['accepted'] ?? false) === true && ($summary['error_count'] ?? 1) === 0, 'Complete evidence summary must be accepted.');
+$check(($summary['accepted'] ?? true) === false && ($summary['metadata_valid'] ?? false) === true && ($summary['error_count'] ?? 1) === 0, 'Synthetic shape-valid metadata cannot be release accepted.');
+$check(count((array) ($summary['release_blockers'] ?? [])) === 2, 'Independent acceptance blockers must remain explicit.');
+
+// Reproduced before this fix: arbitrary HTTPS and Live were accepted as staging.
+foreach ([
+    'https://www.sabrihomeopathy.com/',
+    'https://sabrihomeopathy.com/',
+    'https://staging.example.test/',
+    'https://sabrisocialstaging.sabrihomeopathy.com.evil.example/',
+    'https://sabrisocialstaging.sabrihomeopathy.com/profile/',
+    'https://sabrisocialstaging.sabrihomeopathy.com:8443/',
+] as $bad_host) {
+    $host_forgery = $complete;
+    $host_forgery['staging_environment']['site_url'] = $bad_host;
+    $check(Visual_Acceptance::validate_evidence($host_forgery) !== [], 'Wrong Staging host accepted: ' . $bad_host);
+    $check((Visual_Acceptance::summarize($host_forgery)['accepted'] ?? true) === false, 'Wrong host cannot claim release acceptance.');
+}
 
 // V12.1 chronology: an older approval cannot authorize a later test.
 // Both timestamps are valid and in the past; it is the order that fails.
