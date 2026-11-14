@@ -39,6 +39,14 @@ tests/v12-3-requirement-traceability.php
 
 
 
+
+## V12.3 continued source execution — 14 November 2026 (Draft PR #50)
+
+- Additional source-only corrections: strict canonical staging host; prevent metadata-only acceptance; Dark profile aliases/Selected token parity; control border contrast and 44px target; 3px keyboard focus and native disclosure target sizing.
+- Independent native repository source freeze for File03/08/09/17/20/21/24/26 shows 4 stale historical references; does not establish deployed compatibility.
+- File25 source asset register covers 8 CSS/JS files and provisional six route budgets. Real Core Web Vitals, staging and File24 acceptance remain blocked.
+- Technical source evidence: `docs/V12.3-FILE25-CONTINUED-EXECUTION-HANDOFF-2026-11-14.md`. Source-only, main and Live untouched.
+
 ## V12.1 PR49 — native-owner Privacy / Provider / REST integration correction (Draft, 11 Nov 2026)
 
 - Six confirmed **source-level** root-cause groups, corrected without merging old PR16's divergent tree: unauthorized member indexing through generic visual filter; forged UI metrics in actual public profile render path; stale/failed Section Provider cache and phantom cap; rejected 500-row Timeline phantom truncation; File09 verified snapshot being mistaken for File03 public professional permission; nested date-based REST false 304.

@@ -3,7 +3,7 @@
   "date": "2026-11-14",
   "governing_source": "Sabri-Website-Master-Plan-V12.3.docx §2.7 and File25 execution plan W10",
   "source_only": true,
-  "asset_binary_source_commit": null,
+  "asset_binary_source_commit": "187cd229c306c6ca577fa1854f8c017b07948f0b",
   "initial_budgets_not_release_acceptance": true,
   "installed_staging_measured": false,
   "actual_route_transfer_measured": false,
@@ -118,7 +118,7 @@
       "field_status": "not_measured"
     }
   ],
-  "next_exact_asset_commit_pending_update": true,
+  "next_exact_asset_commit_pending_update": false,
   "source_visual_control_review": "W03 interactive control border correction: 3:1 required, local Chromium light/dark green",
   "W09_keyboard_focus_source_fixture": "4 preference and 4 disclosure focus targets: Chromium 1px auto -> 3px solid, disclosure 25.59px -> 44.78px (local source fixture)"
 }

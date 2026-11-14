@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — 2026-11-14 — V12.3 extended W03/W08/W09/W10/W11 source corrections (Draft PR #50)
+
+- Fail-closed canonical staging metadata and distinguish File25 metadata validity from File24 independent release approval.
+- Repair inherited Dark profile button aliases and Selected state, interactive functional borders and minimum touch target sizes.
+- Add 3px visible keyboard focus for 4 preference actions + 4 native disclosure summaries; preserve native summary semantics.
+- Freeze current eight native owner GitHub source HEADs, four stale historical references, six provisional route budgets and exact-hash eight source CSS/JS assets.
+- Keep Source CI, Chromium synthetic fixtures, Staging and Live as separate realities; source improvements are not proof of deployed resolution.
+
 ## Unreleased — 2026-11-14 — V12.3 source parity and six-scene acceptance (Draft PR #50)
 
 - V12.3 W00 baseline records GitHub source reality apart from disconnected Jetpack/WPVibe and unknown exact deployed plugin, DB/schema, migration and logs.
