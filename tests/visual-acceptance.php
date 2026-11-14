@@ -20,7 +20,7 @@ $check = static function (bool $condition, string $message) use (&$failures): vo
 $contract = Visual_Acceptance::contract();
 $check(($contract['owner'] ?? '') === 'file-25', 'File 25 must own visual acceptance.');
 $check(($contract['shell_owner'] ?? '') === 'file-20', 'File 20 must remain the shell owner.');
-$check(($contract['contract_version'] ?? '') === '1.5.0', 'Visual acceptance contract version must include V12.1 state evidence.');
+$check(($contract['contract_version'] ?? '') === '1.6.0', 'Visual acceptance contract must include V12.3 six-scene evidence obligations.');
 $check(($contract['green_ci_is_acceptance'] ?? true) === false, 'Green CI must not be treated as visual acceptance.');
 $check(($contract['source_contract_is_acceptance'] ?? true) === false, 'Source contracts must not be treated as visual acceptance.');
 $check(($contract['target_commit_sha_required'] ?? false) === true, 'All evidence must be bound to one target commit.');
@@ -40,6 +40,20 @@ $check(in_array('marketplace-section', (array) ($contract['required_surfaces'] ?
 foreach (['filtered-empty-state', 'permission-denied-state', 'offline-state'] as $requiredV12State) {
     $check(in_array($requiredV12State, (array) ($contract['required_surfaces'] ?? []), true), 'V12-012 visual evidence is mandatory: ' . $requiredV12State);
 }
+$scene_owners = [
+    'scene-home-first-view' => ['file-20', 'file-21', 'file-25'],
+    'scene-search-results' => ['file-20', 'file-26', 'file-25'],
+    'scene-settings-preferences' => ['file-20', 'file-19', 'file-25'],
+    'scene-doctor-booking' => ['file-03', 'file-08', 'file-09', 'file-25'],
+    'scene-book-lesson-reader' => ['file-05', 'file-12', 'file-25'],
+    'scene-publication-composer' => ['file-21', 'file-22', 'file-25'],
+];
+foreach ($scene_owners as $scene => $owners) {
+    $check(in_array($scene, (array)($contract['required_surfaces'] ?? []), true), 'Missing V12.3 mandatory visual scene: ' . $scene);
+    $check(($contract['v12_3_scene_owners'][$scene] ?? []) === $owners, 'Visual ownership must remain distinct: ' . $scene);
+}
+$check(($contract['v12_3_scenes_have_real_artifact_evidence'] ?? true) === false, 'Scene declarations must never assert collected visual artifacts.');
+$check(($contract['v12_3_approval_requires_independent_file24'] ?? false) === true, 'V12.3 visual release must require independent File24 review.');
 $check(in_array('rtl', (array) ($contract['directions'] ?? []), true), 'RTL evidence is required.');
 $check(in_array('forced-colors', (array) ($contract['color_modes'] ?? []), true), 'Forced-colors evidence is required.');
 $check(in_array(400, (array) ($contract['zoom_levels'] ?? []), true), 'Four-hundred-percent zoom evidence is required.');
@@ -112,6 +126,9 @@ foreach ((array) $contract['zoom_levels'] as $zoom) {
 }
 
 $check(Visual_Acceptance::validate_evidence($complete) === [], 'A complete commit-bound evidence manifest must validate.');
+$missing_scene = $complete;
+unset($missing_scene['surfaces']['scene-settings-preferences']);
+$check(Visual_Acceptance::validate_evidence($missing_scene) !== [], 'V12.3 six-scene acceptance must fail if even one scene is missing.');
 $missingV12 = $complete;
 unset($missingV12['surfaces']['permission-denied-state']);
 $check(Visual_Acceptance::validate_evidence($missingV12) !== [], 'A staging manifest missing permission-denied evidence must not be accepted.');
