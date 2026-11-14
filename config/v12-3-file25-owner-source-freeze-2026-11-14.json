@@ -1,0 +1,191 @@
+{
+  "schema": "file25.v12.3.owner_repo_source_freeze.v1",
+  "date": "2026-11-14",
+  "source_only": true,
+  "file25_candidate_parent_sha": "3f1a433d04756e19fc4bc445ef5f2216a19488f6",
+  "owner_count": 8,
+  "changed_old_source_pointers_count": 4,
+  "scope_note": "Main HEAD proves repository truth only. Source headers do not prove installed versions, owner DTO correctness or runtime compatibility.",
+  "no_installed_plugin_assertions": true,
+  "staging_native_acceptance": false,
+  "live_native_acceptance": false,
+  "rows": [
+    {
+      "file_id": "03",
+      "repository": "majidhussainqadri1-dot/03-sabri-profiles-and-doctors",
+      "main_source_sha": "bf317e5521ec79f9f16d21353f402571fcd4f84c",
+      "plugin_header_version": "1.2.0-rc18",
+      "version_evidence": "exact main plugin PHP header/constants",
+      "prior_file25_recorded_source_sha": "636e3ef965423887f810718abec3cd1c11c3659d",
+      "comparison_from_old": {
+        "ahead_commits": 39,
+        "behind_commits": 0,
+        "changed_files": 14
+      },
+      "source_drift_from_record": "ahead",
+      "source_header_checked": true,
+      "source_contract_behavior_accepted": false,
+      "installed_plugin_version": null,
+      "installed_schema_version": null,
+      "live_parity_verified": false,
+      "staging_verified": false,
+      "explicit_known_header_constants": {
+        "db_version": "1.2.0",
+        "profile_contract": "1.4.0",
+        "php_minimum": "8.1"
+      }
+    },
+    {
+      "file_id": "08",
+      "repository": "majidhussainqadri1-dot/08-worldwide-clinic-and-appointments-foundation",
+      "main_source_sha": "d086840f7e2ac0ed328006385f064e0e2fb58cb1",
+      "plugin_header_version": "1.2.16",
+      "version_evidence": "exact main plugin PHP header/constants",
+      "prior_file25_recorded_source_sha": "9dcc8d16ea81d0bbd27184e71bc09ba04d30ba03",
+      "comparison_from_old": {
+        "ahead_commits": 14,
+        "behind_commits": 0,
+        "changed_files": 29
+      },
+      "source_drift_from_record": "ahead",
+      "source_header_checked": true,
+      "source_contract_behavior_accepted": false,
+      "installed_plugin_version": null,
+      "installed_schema_version": null,
+      "live_parity_verified": false,
+      "staging_verified": false,
+      "explicit_known_header_constants": {
+        "public_clinic_contract": "1.1.0"
+      }
+    },
+    {
+      "file_id": "09",
+      "repository": "majidhussainqadri1-dot/09-global-doctor-onboarding-and-verification-completion",
+      "main_source_sha": "8f52f87a6d82fc89c6c78b7da80b474dff916d97",
+      "plugin_header_version": "1.3.0",
+      "version_evidence": "exact main plugin PHP header/constants",
+      "prior_file25_recorded_source_sha": "cfc5f781a766330314dc98c42abeca0eb7786eba",
+      "comparison_from_old": {
+        "ahead_commits": 38,
+        "behind_commits": 0,
+        "changed_files": 19
+      },
+      "source_drift_from_record": "ahead",
+      "source_header_checked": true,
+      "source_contract_behavior_accepted": false,
+      "installed_plugin_version": null,
+      "installed_schema_version": null,
+      "live_parity_verified": false,
+      "staging_verified": false,
+      "explicit_known_header_constants": {
+        "schema_version": "6",
+        "cf01_practitioner_contract": "1.0.0"
+      }
+    },
+    {
+      "file_id": "17",
+      "repository": "majidhussainqadri1-dot/17-sabri-network",
+      "main_source_sha": "8ae656e51796d1f05865d8be5dca2480443d79ca",
+      "plugin_header_version": "2.1.0",
+      "version_evidence": "exact main plugin PHP header/constants",
+      "prior_file25_recorded_source_sha": null,
+      "comparison_from_old": null,
+      "source_drift_from_record": "untracked",
+      "source_header_checked": true,
+      "source_contract_behavior_accepted": false,
+      "installed_plugin_version": null,
+      "installed_schema_version": null,
+      "live_parity_verified": false,
+      "staging_verified": false,
+      "explicit_known_header_constants": {
+        "php_minimum": "8.1"
+      }
+    },
+    {
+      "file_id": "20",
+      "repository": "majidhussainqadri1-dot/20-sabri-unified-application-shell",
+      "main_source_sha": "8a4dbcaf4fef8e926b9b834ecfde16c21a0f00ca",
+      "plugin_header_version": "1.4.17",
+      "version_evidence": "exact main plugin PHP header/constants",
+      "prior_file25_recorded_source_sha": "8a4dbcaf4fef8e926b9b834ecfde16c21a0f00ca",
+      "comparison_from_old": {
+        "ahead_commits": 0,
+        "behind_commits": 0,
+        "changed_files": 0
+      },
+      "source_drift_from_record": "unchanged",
+      "source_header_checked": true,
+      "source_contract_behavior_accepted": false,
+      "installed_plugin_version": null,
+      "installed_schema_version": null,
+      "live_parity_verified": false,
+      "staging_verified": false,
+      "explicit_known_header_constants": {}
+    },
+    {
+      "file_id": "21",
+      "repository": "majidhussainqadri1-dot/sabri-complete-home-news-feed",
+      "main_source_sha": "626b380328d4400014504e679032291cd023bbdb",
+      "plugin_header_version": "1.0.5",
+      "version_evidence": "exact main plugin PHP header/constants",
+      "prior_file25_recorded_source_sha": "f2eb7e95ddea327af36ea725ffb923b029f885e6",
+      "comparison_from_old": {
+        "ahead_commits": 10,
+        "behind_commits": 0,
+        "changed_files": 3
+      },
+      "source_drift_from_record": "ahead",
+      "source_header_checked": true,
+      "source_contract_behavior_accepted": false,
+      "installed_plugin_version": null,
+      "installed_schema_version": null,
+      "live_parity_verified": false,
+      "staging_verified": false,
+      "explicit_known_header_constants": {
+        "runtime_version": "1.0.3",
+        "schema_version": "1.0.0"
+      }
+    },
+    {
+      "file_id": "24",
+      "repository": "majidhussainqadri1-dot/24-sabri-platform-security-privacy-compliance-and-resilience-center",
+      "main_source_sha": "a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb",
+      "plugin_header_version": "0.99.0",
+      "version_evidence": "exact main plugin PHP header/constants",
+      "prior_file25_recorded_source_sha": "a5b8d49968a7a5a7d6f3f4655bea541bf38a9acb",
+      "comparison_from_old": {
+        "ahead_commits": 0,
+        "behind_commits": 0,
+        "changed_files": 0
+      },
+      "source_drift_from_record": "unchanged",
+      "source_header_checked": true,
+      "source_contract_behavior_accepted": false,
+      "installed_plugin_version": null,
+      "installed_schema_version": null,
+      "live_parity_verified": false,
+      "staging_verified": false,
+      "explicit_known_header_constants": {}
+    },
+    {
+      "file_id": "26",
+      "repository": "majidhussainqadri1-dot/26-search-discovery-recommendations-knowledge-graph-classification",
+      "main_source_sha": "1b064c6ea9f81195611ed001d5457e8ced65460a",
+      "plugin_header_version": "1.3.0",
+      "version_evidence": "exact main plugin PHP header/constants",
+      "prior_file25_recorded_source_sha": null,
+      "comparison_from_old": null,
+      "source_drift_from_record": "untracked",
+      "source_header_checked": true,
+      "source_contract_behavior_accepted": false,
+      "installed_plugin_version": null,
+      "installed_schema_version": null,
+      "live_parity_verified": false,
+      "staging_verified": false,
+      "explicit_known_header_constants": {
+        "schema_version": "1.0.0",
+        "search_contract": "1.3"
+      }
+    }
+  ]
+}

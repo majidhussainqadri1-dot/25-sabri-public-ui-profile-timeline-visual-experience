@@ -19,8 +19,8 @@
     {
       "id": "W02",
       "title": "V12.3 light/dark tokens",
-      "state": "source_candidate",
-      "reason": "authored source patch; CI, computed style and File24 pending"
+      "state": "source_browser_pass_file24_pending",
+      "reason": "V12.3 CSS/PHP parity, dark profile alias fixes, synthetic Chromium 45/45; independent File24/installed acceptance pending"
     },
     {
       "id": "W03",
@@ -43,26 +43,26 @@
     {
       "id": "W06",
       "title": "six visual scenes",
-      "state": "source_gate_only",
-      "reason": "Six owner-bounded visual scenes mandatory in contract 1.6.0; real screenshots / File24 acceptance blocked"
+      "state": "source_evidence_gate_only",
+      "reason": "Six-scene visual contract 1.7.0 requires real screenshot bytes; none independently verified"
     },
     {
       "id": "W07",
       "title": "responsive RTL and settings",
-      "state": "blocked",
-      "reason": "real device/viewport/RTL tests pending"
+      "state": "synthetic_browser_pass_runtime_blocked",
+      "reason": "Source fixture passed 45/45 across 5 widths x 3 languages x 3 modes, no installed WordPress/browser device matrix"
     },
     {
       "id": "W08",
       "title": "native integration privacy",
-      "state": "blocked",
-      "reason": "File03/08/09/17/20/21/24/26 installed contract parity pending"
+      "state": "source_repo_frozen_runtime_blocked",
+      "reason": "8 current owner source SHA/header snapshots verified; 4 stale pointers; installed native contracts, DB and File24 acceptance unknown"
     },
     {
       "id": "W09",
       "title": "WCAG 2.2 AA and human UX",
-      "state": "blocked",
-      "reason": "browser/screen readers/human testing pending"
+      "state": "synthetic_browser_partial",
+      "reason": "Actual Chromium computed contrast/keyboard spot-check 45/45, but no assistive/human/WCAG installed acceptance"
     },
     {
       "id": "W10",
@@ -89,7 +89,9 @@
   "migration_state": null,
   "live_verification_status": "UNVERIFIED",
   "live_resolved_defects": 0,
-  "notes": "0 verified means no proof, not absence of defects. No progress percentage certified. Six-scene contract declarations are NOT evidence screenshots.",
+  "notes": "0 verified means no proof, not absence of defects. No progress percentage certified. Six-scene contract declarations are NOT evidence screenshots. W08 new source freeze is NOT installed compatibility or permission validation.",
   "source_traceability_register": "config/v12-3-file25-requirement-traceability.json",
-  "traceability_scope": 14
+  "traceability_scope": 14,
+  "source_owner_freeze_register": "config/v12-3-file25-owner-source-freeze-2026-11-14.json",
+  "last_audited_source_sha": "3f1a433d04756e19fc4bc445ef5f2216a19488f6"
 }
