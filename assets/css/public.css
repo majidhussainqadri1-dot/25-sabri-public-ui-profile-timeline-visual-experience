@@ -3,14 +3,15 @@
     --spux-primary-strong: var(--sabri-visual-primary-strong, #065C3B);
     --spux-primary-soft: var(--sabri-visual-primary-soft, #E7F5EE);
     --spux-on-primary: var(--sabri-visual-on-primary, #FFFFFF);
-    --spux-text: var(--sabri-visual-text, #171717);
-    --spux-muted: var(--sabri-visual-muted, #5f6368);
+    --spux-text: var(--sabri-visual-text, #15251E);
+    --spux-muted: var(--sabri-visual-muted, #4A6155);
     --spux-surface: var(--sabri-visual-surface, #ffffff);
-    --spux-page: var(--sabri-visual-page, #f7f5f1);
-    --spux-border: var(--sabri-visual-border, #dfe2e6);
-    --spux-focus: var(--sabri-visual-focus, #0b57d0);
-    --spux-danger: var(--sabri-visual-danger, #b42318);
-    --spux-warning: var(--sabri-visual-warning, #8a4b08);
+    --spux-page: var(--sabri-visual-page, #F4F7F5);
+    --spux-border: var(--sabri-visual-border, #D6E1DA);
+    --spux-control-border: var(--sabri-visual-control-border, #6B8476);
+    --spux-focus: var(--sabri-visual-focus, #087A4E);
+    --spux-danger: var(--sabri-visual-danger, #9B3B36);
+    --spux-warning: var(--sabri-visual-warning, #664808);
     --spux-radius: var(--sabri-visual-radius-card, 1rem);
     --spux-radius-sm: var(--sabri-visual-radius-control, 0.75rem);
     --spux-shadow: 0 0.25rem 1.25rem rgb(17 17 17 / 8%);
@@ -156,7 +157,7 @@
 
 .spux-button--secondary {
     background: var(--spux-surface);
-    border-color: var(--spux-border);
+    border-color: var(--spux-control-border);
     color: var(--spux-text);
 }
 

@@ -20,6 +20,7 @@
       "tests/staging-probe.php",
       "tests/upgrade-manager.php",
       "tests/design-system.php",
+      "tests/v12-3-design-tokens.php",
       "tests/release-engineering.php",
       "tests/review94-133-forty-round-adversarial.php",
       "tests/review134-173-current-directives.php",
