@@ -249,36 +249,42 @@ if (! function_exists('sabri_public_register_card_variant')) {
     }
 }
 
-function sabri_public_experience_activate(): void
-{
-    try {
-        \Sabri\PublicExperience\Safe_Mode::begin('activation');
-        \Sabri\PublicExperience\Plugin::activate();
-        \Sabri\PublicExperience\Safe_Mode::end();
-    } catch (Throwable $exception) {
-        \Sabri\PublicExperience\Safe_Mode::enable('activation-exception', $exception);
-        \Sabri\PublicExperience\Safe_Mode::end();
-        throw $exception;
+if (! function_exists('sabri_public_experience_activate')) {
+    function sabri_public_experience_activate(): void
+    {
+        try {
+            \Sabri\PublicExperience\Safe_Mode::begin('activation');
+            \Sabri\PublicExperience\Plugin::activate();
+            \Sabri\PublicExperience\Safe_Mode::end();
+        } catch (Throwable $exception) {
+            \Sabri\PublicExperience\Safe_Mode::enable('activation-exception', $exception);
+            \Sabri\PublicExperience\Safe_Mode::end();
+            throw $exception;
+        }
     }
 }
 
-function sabri_public_experience_deactivate(): void
-{
-    try {
-        \Sabri\PublicExperience\Plugin::deactivate();
-    } catch (Throwable $exception) {
-        \Sabri\PublicExperience\Safe_Mode::enable('deactivation-exception', $exception);
+if (! function_exists('sabri_public_experience_deactivate')) {
+    function sabri_public_experience_deactivate(): void
+    {
+        try {
+            \Sabri\PublicExperience\Plugin::deactivate();
+        } catch (Throwable $exception) {
+            \Sabri\PublicExperience\Safe_Mode::enable('deactivation-exception', $exception);
+        }
     }
 }
 
-function sabri_public_experience_bootstrap(): void
-{
-    try {
-        \Sabri\PublicExperience\Plugin::instance()->boot();
-    } catch (Throwable $exception) {
-        \Sabri\PublicExperience\Safe_Mode::enable('bootstrap-exception', $exception);
-        \Sabri\PublicExperience\Safe_Mode::end();
-        \Sabri\PublicExperience\Safe_Mode::register();
+if (! function_exists('sabri_public_experience_bootstrap')) {
+    function sabri_public_experience_bootstrap(): void
+    {
+        try {
+            \Sabri\PublicExperience\Plugin::instance()->boot();
+        } catch (Throwable $exception) {
+            \Sabri\PublicExperience\Safe_Mode::enable('bootstrap-exception', $exception);
+            \Sabri\PublicExperience\Safe_Mode::end();
+            \Sabri\PublicExperience\Safe_Mode::register();
+        }
     }
 }
 
