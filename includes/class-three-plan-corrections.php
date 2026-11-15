@@ -161,8 +161,8 @@ final class Three_Plan_Corrections
     /** @param array<string,mixed> $args */
     public static function render_welcome_panel(array $args = []): string
     {
-        // File 25 must never decide whether the overlay is due. File 20 invokes
-        // this renderer only after its account/cookie/localStorage 30-day gate.
+        // File 25 never decides whether an automatic welcome is due. File 20
+        // alone owns the device-local 30-day gate and route eligibility.
         if (($args['invoked_by_file_20'] ?? false) !== true) {
             return '';
         }
@@ -171,8 +171,9 @@ final class Three_Plan_Corrections
         $message = self::text($args['message'] ?? '', 600);
         $continue_label = self::text($args['continue_label'] ?? 'Continue', 80);
         $close_label = self::text($args['close_label'] ?? 'Close', 80);
+        $skip_label = self::text($args['skip_label'] ?? 'Skip', 80);
         $continue_url = Public_URL::sanitize_same_site($args['continue_url'] ?? home_url('/'));
-        if ($title === '' || $continue_label === '' || $close_label === '' || $continue_url === '') {
+        if ($title === '' || $continue_label === '' || $close_label === '' || $skip_label === '' || $continue_url === '') {
             return '';
         }
 
@@ -185,8 +186,10 @@ final class Three_Plan_Corrections
             . '<h2 id="sabri-welcome-title">' . self::escape_html($title) . '</h2>'
             . $description
             . '<div class="sabri-ui-welcome-panel__actions">'
-            . '<a class="sabri-ui-button sabri-ui-button--primary" href="' . self::escape_url($continue_url) . '">'
+            . '<a class="sabri-ui-button sabri-ui-button--primary" data-sabri-welcome-continue href="' . self::escape_url($continue_url) . '">'
             . self::escape_html($continue_label) . '</a>'
+            . '<button class="sabri-ui-button sabri-ui-button--secondary" type="button" data-sabri-welcome-skip>'
+            . self::escape_html($skip_label) . '</button>'
             . '<button class="sabri-ui-button sabri-ui-button--secondary" type="button" data-sabri-welcome-dismiss>'
             . self::escape_html($close_label) . '</button>'
             . '</div></section>';
