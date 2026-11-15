@@ -172,6 +172,9 @@ final class Three_Plan_Corrections
         $continue_label = self::text($args['continue_label'] ?? 'Continue', 80);
         $close_label = self::text($args['close_label'] ?? 'Close', 80);
         $skip_label = self::text($args['skip_label'] ?? 'Skip', 80);
+        $language = (string) ($args['language'] ?? 'en');
+        if (! in_array($language, ['en', 'ur', 'ar'], true)) { $language = 'en'; }
+        $direction = in_array($language, ['ur', 'ar'], true) ? 'rtl' : 'ltr';
         $continue_url = Public_URL::sanitize_same_site($args['continue_url'] ?? home_url('/'));
         if ($title === '' || $continue_label === '' || $close_label === '' || $skip_label === '' || $continue_url === '') {
             return '';
@@ -181,7 +184,7 @@ final class Three_Plan_Corrections
             ? '<p class="sabri-ui-welcome-panel__message" dir="auto">' . self::escape_html($message) . '</p>'
             : '';
 
-        return '<section class="sabri-ui-welcome-panel" role="region" aria-live="polite" aria-atomic="true" aria-labelledby="sabri-welcome-title"'
+        return '<section class="sabri-ui-welcome-panel" lang="' . self::escape_attr($language) . '" dir="' . self::escape_attr($direction) . '" role="region" aria-live="polite" aria-atomic="true" aria-labelledby="sabri-welcome-title"'
             . ' data-directive="CHAT-UX-001" data-frequency-owner="file-20" data-visual-owner="file-25">'
             . '<h2 id="sabri-welcome-title" dir="auto">' . self::escape_html($title) . '</h2>'
             . $description
