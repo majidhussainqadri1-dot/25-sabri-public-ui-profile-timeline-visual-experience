@@ -42,6 +42,9 @@ jobs:
       - name: Master Plan v3 authoritative-contract reconciliation
         run: php tests/master-plan-reconciliation.php
 
+      - name: Guard File25 real-WordPress bootstrap against self-declared lifecycle functions
+        run: php tests/bootstrap-lifecycle-regression.php
+
       - name: File 18 owner-executed public DTO contract
         run: php tests/file18-marketplace-provider.php
 
