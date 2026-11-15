@@ -184,7 +184,7 @@ final class Three_Plan_Corrections
             ? '<p class="sabri-ui-welcome-panel__message" dir="auto">' . self::escape_html($message) . '</p>'
             : '';
 
-        return '<section class="sabri-ui-welcome-panel" lang="' . self::escape_attr($language) . '" dir="' . self::escape_attr($direction) . '" role="region" aria-live="polite" aria-atomic="true" aria-labelledby="sabri-welcome-title"'
+        return '<section class="sabri-ui-welcome-panel" lang="' . esc_attr($language) . '" dir="' . esc_attr($direction) . '" role="region" aria-live="polite" aria-atomic="true" aria-labelledby="sabri-welcome-title"'
             . ' data-directive="CHAT-UX-001" data-frequency-owner="file-20" data-visual-owner="file-25">'
             . '<h2 id="sabri-welcome-title" dir="auto">' . self::escape_html($title) . '</h2>'
             . $description
