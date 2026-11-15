@@ -181,7 +181,7 @@ final class Three_Plan_Corrections
             ? '<p class="sabri-ui-welcome-panel__message">' . self::escape_html($message) . '</p>'
             : '';
 
-        return '<section class="sabri-ui-welcome-panel" role="region" aria-labelledby="sabri-welcome-title"'
+        return '<section class="sabri-ui-welcome-panel" role="region" aria-live="polite" aria-atomic="true" aria-labelledby="sabri-welcome-title"'
             . ' data-directive="CHAT-UX-001" data-frequency-owner="file-20" data-visual-owner="file-25">'
             . '<h2 id="sabri-welcome-title">' . self::escape_html($title) . '</h2>'
             . $description
