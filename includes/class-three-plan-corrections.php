@@ -178,12 +178,12 @@ final class Three_Plan_Corrections
         }
 
         $description = $message !== ''
-            ? '<p class="sabri-ui-welcome-panel__message">' . self::escape_html($message) . '</p>'
+            ? '<p class="sabri-ui-welcome-panel__message" dir="auto">' . self::escape_html($message) . '</p>'
             : '';
 
         return '<section class="sabri-ui-welcome-panel" role="region" aria-live="polite" aria-atomic="true" aria-labelledby="sabri-welcome-title"'
             . ' data-directive="CHAT-UX-001" data-frequency-owner="file-20" data-visual-owner="file-25">'
-            . '<h2 id="sabri-welcome-title">' . self::escape_html($title) . '</h2>'
+            . '<h2 id="sabri-welcome-title" dir="auto">' . self::escape_html($title) . '</h2>'
             . $description
             . '<div class="sabri-ui-welcome-panel__actions">'
             . '<a class="sabri-ui-button sabri-ui-button--primary" data-sabri-welcome-continue href="' . self::escape_url($continue_url) . '">'
